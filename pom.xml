@@ -15,7 +15,11 @@
     </properties>
 
     <developers>
-
+        <developer>
+            <id>242414</id>
+            <name>Bartłomiej Kałach</name>
+            <email>242414@edu.p.lodz.pl</email>
+        </developer>
     </developers>
 
 </project>
