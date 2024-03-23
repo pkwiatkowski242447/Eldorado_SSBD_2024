@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.config;
+package pl.lodz.p.it.ssbd2024.ssbd03.webconfig;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 

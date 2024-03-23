@@ -21,4 +21,8 @@ public class HelloController {
         return helloService.getHello();
     }
 
+    @GetMapping("/add")
+    public void addTestEnt() {
+        helloService.addTestEnt();
+    }
 }
