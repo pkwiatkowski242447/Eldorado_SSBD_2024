@@ -32,6 +32,9 @@
         <postgres.version>42.6.0</postgres.version>
         <!--Test-->
         <junit.version>5.10.2</junit.version>
+        <!--Logging-->
+        <slf4j.version>2.0.12</slf4j.version>
+        <logback.version>1.4.14</logback.version>
         <!--Lombok-->
         <lombok.version>1.18.30</lombok.version>
         <!--Plugins-->
@@ -164,6 +167,23 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!--Logging-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
         </dependency>
 
         <!--Lombok-->
