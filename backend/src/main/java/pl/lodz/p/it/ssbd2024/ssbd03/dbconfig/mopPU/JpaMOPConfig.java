@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.mokPU;
+package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.mopPU;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +23,10 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableJpaRepositories(
         value = DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN,
-        entityManagerFactoryRef = DatabaseConfigConstants.EMF_MOK,
-        transactionManagerRef = DatabaseConfigConstants.TXM_MOK
+        entityManagerFactoryRef = DatabaseConfigConstants.EMF_MOP,
+        transactionManagerRef = DatabaseConfigConstants.TXM_MOP
 )
-public class JpaMOKConfig {
+public class JpaMOPConfig {
 
     @Value("${hibernate.dialect}")
     private String dialect;
@@ -45,8 +45,8 @@ public class JpaMOKConfig {
     }
 
     ///FIXME
-    @Bean(DatabaseConfigConstants.SF_MOK)
-    public LocalSessionFactoryBean sessionFactory(@Qualifier(DatabaseConfigConstants.DS_MOK) DataSource dataSource) {
+    @Bean(DatabaseConfigConstants.SF_MOP)
+    public LocalSessionFactoryBean sessionFactory(@Qualifier(DatabaseConfigConstants.DS_MOP) DataSource dataSource) {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
@@ -55,19 +55,19 @@ public class JpaMOKConfig {
         return sessionFactory;
     }
 
-    @Bean(DatabaseConfigConstants.EMF_MOK)
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DatabaseConfigConstants.DS_MOK) DataSource dataSource) {
+    @Bean(DatabaseConfigConstants.EMF_MOP)
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DatabaseConfigConstants.DS_MOP) DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setDataSource(dataSource);
-        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.MOK_PU);
+        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.MOP_PU);
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
         entityManagerFactory.setJpaProperties(this.properties());
         return entityManagerFactory;
     }
 
-    @Bean(DatabaseConfigConstants.TXM_MOK)
-    public PlatformTransactionManager transactionManager(@Qualifier(DatabaseConfigConstants.EMF_MOK) LocalContainerEntityManagerFactoryBean factoryBean) {
+    @Bean(DatabaseConfigConstants.TXM_MOP)
+    public PlatformTransactionManager transactionManager(@Qualifier(DatabaseConfigConstants.EMF_MOP) LocalContainerEntityManagerFactoryBean factoryBean) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(factoryBean.getObject());
         return transactionManager;

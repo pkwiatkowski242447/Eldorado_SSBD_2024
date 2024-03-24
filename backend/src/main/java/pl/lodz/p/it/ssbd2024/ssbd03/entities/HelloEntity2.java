@@ -30,6 +30,6 @@ public class HelloEntity2 {
     private Integer age;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime dateTime;
+    private LocalDateTime date;
 }
 

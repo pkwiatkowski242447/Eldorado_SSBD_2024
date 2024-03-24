@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.mokPU;
+package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.mopPU;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,18 +11,18 @@ import javax.sql.DataSource;
 
 @Configuration
 @PropertySource(value = {"classpath:application.properties"})
-public class DataSourceMOKConfig {
+public class DataSourceMOPConfig {
 
     @Value("${jdbc.driverClassName}")
     private String driverClassName;
     @Value("${jdbc.ssbd03.url}")
     private String url;
-    @Value("${jdbc.ssbd03.mok.username}")
+    @Value("${jdbc.ssbd03.mop.username}")
     private String username;
-    @Value("${jdbc.ssbd03.mok.password}")
+    @Value("${jdbc.ssbd03.mop.password}")
     private String password;
 
-    @Bean(DatabaseConfigConstants.DS_MOK)
+    @Bean(DatabaseConfigConstants.DS_MOP)
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(driverClassName);
@@ -32,8 +32,8 @@ public class DataSourceMOKConfig {
         return dataSource;
     }
 
-//    @Bean("jdbcTemplateMOK")
-//    public JdbcTemplate jdbcTemplate(@Qualifier("dataSourceMOK") DataSource dataSource) {
+//    @Bean("jdbcTemplateMOP")
+//    public JdbcTemplate jdbcTemplate(@Qualifier("dataSourceMOP") DataSource dataSource) {
 //        return new JdbcTemplate(dataSource);
 //    }
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.HelloEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.HelloEntity2;
 import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoAdm;
-import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOK;
+import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOP;
 
 import java.time.LocalDateTime;
 
@@ -15,12 +15,12 @@ import java.time.LocalDateTime;
 public class HelloService {
 
     private HelloRepoAdm repoAdm;
-    private HelloRepoMOK repoMOK;
+    private HelloRepoMOP repoMOP;
 
     @Autowired
-    public HelloService(HelloRepoAdm repoAdm, HelloRepoMOK repoMOK) {
+    public HelloService(HelloRepoAdm repoAdm, HelloRepoMOP repoMOP) {
         this.repoAdm = repoAdm;
-        this.repoMOK = repoMOK;
+        this.repoMOP = repoMOP;
     }
 
 
@@ -32,7 +32,7 @@ public class HelloService {
         HelloEntity ent = new HelloEntity(null, "Jan", 20);
         repoAdm.save(ent);
         HelloEntity2 ent2 = new HelloEntity2(null, "Miroslaw", 18, LocalDateTime.now());
-        repoMOK.save(ent2);
+        repoMOP.save(ent2);
     }
 }
 
