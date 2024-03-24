@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.adminPU;
+package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.mokPU;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,14 +23,10 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableJpaRepositories(
         value = DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN,
-        entityManagerFactoryRef = JPAConfig.ENTITY_MANAGER_FACTORY_NAME,
-        transactionManagerRef = JPAConfig.TRANSACTION_MANAGER_FACTORY_NAME
+        entityManagerFactoryRef = DatabaseConfigConstants.EMF_MOK,
+        transactionManagerRef = DatabaseConfigConstants.TXM_MOK
 )
-public class JPAConfig {
-
-    static final String SESSION_FACTORY_NAME = "sessionFactoryAdmin";
-    static final String ENTITY_MANAGER_FACTORY_NAME = "entityManagerFactoryAdmin";
-    static final String TRANSACTION_MANAGER_FACTORY_NAME = "transactionManagerAdmin";
+public class JpaMOKConfig {
 
     @Value("${hibernate.dialect}")
     private String dialect;
@@ -38,22 +34,19 @@ public class JPAConfig {
     private String showSql;
     @Value("${hibernate.format_sql}")
     private String formatSql;
-    @Value("${hibernate.hbm2ddl.auto}")
-    private String hbm2ddlAuto;
 
     private Properties properties() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", dialect);
         properties.put("hibernate.show_sql", showSql);
         properties.put("hibernate.format_sql", formatSql);
-        properties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
 
         return properties;
     }
 
     ///FIXME
-    @Bean(SESSION_FACTORY_NAME)
-    public LocalSessionFactoryBean sessionFactory(@Qualifier(DataSourceConfig.DATA_SOURCE_NAME) DataSource dataSource) {
+    @Bean(DatabaseConfigConstants.SF_MOK)
+    public LocalSessionFactoryBean sessionFactory(@Qualifier(DatabaseConfigConstants.DS_MOK) DataSource dataSource) {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
@@ -62,19 +55,19 @@ public class JPAConfig {
         return sessionFactory;
     }
 
-    @Bean(ENTITY_MANAGER_FACTORY_NAME)
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DataSourceConfig.DATA_SOURCE_NAME) DataSource dataSource) {
+    @Bean(DatabaseConfigConstants.EMF_MOK)
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DatabaseConfigConstants.DS_MOK) DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setDataSource(dataSource);
-        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.ADMIN_PU);
+        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.MOK_PU);
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
         entityManagerFactory.setJpaProperties(this.properties());
         return entityManagerFactory;
     }
 
-    @Bean(TRANSACTION_MANAGER_FACTORY_NAME)
-    public PlatformTransactionManager transactionManager(@Qualifier(ENTITY_MANAGER_FACTORY_NAME) LocalContainerEntityManagerFactoryBean factoryBean) {
+    @Bean(DatabaseConfigConstants.TXM_MOK)
+    public PlatformTransactionManager transactionManager(@Qualifier(DatabaseConfigConstants.EMF_MOK) LocalContainerEntityManagerFactoryBean factoryBean) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(factoryBean.getObject());
         return transactionManager;
