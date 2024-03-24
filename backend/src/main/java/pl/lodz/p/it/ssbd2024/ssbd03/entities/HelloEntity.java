@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03;
+package pl.lodz.p.it.ssbd2024.ssbd03.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

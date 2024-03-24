@@ -24,8 +24,8 @@ public class DatabaseProperties {
     private String driverClassName;
     @Value("${jdbc.url}")
     private String url;
-    @Value("${jdbc.username}")
+    @Value("${jdbc.admin.username}")
     private String username;
-    @Value("${jdbc.password}")
+    @Value("${jdbc.admin.password}")
     private String password;
 }

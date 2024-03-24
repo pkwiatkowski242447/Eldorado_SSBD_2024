@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03;
+package pl.lodz.p.it.ssbd2024.ssbd03.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

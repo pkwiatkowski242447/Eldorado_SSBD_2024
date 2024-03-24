@@ -20,7 +20,7 @@ public class JpaConfiguration {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource, HibernateConfig hibernateConfig) {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setDataSource(dataSource);
-        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.POSTGRES_PU);
+        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.ADMIN_PU);
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
         entityManagerFactory.setJpaProperties(hibernateConfig.properties());

@@ -23,7 +23,7 @@ public class DataSourceConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean
+    @Bean("dataSourceAdmin")
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(dbProperties.getDriverClassName());
