@@ -19,7 +19,6 @@ public class HelloRepoMOP {
 
     @Transactional(DatabaseConfigConstants.TXM_MOP)
     public void save(HelloEntity2 ent) {
-        LOGGER.info("USING PU: " + entityManager.getEntityManagerFactory().getProperties().get("hibernate.ejb.persistenceUnitName"));
         entityManager.persist(ent);
     }
 }
