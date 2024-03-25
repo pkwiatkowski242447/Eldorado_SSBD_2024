@@ -8,12 +8,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.HelloEntity;
 
 @Repository
-public class HelloRepoAdm {
+public class HelloRepoMOK {
 
-    @PersistenceContext(unitName=DatabaseConfigConstants.ADMIN_PU)
+    @PersistenceContext(unitName=DatabaseConfigConstants.MOK_PU)
     private EntityManager entityManager;
 
-    @Transactional("transactionManagerAdmin")
+    @Transactional(DatabaseConfigConstants.TXM_MOK)
     public void save(HelloEntity ent) {
         entityManager.persist(ent);
     }

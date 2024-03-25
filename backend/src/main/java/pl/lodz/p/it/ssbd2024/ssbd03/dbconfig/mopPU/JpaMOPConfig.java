@@ -44,17 +44,6 @@ public class JpaMOPConfig {
         return properties;
     }
 
-    ///FIXME
-    @Bean(DatabaseConfigConstants.SF_MOP)
-    public LocalSessionFactoryBean sessionFactory(@Qualifier(DatabaseConfigConstants.DS_MOP) DataSource dataSource) {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource);
-        sessionFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
-        sessionFactory.setHibernateProperties(this.properties());
-
-        return sessionFactory;
-    }
-
     @Bean(DatabaseConfigConstants.EMF_MOP)
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DatabaseConfigConstants.DS_MOP) DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();

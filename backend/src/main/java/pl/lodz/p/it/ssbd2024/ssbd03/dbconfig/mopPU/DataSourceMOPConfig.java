@@ -31,9 +31,4 @@ public class DataSourceMOPConfig {
         dataSource.setPassword(password);
         return dataSource;
     }
-
-//    @Bean("jdbcTemplateMOP")
-//    public JdbcTemplate jdbcTemplate(@Qualifier("dataSourceMOP") DataSource dataSource) {
-//        return new JdbcTemplate(dataSource);
-//    }
 }
