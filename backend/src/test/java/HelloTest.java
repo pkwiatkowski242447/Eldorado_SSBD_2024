@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import pl.lodz.p.it.ssbd2024.ssbd03.HelloService;
+import pl.lodz.p.it.ssbd2024.ssbd03.web.HelloService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
