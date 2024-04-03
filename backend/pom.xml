@@ -28,6 +28,8 @@
         <!--Hibernate-->
         <hibernate.version>6.4.4.Final</hibernate.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <!--Hikari-->
+        <hikari.version>5.1.0</hikari.version>
         <!--Postgres-->
         <postgres.version>42.6.0</postgres.version>
         <!--Test-->
@@ -146,6 +148,12 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
+        </dependency>
+        <!--Hikari-->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikari.version}</version>
         </dependency>
 
         <!--Postgres-->
