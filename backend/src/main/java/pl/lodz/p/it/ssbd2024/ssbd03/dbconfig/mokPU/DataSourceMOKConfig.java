@@ -23,16 +23,8 @@ public class DataSourceMOKConfig {
     private String username;
     @Value("${jdbc.ssbd03.mok.password}")
     private String password;
-
-//    @Bean(DatabaseConfigConstants.DS_MOK)
-//    public DataSource dataSource() {
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName(driverClassName);
-//        dataSource.setUrl(url);
-//        dataSource.setUsername(username);
-//        dataSource.setPassword(password);
-//        return dataSource;
-//    }
+    @Value("${jdbc.ssbd03.mok.max_pool_size}")
+    private Integer maxPoolSize;
 
     @Bean(DatabaseConfigConstants.DS_MOK)
     public DataSource dataSource(){
@@ -42,7 +34,7 @@ public class DataSourceMOKConfig {
         hikariConfig.setUsername(username);
         hikariConfig.setPassword(password);
 
-        hikariConfig.setMaximumPoolSize(2);
+        hikariConfig.setMaximumPoolSize(maxPoolSize);
         hikariConfig.setConnectionTestQuery("SELECT 1");
         hikariConfig.setPoolName("MOK_HIKARI_CP");
 
