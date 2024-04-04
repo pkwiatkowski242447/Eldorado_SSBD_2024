@@ -34,7 +34,4 @@ public abstract class UserLevel extends AbstractEntity implements Serializable {
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     private Account account;
 
-    @Column(name = "level",  nullable = false, updatable = false, length = 16)
-    @Setter(AccessLevel.NONE)
-    private String level;
 }

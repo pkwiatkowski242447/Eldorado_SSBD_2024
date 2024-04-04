@@ -9,11 +9,11 @@ import lombok.ToString;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "admin_data")
-@DiscriminatorValue("ADMIN")
+@Table(name = "staff_data")
+@DiscriminatorValue("STAFF")
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Admin extends UserLevel implements Serializable {
+public class Staff extends UserLevel implements Serializable {
     private static final long serialVersionUID = 1L;
 
 }
