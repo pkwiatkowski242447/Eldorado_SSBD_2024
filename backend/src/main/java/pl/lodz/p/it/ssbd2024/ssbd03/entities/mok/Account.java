@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,7 @@ import lombok.Setter;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -50,6 +53,23 @@ public class Account extends AbstractEntity {
     @ToString.Exclude
     ///TODO rozwazyc zmiane na Set
     private Collection<UserLevel> userLevels = new ArrayList<>();
+
+    @Column(name = "last_successful_login_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime lastSuccessfulLoginTime;
+
+    @Column(name = "last_successful_login_ip", length = 17)
+    private String lastSuccessfulLoginIp;
+
+    @Column(name = "last_unsuccessful_login_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime lastUnsuccessfulLoginTime;
+
+    @Column(name = "last_unsuccessful_login_ip", length = 17)
+    private String lastUnsuccessfulLoginIp;
+
+    @Column(name = "language", length = 16)
+    private String accountLanguage;
 
     public Account(String login, String password, String name, String lastname, String email) {
         this.login = login;
