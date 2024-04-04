@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.adminPU;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +23,22 @@ public class DataSourceAdminConfig {
     private String username;
     @Value("${jdbc.ssbd03.admin.password}")
     private String password;
+    @Value("${jdbc.ssbd03.admin.max_pool_size}")
+    private Integer maxPoolSize;
 
     @Bean(DatabaseConfigConstants.DS_ADMIN)
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setDriverClassName(driverClassName);
+        hikariConfig.setJdbcUrl(url);
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
+
+        hikariConfig.setMaximumPoolSize(maxPoolSize);
+        hikariConfig.setConnectionTestQuery("SELECT 1");
+        hikariConfig.setPoolName("ADMIN_HIKARI_CP");
+
+        return new HikariDataSource(hikariConfig);
     }
 
 }
