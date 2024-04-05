@@ -6,11 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
 
@@ -24,7 +21,7 @@ import java.util.Properties;
 @EnableJpaRepositories(
         value = DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN,
         entityManagerFactoryRef = DatabaseConfigConstants.EMF_MOK,
-        transactionManagerRef = DatabaseConfigConstants.TXM_MOK
+        transactionManagerRef = DatabaseConfigConstants.TXM
 )
 public class JpaMOKConfig {
 
@@ -34,12 +31,15 @@ public class JpaMOKConfig {
     private String showSql;
     @Value("${hibernate.format_sql}")
     private String formatSql;
+    @Value("hibernate.transaction.jta.platform")
+    private String transactionJtaPlatform;
 
     private Properties properties() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", dialect);
         properties.put("hibernate.show_sql", showSql);
         properties.put("hibernate.format_sql", formatSql);
+        properties.put("hibernate.transaction.jta.platform", transactionJtaPlatform);
 
         return properties;
     }
@@ -53,12 +53,5 @@ public class JpaMOKConfig {
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
         entityManagerFactory.setJpaProperties(this.properties());
         return entityManagerFactory;
-    }
-
-    @Bean(DatabaseConfigConstants.TXM_MOK)
-    public PlatformTransactionManager transactionManager(@Qualifier(DatabaseConfigConstants.EMF_MOK) LocalContainerEntityManagerFactoryBean factoryBean) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(factoryBean.getObject());
-        return transactionManager;
     }
 }

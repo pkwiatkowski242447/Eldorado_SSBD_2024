@@ -28,8 +28,5 @@ public class DatabaseConfigConstants {
 
 
     // Transaction managers
-    public static final String TXM_ADMIN = "transactionManagerAdmin";
-    public static final String TXM_MOK = "transactionManagerMOK";
-    public static final String TXM_MOP = "transactionManagerMOP";
-
+    public static final String TXM = "transactionManager";
 }

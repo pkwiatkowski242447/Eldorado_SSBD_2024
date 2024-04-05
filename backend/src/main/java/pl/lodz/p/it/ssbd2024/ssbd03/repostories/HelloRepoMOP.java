@@ -2,10 +2,10 @@ package pl.lodz.p.it.ssbd2024.ssbd03.repostories;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.HelloEntity2;
 
@@ -17,7 +17,7 @@ public class HelloRepoMOP {
     @PersistenceContext(unitName= DatabaseConfigConstants.MOP_PU)
     private EntityManager entityManager;
 
-    @Transactional(DatabaseConfigConstants.TXM_MOP)
+    @Transactional
     public void save(HelloEntity2 ent) {
         entityManager.persist(ent);
     }

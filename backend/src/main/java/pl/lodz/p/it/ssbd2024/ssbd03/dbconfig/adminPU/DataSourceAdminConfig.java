@@ -1,15 +1,12 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.adminPU;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import org.postgresql.xa.PGXADataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
-
-import javax.sql.DataSource;
 
 @Configuration
 @PropertySource(value = {"classpath:application.properties"})
@@ -27,18 +24,19 @@ public class DataSourceAdminConfig {
     private Integer maxPoolSize;
 
     @Bean(DatabaseConfigConstants.DS_ADMIN)
-    public DataSource dataSource() {
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setDriverClassName(driverClassName);
-        hikariConfig.setJdbcUrl(url);
-        hikariConfig.setUsername(username);
-        hikariConfig.setPassword(password);
+    public AtomikosDataSourceBean dataSource() {
+        PGXADataSource pgxaDataSource = new PGXADataSource();
+        pgxaDataSource.setUrl(url);
+        pgxaDataSource.setUser(username);
+        pgxaDataSource.setPassword(password);
 
-        hikariConfig.setMaximumPoolSize(maxPoolSize);
-        hikariConfig.setConnectionTestQuery("SELECT 1");
-        hikariConfig.setPoolName("ADMIN_HIKARI_CP");
+        AtomikosDataSourceBean dataSource = new AtomikosDataSourceBean();
+        dataSource.setXaDataSource(pgxaDataSource);
+        dataSource.setMaxPoolSize(maxPoolSize);
+        dataSource.setTestQuery("SELECT 1");
+        dataSource.setUniqueResourceName("ADMIN_ATOMIKOS_CP");
 
-        return new HikariDataSource(hikariConfig);
+        return dataSource;
     }
 
 }
