@@ -23,7 +23,6 @@ public class HelloService {
         this.repoMOP = repoMOP;
     }
 
-
     public String getHello() {
         return "Hello World";
     }

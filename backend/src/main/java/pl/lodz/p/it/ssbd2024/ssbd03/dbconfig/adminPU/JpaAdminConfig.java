@@ -1,17 +1,13 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.adminPU;
 
-import jakarta.annotation.sql.DataSourceDefinition;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
 
@@ -25,7 +21,7 @@ import java.util.Properties;
 @EnableJpaRepositories(
         value = DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN,
         entityManagerFactoryRef = DatabaseConfigConstants.EMF_ADMIN,
-        transactionManagerRef = DatabaseConfigConstants.TXM_ADMIN
+        transactionManagerRef = DatabaseConfigConstants.TXM
 )
 public class JpaAdminConfig {
 
@@ -37,6 +33,10 @@ public class JpaAdminConfig {
     private String formatSql;
     @Value("${hibernate.hbm2ddl.auto}")
     private String hbm2ddlAuto;
+    @Value("hibernate.transaction.jta.platform")
+    private String transactionJtaPlatform;
+    @Value("${hibernate.hbm2ddl.import_files}")
+    private String importFiles;
 
     private Properties properties() {
         Properties properties = new Properties();
@@ -44,6 +44,8 @@ public class JpaAdminConfig {
         properties.put("hibernate.show_sql", showSql);
         properties.put("hibernate.format_sql", formatSql);
         properties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
+        properties.put("hibernate.transaction.jta.platform", transactionJtaPlatform);
+        properties.put("hibernate.hbm2ddl.import_files", importFiles);
 
         return properties;
     }
@@ -57,12 +59,5 @@ public class JpaAdminConfig {
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
         entityManagerFactory.setJpaProperties(this.properties());
         return entityManagerFactory;
-    }
-
-    @Bean(DatabaseConfigConstants.TXM_ADMIN)
-    public PlatformTransactionManager transactionManager(@Qualifier(DatabaseConfigConstants.EMF_ADMIN) LocalContainerEntityManagerFactoryBean factoryBean) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(factoryBean.getObject());
-        return transactionManager;
     }
 }
