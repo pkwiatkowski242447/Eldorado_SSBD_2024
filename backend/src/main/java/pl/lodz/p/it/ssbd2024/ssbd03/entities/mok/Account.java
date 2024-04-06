@@ -68,7 +68,8 @@ public class Account extends AbstractEntity {
     @Column(name = "last_unsuccessful_login_ip", length = 17)
     private String lastUnsuccessfulLoginIp;
 
-    @Column(name = "language", length = 16)
+    @Column(name = "language", nullable = false, length = 16)
+    ///TODO rozwazyc tabele slownikowa
     private String accountLanguage;
 
     public Account(String login, String password, String name, String lastname, String email) {
@@ -81,5 +82,9 @@ public class Account extends AbstractEntity {
 
     public void addUserLevel(UserLevel userLevel) {
         userLevels.add(userLevel);
+    }
+
+    public void removeUserLevel(UserLevel userLevel) {
+        userLevels.remove(userLevel);
     }
 }
