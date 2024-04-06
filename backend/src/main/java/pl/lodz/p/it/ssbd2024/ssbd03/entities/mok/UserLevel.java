@@ -31,8 +31,8 @@ public abstract class UserLevel extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
     private Account account;
 
 }

@@ -51,6 +51,7 @@ public class Account extends AbstractEntity {
 
     @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
+    @Setter(AccessLevel.NONE)
     ///TODO rozwazyc zmiane na Set
     private Collection<UserLevel> userLevels = new ArrayList<>();
 
