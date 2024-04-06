@@ -30,7 +30,7 @@ public class Account extends AbstractEntity {
     @Setter(AccessLevel.NONE)
     private String login;
 
-    @Column(name = "password", nullable = false, length = 64)
+    @Column(name = "password", nullable = false, length = 60)
     @ToString.Exclude
     private String password;
 
