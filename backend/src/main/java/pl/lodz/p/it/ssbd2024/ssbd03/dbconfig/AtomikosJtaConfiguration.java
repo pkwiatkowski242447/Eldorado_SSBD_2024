@@ -11,9 +11,11 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 @Configuration
+@EnableTransactionManagement
 public class AtomikosJtaConfiguration {
 
     @Bean
@@ -25,32 +27,27 @@ public class AtomikosJtaConfiguration {
         return hibernateJpaVendorAdapter;
     }
 
-    @Bean(name = "userTransaction")
+    @Bean(name = "atomikosUserTransaction")
     public UserTransaction userTransaction() throws Throwable {
         UserTransactionImp userTransactionImp = new UserTransactionImp();
         userTransactionImp.setTransactionTimeout(10000);
+        AtomikosJtaPlatform.transaction = userTransactionImp;
         return userTransactionImp;
     }
 
-    @Bean(name = "atomikosTransactionManager", initMethod = "init", destroyMethod = "close")
-    public TransactionManager atomikosTransactionManager() throws Throwable {
+    @Bean(name = "atomikosTransactionManager")
+    public TransactionManager atomikosTransactionManager() {
         UserTransactionManager userTransactionManager = new UserTransactionManager();
         userTransactionManager.setForceShutdown(false);
-
         AtomikosJtaPlatform.transactionManager = userTransactionManager;
-
         return userTransactionManager;
     }
 
     @Bean(name = DatabaseConfigConstants.TXM)
-    @DependsOn({"userTransaction", "atomikosTransactionManager"})
+    @DependsOn({"atomikosUserTransaction", "atomikosTransactionManager"})
     public PlatformTransactionManager transactionManager() throws Throwable {
         UserTransaction userTransaction = userTransaction();
-
-        AtomikosJtaPlatform.transaction = userTransaction;
-
         TransactionManager atomikosTransactionManager = atomikosTransactionManager();
-
         return new JtaTransactionManager(userTransaction, atomikosTransactionManager);
     }
 }

@@ -16,5 +16,6 @@ public class HelloRepoMOK {
     @Transactional
     public void save(HelloEntity ent) {
         entityManager.persist(ent);
+        entityManager.flush();
     }
 }

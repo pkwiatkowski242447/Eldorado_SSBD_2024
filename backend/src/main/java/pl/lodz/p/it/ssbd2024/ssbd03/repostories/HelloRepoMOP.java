@@ -20,5 +20,6 @@ public class HelloRepoMOP {
     @Transactional
     public void save(HelloEntity2 ent) {
         entityManager.persist(ent);
+        entityManager.flush();
     }
 }
