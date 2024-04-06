@@ -32,9 +32,10 @@ public class Reservation extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    ///TODO persist ?xd
+    ///FIXME do analizy, indeks z null??
+    ///oraz czy moze zostac tu kaskada PERSIST?
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @JoinColumn(name = "client_id", referencedColumnName = "id", updatable = false)
     @Setter(AccessLevel.NONE)
     private Client client;
 
@@ -42,9 +43,6 @@ public class Reservation extends AbstractEntity implements Serializable {
     @JoinColumn(name = "sector_id", referencedColumnName = "id", nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private Sector sector;
-
-    @Column(name = "duration")
-    private Integer duration;
 
     @Column(name = "begin_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -54,7 +52,6 @@ public class Reservation extends AbstractEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endTime;
 
-    ///FIXME przemyslec
     @OneToMany(mappedBy = "reservation", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     @Setter(AccessLevel.NONE)

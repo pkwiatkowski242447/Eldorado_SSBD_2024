@@ -25,29 +25,24 @@ public class Parking extends AbstractEntity {
     @Embedded
     private Address address;
 
-    ///FIXME kaskada REMOVE raczej nie powinna tu wystapic cnie?
-    @OneToMany(mappedBy = "parking", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "parking", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
     @Setter(AccessLevel.NONE)
     private List<Sector> sectors = new ArrayList<>();
 
-    ///FIXME boolean czy void
-    public boolean addSector(String... args) {
+    public void addSector(String... args) {
         ///TODO implement
-        return false;
     }
 
-    public boolean deleteSector(String sectorName) {
+    public void deleteSector(String sectorName) {
         ///TODO implement
-        return false;
     }
 
-    public boolean assignClient() {
+    public void assignClient() {
         ///TODO implement
-        return false;
     }
 
-    public void changeSectorWeight(String sectorName, Double newWeight) {
+    public void changeSectorWeight(String sectorName, Integer newWeight) {
         ///TODO implement
     }
 }

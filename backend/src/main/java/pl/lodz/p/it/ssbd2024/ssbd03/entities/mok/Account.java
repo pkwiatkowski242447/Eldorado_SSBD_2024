@@ -55,6 +55,7 @@ public class Account extends AbstractEntity {
     ///TODO rozwazyc zmiane na Set
     private Collection<UserLevel> userLevels = new ArrayList<>();
 
+    ///TODO na embeded
     @Column(name = "last_successful_login_time")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime lastSuccessfulLoginTime;

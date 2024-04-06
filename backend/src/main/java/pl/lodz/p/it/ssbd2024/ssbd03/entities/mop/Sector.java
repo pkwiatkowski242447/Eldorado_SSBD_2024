@@ -44,10 +44,9 @@ public class Sector extends AbstractEntity implements Serializable {
     @Column(name = "max_places", nullable = false)
     private Integer maxPlaces;
 
-    @Column(name = "places", nullable = false)
-    private Integer places = 0;
+    @Column(name = "available_places", nullable = false)
+    private Integer availablePlaces = 0;
 
     @Column(name = "weight", nullable = false)
-    ///FIXME przemyslec zmiane typu wagi
-    private Double weight;
+    private Integer weight;
 }
