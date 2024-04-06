@@ -8,7 +8,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
 
 import javax.sql.DataSource;
@@ -17,11 +16,9 @@ import java.util.Properties;
 
 @Configuration
 @PropertySource(value = {"classpath:application.properties"})
-@EnableTransactionManagement
 @EnableJpaRepositories(
         value = DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN,
-        entityManagerFactoryRef = DatabaseConfigConstants.EMF_MOP,
-        transactionManagerRef = DatabaseConfigConstants.TXM
+        entityManagerFactoryRef = DatabaseConfigConstants.EMF_MOP
 )
 public class JpaMOPConfig {
 
@@ -31,15 +28,12 @@ public class JpaMOPConfig {
     private String showSql;
     @Value("${hibernate.format_sql}")
     private String formatSql;
-    @Value("hibernate.transaction.jta.platform")
-    private String transactionJtaPlatform;
 
     private Properties properties() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", dialect);
         properties.put("hibernate.show_sql", showSql);
         properties.put("hibernate.format_sql", formatSql);
-        properties.put("hibernate.transaction.jta.platform", transactionJtaPlatform);
 
         return properties;
     }
@@ -47,7 +41,7 @@ public class JpaMOPConfig {
     @Bean(DatabaseConfigConstants.EMF_MOP)
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DatabaseConfigConstants.DS_MOP) DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
-        entityManagerFactory.setDataSource(dataSource);
+        entityManagerFactory.setJtaDataSource(dataSource);
         entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.MOP_PU);
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
