@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 @Table(name = "parking_event")
 @ToString(callSuper = true)
 @NoArgsConstructor
-@Getter @Setter
 public class ParkingEvent extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -33,13 +32,16 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
 
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "reservation_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @Getter
     private Reservation reservation;
 
     @Column(name = "date")
     @Temporal(TemporalType.TIMESTAMP)
+    @Getter @Setter
     private LocalDateTime date;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Getter @Setter
     private EventType type;
 }

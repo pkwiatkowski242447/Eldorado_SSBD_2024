@@ -27,7 +27,6 @@ import java.util.List;
 @Table(name = "reservation")
 @ToString(callSuper = true)
 @NoArgsConstructor
-@Getter @Setter
 public class Reservation extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -36,24 +35,26 @@ public class Reservation extends AbstractEntity implements Serializable {
     ///oraz czy moze zostac tu kaskada PERSIST?
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "client_id", referencedColumnName = "id", updatable = false)
-    @Setter(AccessLevel.NONE)
+    @Getter
     private Client client;
 
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "sector_id", referencedColumnName = "id", nullable = false, updatable = false)
-    @Setter(AccessLevel.NONE)
+    @Getter
     private Sector sector;
 
     @Column(name = "begin_time")
     @Temporal(TemporalType.TIMESTAMP)
+    @Getter @Setter
     private LocalDateTime beginTime;
 
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
+    @Getter @Setter
     private LocalDateTime endTime;
 
     @OneToMany(mappedBy = "reservation", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
-    @Setter(AccessLevel.NONE)
+    @Getter
     private List<ParkingEvent> parkingEvents = new ArrayList<>();
 }

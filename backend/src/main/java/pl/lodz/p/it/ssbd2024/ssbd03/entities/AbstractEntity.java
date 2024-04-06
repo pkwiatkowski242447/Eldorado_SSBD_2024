@@ -14,16 +14,16 @@ import java.util.UUID;
 
 @MappedSuperclass
 @ToString
-@EqualsAndHashCode
-@Getter
 public class AbstractEntity {
     @Id
     @Column(name = "id", columnDefinition = "UUID", unique = true, nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Getter
     private UUID id;
 
     @Version
     @Column(name = "version", nullable = false)
     @EqualsAndHashCode.Exclude
+    @Getter
     private Long version;
 }

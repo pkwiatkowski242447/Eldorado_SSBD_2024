@@ -19,7 +19,6 @@ import java.io.Serializable;
 @DiscriminatorValue("CLIENT")
 @ToString(callSuper = true)
 @NoArgsConstructor
-@Getter @Setter
 public class Client extends UserLevel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -28,5 +27,6 @@ public class Client extends UserLevel implements Serializable {
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Getter @Setter
     private ClientType type = ClientType.BASIC;
 }

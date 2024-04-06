@@ -2,20 +2,17 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,53 +21,48 @@ import java.util.Collection;
 @SecondaryTable(name = "personal_data")
 @ToString(callSuper = true)
 @NoArgsConstructor
-@Getter @Setter
 public class Account extends AbstractEntity {
     @Column(name = "login", unique = true, nullable = false, updatable = false, length = 32)
-    @Setter(AccessLevel.NONE)
+    @Getter
     private String login;
 
     @Column(name = "password", nullable = false, length = 60)
     @ToString.Exclude
+    @Getter @Setter
     private String password;
 
     @Column(name = "verified", nullable = false)
+    @Getter @Setter
     private boolean verified = false;
 
     @Column(name = "active", nullable = false)
+    @Getter @Setter
     private boolean active = true;
 
     @Column(name = "name", table = "personal_data", nullable = false, length = 32)
+    @Getter @Setter
     private String name;
 
     @Column(name = "lastname", table = "personal_data", nullable = false, length = 32)
+    @Getter @Setter
     private String lastname;
 
     @Column(name = "email", table = "personal_data", nullable = false, length = 64)
+    @Getter @Setter
     private String email;
 
     @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
-    @Setter(AccessLevel.NONE)
-    ///TODO rozwazyc zmiane na Set
+    @Getter
+    ///TODO rozwazyc zmiane na Set<>
     private Collection<UserLevel> userLevels = new ArrayList<>();
 
-    ///TODO na embeded
-    @Column(name = "last_successful_login_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime lastSuccessfulLoginTime;
-
-    @Column(name = "last_successful_login_ip", length = 17)
-    private String lastSuccessfulLoginIp;
-
-    @Column(name = "last_unsuccessful_login_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime lastUnsuccessfulLoginTime;
-
-    @Column(name = "last_unsuccessful_login_ip", length = 17)
-    private String lastUnsuccessfulLoginIp;
+    @Embedded
+    @Getter @Setter
+    private ActivityLog activityLog;
 
     @Column(name = "language", nullable = false, length = 16)
+    @Getter @Setter
     ///TODO rozwazyc tabele slownikowa
     private String accountLanguage;
 

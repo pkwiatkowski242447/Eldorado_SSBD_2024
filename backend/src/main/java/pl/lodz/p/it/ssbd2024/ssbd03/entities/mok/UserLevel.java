@@ -26,13 +26,13 @@ import java.io.Serializable;
 @DiscriminatorColumn(name = "level", discriminatorType = DiscriminatorType.STRING)
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter @Setter
 public abstract class UserLevel extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @Getter @Setter
     private Account account;
 
 }

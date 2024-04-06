@@ -55,7 +55,6 @@ public class JpaAdminConfig {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setDataSource(dataSource);
         entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.ADMIN_PU);
-        ///TODO atomicos vendor???
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
         entityManagerFactory.setJpaProperties(this.properties());
