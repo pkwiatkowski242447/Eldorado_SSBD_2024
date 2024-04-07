@@ -1,10 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "parking")
+@Table(name = "parking", uniqueConstraints = {@UniqueConstraint(columnNames = {"city", "zip_code","street"})})
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Parking extends AbstractEntity {
