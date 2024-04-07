@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Admin extends UserLevel implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
 }

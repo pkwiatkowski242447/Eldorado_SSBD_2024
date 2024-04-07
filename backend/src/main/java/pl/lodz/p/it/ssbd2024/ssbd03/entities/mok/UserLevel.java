@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
@@ -18,6 +17,7 @@ import lombok.Setter;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -26,12 +26,13 @@ import java.io.Serializable;
 @DiscriminatorColumn(name = "level", discriminatorType = DiscriminatorType.STRING)
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter @Setter
 public abstract class UserLevel extends AbstractEntity implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @JoinColumn(name = "account_id", referencedColumnName = "id", updatable = false)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @Getter @Setter
     private Account account;
 
 }
