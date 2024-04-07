@@ -33,11 +33,11 @@ public class Account extends AbstractEntity {
 
     @Column(name = "verified", nullable = false)
     @Getter @Setter
-    private boolean verified = false;
+    private Boolean verified = false;
 
     @Column(name = "active", nullable = false)
     @Getter @Setter
-    private boolean active = true;
+    private Boolean active = true;
 
     @Column(name = "name", table = "personal_data", nullable = false, length = 32)
     @Getter @Setter

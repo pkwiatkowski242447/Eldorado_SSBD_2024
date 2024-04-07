@@ -20,7 +20,7 @@ public class Address implements Serializable {
     @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "zipCode", nullable = false, length = 6)
+    @Column(name = "zip_code", nullable = false, length = 6)
     // XX-XXX pattern
     private String zipCode;
 
