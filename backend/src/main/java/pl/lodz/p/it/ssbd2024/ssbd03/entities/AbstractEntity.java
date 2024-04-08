@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @MappedSuperclass
 @ToString
-public class AbstractEntity {
+public class AbstractEntity implements Signable {
     @Id
     @Column(name = "id", columnDefinition = "UUID", unique = true, nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
