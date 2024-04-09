@@ -28,11 +28,12 @@ public class Parking extends AbstractEntity {
     private List<Sector> sectors = new ArrayList<>();
 
     public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
-        ///TODO implement
+        sectors.add(new Sector(this,name,type,maxPlaces,weight));
     }
 
     public void deleteSector(String sectorName) {
-        ///TODO implement
+        //Replace sector list with the list without the specified sector
+        sectors = sectors.stream().filter(sector -> !sector.getName().equals(sectorName)).toList();
     }
 
     public void assignClient() {
