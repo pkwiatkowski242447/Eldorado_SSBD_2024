@@ -7,12 +7,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -66,12 +70,23 @@ public class Account extends AbstractEntity {
     ///TODO rozwazyc tabele slownikowa
     private String accountLanguage;
 
-    public Account(String login, String password, String name, String lastname, String email) {
+    @Column(name = "phone_number", nullable = false, length = 16)
+    @Getter @Setter
+    private String phoneNumber;
+
+    @Column(name = "creation_date", nullable = false, updatable = false)
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Getter
+    private LocalDateTime creationDate;
+
+    public Account(String login, String password, String name, String lastname, String email, String phoneNumber) {
         this.login = login;
         this.password = password;
         this.name = name;
         this.lastname = lastname;
         this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
     public void addUserLevel(UserLevel userLevel) {

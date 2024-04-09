@@ -11,7 +11,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 @Table(name = "token")
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Token extends AbstractEntity{
+public class Token extends AbstractEntity {
+    public static enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
+
     @Column(name = "token_value", unique = true, nullable = false)
     @Getter @Setter
     private String tokenValue;
@@ -20,8 +22,6 @@ public class Token extends AbstractEntity{
     @ToString.Exclude
     @Getter
     private Account account;
-
-    public static enum TokenType {RESET_PASSWORD}
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
