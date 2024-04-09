@@ -1,13 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +12,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "sector")
+@Table(name = "sector", uniqueConstraints = {@UniqueConstraint(columnNames = {"parking_id", "name"})})
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Sector extends AbstractEntity implements Serializable {
@@ -33,7 +26,7 @@ public class Sector extends AbstractEntity implements Serializable {
     @Getter
     private Parking parking;
 
-    @Column(name = "name", unique = true, nullable = false, length = 5)
+    @Column(name = "name", nullable = false, length = 5)
     @Getter @Setter
     private String name;
 

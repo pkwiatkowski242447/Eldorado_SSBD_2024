@@ -17,6 +17,11 @@ public class HelloController {
     }
 
     @GetMapping
+    public String getEmpty() {
+        return "";
+    }
+
+    @GetMapping("/a")
     public String getHello() {
         return helloService.getHello();
     }

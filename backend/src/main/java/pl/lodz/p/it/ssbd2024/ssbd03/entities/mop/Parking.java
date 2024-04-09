@@ -11,6 +11,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "parking", uniqueConstraints = {@UniqueConstraint(columnNames = {"city", "zip_code","street"})})
@@ -22,7 +23,7 @@ public class Parking extends AbstractEntity {
     @Getter @Setter
     private Address address;
 
-    @OneToMany(mappedBy = "parking", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToMany(mappedBy = "parking", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
     @ToString.Exclude
     @Getter
     private List<Sector> sectors = new ArrayList<>();
@@ -33,7 +34,7 @@ public class Parking extends AbstractEntity {
 
     public void deleteSector(String sectorName) {
         //Replace sector list with the list without the specified sector
-        sectors = sectors.stream().filter(sector -> !sector.getName().equals(sectorName)).toList();
+        sectors = sectors.stream().filter(sector -> !sector.getName().equals(sectorName)).collect(Collectors.toList());
     }
 
     public void assignClient() {

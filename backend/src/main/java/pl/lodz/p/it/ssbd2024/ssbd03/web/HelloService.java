@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.web;
 
+import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOK;
 import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOP;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @NoArgsConstructor
@@ -23,6 +25,8 @@ public class HelloService {
 
     private ParkingFacade parkingFacade;
 
+    private Parking parkingSer;
+
     @Autowired
     public HelloService(HelloRepoMOK repoMOK, HelloRepoMOP repoMOP, ParkingFacade parkingFacade) {
         this.repoMOK = repoMOK;
@@ -31,11 +35,28 @@ public class HelloService {
 
         Parking parking = getTestParking("a");
         parkingFacade.create(parking);
+//        Parking parking1 = getTestParking("b");
+//        parkingFacade.create(parking1);
+        parkingSer = parking;
 
-        System.out.println(parkingFacade.find(parking.getId()).orElse(null).getId());
+        System.out.println("asd ID 1 parkingu: "+parkingFacade.find(parking.getId()).orElse(null).getId());
+        System.out.println("asd liczba parkingow 1: "+parkingFacade.findAll().size());
+        System.out.println("asd liczba sektorow w parkingu: "+parkingFacade.findAndRefresh(parking.getId()).orElse(null).getSectors().size());
     }
 
+    @Transactional
     public String getHello() {
+
+        Parking parking = parkingFacade.find(parkingSer.getId()).orElse(null);
+        System.out.println("asd liczba sektorow: " + parking.getSectors().size());
+
+        parkingFacade.removeSector(parking.getSectors().get(0));
+        System.out.println("usunieto");
+        //parking = parkingFacade.findAndRefresh(parking.getId()).orElse(null);
+        System.out.println("asd liczba sektorow w bazie po parkingu: " + parking.getSectors().size());
+//
+//        parkingFacade.remove(parking1);
+//        System.out.println("asd liczba parkingow po probie usuniecia: "+parkingFacade.findAll().size());
         return "Hello World";
     }
 
