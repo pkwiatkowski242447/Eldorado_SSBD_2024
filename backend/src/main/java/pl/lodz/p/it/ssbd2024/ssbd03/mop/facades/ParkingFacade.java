@@ -2,7 +2,6 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.SecondaryTable;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -62,9 +61,31 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     @Transactional
-    public List<Parking> findWithPagination(int pageNumber, int pageSize){
+    public List<Parking> findAllWithPagination(int page, int pageSize, boolean showOnlyActive){
         return getEntityManager().createNamedQuery("Parking.findAll")
-                .setFirstResult(pageNumber * pageSize)
+                .setFirstResult(page * pageSize)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setMaxResults(pageSize)
+                .getResultList();
+    }
+
+    @Transactional
+    public List<Parking> findParkingsBySectorTypes(List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive){
+        return getEntityManager().
+                createNamedQuery("Parking.findBySectorTypes")
+                .setParameter("sectorTypes", sectorTypes)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(page * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+    }
+
+    @Transactional
+    public List<Parking> findParkingWithAvailablePlaces( int page, int pageSize, boolean showOnlyActive){
+        return getEntityManager().
+                createNamedQuery("Parking.findWithAvailablePlaces")
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
     }
@@ -97,10 +118,31 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     @Transactional
-    public List<Sector> findSectorsInParkingWithPagination(UUID parkingId,int pageNumber, int pageSize){
+    public List<Sector> findSectorsInParkingWithPagination(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
         return getEntityManager().createNamedQuery("Sector.findAllInParking")
                 .setParameter("parkingId", parkingId)
-                .setFirstResult(pageNumber * pageSize)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(page * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+    }
+
+    @Transactional
+    public List<Sector> findSectorInParkingWithAvailablePlaces(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
+        return  getEntityManager().createNamedQuery("Sector.findWithAvailablePlaces")
+                .setParameter("parkingId",parkingId)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(page * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+    }
+
+    @Transactional
+    public List<Sector> findSectorInParkingBySectorTypes(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
+        return  getEntityManager().createNamedQuery("Sector.findBySectorTypes")
+                .setParameter("parkingId",parkingId)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
     }

@@ -20,18 +20,8 @@ public class HelloController {
     }
 
     @GetMapping
-    public String getEmpty() {
-        return "";
-    }
-
-    @GetMapping("/a")
     public String getHello() {
         return helloService.getHello();
-    }
-
-    @GetMapping("/b")
-    public String getHello2(@RequestParam(name = "parkingId") UUID parkingId, @RequestParam(name = "pageNumber") int pageNumber, @RequestParam(name = "pageSize") int pageSize) {
-        return helloService.getHello2(parkingId,pageNumber,pageSize);
     }
 
     @GetMapping("/add")

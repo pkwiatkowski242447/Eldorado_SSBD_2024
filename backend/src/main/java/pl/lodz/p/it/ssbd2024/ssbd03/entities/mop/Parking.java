@@ -20,7 +20,27 @@ import java.util.stream.Collectors;
 @NamedQueries({
         @NamedQuery(
                 name = "Parking.findAll",
-                query = "SELECT p FROM Parking p"
+                query = """
+                        SELECT s.parking FROM Sector s
+                        WHERE (:showOnlyActive != true OR s.weight>0)
+                        GROUP BY s.parking
+                        ORDER BY s.parking.address.city, s.parking.address.city"""
+        ),
+        @NamedQuery(
+          name = "Parking.findBySectorTypes",
+          query = """
+                  SELECT s.parking FROM Sector s
+                  WHERE s.type IN :sectorTypes AND (:showOnlyActive != true OR s.weight>0)
+                  GROUP BY s.parking
+                  ORDER BY s.parking.address.city, s.parking.address.city"""
+        ),
+        @NamedQuery(
+                name = "Parking.findWithAvailablePlaces",
+                query = """
+                        SELECT s.parking FROM Sector s 
+                        WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0) 
+                        GROUP BY s.parking 
+                        ORDER BY s.parking.address.city, s.parking.address.city"""
         )
 })
 public class Parking extends AbstractEntity {

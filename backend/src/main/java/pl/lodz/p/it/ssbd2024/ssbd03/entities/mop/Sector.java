@@ -18,7 +18,24 @@ import java.io.Serializable;
 @NamedQueries({
         @NamedQuery(
                 name = "Sector.findAllInParking",
-                query = "SELECT s FROM Sector s WHERE s.parking.id = :parkingId"
+                query = """
+                        SELECT s FROM Sector s
+                        WHERE s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight>0)
+                        ORDER BY s.name"""
+        ),
+        @NamedQuery(
+                name = "Sector.findWithAvailablePlaces",
+                query = """
+                        SELECT s FROM Sector s
+                        WHERE s.availablePlaces != 0 AND s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight>0)
+                        ORDER BY s.name"""
+        ),
+        @NamedQuery(
+                name = "Sector.findBySectorTypes",
+                query = """
+                        SELECT s FROM Sector s 
+                        WHERE s.type IN :sectorTypes AND :parkingId = s.parking AND (:showOnlyActive != true OR s.weight>0) 
+                        ORDER BY s.parking.address.city, s.parking.address.city"""
         )
 })
 public class Sector extends AbstractEntity implements Serializable {
