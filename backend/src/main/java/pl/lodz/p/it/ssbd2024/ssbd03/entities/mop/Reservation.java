@@ -5,11 +5,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,13 +28,30 @@ import java.util.List;
 @Table(name = "reservation")
 @ToString(callSuper = true)
 @NoArgsConstructor
+
+@NamedQueries({
+        @NamedQuery(
+                name = "Reservation.findActiveReservations",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.endTime IS NULL OR CURRENT_DATE < r.endTime
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findHistoricalReservations",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.endTime IS NOT NULL OR CURRENT_DATE >= r.endTime
+                        ORDER BY r.beginTime"""
+        )
+}
+)
+
 public class Reservation extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    ///FIXME do analizy, indeks z null??
-    ///oraz czy moze zostac tu kaskada PERSIST?
-    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "client_id", referencedColumnName = "id", updatable = false)
     @Getter
     private Client client;
@@ -45,16 +63,29 @@ public class Reservation extends AbstractEntity implements Serializable {
 
     @Column(name = "begin_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter @Setter
+    @Getter
+    @Setter
+    ///FIXME setter? chyba lepiej dac do konstruktora
     private LocalDateTime beginTime;
 
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter @Setter
+    @Getter
+    @Setter
+    ///FIXME ten setter imo konieczny dla wjazdu bez uprzedniej rezerwacji
     private LocalDateTime endTime;
 
     @OneToMany(mappedBy = "reservation", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     @Getter
     private List<ParkingEvent> parkingEvents = new ArrayList<>();
+
+    public Reservation(Client client, Sector sector) {
+        this.client = client;
+        this.sector = sector;
+    }
+
+    public Reservation(Sector sector) {
+        this(null, sector);
+    }
 }

@@ -17,8 +17,14 @@ public class HelloController {
     }
 
     @GetMapping
-    public String getHello() {
-        return helloService.getHello();
+    public String home() {
+        return "Sweet home";
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        helloService.getTest();
+        return "Good";
     }
 
     @GetMapping("/add")

@@ -51,7 +51,7 @@ public class Account extends AbstractEntity {
     @Getter @Setter
     private String lastname;
 
-    @Column(name = "email", table = "personal_data", nullable = false, length = 64)
+    @Column(name = "email", table = "personal_data", unique = true, nullable = false, length = 64)
     @Getter @Setter
     private String email;
 

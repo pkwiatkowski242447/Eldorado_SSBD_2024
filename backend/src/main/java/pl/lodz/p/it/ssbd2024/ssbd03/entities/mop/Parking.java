@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "parking", uniqueConstraints = {@UniqueConstraint(columnNames = {"city", "zip_code","street"})})
+@Table(name = "parking", uniqueConstraints = {@UniqueConstraint(columnNames = {"city", "zip_code", "street"})})
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Parking extends AbstractEntity {
@@ -28,7 +28,7 @@ public class Parking extends AbstractEntity {
     private List<Sector> sectors = new ArrayList<>();
 
     public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
-        ///TODO implement
+        sectors.add(new Sector(this, name, type, maxPlaces, weight));
     }
 
     public void deleteSector(String sectorName) {
