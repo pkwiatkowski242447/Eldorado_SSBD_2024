@@ -15,13 +15,19 @@ import java.io.Serializable;
 @Table(name = "sector", uniqueConstraints = {@UniqueConstraint(columnNames = {"parking_id", "name"})})
 @ToString(callSuper = true)
 @NoArgsConstructor
+@NamedQueries({
+        @NamedQuery(
+                name = "Sector.findAllInParking",
+                query = "SELECT s FROM Sector s WHERE s.parking.id = :parkingId"
+        )
+})
 public class Sector extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
     public static enum SectorType {COVERED, UNCOVERED, UNDERGROUND}
 
-    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "parking_id", referencedColumnName = "id", nullable = false, updatable = false)
     @Getter
     private Parking parking;

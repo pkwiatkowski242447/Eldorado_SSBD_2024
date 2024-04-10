@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOK;
 import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOP;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,31 +34,43 @@ public class HelloService {
         this.repoMOP = repoMOP;
         this.parkingFacade = parkingFacade;
 
+        for(int i=0; i<5; i++){
+            parkingFacade.create(getTestParking(String.valueOf(i)));
+        }
+
         Parking parking = getTestParking("a");
         parkingFacade.create(parking);
 //        Parking parking1 = getTestParking("b");
 //        parkingFacade.create(parking1);
         parkingSer = parking;
 
-        System.out.println("asd ID 1 parkingu: "+parkingFacade.find(parking.getId()).orElse(null).getId());
-        System.out.println("asd liczba parkingow 1: "+parkingFacade.findAll().size());
-        System.out.println("asd liczba sektorow w parkingu: "+parkingFacade.findAndRefresh(parking.getId()).orElse(null).getSectors().size());
+//        System.out.println("asd ID 1 parkingu: "+parkingFacade.find(parking.getId()).orElse(null).getId());
+//        System.out.println("asd liczba parkingow 1: "+parkingFacade.findAll().size());
+//        System.out.println("asd liczba sektorow w parkingu: "+parkingFacade.findAndRefresh(parking.getId()).orElse(null).getSectors().size());
     }
 
     @Transactional
     public String getHello() {
-
         Parking parking = parkingFacade.find(parkingSer.getId()).orElse(null);
-        System.out.println("asd liczba sektorow: " + parking.getSectors().size());
 
-        parkingFacade.removeSector(parking.getSectors().get(0));
-        System.out.println("usunieto");
-        //parking = parkingFacade.findAndRefresh(parking.getId()).orElse(null);
-        System.out.println("asd liczba sektorow w bazie po parkingu: " + parking.getSectors().size());
-//
-//        parkingFacade.remove(parking1);
-//        System.out.println("asd liczba parkingow po probie usuniecia: "+parkingFacade.findAll().size());
+        Sector sector = parking.getSectors().getFirst();
+        sector.setName("s11");
+        parkingFacade.editSector(sector);
+
         return "Hello World";
+    }
+
+    @Transactional
+    public String getHello2(UUID parkingId, int pageNumber, int pageSize) {
+        StringBuilder sb = new StringBuilder();
+
+        List<Sector> sectors = parkingFacade.findSectorsInParkingWithPagination(parkingId, pageNumber,pageSize);
+        sectors.forEach((sector -> {
+            sb.append(sector.toString()).append('\n');
+        }));
+        System.out.println("test");
+        System.out.println(sb.toString());
+        return sb.toString();
     }
 
     public void addTestEnt() {

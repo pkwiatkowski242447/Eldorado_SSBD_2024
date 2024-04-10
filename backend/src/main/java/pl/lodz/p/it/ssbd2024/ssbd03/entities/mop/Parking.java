@@ -17,6 +17,12 @@ import java.util.stream.Collectors;
 @Table(name = "parking", uniqueConstraints = {@UniqueConstraint(columnNames = {"city", "zip_code","street"})})
 @ToString(callSuper = true)
 @NoArgsConstructor
+@NamedQueries({
+        @NamedQuery(
+                name = "Parking.findAll",
+                query = "SELECT p FROM Parking p"
+        )
+})
 public class Parking extends AbstractEntity {
 
     @Embedded
