@@ -16,6 +16,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(
@@ -26,6 +27,33 @@ import java.util.List;
 )
 @ToString(callSuper = true)
 @NoArgsConstructor
+@NamedQueries({
+        @NamedQuery(
+                name = "Parking.findAll",
+                query = """
+                        SELECT s.parking FROM Sector s
+                        WHERE (:showOnlyActive != true OR s.weight>0)
+                        GROUP BY s.parking
+                        ORDER BY s.parking.address.city, s.parking.address.city"""
+        ),
+        @NamedQuery(
+          name = "Parking.findBySectorTypes",
+          query = """
+                  SELECT s.parking FROM Sector s
+                  WHERE s.type IN :sectorTypes AND (:showOnlyActive != true OR s.weight>0)
+                  GROUP BY s.parking
+                  ORDER BY s.parking.address.city, s.parking.address.city"""
+        ),
+        @NamedQuery(
+                name = "Parking.findWithAvailablePlaces",
+                query = """
+                        SELECT s.parking FROM Sector s 
+                        WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0) 
+                        GROUP BY s.parking 
+                        ORDER BY s.parking.address.city, s.parking.address.city"""
+        )
+})
+
 @Getter
 public class Parking extends AbstractEntity {
 
@@ -42,11 +70,12 @@ public class Parking extends AbstractEntity {
     private List<Sector> sectors = new ArrayList<>();
 
     public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
-        ///TODO implement
+        sectors.add(new Sector(this,name,type,maxPlaces,weight));
     }
 
     public void deleteSector(String sectorName) {
-        ///TODO implement
+        //Replace sector list with the list without the specified sector
+        sectors = sectors.stream().filter(sector -> !sector.getName().equals(sectorName)).collect(Collectors.toList());
     }
 
     public void assignClient() {

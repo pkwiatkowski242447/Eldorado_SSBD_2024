@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
+import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +26,29 @@ import java.io.Serializable;
 @Table(name = DatabaseConsts.SECTOR_TABLE)
 @ToString(callSuper = true)
 @NoArgsConstructor
+@NamedQueries({
+        @NamedQuery(
+                name = "Sector.findAllInParking",
+                query = """
+                        SELECT s FROM Sector s
+                        WHERE s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight>0)
+                        ORDER BY s.name"""
+        ),
+        @NamedQuery(
+                name = "Sector.findWithAvailablePlaces",
+                query = """
+                        SELECT s FROM Sector s
+                        WHERE s.availablePlaces != 0 AND s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight>0)
+                        ORDER BY s.name"""
+        ),
+        @NamedQuery(
+                name = "Sector.findBySectorTypes",
+                query = """
+                        SELECT s FROM Sector s 
+                        WHERE s.type IN :sectorTypes AND :parkingId = s.parking AND (:showOnlyActive != true OR s.weight>0) 
+                        ORDER BY s.parking.address.city, s.parking.address.city"""
+        )
+})
 public class Sector extends AbstractEntity implements Serializable {
 
     @Serial
