@@ -59,6 +59,15 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     @Transactional
+    public List<Reservation> findActiveReservationsWithPagination(int page, int pageSize) {
+        return getEntityManager()
+                .createQuery("Reservation.findActiveReservations")
+                .setFirstResult(page * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+    }
+
+    @Transactional
     @Override
     public int count() {
         return super.count();

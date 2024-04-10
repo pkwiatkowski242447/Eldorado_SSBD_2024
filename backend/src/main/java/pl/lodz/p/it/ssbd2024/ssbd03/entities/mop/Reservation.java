@@ -34,14 +34,14 @@ import java.util.List;
                 name = "Reservation.findActiveReservations",
                 query = """
                         SELECT r FROM Reservation r
-                        WHERE r.endTime IS NULL OR CURRENT_DATE < r.endTime
+                        WHERE r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime
                         ORDER BY r.beginTime"""
         ),
         @NamedQuery(
                 name = "Reservation.findHistoricalReservations",
                 query = """
                         SELECT r FROM Reservation r
-                        WHERE r.endTime IS NOT NULL OR CURRENT_DATE >= r.endTime
+                        WHERE r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime
                         ORDER BY r.beginTime"""
         )
 }
