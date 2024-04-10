@@ -31,22 +31,39 @@ import java.util.List;
 
 @NamedQueries({
         @NamedQuery(
+                name = "Reservation.findAll",
+                query = """
+                        SELECT r FROM Reservation r
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
                 name = "Reservation.findActiveReservations",
                 query = """
                         SELECT r FROM Reservation r
-                        WHERE r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime
+                        WHERE r.client.id = :clientId
+                          AND r.beginTime <= CURRENT_TIMESTAMP
+                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
                         ORDER BY r.beginTime"""
         ),
         @NamedQuery(
                 name = "Reservation.findHistoricalReservations",
                 query = """
                         SELECT r FROM Reservation r
-                        WHERE r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime
+                        WHERE r.client.id = :clientId
+                          AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findSectorReservations",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.sector.id = :sectorId
+                          AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
                         ORDER BY r.beginTime"""
         )
 }
 )
-
+///TODO co z przyszlymi rezerwacjami?
 public class Reservation extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -63,15 +80,13 @@ public class Reservation extends AbstractEntity implements Serializable {
 
     @Column(name = "begin_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter
-    @Setter
+    @Getter @Setter
     ///FIXME setter? chyba lepiej dac do konstruktora
     private LocalDateTime beginTime;
 
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter
-    @Setter
+    @Getter @Setter
     ///FIXME ten setter imo konieczny dla wjazdu bez uprzedniej rezerwacji
     private LocalDateTime endTime;
 

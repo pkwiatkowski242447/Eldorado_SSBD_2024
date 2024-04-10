@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.web;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -12,8 +13,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.ReservationFacade;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
+@Slf4j
 public class HelloService {
 
     private final ReservationFacade reservationFacade;
@@ -25,26 +29,18 @@ public class HelloService {
 
     @Transactional
     public void getTest() {
-        Account account = new Account("Adas13", "@#12d]x1", "Adam", "Tom", "adam@example.com", "100100100");
-        account.setAccountLanguage("PL");
+        System.out.println("TST_ACT_FIRST: " + reservationFacade.findActiveReservations(UUID.fromString("69507c7f-4c03-4087-85e6-3ae3b6fc2201")));
+        System.out.println("TST_HIST_FIRST: " + reservationFacade.findHistoricalReservations(UUID.fromString("69507c7f-4c03-4087-85e6-3ae3b6fc2201")));
 
-        var clientLevel = new Client();
-        clientLevel.setAccount(account);
-        account.addUserLevel(clientLevel);
-        Parking parking = new Parking();
-        parking.setAddress(new Address("Boat City", "00-000", "Sloneczna"));
-        parking.addSector("S1", Sector.SectorType.COVERED, 20, 1);
-        parking.addSector("S2", Sector.SectorType.UNCOVERED, 20, 2);
-        parking.addSector("S3", Sector.SectorType.UNDERGROUND, 20, 3);
+        System.out.println("TST_ACT_SECOND: " + reservationFacade.findActiveReservations(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c")));
+        System.out.println("TST_HIST_SECOND: " + reservationFacade.findHistoricalReservations(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c")));
 
-        System.out.println(parking.getSectors().size());
-
-        Reservation reservation = new Reservation(clientLevel, parking.getSectors().getFirst());
-
-        reservation.setBeginTime(LocalDateTime.now());
-        reservation.setEndTime(LocalDateTime.now().plusHours(2));
-
-        reservationFacade.create(reservation);
+        //Pagination
+        System.out.println("TST_HIST_PAG11: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 1, 1));
+        System.out.println("TST_HIST_PAG21: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 2, 1));
+        System.out.println("TST_HIST_PAG12: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 1, 2));
+        System.out.println("TST_HIST_PAG01: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 0, 1));
+        System.out.println("TST_HIST_PAG02: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 0, 2));
     }
 
     public void addTestEnt() {
