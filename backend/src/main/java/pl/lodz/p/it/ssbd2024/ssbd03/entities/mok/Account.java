@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
@@ -96,12 +97,25 @@ public class Account extends AbstractEntity {
     @Setter
     private String accountLanguage;
 
-    public Account(String login, String password, String name, String lastname, String email) {
+    @NotBlank(message = AccountMessages.PHONE_NUMBER_BLANK)
+    @Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
+    @Column(name = DatabaseConsts.ACCOUNT_PHONE_NUMBER_COLUMN, nullable = false, length = 32)
+    @Getter @Setter
+    private String phoneNumber;
+
+    @Column(name = DatabaseConsts.ACCOUNT_CREATION_DATE_COLUMN, nullable = false, updatable = false)
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Getter
+    private LocalDateTime creationDate;
+
+    public Account(String login, String password, String name, String lastname, String email, String phoneNumber) {
         this.login = login;
         this.password = password;
         this.name = name;
         this.lastname = lastname;
         this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
     public void addUserLevel(UserLevel userLevel) {

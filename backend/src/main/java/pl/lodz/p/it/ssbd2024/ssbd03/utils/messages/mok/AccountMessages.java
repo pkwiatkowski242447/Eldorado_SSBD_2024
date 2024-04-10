@@ -33,4 +33,7 @@ public class AccountMessages {
 
     public static final String LANGUAGE_BLANK = "Specified language setting could not be null, empty nor consist only of whitespace characters.";
     public static final String LANGUAGE_REGEX_NOT_MET = "Specified language setting does not match regex.";
+
+    public static final String PHONE_NUMBER_BLANK = "Phone number could not be null, empty or consist of whitespace characters.";
+    public static final String PHONE_NUMBER_REGEX_NOT_MET = "Specified phone number is not a valid phone number.";
 }

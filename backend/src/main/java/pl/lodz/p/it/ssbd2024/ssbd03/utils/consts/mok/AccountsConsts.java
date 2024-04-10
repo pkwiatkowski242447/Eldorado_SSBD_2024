@@ -23,4 +23,6 @@ public class AccountsConsts {
     public static final int USER_LEVEL_MAX_SIZE = 3;
 
     public static final String LANGUAGE_REGEX = "^[A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?$";
+
+    public static final String PHONE_NUMBER_REGEX = "^(?<!\\w)(\\(?(\\+|00)?48\\)?)?[ -]?\\d{3}[ -]?\\d{3}[ -]?\\d{3}(?!\\w)$";
 }

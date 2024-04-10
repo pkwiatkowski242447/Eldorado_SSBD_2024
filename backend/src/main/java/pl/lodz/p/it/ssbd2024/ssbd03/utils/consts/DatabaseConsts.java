@@ -24,6 +24,8 @@ public class DatabaseConsts {
     public static final String ACCOUNT_BLOCKED_COLUMN = "blocked";
     public static final String ACCOUNT_BLOCKED_TIME_COLUMN = "blocked_timestamp";
     public static final String ACCOUNT_LANGUAGE_COLUMN = "language";
+    public static final String ACCOUNT_PHONE_NUMBER_COLUMN = "phone_number";
+    public static final String ACCOUNT_CREATION_DATE_COLUMN = "creation_date";
 
     public static final String ACCOUNT_LAST_SUCCESSFUL_LOGIN_TIME = "last_successful_login_time";
     public static final String ACCOUNT_LAST_SUCCESSFUL_LOGIN_IP = "last_successful_login_ip";
