@@ -66,41 +66,49 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     @Transactional
     public List<Reservation> findAllWithPagination(int page, int pageSize) {
-        return getEntityManager()
+        var list = getEntityManager()
                 .createNamedQuery("Reservation.findAll", Reservation.class)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAll(list);
+        return list;
     }
 
     @Transactional
     public List<Reservation> findActiveReservationsWithPagination(UUID clientId, int page, int pageSize) {
-        return getEntityManager()
+        var list = getEntityManager()
                 .createNamedQuery("Reservation.findActiveReservations", Reservation.class)
                 .setParameter("clientId", clientId)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAll(list);
+        return list;
     }
 
     @Transactional
     public List<Reservation> findHistoricalReservationsWithPagination(UUID clientId, int page, int pageSize) {
-        return getEntityManager()
+        var list = getEntityManager()
                 .createNamedQuery("Reservation.findHistoricalReservations", Reservation.class)
                 .setParameter("clientId", clientId)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAll(list);
+        return list;
     }
 
     @Transactional
     public List<Reservation> findSectorReservationsWithPagination(UUID sectorId, int page, int pageSize) {
-        return getEntityManager()
+        var list = getEntityManager()
                 .createNamedQuery("Reservation.findSectorReservations", Reservation.class)
                 .setParameter("sectorId", sectorId)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAll(list);
+        return list;
     }
 
     @Transactional

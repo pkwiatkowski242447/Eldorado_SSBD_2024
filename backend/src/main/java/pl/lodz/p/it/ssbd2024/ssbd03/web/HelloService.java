@@ -9,7 +9,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.HelloEntity2;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOK;
 import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOP;
 
