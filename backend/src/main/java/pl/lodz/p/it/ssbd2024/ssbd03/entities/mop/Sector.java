@@ -62,7 +62,7 @@ public class Sector extends AbstractEntity implements Serializable {
     @Getter
     private Parking parking;
 
-    @Pattern(regexp = SectorConsts.SECTOR_NAME_PATTERN, message = SectorMessages.SECTOR_REGEX_NOT_MET)
+    //@Pattern(regexp = SectorConsts.SECTOR_NAME_PATTERN, message = SectorMessages.SECTOR_REGEX_NOT_MET)
     @Size(min = SectorConsts.SECTOR_NAME_LENGTH, max = SectorConsts.SECTOR_NAME_LENGTH, message = SectorMessages.SECTOR_NAME_INVALID)
     @Column(name = DatabaseConsts.SECTOR_NAME_COLUMN, unique = true, nullable = false, length = 5)
     @Getter @Setter

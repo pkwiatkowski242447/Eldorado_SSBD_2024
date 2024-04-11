@@ -64,13 +64,13 @@ public class Parking extends AbstractEntity {
 
     @NotNull(message = ParkingMessages.LIST_OF_SECTORS_NULL)
     @Size(min = ParkingConsts.LIST_OF_SECTORS_MIN_SIZE, message = ParkingMessages.LIST_OF_SECTORS_EMPTY)
-    @Size(min = ParkingConsts.LIST_OF_SECTORS_MAX_SIZE, message = ParkingMessages.LIST_OF_SECTORS_FULL)
+    @Size(max = ParkingConsts.LIST_OF_SECTORS_MAX_SIZE, message = ParkingMessages.LIST_OF_SECTORS_FULL)
     @OneToMany(mappedBy = DatabaseConsts.PARKING_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
     private List<Sector> sectors = new ArrayList<>();
 
     public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
-        sectors.add(new Sector(this,name,type,maxPlaces,weight));
+        sectors.add(new Sector(this, name, type, maxPlaces, weight));
     }
 
     public void deleteSector(String sectorName) {

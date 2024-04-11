@@ -25,7 +25,7 @@ import java.util.Collection;
 @NamedQueries({
         // General queries
         @NamedQuery(
-                name = "Account.findAccountByLogin",
+                name = "Account.findByLogin",
                 query = """
                         SELECT a FROM Account a
                         WHERE a.login = :login
@@ -221,7 +221,7 @@ public class Account extends AbstractEntity {
     @Email(message = AccountMessages.EMAIL_NOT_MET)
     @Size(min = AccountsConsts.EMAIL_MIN_LENGTH, message = AccountMessages.EMAIL_TOO_SHORT)
     @Size(max = AccountsConsts.EMAIL_MAX_LENGTH, message = AccountMessages.EMAIL_TOO_LONG)
-    @Column(name = DatabaseConsts.PERSONAL_DATA_EMAIL_COLUMN, table = DatabaseConsts.PERSONAL_DATA_TABLE, nullable = false, length = 64)
+    @Column(name = DatabaseConsts.PERSONAL_DATA_EMAIL_COLUMN, table = DatabaseConsts.PERSONAL_DATA_TABLE, unique = true, nullable = false, length = 64)
     @Setter
     private String email;
 

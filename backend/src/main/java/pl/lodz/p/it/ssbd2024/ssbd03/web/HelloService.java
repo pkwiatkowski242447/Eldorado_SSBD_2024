@@ -1,12 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.web;
 
+import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.HelloEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.HelloEntity2;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOK;
 import pl.lodz.p.it.ssbd2024.ssbd03.repostories.HelloRepoMOP;
 
@@ -20,11 +19,12 @@ public class HelloService {
     private HelloRepoMOP repoMOP;
 
     @Autowired
-    public HelloService(HelloRepoMOK repoMOK, HelloRepoMOP repoMOP, AccountMOKFacade accountMOKFacade, AccountMOPFacade accountMOPFacade) {
+    public HelloService(HelloRepoMOK repoMOK, HelloRepoMOP repoMOP) {
         this.repoMOK = repoMOK;
         this.repoMOP = repoMOP;
     }
 
+    @Transactional
     public String getHello() {
         return "Hello World";
     }
@@ -36,4 +36,3 @@ public class HelloService {
         repoMOP.save(ent2);
     }
 }
-

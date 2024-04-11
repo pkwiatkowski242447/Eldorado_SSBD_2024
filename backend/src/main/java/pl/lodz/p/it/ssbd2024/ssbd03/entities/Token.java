@@ -12,6 +12,35 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 @Table(name = DatabaseConsts.TOKEN_TABLE)
 @ToString(callSuper = true)
 @NoArgsConstructor
+@NamedQueries({
+        @NamedQuery(
+                name = "Token.findByTypeAndAccount",
+                query = """
+                        SELECT t FROM Token t
+                        WHERE t.type = :tokenType AND t.account.id = :accountId"""
+        ),
+        @NamedQuery(
+                name = "Token.removeByAccount",
+                query = """
+                        DELETE FROM Token t
+                        WHERE t.account.id = :accountId"""
+        ),
+        @NamedQuery(
+                name = "Token.removeByTypeAndAccount",
+                query = """
+                        DELETE FROM Token t
+                        WHERE t.type = :tokenType AND t.account.id = :accountId"""
+        ),
+        @NamedQuery(
+                name = "Token.findByTokenValue",
+                query = """
+                        SELECT t FROM Token t
+                        WHERE t.tokenValue = :tokenValue"""
+
+
+        )
+})
+
 public class Token extends AbstractEntity {
     public static enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
 

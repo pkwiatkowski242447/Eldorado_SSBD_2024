@@ -38,7 +38,6 @@ public abstract class AbstractFacade<T> {
         return Optional.ofNullable(getEntityManager().find(entityClass, id));
     }
 
-    // Ta metoda dodatkowo wykonuje refresh(), czyli wymusza wczytanie z bazy aktualnych danych obiektu
     protected Optional<T> findAndRefresh(UUID id) {
         Optional<T> optEntity = find(id);
         optEntity.ifPresent(t -> getEntityManager().refresh(t));
@@ -48,7 +47,21 @@ public abstract class AbstractFacade<T> {
     protected List<T> findAll() {
         CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
-        return getEntityManager().createQuery(cq).getResultList();
+        List<T> list = getEntityManager().createQuery(cq).getResultList();
+        refreshAll(list);
+        return list;
+    }
+
+    protected void refreshAll(List<T> list) {
+        if (list != null && !list.isEmpty()) {
+            list.forEach(getEntityManager()::refresh);
+        }
+    }
+
+    protected void refreshAll(List<T> list) {
+        if (list != null && !list.isEmpty()) {
+            list.forEach(getEntityManager()::refresh);
+        }
     }
 
     protected int count() {

@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -50,7 +51,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
 
     @Override
     @Transactional
-    public Optional<Parking> find(UUID id) {
+    protected Optional<Parking> find(UUID id) {
         return super.find(id);
     }
 
@@ -62,32 +63,38 @@ public class ParkingFacade extends AbstractFacade<Parking> {
 
     @Transactional
     public List<Parking> findAllWithPagination(int page, int pageSize, boolean showOnlyActive){
-        return getEntityManager().createNamedQuery("Parking.findAll")
+        var list = getEntityManager().createNamedQuery("Parking.findAll", Parking.class)
                 .setFirstResult(page * pageSize)
                 .setParameter("showOnlyActive", showOnlyActive)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAll(list);
+        return list;
     }
 
     @Transactional
     public List<Parking> findParkingsBySectorTypes(List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive){
-        return getEntityManager().
-                createNamedQuery("Parking.findBySectorTypes")
+        var list = getEntityManager().
+                createNamedQuery("Parking.findBySectorTypes", Parking.class)
                 .setParameter("sectorTypes", sectorTypes)
                 .setParameter("showOnlyActive", showOnlyActive)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAll(list);
+        return list;
     }
 
     @Transactional
     public List<Parking> findParkingWithAvailablePlaces( int page, int pageSize, boolean showOnlyActive){
-        return getEntityManager().
-                createNamedQuery("Parking.findWithAvailablePlaces")
+        var list = getEntityManager().
+                createNamedQuery("Parking.findWithAvailablePlaces", Parking.class)
                 .setParameter("showOnlyActive", showOnlyActive)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAll(list);
+        return list;
     }
 
     @Override
@@ -106,7 +113,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     // -- SECTORS --
 
     @Transactional
-    public Optional<Sector> findSectorById(UUID id){
+    protected Optional<Sector> findSectorById(UUID id){
         return Optional.ofNullable(getEntityManager().find(Sector.class, id));
     }
 
@@ -119,47 +126,58 @@ public class ParkingFacade extends AbstractFacade<Parking> {
 
     @Transactional
     public List<Sector> findSectorsInParkingWithPagination(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
-        return getEntityManager().createNamedQuery("Sector.findAllInParking")
+        var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("showOnlyActive", showOnlyActive)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAllSectors(list);
+        return list;
     }
 
     @Transactional
     public List<Sector> findSectorInParkingWithAvailablePlaces(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
-        return  getEntityManager().createNamedQuery("Sector.findWithAvailablePlaces")
+        var list =  getEntityManager().createNamedQuery("Sector.findWithAvailablePlaces", Sector.class)
                 .setParameter("parkingId",parkingId)
                 .setParameter("showOnlyActive", showOnlyActive)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAllSectors(list);
+        return list;
     }
 
     @Transactional
     public List<Sector> findSectorInParkingBySectorTypes(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
-        return  getEntityManager().createNamedQuery("Sector.findBySectorTypes")
+        var list = getEntityManager().createNamedQuery("Sector.findBySectorTypes", Sector.class)
                 .setParameter("parkingId",parkingId)
                 .setParameter("showOnlyActive", showOnlyActive)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+        refreshAllSectors(list);
+        return list;
     }
 
+    //This method will not single-handedly remove the sector from database
+    //To remove it you need to additionally update the parking and save changes to database
     @Transactional
     public void removeSector(Sector sector){
-        //TODO parking nie może być nullem
-        Parking parking = find(sector.getParking().getId()).orElse(null);
-        parking.deleteSector(sector.getName());
         getEntityManager().remove(sector);
         getEntityManager().flush();
-        edit(parking);
     }
 
     @Transactional
     public void editSector(Sector sector){
         getEntityManager().merge(sector);
         getEntityManager().flush();
+    }
+
+    @Transactional
+    protected void refreshAllSectors(List<Sector> list) {
+        if (list != null && !list.isEmpty()) {
+            list.forEach(getEntityManager()::refresh);
+        }
     }
 }
