@@ -7,7 +7,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 
@@ -120,7 +120,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    // TODO
     @Transactional
     public Optional<List<Account>> findAllAccountsMatchingLoginWithPagination(int pageNumber, int pageSize, String login, boolean active) {
         try {

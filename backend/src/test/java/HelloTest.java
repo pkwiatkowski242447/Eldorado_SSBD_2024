@@ -1,13 +1,11 @@
-//import org.junit.jupiter.api.Test;
-//import pl.lodz.p.it.ssbd2024.ssbd03.web.HelloService;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//
-//public class HelloTest {
-//
-//    @Test
-//    void testHello() {
-//        HelloService helloService = new HelloService();
-//        assertEquals("Hello World", helloService.getHello());
-//    }
-//}
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class HelloTest {
+
+    @Test
+    void test() {
+        assertTrue(12 > 0);
+    }
+}

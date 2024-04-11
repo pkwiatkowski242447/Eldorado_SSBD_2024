@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.mopPU;
+package pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.mopPU;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import org.postgresql.xa.PGXADataSource;
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 
 @Configuration
 @PropertySource(value = {"classpath:application.properties"})

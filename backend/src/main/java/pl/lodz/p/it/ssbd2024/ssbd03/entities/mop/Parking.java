@@ -75,7 +75,9 @@ public class Parking extends AbstractEntity {
 
     public void deleteSector(String sectorName) {
         //Replace sector list with the list without the specified sector
-        sectors = sectors.stream().filter(sector -> !sector.getName().equals(sectorName)).collect(Collectors.toList());
+        sectors = sectors.stream()
+                .filter(sector -> !sector.getName().equals(sectorName))
+                .collect(Collectors.toList());
     }
 
     public void assignClient() {

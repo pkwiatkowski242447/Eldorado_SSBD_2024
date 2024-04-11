@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mop;
+package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 
 @Repository
 public class ReservationFacade extends AbstractFacade<Reservation> {
