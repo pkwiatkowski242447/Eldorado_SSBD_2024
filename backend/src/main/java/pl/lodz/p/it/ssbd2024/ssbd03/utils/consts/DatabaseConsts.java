@@ -77,7 +77,7 @@ public class DatabaseConsts {
 
     // public.parking_event table
 
-    public static final String PARKING_EVENT_TABLE = "parking";
+    public static final String PARKING_EVENT_TABLE = "parking_event";
 
     public static final String PARKING_EVENT_RESERVATION_ID_COLUMN = "reservation_id";
     public static final String PARKING_EVENT_DATE_COLUMN = "date";

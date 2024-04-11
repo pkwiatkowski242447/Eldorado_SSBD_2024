@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
         @NamedQuery(
                 name = "Parking.findWithAvailablePlaces",
                 query = """
-                        SELECT s.parking FROM Sector s 
+                        SELECT s.parking FROM Sector s
                         WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0) 
                         GROUP BY s.parking 
                         ORDER BY s.parking.address.city, s.parking.address.city"""
@@ -64,7 +64,7 @@ public class Parking extends AbstractEntity {
 
     @NotNull(message = ParkingMessages.LIST_OF_SECTORS_NULL)
     @Size(min = ParkingConsts.LIST_OF_SECTORS_MIN_SIZE, message = ParkingMessages.LIST_OF_SECTORS_EMPTY)
-    @Size(min = ParkingConsts.LIST_OF_SECTORS_MAX_SIZE, message = ParkingMessages.LIST_OF_SECTORS_FULL)
+    @Size(max = ParkingConsts.LIST_OF_SECTORS_MAX_SIZE, message = ParkingMessages.LIST_OF_SECTORS_FULL)
     @OneToMany(mappedBy = DatabaseConsts.PARKING_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
     private List<Sector> sectors = new ArrayList<>();
