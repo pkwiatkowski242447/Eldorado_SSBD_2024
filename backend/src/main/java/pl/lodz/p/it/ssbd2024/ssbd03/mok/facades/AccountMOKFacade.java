@@ -120,7 +120,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    // TODO
     @Transactional
     public Optional<List<Account>> findAllAccountsMatchingLoginWithPagination(int pageNumber, int pageSize, String login, boolean active) {
         try {

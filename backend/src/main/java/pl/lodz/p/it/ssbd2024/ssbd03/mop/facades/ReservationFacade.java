@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mop;
+package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
