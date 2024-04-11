@@ -23,15 +23,153 @@ import java.util.Collection;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @NamedQueries({
+        // General queries
         @NamedQuery(
                 name = "Account.findByLogin",
-                query = "SELECT a FROM Account a WHERE a.login = :login"
-        )
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.login = :login
+                        """
+        ),
+
+        @NamedQuery(
+                name = "Account.findAccountByEmail",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.email = :email
+                        """
+        ),
+
+        @NamedQuery(
+                name = "Account.findAllAccountsByActive",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.active = :active
+                        ORDER BY a.login
+                        """
+        ),
+
+        @NamedQuery(
+                name = "Account.findAllAccountsMatchingGivenLogin",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE LOWER(a.login) LIKE CONCAT('%', LOWER(:login) , '%')
+                        AND a.active = :active
+                        ORDER BY a.login
+                        """
+        ),
+
+        // Find accounts by user level
+        @NamedQuery(
+                name = "Account.findAccountsByUserLevelAndActive",
+                query = """
+                        SELECT DISTINCT a FROM Account a
+                        JOIN a.userLevels ul
+                        WHERE TYPE(ul) = :userLevel
+                        ORDER BY a.login
+                        """
+        ),
+
+        // Find all accounts for deletion
+        @NamedQuery(
+                name = "Account.findAllAccountsMarkedForDeletion",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.active = false AND a.creationDate < :timestamp
+                        ORDER BY a.login
+                        """
+        ),
+
+        // Finding blocked accounts
+        @NamedQuery(
+                name = "Account.findAllAccountsByBlockedInAscOrder",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.blocked = :blocked
+                        ORDER BY a.login ASC
+                        """
+        ),
+
+        @NamedQuery(
+                name = "Account.findAllBlockedAccountsThatWereBlockedByAdmin",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.blocked = true AND a.blockedTime is null
+                        ORDER BY a.login ASC
+                        """
+        ),
+
+        @NamedQuery(
+                name = "Account.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.blocked = true AND a.blockedTime is not null
+                        ORDER BY a.login ASC
+                        """
+        ),
+
+        // Accounts that are active and yet email is still not verified
+        @NamedQuery(
+                name = "Account.findAllAccountsByVerifiedAndActiveInAscOrder",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.verified = :verified AND a.active = :active
+                        ORDER BY a.login ASC
+                        """
+        ),
+
+        // Find accounts matching user first name
+        @NamedQuery(
+                name = "Account.findAccountsByActiveAndMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE
+                            a.active = :active AND
+                            (
+                                LOWER(a.name) LIKE CONCAT('%', LOWER(:userFirstName), '%') OR
+                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:userLastName), '%')
+                            )
+                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:userLogin) , '%')
+                        ORDER BY a.login ASC
+                        """
+        ),
+        @NamedQuery(
+                name = "Account.findAccountsByActiveAndMatchingUserFirstNameOrUserLastNameAndLoginInDescendingOrder",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE
+                            a.active = :active AND
+                            (
+                                LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
+                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')
+                            )
+                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:login) , '%')
+                        ORDER BY a.login DESC
+                        """
+        ),
+
+        // Connected to activity log
+        @NamedQuery(
+                name = "Account.findAccountsWithoutAnyActivityFrom",
+                query = """
+                        SELECT a FROM Account a
+                        WHERE a.active = :active AND a.activityLog.lastSuccessfulLoginTime < :lastSuccessfulLoginTime
+                        ORDER BY a.login ASC
+                        """
+        ),
+
+        @NamedQuery(
+                name = "Account.countAccountsWithoutAnyActivityFrom",
+                query = """
+                        SELECT COUNT(a) FROM Account a
+                        WHERE a.active = :active AND a.activityLog.lastSuccessfulLoginTime < :lastSuccessfulLoginTime
+                        """
+        ),
 })
 public class Account extends AbstractEntity {
 
     @NotBlank(message = AccountMessages.LOGIN_BLANK)
-    @Pattern(regexp = AccountsConsts.LOGIN_REGEX, message = AccountMessages.LOGIN_REGEX_NOT_MET)
+    //@Pattern(regexp = AccountsConsts.LOGIN_REGEX, message = AccountMessages.LOGIN_REGEX_NOT_MET)
     @Size(min = AccountsConsts.LOGIN_MIN_LENGTH, message = AccountMessages.LOGIN_TOO_SHORT)
     @Size(max = AccountsConsts.LOGIN_MAX_LENGTH, message = AccountMessages.LOGIN_TOO_LONG)
     @Column(name = DatabaseConsts.ACCOUNT_LOGIN_COLUMN, unique = true, nullable = false, updatable = false, length = 32)
@@ -64,16 +202,16 @@ public class Account extends AbstractEntity {
     @Setter
     private LocalDateTime blockedTime;
 
-    @NotBlank
-    @Pattern(regexp = AccountsConsts.NAME_REGEX)
+    @NotBlank(message = AccountMessages.NAME_BLANK)
+    //@Pattern(regexp = AccountsConsts.NAME_REGEX, message = AccountMessages.NAME_REGEX_NOT_MET)
     @Size(min = AccountsConsts.NAME_MIN_LENGTH, message = AccountMessages.NAME_TOO_SHORT)
     @Size(max = AccountsConsts.NAME_MAX_LENGTH, message = AccountMessages.NAME_TOO_LONG)
     @Column(name = DatabaseConsts.PERSONAL_DATA_NAME_COLUMN, table = DatabaseConsts.PERSONAL_DATA_TABLE, nullable = false, length = 32)
     @Setter
     private String name;
 
-    @NotBlank
-    @Pattern(regexp = AccountsConsts.LASTNAME_REGEX)
+    @NotBlank(message = AccountMessages.LASTNAME_BLANK)
+    //@Pattern(regexp = AccountsConsts.LASTNAME_REGEX, message = AccountMessages.LASTNAME_REGEX_NOT_MET)
     @Size(min = AccountsConsts.LASTNAME_MIN_LENGTH, message = AccountMessages.LASTNAME_TOO_SHORT)
     @Size(max = AccountsConsts.LASTNAME_MAX_LENGTH, message = AccountMessages.LASTNAME_TOO_LONG)
     @Column(name = DatabaseConsts.PERSONAL_DATA_LASTNAME_COLUMN, table = DatabaseConsts.PERSONAL_DATA_TABLE, nullable = false, length = 32)
@@ -98,13 +236,13 @@ public class Account extends AbstractEntity {
     private ActivityLog activityLog;
 
     @NotBlank(message = AccountMessages.LANGUAGE_BLANK)
-    @Pattern(regexp = AccountsConsts.LANGUAGE_REGEX, message = AccountMessages.LANGUAGE_REGEX_NOT_MET)
+    //@Pattern(regexp = AccountsConsts.LANGUAGE_REGEX, message = AccountMessages.LANGUAGE_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_LANGUAGE_COLUMN, nullable = false, length = 16)
     @Setter
     private String accountLanguage;
 
     @NotBlank(message = AccountMessages.PHONE_NUMBER_BLANK)
-    @Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
+    //@Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_PHONE_NUMBER_COLUMN, nullable = false, length = 32)
     @Getter @Setter
     private String phoneNumber;

@@ -48,8 +48,8 @@ import java.util.stream.Collectors;
                 name = "Parking.findWithAvailablePlaces",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0) 
-                        GROUP BY s.parking 
+                        WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0)
+                        GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         )
 })
