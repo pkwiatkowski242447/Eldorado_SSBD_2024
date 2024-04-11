@@ -22,6 +22,12 @@ import java.util.Collection;
 @Getter
 @ToString(callSuper = true)
 @NoArgsConstructor
+@NamedQueries({
+        @NamedQuery(
+                name = "Account.findByLogin",
+                query = "SELECT a FROM Account a WHERE a.login = :login"
+        )
+})
 public class Account extends AbstractEntity {
 
     @NotBlank(message = AccountMessages.LOGIN_BLANK)
