@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
 @Repository
 public class ReservationFacade extends AbstractFacade<Reservation> {
@@ -75,28 +74,12 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     @Transactional
-    public List<Reservation> findActiveReservations(UUID clientId) {
-        return getEntityManager()
-                .createNamedQuery("Reservation.findActiveReservations", Reservation.class)
-                .setParameter("clientId", clientId)
-                .getResultList();
-    }
-
-    @Transactional
     public List<Reservation> findActiveReservationsWithPagination(UUID clientId, int page, int pageSize) {
         return getEntityManager()
                 .createNamedQuery("Reservation.findActiveReservations", Reservation.class)
                 .setParameter("clientId", clientId)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
-                .getResultList();
-    }
-
-    @Transactional
-    public List<Reservation> findHistoricalReservations(UUID clientId) {
-        return getEntityManager()
-                .createNamedQuery("Reservation.findHistoricalReservations", Reservation.class)
-                .setParameter("clientId", clientId)
                 .getResultList();
     }
 

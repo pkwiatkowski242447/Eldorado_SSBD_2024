@@ -29,18 +29,12 @@ public class HelloService {
 
     @Transactional
     public void getTest() {
-        System.out.println("TST_ACT_FIRST: " + reservationFacade.findActiveReservations(UUID.fromString("69507c7f-4c03-4087-85e6-3ae3b6fc2201")));
-        System.out.println("TST_HIST_FIRST: " + reservationFacade.findHistoricalReservations(UUID.fromString("69507c7f-4c03-4087-85e6-3ae3b6fc2201")));
+        System.out.println("TST_ACT_FIRST: " + reservationFacade.findActiveReservationsWithPagination(UUID.fromString("69507c7f-4c03-4087-85e6-3ae3b6fc2201"), 0, 200));
+        System.out.println("TST_HIST_FIRST: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("69507c7f-4c03-4087-85e6-3ae3b6fc2201"), 0, 200));
 
-        System.out.println("TST_ACT_SECOND: " + reservationFacade.findActiveReservations(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c")));
-        System.out.println("TST_HIST_SECOND: " + reservationFacade.findHistoricalReservations(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c")));
+        System.out.println("TST_ACT_SECOND: " + reservationFacade.findActiveReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 0, 200));
+        System.out.println("TST_HIST_SECOND: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 0, 200));
 
-        //Pagination
-        System.out.println("TST_HIST_PAG11: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 1, 1));
-        System.out.println("TST_HIST_PAG21: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 2, 1));
-        System.out.println("TST_HIST_PAG12: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 1, 2));
-        System.out.println("TST_HIST_PAG01: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 0, 1));
-        System.out.println("TST_HIST_PAG02: " + reservationFacade.findHistoricalReservationsWithPagination(UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c"), 0, 2));
     }
 
     public void addTestEnt() {
