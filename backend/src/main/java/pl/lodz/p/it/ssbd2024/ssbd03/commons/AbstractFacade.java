@@ -58,6 +58,12 @@ public abstract class AbstractFacade<T> {
         }
     }
 
+    protected void refreshAll(List<T> list) {
+        if (list != null && !list.isEmpty()) {
+            list.forEach(getEntityManager()::refresh);
+        }
+    }
+
     protected int count() {
         CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         Root<T> rt = cq.from(entityClass);

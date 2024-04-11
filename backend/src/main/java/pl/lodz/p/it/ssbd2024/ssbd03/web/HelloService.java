@@ -19,16 +19,14 @@ public class HelloService {
     private HelloRepoMOK repoMOK;
     private HelloRepoMOP repoMOP;
 
-    private ParkingFacade parkingFacade;
-
-    private Parking parkingSer;
 
     @Autowired
-    public HelloService(HelloRepoMOK repoMOK, HelloRepoMOP repoMOP) {
+    public HelloService(HelloRepoMOK repoMOK, HelloRepoMOP repoMOP, ParkingFacade parkingFacade) {
         this.repoMOK = repoMOK;
         this.repoMOP = repoMOP;
     }
 
+    @Transactional
     public String getHello() {
         return "Hello World";
     }
