@@ -79,13 +79,11 @@ public class Reservation extends AbstractEntity implements Serializable {
     @Column(name = "begin_time")
     @Temporal(TemporalType.TIMESTAMP)
     @Getter @Setter
-    ///FIXME setter? chyba lepiej dac do konstruktora
     private LocalDateTime beginTime;
 
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     @Getter @Setter
-    ///FIXME ten setter imo konieczny dla wjazdu bez uprzedniej rezerwacji
     private LocalDateTime endTime;
 
     @OneToMany(mappedBy = "reservation", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})

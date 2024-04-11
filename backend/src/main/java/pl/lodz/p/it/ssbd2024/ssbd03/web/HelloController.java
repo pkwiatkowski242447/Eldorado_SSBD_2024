@@ -1,11 +1,12 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/")
@@ -19,14 +20,8 @@ public class HelloController {
     }
 
     @GetMapping
-    public String home() {
-        return "Sweet home";
-    }
-
-    @GetMapping("/test")
-    public String test() throws JsonProcessingException {
-        helloService.getTest();
-        return "GOOD";
+    public String getHello() {
+        return helloService.getHello();
     }
 
     @GetMapping("/add")
