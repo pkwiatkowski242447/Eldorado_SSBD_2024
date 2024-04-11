@@ -94,6 +94,16 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     @Transactional
+    public List<Reservation> findSectorReservationsWithPagination(UUID sectorId, int page, int pageSize) {
+        return getEntityManager()
+                .createNamedQuery("Reservation.findSectorReservations", Reservation.class)
+                .setParameter("sectorId", sectorId)
+                .setFirstResult(page * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+    }
+
+    @Transactional
     @Override
     public int count() {
         return super.count();

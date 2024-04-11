@@ -41,7 +41,6 @@ import java.util.List;
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.client.id = :clientId
-                          AND r.beginTime <= CURRENT_TIMESTAMP
                           AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
                         ORDER BY r.beginTime"""
         ),
@@ -58,12 +57,11 @@ import java.util.List;
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.sector.id = :sectorId
-                          AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
                         ORDER BY r.beginTime"""
         )
 }
 )
-///TODO co z przyszlymi rezerwacjami?
+
 public class Reservation extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
