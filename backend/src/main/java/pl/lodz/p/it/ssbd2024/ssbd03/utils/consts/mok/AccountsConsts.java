@@ -10,11 +10,11 @@ public class AccountsConsts {
 
     public static final int NAME_MIN_LENGTH = 2;
     public static final int NAME_MAX_LENGTH = 32;
-    public static final String NAME_REGEX = "^[a-zA-Z]$";
+    public static final String NAME_REGEX = "^[a-zA-Z]{2, 32}$";
 
     public static final int LASTNAME_MIN_LENGTH = 2;
     public static final int LASTNAME_MAX_LENGTH = 32;
-    public static final String LASTNAME_REGEX = "^[a-zA-Z]$";
+    public static final String LASTNAME_REGEX = "^[a-zA-Z]{2, 32}$";
 
     public static final int EMAIL_MIN_LENGTH = 8;
     public static final int EMAIL_MAX_LENGTH = 32;
