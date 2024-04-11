@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.mokPU;
+package pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.authPU;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,19 +8,18 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 
 import javax.sql.DataSource;
 import java.util.Properties;
-
 
 @Configuration
 @PropertySource(value = {"classpath:application.properties"})
 @EnableJpaRepositories(
         value = DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN,
-        entityManagerFactoryRef = DatabaseConfigConstants.EMF_MOK
+        entityManagerFactoryRef = DatabaseConfigConstants.EMF_AUTH
 )
-public class JpaMOKConfig {
+public class JpaAuthConfig {
 
     @Value("${hibernate.dialect}")
     private String dialect;
@@ -38,11 +37,11 @@ public class JpaMOKConfig {
         return properties;
     }
 
-    @Bean(DatabaseConfigConstants.EMF_MOK)
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DatabaseConfigConstants.DS_MOK) DataSource dataSource) {
+    @Bean(DatabaseConfigConstants.EMF_AUTH)
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier(DatabaseConfigConstants.DS_AUTH) DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setJtaDataSource(dataSource);
-        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.MOK_PU);
+        entityManagerFactory.setPersistenceUnitName(DatabaseConfigConstants.AUTH_PU);
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setPackagesToScan(DatabaseConfigConstants.JPA_PACKAGE_TO_SCAN);
         entityManagerFactory.setJpaProperties(this.properties());

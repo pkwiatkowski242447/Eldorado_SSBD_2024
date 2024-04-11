@@ -2,12 +2,11 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 

@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig;
+package pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;

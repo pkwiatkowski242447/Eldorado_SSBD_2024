@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.dbconfig;
+package pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig;
 
 public class DatabaseConfigConstants {
 

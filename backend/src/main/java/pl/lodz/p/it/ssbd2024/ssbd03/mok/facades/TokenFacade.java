@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
 
 import jakarta.persistence.EntityManager;
@@ -7,7 +7,7 @@ import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 
 import java.util.List;
