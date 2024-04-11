@@ -40,6 +40,8 @@
         <lombok.version>1.18.30</lombok.version>
         <!-- Atomikos -->
         <atomikos.version>6.0.0</atomikos.version>
+        <!--Jackson-->
+        <jackson.version>2.17.0</jackson.version>
         <!--Plugins-->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
@@ -216,6 +218,13 @@
             <artifactId>transactions-jdbc</artifactId>
             <version>${atomikos.version}</version>
             <classifier>jakarta</classifier>
+        </dependency>
+
+        <!--Jackson-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
 

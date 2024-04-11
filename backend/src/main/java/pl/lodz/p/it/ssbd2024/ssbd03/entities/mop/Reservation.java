@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -29,6 +31,40 @@ import java.util.List;
 @Table(name = DatabaseConsts.RESERVATION_TABLE)
 @ToString(callSuper = true)
 @NoArgsConstructor
+
+@NamedQueries({
+        @NamedQuery(
+                name = "Reservation.findAll",
+                query = """
+                        SELECT r FROM Reservation r
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findActiveReservations",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.client.id = :clientId
+                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findHistoricalReservations",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.client.id = :clientId
+                          AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findSectorReservations",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.sector.id = :sectorId
+                        ORDER BY r.beginTime"""
+        )
+}
+)
+
 public class Reservation extends AbstractEntity implements Serializable {
 
     @Serial
@@ -60,4 +96,13 @@ public class Reservation extends AbstractEntity implements Serializable {
     @ToString.Exclude
     @Getter
     private List<ParkingEvent> parkingEvents = new ArrayList<>();
+
+    public Reservation(Client client, Sector sector) {
+        this.client = client;
+        this.sector = sector;
+    }
+
+    public Reservation(Sector sector) {
+        this(null, sector);
+    }
 }
