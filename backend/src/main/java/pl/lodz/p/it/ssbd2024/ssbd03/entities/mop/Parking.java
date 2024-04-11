@@ -70,7 +70,7 @@ public class Parking extends AbstractEntity {
     private List<Sector> sectors = new ArrayList<>();
 
     public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
-        sectors.add(new Sector(this,name,type,maxPlaces,weight));
+        sectors.add(new Sector(this, name, type, maxPlaces, weight));
     }
 
     public void deleteSector(String sectorName) {
