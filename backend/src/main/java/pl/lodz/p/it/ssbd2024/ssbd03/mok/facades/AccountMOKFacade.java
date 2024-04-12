@@ -66,7 +66,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccounts.setFirstResult(pageNumber * pageSize);
             findAllAccounts.setMaxResults(pageSize);
             findAllAccounts.setParameter("active", true);
-            return Optional.of(findAllAccounts.getResultList());
+            var list = findAllAccounts.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -79,7 +81,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccounts.setFirstResult(pageNumber * pageSize);
             findAllAccounts.setMaxResults(pageSize);
             findAllAccounts.setParameter("active", false);
-            return Optional.of(findAllAccounts.getResultList());
+            var list = findAllAccounts.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -92,7 +96,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllActiveAccountsByUserLevelQuery.setFirstResult(pageNumber * pageSize);
             findAllActiveAccountsByUserLevelQuery.setMaxResults(pageSize);
             findAllActiveAccountsByUserLevelQuery.setParameter("userLevel", userLevel);
-            return Optional.of(findAllActiveAccountsByUserLevelQuery.getResultList());
+            var list = findAllActiveAccountsByUserLevelQuery.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -101,7 +107,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     @Transactional
     public Optional<Account> findByLogin(String login) {
         try {
-            TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findAccountByLogin", Account.class);
+            TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
             findAccountByLogin.setParameter("login", login);
             return Optional.of(findAccountByLogin.getSingleResult());
         } catch (PersistenceException exception) {
@@ -128,7 +134,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccountsMatchingLogin.setMaxResults(pageSize);
             findAllAccountsMatchingLogin.setParameter("login", login);
             findAllAccountsMatchingLogin.setParameter("active", active);
-            return Optional.of(findAllAccountsMatchingLogin.getResultList());
+            var list = findAllAccountsMatchingLogin.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -138,7 +146,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     public Optional<List<Account>> findAllAccountsMarkedForDeletion() {
         try {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
-            return Optional.of(findAllAccountsMarkedForDeletion.getResultList());
+            var list = findAllAccountsMarkedForDeletion.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -151,7 +161,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllBlockedAccounts.setFirstResult(pageNumber * pageSize);
             findAllBlockedAccounts.setMaxResults(pageSize);
             findAllBlockedAccounts.setParameter("blocked", blocked);
-            return Optional.of(findAllBlockedAccounts.getResultList());
+            var list = findAllBlockedAccounts.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -163,7 +175,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             TypedQuery<Account> findAllAccountsBlockedByAdminQuery = entityManager.createNamedQuery("Account.findAllBlockedAccountsThatWereBlockedByAdmin", Account.class);
             findAllAccountsBlockedByAdminQuery.setFirstResult(pageNumber * pageSize);
             findAllAccountsBlockedByAdminQuery.setMaxResults(pageSize);
-            return Optional.of(findAllAccountsBlockedByAdminQuery.getResultList());
+            var list = findAllAccountsBlockedByAdminQuery.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -176,7 +190,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
                     .createNamedQuery("Account.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes", Account.class);
             findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery.setFirstResult(pageNumber * pageSize);
             findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery.setMaxResults(pageSize);
-            return Optional.of(findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery.getResultList());
+            var list = findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -190,7 +206,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccountsWithUnverifiedEmailQuery.setMaxResults(pageSize);
             findAllAccountsWithUnverifiedEmailQuery.setParameter("verified", false);
             findAllAccountsWithUnverifiedEmailQuery.setParameter("active", true);
-            return Optional.of(findAllAccountsWithUnverifiedEmailQuery.getResultList());
+            var list = findAllAccountsWithUnverifiedEmailQuery.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -204,7 +222,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccountsWithUnverifiedEmailQuery.setMaxResults(pageSize);
             findAllAccountsWithUnverifiedEmailQuery.setParameter("verified", false);
             findAllAccountsWithUnverifiedEmailQuery.setParameter("active", false);
-            return Optional.of(findAllAccountsWithUnverifiedEmailQuery.getResultList());
+            var list = findAllAccountsWithUnverifiedEmailQuery.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -231,7 +251,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccountsMatchingCriteriaQuery.setParameter("firstName", firstName);
             findAllAccountsMatchingCriteriaQuery.setParameter("lastName", lastName);
             findAllAccountsMatchingCriteriaQuery.setParameter("active", active);
-            return Optional.of(findAllAccountsMatchingCriteriaQuery.getResultList());
+            var list = findAllAccountsMatchingCriteriaQuery.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -244,7 +266,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
             findAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);
             findAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
-            return Optional.of(findAllAccountsWithoutRecentActivityQuery.getResultList());
+            var list = findAllAccountsWithoutRecentActivityQuery.getResultList();
+            refreshAll(list);
+            return Optional.of(list);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
