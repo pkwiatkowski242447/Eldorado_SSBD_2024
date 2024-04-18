@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.JWTService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.JWTMessages;
 
@@ -27,12 +28,13 @@ import java.util.UUID;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
-    private final AccountMOKFacade accountFacade;
+    private final AuthenticationFacade authenticationFacade;
 
+    @Autowired
     public JWTAuthenticationFilter(JWTService jwtService,
-                                   AccountMOKFacade accountFacade) {
+                                   AuthenticationFacade authenticationFacade) {
         this.jwtService = jwtService;
-        this.accountFacade = accountFacade;
+        this.authenticationFacade = authenticationFacade;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             final UUID accountId = jwtService.extractAccountId(jwtToken);
-            Account account = accountFacade.find(accountId).orElseThrow();
+            Account account = authenticationFacade.find(accountId).orElseThrow();
 
             if (!jwtService.isTokenValid(jwtToken, account)) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());

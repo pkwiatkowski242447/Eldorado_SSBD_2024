@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
     public SecurityConfig(AuthenticationProvider authenticationProvider,
                           JWTAuthenticationFilter jwtAuthenticationFilter) {
         this.authenticationProvider = authenticationProvider;

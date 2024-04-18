@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ public class ApplicationConfig {
 
     private final AuthenticationFacade authenticationFacade;
 
+    @Autowired
     public ApplicationConfig(AuthenticationFacade authenticationFacade) {
         this.authenticationFacade = authenticationFacade;
     }
