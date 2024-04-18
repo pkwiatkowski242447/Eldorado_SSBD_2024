@@ -227,7 +227,7 @@ public class Account extends AbstractEntity {
 
     @Size(min = AccountsConsts.USER_LEVEL_MIN_SIZE, message = AccountMessages.USER_LEVEL_EMPTY)
     @Size(max = AccountsConsts.USER_LEVEL_MAX_SIZE, message = AccountMessages.USER_LEVEL_FULL)
-    @OneToMany(mappedBy = DatabaseConsts.ACCOUNT_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @OneToMany(mappedBy = DatabaseConsts.ACCOUNT_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @ToString.Exclude
     private final Collection<UserLevel> userLevels = new ArrayList<>();
 
@@ -268,6 +268,10 @@ public class Account extends AbstractEntity {
 
     public void removeUserLevel(UserLevel userLevel) {
         userLevels.remove(userLevel);
+    }
+
+    public ActivityLog getActivityLog() {
+        return this.activityLog == null ? new ActivityLog() : this.activityLog;
     }
 
     public void blockAccount() {
