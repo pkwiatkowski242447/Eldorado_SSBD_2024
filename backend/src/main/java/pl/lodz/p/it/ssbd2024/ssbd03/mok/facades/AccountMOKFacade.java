@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class AccountMOKFacade extends AbstractFacade<Account> {
@@ -143,9 +144,10 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     }
 
     @Transactional
-    public Optional<List<Account>> findAllAccountsMarkedForDeletion() {
+    public Optional<List<Account>> findAllAccountsMarkedForDeletion(long amount, TimeUnit timeUnit) {
         try {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
+            findAllAccountsMarkedForDeletion.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
             var list = findAllAccountsMarkedForDeletion.getResultList();
             refreshAll(list);
             return Optional.of(list);
