@@ -34,8 +34,7 @@ public class ScheduleService {
         this.tokenFacade = tokenFacade;
     }
 
-    // FIXME delay???????
-    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = 0L)
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = -1L)
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteNotVerifiedAccount() throws ScheduleBadProperties {
         log.info(ScheduleConsts.INVOKING_DELETE_ACCOUNTS_MESS);
@@ -46,6 +45,7 @@ public class ScheduleService {
             inactiveAccountsOpt =
                     accountMOKFacade.findAllAccountsMarkedForDeletion(Long.parseLong(deleteTime), TimeUnit.MINUTES);
         } catch (NumberFormatException e) {
+            log.error(ScheduleConsts.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
             throw new ScheduleBadProperties(ScheduleConsts.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
         }
 
