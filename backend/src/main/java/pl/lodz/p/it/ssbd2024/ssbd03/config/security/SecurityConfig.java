@@ -43,7 +43,10 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/v1/auth/login/**", "/api/v1/auth/register/client").permitAll()
+                        .requestMatchers("/api/v1/auth/login/**",
+                                "/api/v1/auth/register/client",
+                                "/v3/api-docs",
+                                "/swagger-ui/index.html").permitAll()
                         .requestMatchers("/**").authenticated());
 
         return httpSecurity.build();
