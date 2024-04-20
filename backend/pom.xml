@@ -46,7 +46,7 @@
         <!--JWT-->
         <java-jwt.version>4.4.0</java-jwt.version>
         <!--Open API-->
-        <open-api.version>1.7.0</open-api.version>
+        <open-api.version>2.1.0</open-api.version>
         <!--Plugins-->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
@@ -266,11 +266,12 @@
             <version>${java-jwt.version}</version>
         </dependency>
 
+        <!--TODO try to exclude SB-->
         <!--Open API-->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.1.0</version>
+            <version>${open-api.version}</version>
 <!--            <exclusions>-->
 <!--                <exclusion>-->
 <!--                    <groupId>org.springframework.boot</groupId>-->
@@ -338,6 +339,16 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--Javadoc-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -358,6 +369,14 @@
                         </reports>
                     </reportSet>
                 </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <show>public</show>
+                </configuration>
             </plugin>
         </plugins>
     </reporting>
