@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,6 +18,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAcco
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 
+import java.time.LocalDateTime;
+
+@Slf4j
 @Service
 public class AuthenticationService {
 
@@ -35,6 +39,15 @@ public class AuthenticationService {
         try {
             Account refreshedAccount = authenticationFacade.findAndRefresh(account.getId()).orElseThrow(AccountNotFoundException::new);
             refreshedAccount.setActivityLog(activityLog);
+
+            // Increment the number of failed login attempts TODO rozwazyc przeniesienie tego do innej metody
+            if (!refreshedAccount.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= 3) {
+                refreshedAccount.setBlocked(true);
+                refreshedAccount.setBlockedTime(LocalDateTime.now());
+                log.info("Account %s has been blocked".formatted(refreshedAccount.getId()));
+                ///TODO mail
+            }
+
             authenticationFacade.edit(refreshedAccount);
         } catch (AccountNotFoundException exception) {
             throw new ActivityLogUpdateException("Activity log could not be updated.");

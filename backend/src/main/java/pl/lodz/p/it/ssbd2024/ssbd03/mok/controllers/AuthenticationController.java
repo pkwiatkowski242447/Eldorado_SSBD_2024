@@ -60,6 +60,10 @@ public class AuthenticationController {
                 ActivityLog activityLog = account.getActivityLog();
                 activityLog.setLastUnsuccessfulLoginIp(request.getRemoteAddr());
                 activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
+
+                // Increment the number of failed login attempts
+                activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
+
                 authenticationService.updateActivityLog(account, activityLog);
                 return ResponseEntity.badRequest().body(exception.getMessage());
             }
