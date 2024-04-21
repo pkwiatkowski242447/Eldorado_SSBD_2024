@@ -75,7 +75,7 @@ import java.util.Collection;
                 name = "Account.findAllAccountsMarkedForDeletion",
                 query = """
                         SELECT a FROM Account a
-                        WHERE a.active = false AND a.creationDate < :timestamp
+                        WHERE a.verified = false AND a.creationDate < :timestamp
                         ORDER BY a.login
                         """
         ),
