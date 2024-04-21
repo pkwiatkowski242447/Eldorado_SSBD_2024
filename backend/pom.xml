@@ -39,11 +39,11 @@
         <logback.version>1.4.14</logback.version>
         <!--Lombok-->
         <lombok.version>1.18.30</lombok.version>
-        <!-- Atomikos -->
+        <!--Atomikos-->
         <atomikos.version>6.0.0</atomikos.version>
         <!--Jackson-->
         <jackson.version>2.17.0</jackson.version>
-        <!-- JWT -->
+        <!--JWT-->
         <java-jwt.version>4.4.0</java-jwt.version>
         <!--Plugins-->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -131,7 +131,7 @@
             <version>${jakarta-servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Transactions API -->
+        <!--Transactions API-->
         <dependency>
             <groupId>jakarta.transaction</groupId>
             <artifactId>jakarta.transaction-api</artifactId>
@@ -223,7 +223,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Atomikos -->
+        <!--Atomikos-->
         <dependency>
             <groupId>com.atomikos</groupId>
             <artifactId>transactions-jta</artifactId>
@@ -257,7 +257,7 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- JWT -->
+        <!--JWT-->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
@@ -324,6 +324,14 @@
                 </executions>
             </plugin>
         </plugins>
+
+        <!--Enable using pom properties in other files-->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
     <reporting>
@@ -346,5 +354,29 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <database.host>192.168.20.3</database.host>
+                <schema-gen.policy>update</schema-gen.policy>
+                <debug-sql.log>false</debug-sql.log>
+                <logging.level>INFO</logging.level>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <database.host>localhost</database.host>
+                <schema-gen.policy>create-drop</schema-gen.policy>
+                <debug-sql.log>true</debug-sql.log>
+                <logging.level>DEBUG</logging.level>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
