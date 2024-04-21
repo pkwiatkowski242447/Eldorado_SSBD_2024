@@ -1,7 +1,10 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +40,14 @@ import java.util.Collection;
                 query = """
                         SELECT a FROM Account a
                         WHERE a.email = :email
+                        """
+        ),
+
+        @NamedQuery(
+                name = "Account.findAllAccounts",
+                query = """
+                        SELECT a FROM Account a
+                        ORDER BY a.login
                         """
         ),
 
@@ -124,12 +135,11 @@ import java.util.Collection;
                 query = """
                         SELECT a FROM Account a
                         WHERE
-                            a.active = :active AND
                             (
-                                LOWER(a.name) LIKE CONCAT('%', LOWER(:userFirstName), '%') OR
-                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:userLastName), '%')
+                                LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
+                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')
                             )
-                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:userLogin) , '%')
+                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:login) , '%')
                         ORDER BY a.login ASC
                         """
         ),
@@ -244,7 +254,8 @@ public class Account extends AbstractEntity {
     @NotBlank(message = AccountMessages.PHONE_NUMBER_BLANK)
     //@Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_PHONE_NUMBER_COLUMN, nullable = false, length = 32)
-    @Getter @Setter
+    @Getter
+    @Setter
     private String phoneNumber;
 
     @Column(name = DatabaseConsts.ACCOUNT_CREATION_DATE_COLUMN, nullable = false, updatable = false)
