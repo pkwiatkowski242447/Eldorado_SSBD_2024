@@ -32,7 +32,7 @@ public class AuthenticationController {
         this.jwtProvider = jwtProvider;
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) {
         try {
             try {
@@ -54,7 +54,7 @@ public class AuthenticationController {
                 activityLog.setLastUnsuccessfulLoginIp(request.getRemoteAddr());
                 activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
                 authenticationService.updateActivityLog(account, activityLog);
-                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(responseMessage);
+                return ResponseEntity.badRequest().body(responseMessage);
             } catch (AuthenticationInvalidCredentialsException exception) {
                 Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
                 ActivityLog activityLog = account.getActivityLog();

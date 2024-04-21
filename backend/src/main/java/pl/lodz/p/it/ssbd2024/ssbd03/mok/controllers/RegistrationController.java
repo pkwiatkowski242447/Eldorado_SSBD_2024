@@ -30,7 +30,7 @@ public class RegistrationController {
         this.mailProvider = mailProvider;
     }
 
-    @PostMapping( value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping( value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) {
         try {
@@ -46,7 +46,11 @@ public class RegistrationController {
             String token = this.tokenService.createRegistrationToken(newAccount);
             // Send a mail with an activation link
             String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token;
-            mailProvider.sendRegistrationConfirmEmail(accountRegisterDTO.getFirstName(), accountRegisterDTO.getLastName(), accountRegisterDTO.getEmail(), confirmationURL);
+            mailProvider.sendRegistrationConfirmEmail(
+                    accountRegisterDTO.getFirstName(),
+                    accountRegisterDTO.getLastName(),
+                    accountRegisterDTO.getEmail(),
+                    confirmationURL);
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());

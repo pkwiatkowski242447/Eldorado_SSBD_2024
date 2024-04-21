@@ -56,13 +56,40 @@ public class MailProvider {
                     .replace("$note_message", "This e-mail is generated automatically and does not require any responses to it.")
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
 
-            logger.info(emailContent);
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
 
             messageHelper.setTo(emailReceiver);
             messageHelper.setSubject("Activate your account");
+            messageHelper.setText(emailContent, true);
+            messageHelper.setFrom(senderEmail);
+
+            this.mailSender.send(mimeMessage);
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
+            String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", "Hello")
+                    .replace("$result_message", "Your account has been blocked!")
+                    .replace("$action_description", "TEST TEST.")
+                    .replace("$note_title", "Note")
+                    .replace("$note_message", "This e-mail is generated automatically and does not require any responses to it.")
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            messageHelper.setTo(emailReceiver);
+            messageHelper.setSubject("Your account has been blocked");
             messageHelper.setText(emailContent, true);
             messageHelper.setFrom(senderEmail);
 

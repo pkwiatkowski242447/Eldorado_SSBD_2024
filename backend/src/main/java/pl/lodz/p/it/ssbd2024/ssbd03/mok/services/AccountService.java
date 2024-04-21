@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedExce
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,11 +27,14 @@ public class AccountService {
     private final AccountMOKFacade accountFacade;
     private final PasswordEncoder passwordEncoder;
 
+    private final MailProvider mailProvider;
+
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder, MailProvider mailProvider) {
         this.accountFacade = accountFacade;
         this.passwordEncoder = passwordEncoder;
+        this.mailProvider = mailProvider;
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -62,10 +66,12 @@ public class AccountService {
         }
 
         account.setBlocked(true);
+        ///FIXME czy w przypadku blokowania przez admina, czas ma byc ustawioany???
         account.setBlockedTime(LocalDateTime.now());
         accountFacade.edit(account);
 
-        ///TODO wyslanie powiadomienia email
+        // Sending information email
+        mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail());
         ///TODO obsluga proby zablokowania konta użytkownika przez więcej niż 1 administratora???
     }
 }

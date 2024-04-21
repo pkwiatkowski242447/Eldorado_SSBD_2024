@@ -17,6 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateE
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.LocalDateTime;
 
@@ -26,12 +27,14 @@ public class AuthenticationService {
 
     private final AuthenticationFacade authenticationFacade;
     private final AuthenticationManager authenticationManager;
+    private final MailProvider mailProvider;
 
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
-                                 AuthenticationManager authenticationManager) {
+                                 AuthenticationManager authenticationManager, MailProvider mailProvider) {
         this.authenticationFacade = authenticationFacade;
         this.authenticationManager = authenticationManager;
+        this.mailProvider = mailProvider;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -45,7 +48,9 @@ public class AuthenticationService {
                 refreshedAccount.setBlocked(true);
                 refreshedAccount.setBlockedTime(LocalDateTime.now());
                 log.info("Account %s has been blocked".formatted(refreshedAccount.getId()));
-                ///TODO mail
+
+                // Sending information email
+                mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(), refreshedAccount.getEmail());
             }
 
             authenticationFacade.edit(refreshedAccount);
