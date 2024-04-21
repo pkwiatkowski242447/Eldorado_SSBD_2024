@@ -1,10 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
@@ -12,6 +9,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 @Table(name = DatabaseConsts.TOKEN_TABLE)
 @ToString(callSuper = true)
 @NoArgsConstructor
+@AllArgsConstructor
 @NamedQueries({
         @NamedQuery(
                 name = "Token.findByTypeAndAccount",

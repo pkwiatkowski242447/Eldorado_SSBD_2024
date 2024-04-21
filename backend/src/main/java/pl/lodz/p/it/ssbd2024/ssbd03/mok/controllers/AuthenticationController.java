@@ -13,7 +13,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateE
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.JWTService;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.time.LocalDateTime;
 
@@ -23,13 +23,13 @@ import java.time.LocalDateTime;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-    private final JWTService jwtService;
+    private final JWTProvider jwtProvider;
 
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
-                                    JWTService jwtService) {
+                                    JWTProvider jwtProvider) {
         this.authenticationService = authenticationService;
-        this.jwtService = jwtService;
+        this.jwtProvider = jwtProvider;
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -43,7 +43,7 @@ public class AuthenticationController {
                     activityLog.setLastSuccessfulLoginIp(request.getRemoteAddr());
                     activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
                     authenticationService.updateActivityLog(account, activityLog);
-                    return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jwtService.generateJWTToken(account));
+                    return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jwtProvider.generateJWTToken(account));
                 } else if (!account.getActive()) {
                     responseMessage = "Your account has not been activated yet!";
                 } else if (account.getBlocked()) {
