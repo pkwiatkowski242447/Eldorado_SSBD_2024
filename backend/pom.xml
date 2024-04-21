@@ -350,6 +350,14 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <!--Enable using pom properties in other files-->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
     <reporting>
@@ -380,5 +388,29 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <database.host>192.168.20.3</database.host>
+                <schema-gen.policy>update</schema-gen.policy>
+                <debug-sql.log>false</debug-sql.log>
+                <logging.level>INFO</logging.level>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <database.host>localhost</database.host>
+                <schema-gen.policy>create-drop</schema-gen.policy>
+                <debug-sql.log>true</debug-sql.log>
+                <logging.level>DEBUG</logging.level>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
