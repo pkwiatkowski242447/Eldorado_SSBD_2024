@@ -39,12 +39,14 @@
         <logback.version>1.4.14</logback.version>
         <!--Lombok-->
         <lombok.version>1.18.30</lombok.version>
-        <!-- Atomikos -->
+        <!--Atomikos-->
         <atomikos.version>6.0.0</atomikos.version>
         <!--Jackson-->
         <jackson.version>2.17.0</jackson.version>
-        <!-- JWT -->
+        <!--JWT-->
         <java-jwt.version>4.4.0</java-jwt.version>
+        <!--Open API-->
+        <open-api.version>2.1.0</open-api.version>
         <!--Plugins-->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
@@ -131,7 +133,7 @@
             <version>${jakarta-servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Transactions API -->
+        <!--Transactions API-->
         <dependency>
             <groupId>jakarta.transaction</groupId>
             <artifactId>jakarta.transaction-api</artifactId>
@@ -223,7 +225,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Atomikos -->
+        <!--Atomikos-->
         <dependency>
             <groupId>com.atomikos</groupId>
             <artifactId>transactions-jta</artifactId>
@@ -257,11 +259,25 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- JWT -->
+        <!--JWT-->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>${java-jwt.version}</version>
+        </dependency>
+
+        <!--TODO try to exclude SB-->
+        <!--Open API-->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${open-api.version}</version>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-autoconfigure</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
     </dependencies>
 
@@ -323,6 +339,16 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--Javadoc-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -343,6 +369,14 @@
                         </reports>
                     </reportSet>
                 </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <show>public</show>
+                </configuration>
             </plugin>
         </plugins>
     </reporting>
