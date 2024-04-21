@@ -17,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.JWTService;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.JWTMessages;
 
 import java.io.IOException;
@@ -27,13 +27,13 @@ import java.util.UUID;
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JWTService jwtService;
+    private final JWTProvider jwtProvider;
     private final AuthenticationFacade authenticationFacade;
 
     @Autowired
-    public JWTAuthenticationFilter(JWTService jwtService,
+    public JWTAuthenticationFilter(JWTProvider jwtProvider,
                                    AuthenticationFacade authenticationFacade) {
-        this.jwtService = jwtService;
+        this.jwtProvider = jwtProvider;
         this.authenticationFacade = authenticationFacade;
     }
 
@@ -51,13 +51,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwtToken = authHeader.replaceAll("\\s+", "").substring(6);
-        final String userName = jwtService.extractUsername(jwtToken);
+        final String userName = jwtProvider.extractUsername(jwtToken);
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            final UUID accountId = jwtService.extractAccountId(jwtToken);
+            final UUID accountId = jwtProvider.extractAccountId(jwtToken);
             Account account = authenticationFacade.find(accountId).orElseThrow();
 
-            if (!jwtService.isTokenValid(jwtToken, account)) {
+            if (!jwtProvider.isTokenValid(jwtToken, account)) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.getWriter().write(JWTMessages.INVALID_TOKEN);
                 SecurityContextHolder.clearContext();
@@ -75,6 +75,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/api/v1/auth");
+        return path.startsWith("/api/v1/auth") || path.startsWith("/api/v1/register");
     }
 }

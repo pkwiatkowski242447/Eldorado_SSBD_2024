@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.utils;
+package pl.lodz.p.it.ssbd2024.ssbd03.utils.providers;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -15,7 +15,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Component
-public class JWTService {
+public class JWTProvider {
 
     private String secretKey;
 
@@ -38,6 +38,16 @@ public class JWTService {
                 .withClaim(JWTConsts.USER_LEVELS, listOfRoles)
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
+                .withIssuer(JWTConsts.TOKEN_ISSUER)
+                .sign(Algorithm.HMAC256(this.getSingInKey()));
+    }
+
+    public String generateRegistrationToken(Account account) {
+        return JWT.create()
+                .withSubject(account.getLogin())
+                .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
+                .withIssuedAt(Instant.now())
+                .withExpiresAt(Instant.now().plus(24, ChronoUnit.HOURS))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
                 .sign(Algorithm.HMAC256(this.getSingInKey()));
     }

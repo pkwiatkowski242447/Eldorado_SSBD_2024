@@ -2,8 +2,9 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Transactional(propagation = Propagation.MANDATORY)
 public class UserLevelFacade extends AbstractFacade<UserLevel> {
 
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
@@ -28,43 +30,36 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
     }
 
     @Override
-    @Transactional
-    public void create(UserLevel entity) {
-        super.create(entity);
+    public void create(UserLevel userLevel) {
+        super.create(userLevel);
     }
 
     @Override
-    @Transactional
-    public void edit(UserLevel entity) {
-        super.edit(entity);
+    public void edit(UserLevel userLevel) {
+        super.edit(userLevel);
     }
 
     @Override
-    @Transactional
-    public void remove(UserLevel entity) {
-        super.remove(entity);
+    public void remove(UserLevel userLevel) {
+        super.remove(userLevel);
     }
 
     @Override
-    @Transactional
     public Optional<UserLevel> find(UUID id) {
         return super.find(id);
     }
 
     @Override
-    @Transactional
     public Optional<UserLevel> findAndRefresh(UUID id) {
         return super.findAndRefresh(id);
     }
 
     @Override
-    @Transactional
     public List<UserLevel> findAll() {
         return super.findAll();
     }
 
     @Override
-    @Transactional
     public int count() {
         return super.count();
     }
