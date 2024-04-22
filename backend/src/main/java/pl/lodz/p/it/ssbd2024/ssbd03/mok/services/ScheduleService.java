@@ -14,7 +14,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.ScheduleConsts;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -40,21 +39,19 @@ public class ScheduleService {
         log.info(ScheduleConsts.INVOKING_DELETE_ACCOUNTS_MESS);
 
         // Find not verified accounts
-        Optional<List<Account>> inactiveAccountsOpt;
+        List<Account> inactiveAccounts;
         try {
-            inactiveAccountsOpt =
+            inactiveAccounts =
                     accountMOKFacade.findAllAccountsMarkedForDeletion(Long.parseLong(deleteTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
             log.error(ScheduleConsts.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
             throw new ScheduleBadProperties(ScheduleConsts.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
         }
 
-        if (inactiveAccountsOpt.isEmpty()) {
+        if (inactiveAccounts.isEmpty()) {
             log.info(ScheduleConsts.NO_ACCOUNTS_TO_DELETE_MESS);
             return;
         }
-
-        List<Account> inactiveAccounts = inactiveAccountsOpt.get();
 
         log.info(ScheduleConsts.LIST_ACCOUNTS_TO_DELETE_IDS, inactiveAccounts.stream().map(Account::getId).toList());
 
