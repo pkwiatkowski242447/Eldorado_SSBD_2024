@@ -17,6 +17,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.time.LocalDateTime;
 
+/**
+ * Controller used for authentication in the system.
+ */
 @Slf4j
 @RestController()
 @RequestMapping("/api/v1/auth")
@@ -25,6 +28,12 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final JWTProvider jwtProvider;
 
+    /**
+     * Autowired constructor for the controller.
+     *
+     * @param authenticationService
+     * @param jwtProvider
+     */
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
                                     JWTProvider jwtProvider) {
@@ -32,6 +41,14 @@ public class AuthenticationController {
         this.jwtProvider = jwtProvider;
     }
 
+    /**
+     * Allows an unauthenticated user to log in to the system.
+     *
+     * @param accountLoginDTO User's credentials.
+     * @param request         HTTP Request in which the credentials.
+     * @return In case of successful logging in returns HTTP 200 OK and JWT later used to keep track of a session.
+     * If any problems occur returns HTTP 400 BAD REQUEST and JSON containing information about the problem.
+     */
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) {
         try {

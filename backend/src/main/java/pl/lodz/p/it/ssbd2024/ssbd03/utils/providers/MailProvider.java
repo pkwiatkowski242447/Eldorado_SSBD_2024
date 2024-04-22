@@ -25,6 +25,9 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
 
+/**
+ * Component used for sending e-mail messages.
+ */
 @Slf4j
 @Component
 @PropertySource(value = "classpath:mail.properties")
@@ -37,11 +40,22 @@ public class MailProvider {
 
     private final JavaMailSenderImpl mailSender;
 
+    /**
+     * Autowired constructor for the component.
+     * @param javaMailSender
+     */
     @Autowired
     public MailProvider(JavaMailSenderImpl javaMailSender) {
         this.mailSender = javaMailSender;
     }
 
+    /**
+     * Sends an account creation confirmation e-mail to the specified e-mail address.
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param confirmationURL URL used to confirm the account creation.
+     */
     public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
@@ -73,6 +87,12 @@ public class MailProvider {
         }
     }
 
+    /**
+     * Loads e-mail template from the /resources/templates folder.
+     * @param templateName Name of the template file.
+     * @return Returns a String containing the loaded template.
+     * If an exception occurs while reading the template file it will return everything read up to this point.
+     */
     private Optional<String> loadTemplate(String templateName) {
         StringBuilder builder = new StringBuilder();
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("templates/" + templateName);
@@ -87,6 +107,12 @@ public class MailProvider {
         return Optional.of(builder.toString());
     }
 
+    /**
+     * Loads eimage from the /resources/templates/images folder.
+     * @param imageName Name of the image file.
+     * @return Returns a String containing the loaded image.
+     * If an exception occurs while reading the image file it will return everything read up to this point.
+     */
     private Optional<String> loadImage(String imageName) {
         StringBuilder builder = new StringBuilder();
         try {

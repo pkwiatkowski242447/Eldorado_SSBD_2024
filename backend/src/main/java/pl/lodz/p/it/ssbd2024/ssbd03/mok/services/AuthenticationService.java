@@ -17,12 +17,21 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAcco
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 
+/**
+ * Service managing authentication.
+ */
 @Service
 public class AuthenticationService {
 
     private final AuthenticationFacade authenticationFacade;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Autowired constructor for the service.
+     *
+     * @param authenticationFacade
+     * @param authenticationManager
+     */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
                                  AuthenticationManager authenticationManager) {
@@ -30,6 +39,13 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Updates the activity log for the specified Account.
+     *
+     * @param account     Account which ActivityLog is to be updated.
+     * @param activityLog Updated ActivityLog.
+     * @throws ActivityLogUpdateException Threw when problem retrieving Account occurs.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public void updateActivityLog(Account account, ActivityLog activityLog) throws ActivityLogUpdateException {
         try {
@@ -41,6 +57,15 @@ public class AuthenticationService {
         }
     }
 
+    /**
+     * Authenticates a user in the system.
+     *
+     * @param login    Login of the Account.
+     * @param password Password to the Account.
+     * @return Returns an Account with the given credentials.
+     * @throws AuthenticationAccountNotFoundException    Threw when there is no Account with given login.
+     * @throws AuthenticationInvalidCredentialsException Threw when credentials don't match any account.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public Account login(String login, String password) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
         try {
@@ -54,6 +79,13 @@ public class AuthenticationService {
         }
     }
 
+    /**
+     * Retrieves an Account with given login.
+     *
+     * @param login Login of the Account to be retrieved.
+     * @return Returns Account with the specified login.
+     * @throws AuthenticationAccountNotFoundException Threw when there is no Account with given login.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public Account findByLogin(String login) throws AuthenticationAccountNotFoundException {
         try {
