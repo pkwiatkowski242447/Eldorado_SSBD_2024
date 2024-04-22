@@ -12,8 +12,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 @PropertySource(value = {"classpath:application.properties"})
 public class DataSourceMOKConfig {
 
-    @Value("${jdbc.driverClassName}")
-    private String driverClassName;
     @Value("${jdbc.ssbd03.url}")
     private String url;
     @Value("${jdbc.ssbd03.mok.username}")
