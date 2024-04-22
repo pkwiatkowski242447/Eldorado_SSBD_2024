@@ -34,6 +34,7 @@ public class AuthenticationController {
         this.jwtProvider = jwtProvider;
     }
 
+    @CrossOrigin(origins = "https://localhost:3000")
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) {
         try {
