@@ -4,15 +4,19 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Repository;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Repository
 public class TokenFacade extends AbstractFacade<Token> {
 
@@ -84,6 +88,19 @@ public class TokenFacade extends AbstractFacade<Token> {
 
         }
 
+    }
+    public List<Token> findByTokenType(Token.TokenType tokenType) {
+        try {
+            TypedQuery<Token> query = getEntityManager()
+                .createNamedQuery("Token.findByTokenType", Token.class)
+                .setParameter("tokenType", tokenType);
+            var list = query.getResultList();
+            refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            log.error(exception.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     public void removeByAccount(UUID accountId) {
