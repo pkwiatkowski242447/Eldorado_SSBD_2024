@@ -10,6 +10,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Entity representing Account's staff access level.
+ */
 @Entity
 @Table(name = DatabaseConsts.STAFF_DATA_TABLE)
 @DiscriminatorValue(value = DatabaseConsts.STAFF_DISCRIMINATOR)
