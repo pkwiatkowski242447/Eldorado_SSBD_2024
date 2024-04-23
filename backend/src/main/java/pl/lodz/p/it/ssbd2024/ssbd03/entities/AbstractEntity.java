@@ -13,6 +13,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
 import java.util.UUID;
 
+/**
+ * Entity used as a basis for all Entities in the system.
+ * Used to simplify the classes and unify matters related with id generation and version tracking.
+ */
 @MappedSuperclass
 @Getter @ToString
 public class AbstractEntity {

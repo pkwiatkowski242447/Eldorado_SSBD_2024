@@ -19,6 +19,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Entity representing a user account in the system.
+ *
+ * @see UserLevel
+ * @see Admin
+ * @see Client
+ * @see Staff
+ * @see ActivityLog
+ */
 @Entity
 @Table(name = DatabaseConsts.ACCOUNT_TABLE)
 @SecondaryTable(name = DatabaseConsts.PERSONAL_DATA_TABLE)
@@ -200,7 +209,7 @@ public class Account extends AbstractEntity {
     @NotNull(message = AccountMessages.ACTIVE_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_ACTIVE_COLUMN, nullable = false)
     @Setter
-    private Boolean active = true;
+    private Boolean active = false;
 
     @NotNull(message = AccountMessages.BLOCKED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_COLUMN, nullable = false)
@@ -243,7 +252,7 @@ public class Account extends AbstractEntity {
 
     @Embedded
     @Setter
-    private ActivityLog activityLog;
+    private ActivityLog activityLog = new ActivityLog();
 
     @NotBlank(message = AccountMessages.LANGUAGE_BLANK)
     //@Pattern(regexp = AccountsConsts.LANGUAGE_REGEX, message = AccountMessages.LANGUAGE_REGEX_NOT_MET)
@@ -264,6 +273,16 @@ public class Account extends AbstractEntity {
     @Getter
     private LocalDateTime creationDate;
 
+    /**
+     * Constructs new Account entity.
+     *
+     * @param login       Account's login.
+     * @param password    Account's password.
+     * @param name        Account owner's firstname.
+     * @param lastname    Account owner's lastname.
+     * @param email       Email connected with the account.
+     * @param phoneNumber Phone number connected with the account.
+     */
     public Account(String login, String password, String name, String lastname, String email, String phoneNumber) {
         this.login = login;
         this.password = password;
@@ -273,23 +292,44 @@ public class Account extends AbstractEntity {
         this.phoneNumber = phoneNumber;
     }
 
+    /**
+     * Adds new user level to the account.
+     *
+     * @param userLevel User level to be added to the account.
+     */
     public void addUserLevel(UserLevel userLevel) {
         userLevels.add(userLevel);
     }
 
+    /**
+     * Removes user level from the account.
+     *
+     * @param userLevel User level to be removed from the account.
+     */
     public void removeUserLevel(UserLevel userLevel) {
         userLevels.remove(userLevel);
     }
 
+    /**
+     * Retrieves ActivityLog connected with the Account. It ensures that an ActivityLog object exists, in case it doesn't a new ActivityLog is created.
+     *
+     * @return ActivityLog connected to the Account.
+     */
     public ActivityLog getActivityLog() {
         return this.activityLog == null ? new ActivityLog() : this.activityLog;
     }
 
+    /**
+     * Blocks account and sets the time of applying the blockade to current time.
+     */
     public void blockAccount() {
         this.blocked = true;
         this.blockedTime = LocalDateTime.now();
     }
 
+    /**
+     * Unblocks the account and resets the time of applying the blockade.
+     */
     public void unblockAccount() {
         this.blocked = false;
         this.blockedTime = null;
