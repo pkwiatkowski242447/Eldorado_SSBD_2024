@@ -215,4 +215,16 @@ public class AccountService {
     public List<Account> getAllAccounts(int pageNumber, int pageSize) {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
+
+    /**
+     * Retrieves an Account by the login.
+     *
+     * @param login
+     * @return If Account with the given login was found returns Account, otherwise returns null.
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Account getAccountByLogin(String login) {
+        Optional<Account> account = accountFacade.findByLoginAndRefresh(login);
+        return account.orElse(null);
+    }
 }

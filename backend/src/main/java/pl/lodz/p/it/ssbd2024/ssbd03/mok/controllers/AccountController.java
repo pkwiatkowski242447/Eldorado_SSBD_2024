@@ -4,9 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
 
 import java.util.List;
@@ -54,6 +57,22 @@ public class AccountController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getSelf() {
+        //getUserLoginFromSecurityContextHolder
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        //call accountServiceMethod [findByLogin()]
+        Account account =  accountService.getAccountByLogin(username);
+        if (account == null) {
+            log.info("NIE ZNALAZLEM");
+            return ResponseEntity.internalServerError().body("Wystapil blad");
+        } else {
+            log.info("ZNALAZLEM");
+            log.info(account.toString());
+            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
         }
     }
 }

@@ -382,4 +382,16 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     public void remove(Account account) {
         super.remove(account);
     }
+
+    /**
+     * Retrieves an Account by the login and forces its refresh.
+     *
+     * @param login login of the Account to be retrieved.
+     * @return If Account with the given login was found returns an Optional containing the Account, otherwise returns an empty Optional.
+     */
+    public Optional<Account> findByLoginAndRefresh(String login) {
+        Optional<Account> account = findByLogin(login);
+        account.ifPresent(value -> entityManager.refresh(value));
+        return account;
+    }
 }
