@@ -66,7 +66,7 @@ public class RegistrationController {
             // Create a corresponding token in the database
             String token = this.tokenService.createRegistrationToken(newAccount);
             // Send a mail with an activation link
-            String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token;
+            String confirmationURL = "http://localhost:8080/api/v1/accounts/activate-account/" + token;
             mailProvider.sendRegistrationConfirmEmail(accountRegisterDTO.getFirstName(), accountRegisterDTO.getLastName(), accountRegisterDTO.getEmail(), confirmationURL, accountRegisterDTO.getLanguage());
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {

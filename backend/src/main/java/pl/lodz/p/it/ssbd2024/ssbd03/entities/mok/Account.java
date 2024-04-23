@@ -209,7 +209,7 @@ public class Account extends AbstractEntity {
     @NotNull(message = AccountMessages.ACTIVE_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_ACTIVE_COLUMN, nullable = false)
     @Setter
-    private Boolean active = true;
+    private Boolean active = false;
 
     @NotNull(message = AccountMessages.BLOCKED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_COLUMN, nullable = false)
