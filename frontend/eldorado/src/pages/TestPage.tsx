@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, {useState} from 'react';
 import {useAccountState} from '../context/AccountContext';
 import {RolesEnum} from '../types/TokenPayload';
@@ -30,17 +29,6 @@ function TestPage() {
     return (
         <div>
             <h1 style={{backgroundColor: getBannerColor(selectedRole)}}>Your selected role is: {selectedRole}</h1>
-=======
-import React from 'react';
-import {useAccountState} from '../context/AccountContext';
-
-function TestPage() {
-    const {account} = useAccountState();
-    console.log(account)
-    return (
-        <div>
-            <h1>This is a test page</h1>
->>>>>>> ea70a85be9b0efdc62555bdac1da2ea876f10e9c
             {account && (
                 <div>
                     <h2>User Information</h2>
@@ -50,7 +38,6 @@ function TestPage() {
                         <p>{userType}</p>
                     ))}</p>
                     <p>Active Role: {account.activeRole}</p>
-<<<<<<< HEAD
                     <div>
                         <h3>Change Active Role</h3>
                         <select value={selectedRole} onChange={handleRoleChange}>
@@ -61,8 +48,6 @@ function TestPage() {
                             ))}
                         </select>
                     </div>
-=======
->>>>>>> ea70a85be9b0efdc62555bdac1da2ea876f10e9c
                 </div>
             )}
         </div>
