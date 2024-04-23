@@ -11,15 +11,25 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
-
 import java.util.List;
 
+/**
+ * Service managing Accounts.
+ *
+ * @see Account
+ */
 @Service
 public class AccountService {
 
     private final AccountMOKFacade accountFacade;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Autowired constructor for the service.
+     *
+     * @param accountFacade
+     * @param passwordEncoder
+     */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
                           PasswordEncoder passwordEncoder) {
@@ -27,6 +37,19 @@ public class AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Creates and persists in the database new ClientAccount.
+     *
+     * @param login       Account's login.
+     * @param password    Account's password.
+     * @param firstName   Account owner's firstname.
+     * @param lastName    Account owner's lastname.
+     * @param email       Email connected with the account.
+     * @param phoneNumber Phone number connected with the account.
+     * @param language    Internationalization language used for messages.
+     * @return Returns newly created Account.
+     * @throws AccountCreationException Threw when problem related with persisting an Account occurs.
+     */
     @Transactional(propagation = Propagation.MANDATORY)
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {

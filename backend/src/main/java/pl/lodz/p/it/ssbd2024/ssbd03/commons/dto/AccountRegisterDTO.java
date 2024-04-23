@@ -5,7 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+/**
+ * Data transfer object used in creating new account.
+ */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountRegisterDTO {

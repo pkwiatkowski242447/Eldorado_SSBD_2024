@@ -1,15 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +14,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing and storing information about entries and exits within a Reservation.
+ *
+ * @see Reservation
+ */
 @Entity
 @Table(name = DatabaseConsts.PARKING_EVENT_TABLE)
 @ToString(callSuper = true)
@@ -32,6 +28,9 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Used to describe the type of the ParkingEvent
+     */
     public static enum EventType {ENTRY, EXIT}
 
     @NotNull(message = ParkingEventMessages.RESERVATION_NULL)
@@ -43,12 +42,14 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @NotNull(message = ParkingEventMessages.DATE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_DATE_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime date;
 
     @NotNull(message = ParkingEventMessages.EVENT_TYPE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
-    @Getter @Setter
+    @Getter
+    @Setter
     private EventType type;
 }
