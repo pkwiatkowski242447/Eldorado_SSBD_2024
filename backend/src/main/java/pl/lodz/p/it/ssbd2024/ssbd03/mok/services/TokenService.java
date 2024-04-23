@@ -48,4 +48,12 @@ public class TokenService {
 
         return tokenValue;
     }
+
+    public String createEmailConfirmationToken(Account account, String newEmail) {
+
+        Token emailConfirmationToken = new Token(newEmail, account, Token.TokenType.CONFIRM_EMAIL);
+        this.tokenFacade.create(emailConfirmationToken);
+
+        return newEmail;
+    }
 }

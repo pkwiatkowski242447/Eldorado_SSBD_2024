@@ -41,6 +41,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
                         WHERE t.tokenValue = :tokenValue"""
 
 
+        ),
+        @NamedQuery(
+                name = "Token.findByTokenType",
+                query = """
+                        SELECT t FROM Token t
+                        WHERE t.type = :tokenType"""
         )
 })
 public class Token extends AbstractEntity {
