@@ -37,13 +37,21 @@ public class AuthenticationService {
         this.mailProvider = mailProvider;
     }
 
+    /**
+     * Updates the activity log for the specified Account. When the number of failed logins exceeds the allowed number,
+     * the account is blocked and an email notification is sent.
+     *
+     * @param account     Account which ActivityLog is to be updated.
+     * @param activityLog Updated ActivityLog.
+     * @throws ActivityLogUpdateException Threw when problem retrieving Account occurs.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public void updateActivityLog(Account account, ActivityLog activityLog) throws ActivityLogUpdateException {
         try {
             Account refreshedAccount = authenticationFacade.findAndRefresh(account.getId()).orElseThrow(AccountNotFoundException::new);
             refreshedAccount.setActivityLog(activityLog);
 
-            // Increment the number of failed login attempts TODO rozwazyc przeniesienie tego do innej metody
+            // Increment the number of failed login attempts
             if (!refreshedAccount.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= 3) {
                 refreshedAccount.setBlocked(true);
                 refreshedAccount.setBlockedTime(LocalDateTime.now());

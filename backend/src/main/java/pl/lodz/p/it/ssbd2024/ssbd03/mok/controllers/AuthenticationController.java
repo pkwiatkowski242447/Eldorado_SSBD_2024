@@ -42,6 +42,7 @@ public class AuthenticationController {
                 if (account.getActive() && account.getVerified() && !account.getBlocked()) {
                     activityLog.setLastSuccessfulLoginIp(request.getRemoteAddr());
                     activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
+                    activityLog.setUnsuccessfulLoginCounter(0);
                     authenticationService.updateActivityLog(account, activityLog);
                     return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jwtProvider.generateJWTToken(account));
                 } else if (!account.getActive()) {

@@ -14,10 +14,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -54,24 +54,32 @@ public class AccountService {
         }
     }
 
+    /**
+     * Method for blocking an account by its UUID.
+     *
+     * @param id Account identifier
+     * @throws AccountNotFoundException Threw when there is no account with given login.
+     * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
+     * @throws IllegalOperationException Threw when user try to block their own account.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
-    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException {
+    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked()) {
             throw new AccountAlreadyBlockedException("This account is already blocked");
         }
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            log.error("TODO SECURITY CONTEXT");
-            ///TODO Konto z ktorego wykonywana jest czynność nie jest kontem ktore jest blokowane
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+            SecurityContextHolder.getContext().getAuthentication().getName().equals(account.getLogin())) {
+            log.error("You cannot block your own account!");
+            throw new IllegalOperationException("You cannot block your own account!");
         }
 
         account.setBlocked(true);
-        ///FIXME czy w przypadku blokowania przez admina, czas ma byc ustawioany???
-        account.setBlockedTime(LocalDateTime.now());
+        // When admin blocks the account property blockedTime is not set
         accountFacade.edit(account);
 
         // Sending information email
         mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail());
-        ///TODO obsluga proby zablokowania konta użytkownika przez więcej niż 1 administratora???
+        ///TODO obsluga bledu dla proby zablokowania konta użytkownika przez więcej niż 1 administratora???
     }
 }

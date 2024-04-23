@@ -72,6 +72,12 @@ public class MailProvider {
         }
     }
 
+    /**
+     * Sends an account blocking notification e-mail to the specified e-mail address.
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     */
     public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
