@@ -1,14 +1,30 @@
+import com.github.dockerjava.api.model.HostConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.MountableFile;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestcontainersConfig {
 
+    static final String testDBName = "testDB";
+
     ///TODO w przypadku zmiany tworzonego usera w nominalnym dockerze tutaj tez zmienimy :D
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16")
+            .withCreateContainerCmdModifier(cmd -> {
+                        cmd.withName(testDBName);
+                        cmd.withHostName(testDBName);
+                        cmd.withHostConfig(HostConfig.newHostConfig().withPortBindings(
+                                new PortBinding(Ports.Binding.bindPort(5432), new ExposedPort(5432)))
+                        );
+                    }
+            )
             .withUsername("postgres")
             .withPassword("postgres")
             .withDatabaseName("postgres")
@@ -33,7 +49,7 @@ public class TestcontainersConfig {
                 postgres.getPassword()
         );
 
-        System.out.println(connectionProvider.getConnection() != null);
+        assertNotNull(connectionProvider.getConnection());
     }
 
     @Test
