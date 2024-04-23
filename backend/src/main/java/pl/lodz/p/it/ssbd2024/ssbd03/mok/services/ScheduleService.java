@@ -21,6 +21,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Service managing execution of scheduled tasks.
+ * Configuration concerning tasks is set in application.properties.
+ */
 @Service
 @Slf4j
 public class ScheduleService {
@@ -34,6 +38,12 @@ public class ScheduleService {
     @Value("${scheduler.not_verified_account_delete_time}")
     private String deleteTime;
 
+    /**
+     * Autowired constructor for the service.
+     *
+     * @param accountMOKFacade
+     * @param tokenFacade
+     */
     @Autowired
     public ScheduleService(AccountMOKFacade accountMOKFacade, TokenFacade tokenFacade, MailProvider mailProvider) {
         this.accountMOKFacade = accountMOKFacade;
@@ -41,6 +51,12 @@ public class ScheduleService {
         this.mailProvider = mailProvider;
     }
 
+    /**
+     * Removes Accounts which have not finished registration.
+     * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
+     *
+     * @throws ScheduleBadProperties Threw when problem with properties occurs.
+     */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteNotVerifiedAccount() throws ScheduleBadProperties {

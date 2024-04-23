@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Transactional(propagation = Propagation.MANDATORY)
 public class AuthenticationFacade extends AbstractFacade<Account> {
 
     @PersistenceContext(unitName = DatabaseConfigConstants.AUTH_PU)
@@ -24,31 +25,27 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
         super(Account.class);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public EntityManager getEntityManager() {
         return this.entityManager;
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Optional<Account> find(UUID id) {
         return super.find(id);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public void edit(Account entity) {
         super.edit(entity);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public Optional<Account> findAndRefresh(UUID id) {
         return super.findAndRefresh(id);
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     public Optional<Account> findByLogin(String login) {
         try {
             TypedQuery<Account> tq = getEntityManager().createNamedQuery("Account.findByLogin", Account.class);

@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+/**
+ * Data Transfer Object used to authenticate.
+ *
+ * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account
+ */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountLoginDTO {

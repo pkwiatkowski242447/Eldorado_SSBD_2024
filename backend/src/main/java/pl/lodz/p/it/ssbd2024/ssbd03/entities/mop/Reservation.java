@@ -27,6 +27,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing an allocation of a parking spot on the Parking.
+ * It's used to represent both pre-planned reservations and entries to the Parking without a previously made reservation.
+ * In case of a pre-planned reservation it's possible to have multiple ParkingEvents.
+ * If an anonymous user enters the Parking there is no information related to the Client set.
+ * @see ParkingEvent
+ * @see Sector
+ * @see Client
+ */
 @Entity
 @Table(name = DatabaseConsts.RESERVATION_TABLE)
 @ToString(callSuper = true)
@@ -97,11 +106,20 @@ public class Reservation extends AbstractEntity implements Serializable {
     @Getter
     private List<ParkingEvent> parkingEvents = new ArrayList<>();
 
+    /**
+     * Constructs a new reservation for a non-anonymous client.
+     * @param client The Client on behalf of whom the reservation is made.
+     * @param sector Sector in which the parking spot in allocated.
+     */
     public Reservation(Client client, Sector sector) {
         this.client = client;
         this.sector = sector;
     }
 
+    /**
+     * Constructs a new reservation for a non-anonymous client.
+     * @param sector Sector in which the parking spot in allocated.
+     */
     public Reservation(Sector sector) {
         this(null, sector);
     }
