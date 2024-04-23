@@ -22,6 +22,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.SectorMessages;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Entity representing a Sector of a Parking.
+ * @see Parking
+ * @see Reservation
+ */
 @Entity
 @Table(name = DatabaseConsts.SECTOR_TABLE)
 @ToString(callSuper = true)
@@ -54,7 +59,13 @@ public class Sector extends AbstractEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public static enum SectorType {COVERED, UNCOVERED, UNDERGROUND}
+    /**
+     * Used to describe different types of the Sector.
+     * Depending on it, access to the sector is restricted to the different Clients based on their type.
+     * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client
+     * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client.ClientType
+     */
+    public enum SectorType {COVERED, UNCOVERED, UNDERGROUND}
 
     @NotNull(message = SectorMessages.PARKING_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
@@ -94,6 +105,14 @@ public class Sector extends AbstractEntity implements Serializable {
     @Getter @Setter
     private Integer weight;
 
+    /**
+     * Constructs a new Sector.
+     * @param parking Parking in which the sector is located.
+     * @param name Sector's name.
+     * @param type Sector's type.
+     * @param maxPlaces Total number of parking spots in the sector.
+     * @param weight Sector's weight in the spot assigning algorithms. If set to 0, the sector is disabled.
+     */
     public Sector(Parking parking, String name, SectorType type, Integer maxPlaces, Integer weight) {
         this.parking = parking;
         this.name = name;

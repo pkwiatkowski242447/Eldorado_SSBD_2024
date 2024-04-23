@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
@@ -49,5 +46,14 @@ public class AccountController {
                 .toList();
         if (accountList.isEmpty()) return ResponseEntity.noContent().build();
         else return ResponseEntity.ok(accountList);
+    }
+
+    @PostMapping("/activate-account/{token}")
+    public ResponseEntity<?> activateAccount(@PathVariable(value = "token") String token) {
+        if (accountService.activateAccount(token)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

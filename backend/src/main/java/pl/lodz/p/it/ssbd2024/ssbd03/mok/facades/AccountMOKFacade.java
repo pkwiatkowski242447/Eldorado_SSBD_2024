@@ -20,6 +20,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Repository used to manage Accounts Entities in the database on behalf of MOK module.
+ *
+ * @see Account
+ */
+
 @Slf4j
 @Repository
 @Transactional(propagation = Propagation.MANDATORY)
@@ -28,10 +34,18 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
     private EntityManager entityManager;
 
+    /**
+     * Constructs the facade.
+     */
     public AccountMOKFacade() {
         super(Account.class);
     }
 
+    /**
+     * Retrieves an entity manager.
+     *
+     * @return Entity manager associated with the facade.
+     */
     @Override
     public EntityManager getEntityManager() {
         return this.entityManager;
@@ -39,6 +53,11 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // C - create methods
 
+    /**
+     * Persists a new Account in the database.
+     *
+     * @param account Entity to be persisted.
+     */
     @Override
     public void create(Account account) {
         super.create(account);
@@ -46,16 +65,33 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // R - read methods
 
+    /**
+     * Retrieves an Account by the ID.
+     *
+     * @param id ID of the Account to be retrieved.
+     * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
+     */
     @Override
     public Optional<Account> find(UUID id) {
         return super.find(id);
     }
 
+    /**
+     * Retrieves an Account by the ID and forces its refresh.
+     *
+     * @param id ID of the Account to be retrieved.
+     * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
+     */
     @Override
     public Optional<Account> findAndRefresh(UUID id) {
         return super.findAndRefresh(id);
     }
 
+    /**
+     * Retrieves all Accounts.
+     *
+     * @return List containing all Accounts.
+     */
     @Override
     public List<Account> findAll() {
         return super.findAll();
@@ -325,6 +361,11 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // U - update methods
 
+    /**
+     * Forces the modification of the entity in the database.
+     *
+     * @param account Account to be modified.
+     */
     @Override
     public void edit(Account account) {
         super.edit(account);
@@ -332,6 +373,11 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // D - delete methods
 
+    /**
+     * Removes an Account from the database.
+     *
+     * @param account Account to be removed from the database.
+     */
     @Override
     public void remove(Account account) {
         super.remove(account);

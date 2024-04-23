@@ -1,15 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +18,21 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInva
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+/**
+ * Service managing authentication.
+ */
 @Service
 public class AuthenticationService {
 
     private final AuthenticationFacade authenticationFacade;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Autowired constructor for the service.
+     *
+     * @param authenticationFacade
+     * @param authenticationManager
+     */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
                                  AuthenticationManager authenticationManager) {
@@ -35,6 +40,13 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Updates the activity log for the specified Account.
+     *
+     * @param account     Account which ActivityLog is to be updated.
+     * @param activityLog Updated ActivityLog.
+     * @throws ActivityLogUpdateException Threw when problem retrieving Account occurs.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public void updateActivityLog(Account account, ActivityLog activityLog) throws ActivityLogUpdateException {
         try {
@@ -46,8 +58,17 @@ public class AuthenticationService {
         }
     }
 
+    /**
+     * Authenticates a user in the system.
+     *
+     * @param login    Login of the Account.
+     * @param password Password to the Account.
+     * @return Returns an Account with the given credentials.
+     * @throws AuthenticationAccountNotFoundException    Threw when there is no Account with given login.
+     * @throws AuthenticationInvalidCredentialsException Threw when credentials don't match any account.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
-    public Account login(String login, String password, HttpServletRequest request) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
+    public Account login(String login, String password) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -59,6 +80,13 @@ public class AuthenticationService {
         }
     }
 
+    /**
+     * Retrieves an Account with given login.
+     *
+     * @param login Login of the Account to be retrieved.
+     * @return Returns Account with the specified login.
+     * @throws AuthenticationAccountNotFoundException Threw when there is no Account with given login.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public Account findByLogin(String login) throws AuthenticationAccountNotFoundException {
         try {

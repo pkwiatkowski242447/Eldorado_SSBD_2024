@@ -16,7 +16,13 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * Service managing Accounts.
+ *
+ * @see Account
+ */
 @Service
 public class AccountService {
 
@@ -26,6 +32,15 @@ public class AccountService {
     private final MailProvider mailProvider;
     private final JWTProvider jwtProvider;
 
+    /**
+     * Autowired constructor for the service.
+     *
+     * @param accountFacade
+     * @param passwordEncoder
+     * @param tokenFacade
+     * @param mailProvider
+     * @param jwtProvider
+     */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
                           PasswordEncoder passwordEncoder,
@@ -54,7 +69,6 @@ public class AccountService {
      *
      * @throws AccountCreationException When persisting newly created account with client user level results in Persistence exception.
      */
-
     @Transactional(propagation = Propagation.MANDATORY)
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
@@ -153,6 +167,26 @@ public class AccountService {
                     newAdminAccount.getAccountLanguage());
         } catch (PersistenceException exception) {
             throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
+        }
+    }
+    /**
+     * Activate account with a token from URL.
+     * @param token token to activate account
+     * @return
+     */
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean activateAccount(String token) {
+        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
+        Account account = accountFromDB.orElse(null);
+        if (!jwtProvider.isTokenValid(token, account)) {
+            return false;
+        } else {
+            account.setActive(true);
+            account.setVerified(true);
+            accountFacade.edit(account);
+            tokenFacade.findByTokenValue(token).ifPresent(tokenFacade::remove);
+            return true;
         }
     }
 
