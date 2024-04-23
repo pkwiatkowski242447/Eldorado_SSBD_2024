@@ -31,7 +31,7 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     /**
      * Used to describe the type of the ParkingEvent
      */
-    public static enum EventType {ENTRY, EXIT}
+    public enum EventType {ENTRY, EXIT}
 
     @NotNull(message = ParkingEventMessages.RESERVATION_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)

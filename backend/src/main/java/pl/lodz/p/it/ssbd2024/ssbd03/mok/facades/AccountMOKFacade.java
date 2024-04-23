@@ -303,7 +303,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param pageNumber Number of the page to retrieve.
      * @return List of accounts that match the parameters.
      */
-
     public List<Account> findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(String login,
                                                                                                       String firstName,
                                                                                                       String lastName,

@@ -47,10 +47,10 @@ public class Token extends AbstractEntity {
     /**
      * Used to specify the type of the Account action related to the token.
      */
-    public static enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
+    public enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
 
-    @Column(name = DatabaseConsts.TOKEN_TOKEN_VALUE_COLUMN, unique = true, nullable = false)
-    @Setter
+    @Column(name = DatabaseConsts.TOKEN_TOKEN_VALUE_COLUMN, unique = true, nullable = false, length = 512)
+    @Getter @Setter
     private String tokenValue;
 
     @ManyToOne(cascade = {CascadeType.REFRESH})

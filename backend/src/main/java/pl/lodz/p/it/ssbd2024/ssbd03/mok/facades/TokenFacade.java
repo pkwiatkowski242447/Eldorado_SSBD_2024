@@ -5,6 +5,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
@@ -19,6 +21,7 @@ import java.util.UUID;
  * @see Token
  */
 @Repository
+@Transactional(propagation = Propagation.MANDATORY)
 public class TokenFacade extends AbstractFacade<Token> {
 
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)

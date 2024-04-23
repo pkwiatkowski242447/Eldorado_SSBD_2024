@@ -65,7 +65,7 @@ public class Sector extends AbstractEntity implements Serializable {
      * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client
      * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client.ClientType
      */
-    public static enum SectorType {COVERED, UNCOVERED, UNDERGROUND}
+    public enum SectorType {COVERED, UNCOVERED, UNDERGROUND}
 
     @NotNull(message = SectorMessages.PARKING_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
