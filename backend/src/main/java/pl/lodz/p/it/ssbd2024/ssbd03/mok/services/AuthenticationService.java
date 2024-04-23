@@ -1,11 +1,15 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +47,7 @@ public class AuthenticationService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Account login(String login, String password) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
+    public Account login(String login, String password, HttpServletRequest request) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
             SecurityContextHolder.getContext().setAuthentication(authentication);

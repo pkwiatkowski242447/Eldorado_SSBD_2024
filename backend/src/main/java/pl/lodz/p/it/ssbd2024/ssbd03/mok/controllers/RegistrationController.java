@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 
-import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -58,6 +57,15 @@ public class RegistrationController {
         }
     }
 
+    /**
+     * This endpoint allows user with administrative user level to create new account with staff user level. After
+     * the account has been created, the activation link is sent to the e-mail address, specified in the accountRegisterDTO.
+     *
+     * @param accountRegisterDTO Data transfer object, containing user account data, such as login, password, first name, last name, email and so on.
+     * @return If account registration is successful, then 204 NO CONTENT is returned as a response. In case of Persistence exception being thrown
+     * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
+     * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
+     */
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) {
@@ -79,6 +87,15 @@ public class RegistrationController {
         }
     }
 
+    /**
+     * This endpoint allows user with administrative user level to create new account with admin user level. After
+     * the account has been created, the activation link is sent to the e-mail address, specified in the accountRegisterDTO.
+     *
+     * @param accountRegisterDTO Data transfer object, containing user account data, such as login, password, first name, last name, email and so on.
+     * @return If account registration is successful, then 204 NO CONTENT is returned as a response. In case of Persistence exception being thrown
+     * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
+     * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
+     */
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) {

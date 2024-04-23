@@ -9,7 +9,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 @ControllerAdvice
 public class RestControllerAdvice{
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({AuthenticationCredentialsNotFoundException.class})
-    public void handleAuthenticationCredentialsNotFoundException() {}
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    @ExceptionHandler({AuthenticationCredentialsNotFoundException.class})
+//    public void handleAuthenticationCredentialsNotFoundException() {}
 }

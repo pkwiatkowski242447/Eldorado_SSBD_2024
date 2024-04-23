@@ -4,9 +4,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Repository
+@Transactional(propagation = Propagation.MANDATORY)
 public class AccountMOKFacade extends AbstractFacade<Account> {
 
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
@@ -37,7 +39,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // C - create methods
 
-    @Transactional
     @Override
     public void create(Account account) {
         super.create(account);
@@ -45,25 +46,21 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // R - read methods
 
-    @Transactional
     @Override
     public Optional<Account> find(UUID id) {
         return super.find(id);
     }
 
-    @Transactional
     @Override
     public Optional<Account> findAndRefresh(UUID id) {
         return super.findAndRefresh(id);
     }
 
-    @Transactional
     @Override
     public List<Account> findAll() {
         return super.findAll();
     }
 
-    @Transactional
     public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccounts", Account.class);
@@ -79,7 +76,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllActiveAccountsWithPagination(int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccountsByActive", Account.class);
@@ -96,7 +92,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllInactiveAccountsWithPagination(int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccountsByActive", Account.class);
@@ -113,7 +108,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllActiveAccountsWithGivenUserLevelWithPagination(int pageNumber, int pageSize, Class<? extends UserLevel> userLevel) {
         try {
             TypedQuery<Account> findAllActiveAccountsByUserLevelQuery = entityManager.createNamedQuery("Account.findAccountsByUserLevelAndActive", Account.class);
@@ -130,7 +124,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public Optional<Account> findByLogin(String login) {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
@@ -141,7 +134,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public Optional<Account> findByEmail(String email) {
         try {
             TypedQuery<Account> findAccountByEmail = entityManager.createNamedQuery("Account.findAccountByEmail", Account.class);
@@ -152,7 +144,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllAccountsMatchingLoginWithPagination(int pageNumber, int pageSize, String login, boolean active) {
         try {
             TypedQuery<Account> findAllAccountsMatchingLogin = entityManager.createNamedQuery("Account.findAllAccountsMatchingGivenLogin", Account.class);
@@ -170,7 +161,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllAccountsMarkedForDeletion(long amount, TimeUnit timeUnit) {
         try {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
@@ -185,7 +175,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllAccountsByBlocked(int pageNumber, int pageSize, boolean blocked) {
         try {
             TypedQuery<Account> findAllBlockedAccounts = entityManager.createNamedQuery("Account.findAllAccountsByBlockedInAscOrder", Account.class);
@@ -202,7 +191,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllBlockedAccountsThatWereBlockedByAdminWithPagination(int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccountsBlockedByAdminQuery = entityManager.createNamedQuery("Account.findAllBlockedAccountsThatWereBlockedByAdmin", Account.class);
@@ -218,7 +206,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimesWithPagination(int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery = entityManager
@@ -235,7 +222,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllActiveAccountsWithUnverifiedEmailWithPagination(int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
@@ -253,7 +239,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllInactiveAccountsWithUnverifiedEmailWithPagination(int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
@@ -282,7 +267,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param pageNumber Number of the page to retrieve.
      * @return List of accounts that match the parameters.
      */
-    @Transactional
     public List<Account> findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(String login,
                                                                                                       String firstName,
                                                                                                       String lastName,
@@ -311,7 +295,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public List<Account> findAllAccountsWithoutRecentActivityWithPagination(int pageSize, int pageNumber, LocalDateTime lastSuccessfulLogin) {
         try {
             TypedQuery<Account> findAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.findAccountsWithoutAnyActivityFrom", Account.class);
@@ -328,7 +311,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
-    @Transactional
     public Optional<Integer> countAllAccountsWithoutRecentActivityWithPagination(int pageSize, int pageNumber, LocalDateTime lastSuccessfulLogin) {
         try {
             TypedQuery<Integer> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Integer.class);
@@ -343,7 +325,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // U - update methods
 
-    @Transactional
     @Override
     public void edit(Account account) {
         super.edit(account);
@@ -351,7 +332,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
 
     // D - delete methods
 
-    @Transactional
     @Override
     public void remove(Account account) {
         super.remove(account);

@@ -42,7 +42,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 public class Token extends AbstractEntity {
     public static enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
 
-    @Column(name = DatabaseConsts.TOKEN_TOKEN_VALUE_COLUMN, unique = true, nullable = false)
+    @Column(name = DatabaseConsts.TOKEN_TOKEN_VALUE_COLUMN, unique = true, nullable = false, length = 512)
     @Getter @Setter
     private String tokenValue;
 

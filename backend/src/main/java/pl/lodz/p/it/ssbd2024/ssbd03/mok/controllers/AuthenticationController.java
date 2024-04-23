@@ -38,7 +38,7 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) {
         try {
             try {
-                Account account = this.authenticationService.login(accountLoginDTO.getLogin(), accountLoginDTO.getPassword());
+                Account account = this.authenticationService.login(accountLoginDTO.getLogin(), accountLoginDTO.getPassword(), request);
                 ActivityLog activityLog = account.getActivityLog();
                 String responseMessage;
                 if (account.getActive() && !account.getBlocked()) {
