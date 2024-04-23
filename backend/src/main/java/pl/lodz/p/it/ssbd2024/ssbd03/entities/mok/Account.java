@@ -53,6 +53,14 @@ import java.util.Collection;
         ),
 
         @NamedQuery(
+                name = "Account.findAllAccounts",
+                query = """
+                        SELECT a FROM Account a
+                        ORDER BY a.login
+                        """
+        ),
+
+        @NamedQuery(
                 name = "Account.findAllAccountsByActive",
                 query = """
                         SELECT a FROM Account a
@@ -136,12 +144,11 @@ import java.util.Collection;
                 query = """
                         SELECT a FROM Account a
                         WHERE
-                            a.active = :active AND
                             (
-                                LOWER(a.name) LIKE CONCAT('%', LOWER(:userFirstName), '%') OR
-                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:userLastName), '%')
+                                LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
+                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')
                             )
-                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:userLogin) , '%')
+                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:login) , '%')
                         ORDER BY a.login ASC
                         """
         ),

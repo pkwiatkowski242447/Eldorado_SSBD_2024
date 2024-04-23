@@ -18,4 +18,5 @@ public class AccountLoginDTO {
 
     private String login;
     private String password;
+    private String language;
 }

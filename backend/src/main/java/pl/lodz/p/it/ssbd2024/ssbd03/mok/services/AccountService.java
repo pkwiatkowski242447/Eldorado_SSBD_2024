@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
+import java.util.List;
 
 /**
  * Service managing Accounts.
@@ -64,5 +65,31 @@ public class AccountService {
         } catch (PersistenceException exception) {
             throw new AccountCreationException(exception.getMessage(), exception);
         }
+    }
+
+    /**
+     * Retrieve Account that match the parameters.
+     *
+     * @param login      Account's login. A phrase is sought in the logins.
+     * @param firstName  Account's owner first name. A phrase is sought in the names.
+     * @param lastName   Account's owner last name. A phrase is sought in the last names.
+     * @param order
+     * @param pageNumber
+     * @param pageSize
+     * @return
+     */
+    @Transactional
+    public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
+                                                                        String firstName,
+                                                                        String lastName,
+                                                                        boolean order,
+                                                                        int pageNumber,
+                                                                        int pageSize) {
+        return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
+    }
+
+    @Transactional
+    public List<Account> getAllAccounts(int pageNumber, int pageSize) {
+        return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
 }

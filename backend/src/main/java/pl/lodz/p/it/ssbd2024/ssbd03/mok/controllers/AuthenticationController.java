@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateE
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.time.LocalDateTime;
@@ -56,32 +58,32 @@ public class AuthenticationController {
                 Account account = this.authenticationService.login(accountLoginDTO.getLogin(), accountLoginDTO.getPassword());
                 ActivityLog activityLog = account.getActivityLog();
                 String responseMessage;
-                if (account.getActive() && account.getVerified() && !account.getBlocked()) {
+                if (account.getActive() && !account.getBlocked()) {
                     activityLog.setLastSuccessfulLoginIp(request.getRemoteAddr());
                     activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
                     authenticationService.updateActivityLog(account, activityLog);
                     return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jwtProvider.generateJWTToken(account));
                 } else if (!account.getActive()) {
-                    responseMessage = "Your account has not been activated yet!";
-                } else if (account.getBlocked()) {
-                    responseMessage = "Your account has been blocked!";
+                    responseMessage = I18n.AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE;
                 } else {
-                    responseMessage = "Error while logging in.";
+                    responseMessage = I18n.AUTH_CONTROLLER_ACCOUNT_BLOCKED;
                 }
                 activityLog.setLastUnsuccessfulLoginIp(request.getRemoteAddr());
                 activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
                 authenticationService.updateActivityLog(account, activityLog);
-                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(responseMessage);
+                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(I18n.getMessage(responseMessage, accountLoginDTO.getLanguage()));
             } catch (AuthenticationInvalidCredentialsException exception) {
                 Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
                 ActivityLog activityLog = account.getActivityLog();
                 activityLog.setLastUnsuccessfulLoginIp(request.getRemoteAddr());
                 activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
                 authenticationService.updateActivityLog(account, activityLog);
-                return ResponseEntity.badRequest().body(exception.getMessage());
+                return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), account.getAccountLanguage()));
             }
-        } catch (AuthenticationAccountNotFoundException | ActivityLogUpdateException exception) {
-            return ResponseEntity.badRequest().body(exception.getMessage());
+        } catch (AuthenticationAccountNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
+        } catch (ActivityLogUpdateException exception) {
+            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
         }
     }
 
