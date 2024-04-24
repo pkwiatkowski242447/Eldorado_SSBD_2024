@@ -76,14 +76,16 @@ public class AuthenticationController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
-
             SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
             logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Logout failed: " + e.getMessage());
+        } catch (Exception exception) {
+            String localeString = request.getLocale().toString();
+            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), localeString));
         }
     }
+
+
 
     @GetMapping(value = "/test")
     public void testMethod() {
