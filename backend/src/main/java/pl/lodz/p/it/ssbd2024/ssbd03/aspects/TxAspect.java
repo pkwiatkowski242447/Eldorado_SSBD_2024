@@ -5,16 +5,25 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2024.ssbd03.transactions.TransactionKeyTracker;
 
 @Slf4j
 @Aspect
 @Component
 public class TxAspect {
 
+    private final TransactionKeyTracker transactionKeyTracker;
+
     @Pointcut(value = "@annotation(org.springframework.transaction.annotation.Transactional) || @within(org.springframework.transaction.annotation.Transactional)")
     private void txPointcut() {}
+
+    @Autowired
+    public TxAspect(TransactionKeyTracker transactionKeyTracker) {
+        this.transactionKeyTracker = transactionKeyTracker;
+    }
 
     @Around(value = "txPointcut()")
     private Object aroundTxPointcut(ProceedingJoinPoint proceedingJoinPoint) {
@@ -24,7 +33,7 @@ public class TxAspect {
             try {
                 message.append(proceedingJoinPoint.getSignature().getName());
                 message.append(" | Class: ").append(proceedingJoinPoint.getTarget().getClass().getSimpleName());
-                message.append(" | TransactionKey: ").append("NULL");
+                message.append(" | TransactionKey: ").append(transactionKeyTracker.getTransactionKey());
                 message.append(" | User: ").append(null != SecurityContextHolder.getContext().getAuthentication() ? SecurityContextHolder.getContext().getAuthentication().getName() : "--ANONYMOUS--");
             } catch (Exception e) {
                 log.error(" | Unexpected exception within aspect: ", e);
