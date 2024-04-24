@@ -1,20 +1,29 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 
 import jakarta.persistence.PersistenceException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
+import java.util.UUID;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +32,9 @@ import java.util.Optional;
  *
  * @see Account
  */
+@Slf4j
 @Service
+@Transactional(propagation = Propagation.REQUIRED)
 public class AccountService {
 
     private final AccountMOKFacade accountFacade;
@@ -69,7 +80,6 @@ public class AccountService {
      *
      * @throws AccountCreationException When persisting newly created account with client user level results in Persistence exception.
      */
-    @Transactional(propagation = Propagation.MANDATORY)
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
             Account account = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -87,6 +97,34 @@ public class AccountService {
     }
 
     /**
+     * Method for blocking an account by its UUID.
+     *
+     * @param id Account identifier
+     * @throws AccountNotFoundException Threw when there is no account with given login.
+     * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
+     * @throws IllegalOperationException Threw when user try to block their own account.
+     */
+    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
+        if (account.getBlocked()) {
+            throw new AccountAlreadyBlockedException("This account is already blocked");
+        }
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().getName().equals(account.getLogin())) {
+            log.error("You cannot block your own account!");
+            throw new IllegalOperationException("You cannot block your own account!");
+        }
+
+        account.setBlocked(true);
+        // When admin blocks the account property blockedTime is not set
+        accountFacade.edit(account);
+
+        // Sending information email
+        mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail());
+        ///TODO obsluga bledu dla proby zablokowania konta użytkownika przez więcej niż 1 administratora???
+    }
+
+    /**
      * This method is used to create new account, which will have default user level of Staff, create
      * appropriate register token, save it to the database, and at the - send the account activation
      * email to the given email address.
@@ -101,8 +139,6 @@ public class AccountService {
      *
      * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
      */
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
             Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -143,8 +179,6 @@ public class AccountService {
      *
      * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
      */
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
             Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -169,13 +203,12 @@ public class AccountService {
             throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
         }
     }
+
     /**
      * Activate account with a token from URL.
      * @param token token to activate account
      * @return
      */
-
-    @Transactional(propagation = Propagation.REQUIRED)
     public boolean activateAccount(String token) {
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
         Account account = accountFromDB.orElse(null);
@@ -201,7 +234,6 @@ public class AccountService {
      * @param pageSize
      * @return
      */
-    @Transactional
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
                                                                         String lastName,
@@ -211,7 +243,6 @@ public class AccountService {
         return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
     }
 
-    @Transactional
     public List<Account> getAllAccounts(int pageNumber, int pageSize) {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }

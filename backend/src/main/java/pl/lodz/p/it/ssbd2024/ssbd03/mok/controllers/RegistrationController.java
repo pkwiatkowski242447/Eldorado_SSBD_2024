@@ -55,7 +55,7 @@ public class RegistrationController {
      * @param accountRegisterDTO New client's details.
      * @return Returns HTTP 204 NO CONTENT, if a problem occurs returns HTTP 400 BAD REQUEST and JSON object containing details about the problem.
      */
-    @PostMapping(value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping( value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) {
         try {
@@ -71,7 +71,11 @@ public class RegistrationController {
             String token = this.tokenService.createRegistrationToken(newAccount);
             // Send a mail with an activation link
             String confirmationURL = "http://localhost:8080/api/v1/accounts/activate-account/" + token;
-            mailProvider.sendRegistrationConfirmEmail(accountRegisterDTO.getFirstName(), accountRegisterDTO.getLastName(), accountRegisterDTO.getEmail(), confirmationURL, accountRegisterDTO.getLanguage());
+            mailProvider.sendRegistrationConfirmEmail(accountRegisterDTO.getFirstName(),
+                    accountRegisterDTO.getLastName(),
+                    accountRegisterDTO.getEmail(),
+                    confirmationURL,
+                    accountRegisterDTO.getLanguage());
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());

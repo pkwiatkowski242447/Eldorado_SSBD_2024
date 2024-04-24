@@ -60,7 +60,7 @@ public class AuthenticationController {
      * @return In case of successful logging in returns HTTP 200 OK and JWT later used to keep track of a session.
      * If any problems occur returns HTTP 400 BAD REQUEST and JSON containing information about the problem.
      */
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) {
         try {
             try {
@@ -70,6 +70,7 @@ public class AuthenticationController {
                 if (account.getActive() && !account.getBlocked()) {
                     activityLog.setLastSuccessfulLoginIp(request.getRemoteAddr());
                     activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
+                    activityLog.setUnsuccessfulLoginCounter(0);
                     authenticationService.updateActivityLog(account, activityLog);
                     return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jwtProvider.generateJWTToken(account));
                 } else if (!account.getActive()) {
@@ -86,6 +87,10 @@ public class AuthenticationController {
                 ActivityLog activityLog = account.getActivityLog();
                 activityLog.setLastUnsuccessfulLoginIp(request.getRemoteAddr());
                 activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
+
+                // Increment the number of failed login attempts
+                activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
+
                 authenticationService.updateActivityLog(account, activityLog);
                 return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), account.getAccountLanguage()));
             }
@@ -112,10 +117,5 @@ public class AuthenticationController {
         } catch (AuthenticationAccountNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
         }
-    }
-
-    @GetMapping(value = "/test")
-    public void testMethod() {
-        log.info("TEST ENDPOINT");
     }
 }
