@@ -36,4 +36,8 @@ public class AccountMessages {
 
     public static final String PHONE_NUMBER_BLANK = "Phone number could not be null, empty or consist of whitespace characters.";
     public static final String PHONE_NUMBER_REGEX_NOT_MET = "Specified phone number is not a valid phone number.";
+
+    public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "Account with given ID could not be found.";
+    public static final String VALIDATION_EXCEPTION = "Invalid field(s).";
+    public static final String SAME_EMAIL_EXCEPTION = "Account's Email cannot be changed to the same email.";
 }

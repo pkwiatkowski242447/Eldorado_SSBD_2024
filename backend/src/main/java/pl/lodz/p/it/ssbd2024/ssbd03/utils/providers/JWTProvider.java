@@ -42,12 +42,12 @@ public class JWTProvider {
                 .sign(Algorithm.HMAC256(this.getSingInKey()));
     }
 
-    public String generateRegistrationToken(Account account) {
+    public String generateActionToken(Account account, int tokenTTL) {
         return JWT.create()
                 .withSubject(account.getLogin())
                 .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plus(24, ChronoUnit.HOURS))
+                .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
                 .sign(Algorithm.HMAC256(this.getSingInKey()));
     }

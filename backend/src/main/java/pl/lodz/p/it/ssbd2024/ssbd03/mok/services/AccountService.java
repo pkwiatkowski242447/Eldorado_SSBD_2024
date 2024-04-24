@@ -1,33 +1,47 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 
 import jakarta.persistence.PersistenceException;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Validator;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.*;
+
+@Slf4j
 @Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class AccountService {
 
     private final AccountMOKFacade accountFacade;
     private final PasswordEncoder passwordEncoder;
 
+    private final Validator validator;
+
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          Validator validator) {
         this.accountFacade = accountFacade;
         this.passwordEncoder = passwordEncoder;
+        this.validator = validator;
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
             Account account = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -55,7 +69,6 @@ public class AccountService {
      * @param pageSize
      * @return
      */
-    @Transactional
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
                                                                         String lastName,
@@ -65,8 +78,40 @@ public class AccountService {
         return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
     }
 
-    @Transactional
     public List<Account> getAllAccounts(int pageNumber, int pageSize) {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
+    }
+
+    public Optional<Account> getAccountById(UUID id){
+        return accountFacade.findAndRefresh(id);
+    }
+
+    public void changeEmail(Account account, String newEmail) throws AccountEmailChangeException {
+        try {
+            //Account account = accountFacade.findAndRefresh(account.getId()).orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND_EXCEPTION));
+            if (account.getEmail().equals(newEmail)) throw new AccountSameEmailException(SAME_EMAIL_EXCEPTION);
+
+            account.setEmail(newEmail);
+            account.setVerified(false);
+            var errors = validator.validateObject(account);
+            if (errors.hasErrors()) throw new AccountValidationException(VALIDATION_EXCEPTION,
+                    errors.getFieldErrors()
+                            .stream()
+                            .map(v -> new AccountValidationException.FieldConstraintViolation(v.getField(),
+                                    Optional.ofNullable(v.getRejectedValue()).orElse(" ").toString(),
+                                    Optional.ofNullable(v.getDefaultMessage()).orElse(" ")))
+                            .collect(Collectors.toSet()));
+            accountFacade.edit(account);
+        } catch (AccountValidationException e) {
+            //TODO internationalization
+            log.error(e.getMessage());
+            throw new AccountEmailChangeException(I18n.ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION, e);
+        } catch (AccountSameEmailException e) {
+            log.error(e.getMessage());
+            throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION, e);
+        } catch (ConstraintViolationException e) {
+            log.error(e.getMessage());
+            throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION, e);
+        }
     }
 }

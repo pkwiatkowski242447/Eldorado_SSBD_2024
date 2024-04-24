@@ -15,6 +15,12 @@ public class I18n {
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
     public static final String AUTH_CONTROLLER_ACCOUNT_BLOCKED = "authentication.controller.account.blocked";
 
+    // Account service
+    public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "account.service.account.not.found.exception";
+    public static final String ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION = "account.service.account.constraint.validation.exception";
+    public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
+    public static final String ACCOUNT_EMAIL_COLLISION_EXCEPTION = "account.service.account.email.collision.exception";
+
     // Mail provider
 
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";
@@ -22,6 +28,12 @@ public class I18n {
     public static final String CONFIRM_REGISTER_RESULT_MESSAGE = "mail.confirm.register.result_message";
     public static final String CONFIRM_REGISTER_ACTION_DESCRIPTION = "mail.confirm.register.action_description";
     public static final String CONFIRM_REGISTER_NOTE_TITLE = "mail.confirm.register.note_title";
+
+    public static final String CONFIRM_EMAIL_GREETING_MESSAGE = "mail.confirm.email.greeting.message";
+    public static final String CONFIRM_EMAIL_MESSAGE_SUBJECT = "mail.confirm.email.message.subject";
+    public static final String CONFIRM_EMAIL_RESULT_MESSAGE = "mail.confirm.email.result_message";
+    public static final String CONFIRM_EMAIL_ACTION_DESCRIPTION = "mail.confirm.email.action_description";
+    public static final String CONFIRM_EMAIL_NOTE_TITLE = "mail.confirm.email.note_title";
     public static final String AUTO_GENERATED_MESSAGE_NOTE = "mail.auto.generate.message.note";
 
     public static String getMessage(String messageKey, String language) {
