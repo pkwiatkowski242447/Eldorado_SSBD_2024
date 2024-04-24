@@ -36,6 +36,8 @@
         <postgres.version>42.6.0</postgres.version>
         <!--Test-->
         <junit.version>5.10.2</junit.version>
+        <rest-assured.version>5.4.0</rest-assured.version>
+        <mockito.version>5.11.0</mockito.version>
         <!--Logging-->
         <slf4j.version>2.0.12</slf4j.version>
         <logback.version>1.4.14</logback.version>
@@ -240,10 +242,25 @@
             <scope>test</scope>
         </dependency>
 
+        <!--Rest Assured-->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>5.4.0</version>
+            <version>${rest-assured.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--Mockito-->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
 

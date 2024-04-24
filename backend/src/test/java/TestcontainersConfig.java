@@ -14,7 +14,7 @@ public class TestcontainersConfig {
 
     static final String testDBName = "testDB";
 
-    ///TODO w przypadku zmiany tworzonego usera w nominalnym dockerze tutaj tez zmienimy :D
+    ///FIXME w przypadku zmiany tworzonego usera w nominalnym dockerze tutaj tez zmienimy :D
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16")
             .withCreateContainerCmdModifier(cmd -> {
@@ -30,7 +30,7 @@ public class TestcontainersConfig {
             .withDatabaseName("postgres")
             .withCopyFileToContainer(MountableFile.forClasspathResource("sql/init_struct_test.sql"),
                     "/docker-entrypoint-initdb.d/");
-//            .withReuse(true); fixme hmm?
+//            .withReuse(true); //hmm?
 
     @BeforeAll
     static void beforeAll() {
@@ -41,15 +41,4 @@ public class TestcontainersConfig {
     static void afterAll() {
         postgres.stop();
     }
-
-//    @BeforeEach
-//    void setUp() {
-//        DBConnectionProvider connectionProvider = new DBConnectionProvider(
-//                postgres.getJdbcUrl(),
-//                postgres.getUsername(),
-//                postgres.getPassword()
-//        );
-//
-//        assertNotNull(connectionProvider.getConnection());
-//    }
 }
