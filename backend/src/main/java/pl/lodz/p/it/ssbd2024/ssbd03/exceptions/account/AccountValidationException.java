@@ -4,9 +4,20 @@ import lombok.Getter;
 
 import java.util.Set;
 
+/**
+ * Used to specify an Exception related to problems with validation of the Account.
+ * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account
+ */
 @Getter
 public class AccountValidationException extends Exception {
 
+    /**
+     * Used to store information about the incorrect fields.
+     *
+     * @param field Name of the field.
+     * @param value Incorrect value passed to the Account.
+     * @param message Description of the violation.
+     */
     public record FieldConstraintViolation(String field, String value, String message) {
     }
 

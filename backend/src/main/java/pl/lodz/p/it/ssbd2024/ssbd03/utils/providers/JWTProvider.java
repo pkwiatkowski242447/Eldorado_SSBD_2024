@@ -42,6 +42,12 @@ public class JWTProvider {
                 .sign(Algorithm.HMAC256(this.getSingInKey()));
     }
 
+    /**
+     * Generates JWT used for keeping track of different actions which require confirmation.
+     * @param account Account to which the change is related to.
+     * @param tokenTTL Token's time to live in hours.
+     * @return Returns a signed Json Web Token.
+     */
     public String generateActionToken(Account account, int tokenTTL) {
         return JWT.create()
                 .withSubject(account.getLogin())

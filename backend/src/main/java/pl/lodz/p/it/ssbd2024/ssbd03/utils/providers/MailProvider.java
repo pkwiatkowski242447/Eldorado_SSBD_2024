@@ -75,6 +75,14 @@ public class MailProvider {
         }
     }
 
+    /**
+     * Sends an e-mail change confirmation e-mail to the specified e-mail address.
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param confirmationURL URL used to confirm the e-mail address.
+     * @param language Language of the message.
+     */
     public void sendEmailConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));

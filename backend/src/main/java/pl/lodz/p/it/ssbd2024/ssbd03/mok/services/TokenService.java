@@ -34,6 +34,12 @@ public class TokenService {
         return tokenValue;
     }
 
+    /**
+     * Creates and persists E-mail confirmation Token for the Account.
+     *
+     * @param account Account for which the token is created.
+     * @return Returns newly created Token's id.
+     */
     @Transactional(propagation = Propagation.MANDATORY)
     public UUID createEmailConfirmationToken(Account account) {
         String tokenValue = this.jwtProvider.generateActionToken(account,24);

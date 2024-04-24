@@ -4,7 +4,7 @@ public class AccountMessages {
 
     public static final String LOGIN_BLANK = "Login could not be null, empty nor consist only of whitespace characters.";
     public static final String LOGIN_REGEX_NOT_MET = "Login can only consist of letters, digits, underscores and hyphens.";
-    public static final String LOGIN_TOO_SHORT = "Login should be at least 8 characters long.";
+    public static final String LOGIN_TOO_SHORT = "Login should be at least 4 characters long.";
     public static final String LOGIN_TOO_LONG = "Login could not be longer than 20 characters.";
 
     public static final String PASSWORD_BLANK = "Password could not be null, empty nor consist only of whitespace characters.";

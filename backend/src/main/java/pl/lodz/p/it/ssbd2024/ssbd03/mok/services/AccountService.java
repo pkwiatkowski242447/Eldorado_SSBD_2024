@@ -12,7 +12,10 @@ import org.springframework.validation.Validator;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountSameEmailException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
@@ -21,7 +24,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.*;
+import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.SAME_EMAIL_EXCEPTION;
+import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.VALIDATION_EXCEPTION;
 
 @Slf4j
 @Service
@@ -82,13 +86,28 @@ public class AccountService {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
 
-    public Optional<Account> getAccountById(UUID id){
+    /**
+     * Retrieves from the database account by id.
+     *
+     * @param id Account's id.
+     * @return Returns Optional containing the requested account if found, otherwise returns empty Optional.
+     */
+    public Optional<Account> getAccountById(UUID id) {
         return accountFacade.findAndRefresh(id);
     }
 
+    /**
+     * Changes the e-mail of the specified Account.
+     *
+     * @param account  Account which the e-mail will be changed.
+     * @param newEmail New e-mail address.
+     * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
+     *                                     Contains a key to an internationalized message.
+     *                                     Additionally, if the problem was caused by an incorrect new mail,
+     *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
+     */
     public void changeEmail(Account account, String newEmail) throws AccountEmailChangeException {
         try {
-            //Account account = accountFacade.findAndRefresh(account.getId()).orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND_EXCEPTION));
             if (account.getEmail().equals(newEmail)) throw new AccountSameEmailException(SAME_EMAIL_EXCEPTION);
 
             account.setEmail(newEmail);
