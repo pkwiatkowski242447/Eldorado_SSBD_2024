@@ -120,9 +120,4 @@ public class ApplicationConfig {
         mailSender.setPassword(this.senderPassword);
         return mailSender;
     }
-
-    @Bean
-    public TxAspect txAspect() {
-        return new TxAspect();
-    }
 }
