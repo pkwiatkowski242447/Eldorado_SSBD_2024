@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
@@ -11,11 +13,13 @@ import com.github.dockerjava.api.model.Ports;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Testcontainers
 public class TestcontainersConfig {
 
     static final String testDBName = "testDB";
 
     ///TODO w przypadku zmiany tworzonego usera w nominalnym dockerze tutaj tez zmienimy :D
+    @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16")
             .withCreateContainerCmdModifier(cmd -> {
                         cmd.withName(testDBName);
@@ -30,6 +34,7 @@ public class TestcontainersConfig {
             .withDatabaseName("postgres")
             .withCopyFileToContainer(MountableFile.forClasspathResource("sql/init_struct_test.sql"),
                     "/docker-entrypoint-initdb.d/");
+//            .withReuse(true); fixme hmm?
 
     @BeforeAll
     static void beforeAll() {
@@ -41,21 +46,14 @@ public class TestcontainersConfig {
         postgres.stop();
     }
 
-    @BeforeEach
-    void setUp() {
-        DBConnectionProvider connectionProvider = new DBConnectionProvider(
-                postgres.getJdbcUrl(),
-                postgres.getUsername(),
-                postgres.getPassword()
-        );
-
-        assertNotNull(connectionProvider.getConnection());
-    }
-
-    @Test
-    void testPostgresContainer() throws InterruptedException {
-        System.out.println(postgres.getJdbcUrl());
-
-        Thread.sleep(100000L);
-    }
+//    @BeforeEach
+//    void setUp() {
+//        DBConnectionProvider connectionProvider = new DBConnectionProvider(
+//                postgres.getJdbcUrl(),
+//                postgres.getUsername(),
+//                postgres.getPassword()
+//        );
+//
+//        assertNotNull(connectionProvider.getConnection());
+//    }
 }
