@@ -65,25 +65,19 @@ public class JWTProvider {
     }
 
     /**
-     * Generates new JSON Web Token used to keep track of the registration status of a given Account.
-     * Token payload includes:
-     * <ul>
-     *     <li>sub - Login of the Account for which the token was issued</li>
-     *     <li>account_id - ID of the Account for which the token was issued</li>
-     *     <li>iat - Issue time of the token</li>
-     *     <li>exp - Expiry time of the token</li>
-     *     <li>iss - Token issuer</li>
-     * </ul>
+     * Generates JWT used for keeping track of different actions which require confirmation.
      *
-     * @param account Newly registered Account.
-     * @return Returns new JSON Web Token.
+     * @param account Account to which the change is related to.
+     * @param tokenTTL Token's time to live in hours.
+     *
+     * @return Returns a signed Json Web Token.
      */
-    public String generateRegistrationToken(Account account) {
+    public String generateActionToken(Account account, int tokenTTL) {
         return JWT.create()
                 .withSubject(account.getLogin())
                 .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plus(24, ChronoUnit.HOURS))
+                .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
                 .sign(Algorithm.HMAC256(this.getSingInKey()));
     }
