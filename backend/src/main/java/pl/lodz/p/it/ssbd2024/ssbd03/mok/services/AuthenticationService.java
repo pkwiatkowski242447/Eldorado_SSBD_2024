@@ -18,9 +18,13 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAcco
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.time.LocalDateTime;
 
+/**
+ * Service managing authentication.
+ */
 @Slf4j
 @Service
 public class AuthenticationService {
@@ -29,6 +33,12 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final MailProvider mailProvider;
 
+    /**
+     * Autowired constructor for the service.
+     *
+     * @param authenticationFacade
+     * @param authenticationManager
+     */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
                                  AuthenticationManager authenticationManager, MailProvider mailProvider) {
@@ -63,27 +73,43 @@ public class AuthenticationService {
 
             authenticationFacade.edit(refreshedAccount);
         } catch (AccountNotFoundException exception) {
-            throw new ActivityLogUpdateException("Activity log could not be updated.");
+            throw new ActivityLogUpdateException(I18n.AUTH_ACTIVITY_LOG_UPDATE_EXCEPTION);
         }
     }
 
+    /**
+     * Authenticates a user in the system.
+     *
+     * @param login    Login of the Account.
+     * @param password Password to the Account.
+     * @return Returns an Account with the given credentials.
+     * @throws AuthenticationAccountNotFoundException    Threw when there is no Account with given login.
+     * @throws AuthenticationInvalidCredentialsException Threw when credentials don't match any account.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public Account login(String login, String password) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException("Account with given login could not be found!"));
+            return authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException(I18n.AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION));
         } catch (AccountNotFoundException exception) {
             throw new AuthenticationAccountNotFoundException(exception.getMessage(), exception);
         } catch (BadCredentialsException exception) {
-            throw new AuthenticationInvalidCredentialsException("Given credentials are invalid!", exception);
+            throw new AuthenticationInvalidCredentialsException(I18n.AUTH_CREDENTIALS_INVALID_EXCEPTION, exception);
         }
     }
 
+    /**
+     * Retrieves an Account with given login.
+     *
+     * @param login Login of the Account to be retrieved.
+     * @return Returns Account with the specified login.
+     * @throws AuthenticationAccountNotFoundException Threw when there is no Account with given login.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public Account findByLogin(String login) throws AuthenticationAccountNotFoundException {
         try {
-            return this.authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException("Account with given login could not be found!"));
+            return this.authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException(I18n.AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION));
         } catch (AccountNotFoundException exception) {
             throw new AuthenticationAccountNotFoundException(exception.getMessage(), exception);
         }

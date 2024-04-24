@@ -14,6 +14,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * Stores information about activity of an Account.
+ * @see Account
+ */
 @Embeddable
 @NoArgsConstructor
 @ToString

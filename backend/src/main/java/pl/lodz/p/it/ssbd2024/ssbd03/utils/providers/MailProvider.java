@@ -13,6 +13,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.EmailTemplateNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.ImageNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.MailProviderMessages;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,6 +27,9 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
 
+/**
+ * Component used for sending e-mail messages.
+ */
 @Slf4j
 @Component
 @PropertySource(value = "classpath:mail.properties")
@@ -37,31 +42,41 @@ public class MailProvider {
 
     private final JavaMailSenderImpl mailSender;
 
+    /**
+     * Autowired constructor for the component.
+     * @param javaMailSender
+     */
     @Autowired
     public MailProvider(JavaMailSenderImpl javaMailSender) {
         this.mailSender = javaMailSender;
     }
 
-    public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL) {
+    /**
+     * Sends an account creation confirmation e-mail to the specified e-mail address.
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param confirmationURL URL used to confirm the account creation.
+     */
+    public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
-            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
-            String emailContent = this.loadTemplate("link-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("link-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
                     .replace("$firstname", firstName)
                     .replace("$lastname", lastName)
-                    .replace("$greeting_message", "Hello")
-                    .replace("$result_message", "Your account was successfully created!")
-                    .replace("$action_description", "In order to activate it, click the the link below.")
+                    .replace("$greeting_message", I18n.getMessage(I18n.CONFIRM_REGISTER_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.CONFIRM_REGISTER_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.CONFIRM_REGISTER_ACTION_DESCRIPTION, language))
                     .replace("$action_link", confirmationURL)
-                    .replace("$note_title", "Note")
-                    .replace("$note_message", "This e-mail is generated automatically and does not require any responses to it.")
+                    .replace("$note_title", I18n.getMessage(I18n.CONFIRM_REGISTER_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
-
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
 
             messageHelper.setTo(emailReceiver);
-            messageHelper.setSubject("Activate your account");
+            messageHelper.setSubject(I18n.getMessage(I18n.CONFIRM_REGISTER_MESSAGE_SUBJECT, language));
             messageHelper.setText(emailContent, true);
             messageHelper.setFrom(senderEmail);
 
@@ -106,6 +121,12 @@ public class MailProvider {
         }
     }
 
+    /**
+     * Loads e-mail template from the /resources/templates folder.
+     * @param templateName Name of the template file.
+     * @return Returns a String containing the loaded template.
+     * If an exception occurs while reading the template file it will return everything read up to this point.
+     */
     private Optional<String> loadTemplate(String templateName) {
         StringBuilder builder = new StringBuilder();
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("templates/" + templateName);
@@ -115,11 +136,17 @@ public class MailProvider {
                 builder.append(placeHolder);
             }
         } catch (IOException | NullPointerException e) {
-            logger.error("Error while reading email message template file", e.getCause());
+            logger.error(MailProviderMessages.EMAIL_TEMPLATE_READ_EXCEPTION, e.getCause());
         }
         return Optional.of(builder.toString());
     }
 
+    /**
+     * Loads an image from the /resources/templates/images folder.
+     * @param imageName Name of the image file.
+     * @return Returns a String containing the loaded image.
+     * If an exception occurs while reading the image file it will return everything read up to this point.
+     */
     private Optional<String> loadImage(String imageName) {
         StringBuilder builder = new StringBuilder();
         try {
@@ -128,7 +155,7 @@ public class MailProvider {
             byte[] imageContent = Files.readAllBytes(Path.of(imagePath.toURI()));
             builder.append(new String(Base64.getEncoder().encode(imageContent)));
         } catch (IOException | URISyntaxException | NullPointerException e) {
-            logger.error("Error while reading email message template file", e.getCause());
+            logger.error(MailProviderMessages.IMAGE_READ_EXCEPTION, e.getCause());
         }
         return Optional.of(builder.toString());
     }

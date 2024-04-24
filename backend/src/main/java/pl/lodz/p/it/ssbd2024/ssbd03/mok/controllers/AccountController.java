@@ -13,6 +13,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
 
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
+
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -54,5 +60,40 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAllUsers(@RequestParam(name = "pageNumber") int pageNumber, @RequestParam(name = "pageSize") int pageSize) {
+        List<AccountListDTO> accountList = accountService.getAllAccounts(pageNumber, pageSize)
+                .stream()
+                .map(AccountListMapper::toAccountListDTO)
+                .toList();
+        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(accountList);
+    }
+
+    @GetMapping("/match-login-firstname-and-lastname")
+    public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
+                                                                            @RequestParam(name = "firstName", defaultValue = "") String firstName,
+                                                                            @RequestParam(name = "lastName", defaultValue = "") String lastName,
+                                                                            @RequestParam(name = "order", defaultValue = "true") boolean order,
+                                                                            @RequestParam(name = "pageNumber") int pageNumber,
+                                                                            @RequestParam(name = "pageSize") int pageSize) {
+        List<AccountListDTO> accountList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName,
+                        lastName, order, pageNumber, pageSize)
+                .stream()
+                .map(AccountListMapper::toAccountListDTO)
+                .toList();
+        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(accountList);
+    }
+
+    @PostMapping("/activate-account/{token}")
+    public ResponseEntity<?> activateAccount(@PathVariable(value = "token") String token) {
+        if (accountService.activateAccount(token)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

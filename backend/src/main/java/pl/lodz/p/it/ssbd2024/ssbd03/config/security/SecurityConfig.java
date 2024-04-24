@@ -19,6 +19,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTAuthenticationFil
 
 import java.util.List;
 
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -44,9 +45,9 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/v1/auth/login/**",
-                                "/api/v1/auth/register/client",
+                                "/api/v1/register/client",
                                 "/v3/api-docs",
-                                "/swagger-ui/index.html").permitAll()
+                                "/swagger-ui/**").permitAll()
                         .requestMatchers("/**").authenticated());
 
         return httpSecurity.build();
