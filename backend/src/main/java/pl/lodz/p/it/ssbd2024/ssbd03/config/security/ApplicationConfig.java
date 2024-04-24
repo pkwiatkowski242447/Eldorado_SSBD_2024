@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.TxAspect;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
@@ -24,6 +26,7 @@ import java.util.Properties;
 
 @Configuration
 @PropertySource("classpath:mail.properties")
+@EnableAspectJAutoProxy
 public class ApplicationConfig {
 
     @Value("${mail.sender.username}")
@@ -116,5 +119,10 @@ public class ApplicationConfig {
         mailSender.setUsername(this.senderUsername);
         mailSender.setPassword(this.senderPassword);
         return mailSender;
+    }
+
+    @Bean
+    public TxAspect txAspect() {
+        return new TxAspect();
     }
 }
