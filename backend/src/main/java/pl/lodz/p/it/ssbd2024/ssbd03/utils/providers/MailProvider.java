@@ -88,6 +88,76 @@ public class MailProvider {
     }
 
     /**
+     * Sends an account blocking notification e-mail to the specified e-mail address.
+     *
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     */
+    public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
+            String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", "Hello")
+                    .replace("$result_message", "Your account has been blocked!")
+                    .replace("$action_description", "TEST TEST.")
+                    .replace("$note_title", "Note")
+                    .replace("$note_message", "This e-mail is generated automatically and does not require any responses to it.")
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            messageHelper.setTo(emailReceiver);
+
+            messageHelper.setSubject("Your account has been blocked");
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    /**
+     * Sends an e-mail change confirmation e-mail to the specified e-mail address.
+     *
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param confirmationURL URL used to confirm the e-mail address.
+     * @param language Language of the message.
+     */
+    public void sendEmailConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("link-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.CONFIRM_EMAIL_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.CONFIRM_EMAIL_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.CONFIRM_EMAIL_ACTION_DESCRIPTION, language))
+                    .replace("$action_link", confirmationURL)
+                    .replace("$note_title", I18n.getMessage(I18n.CONFIRM_EMAIL_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            messageHelper.setTo(emailReceiver);
+
+            messageHelper.setSubject(I18n.getMessage(I18n.CONFIRM_EMAIL_MESSAGE_SUBJECT, language));
+            messageHelper.setText(emailContent, true);
+            messageHelper.setFrom(senderEmail);
+
+            this.mailSender.send(mimeMessage);
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    /**
      * Loads e-mail template from the /resources/templates folder.
      * @param templateName Name of the template file.
      * @return Returns a String containing the loaded template.

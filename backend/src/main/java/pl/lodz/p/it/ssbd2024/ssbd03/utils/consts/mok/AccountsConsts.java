@@ -2,7 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok;
 
 public class AccountsConsts {
 
-    public static final int LOGIN_MIN_LENGTH = 8;
+    public static final int LOGIN_MIN_LENGTH = 4;
     public static final int LOGIN_MAX_LENGTH = 32;
     public static final String LOGIN_REGEX = "^[a-zA-Z0-9_-]{8,32}$";
 

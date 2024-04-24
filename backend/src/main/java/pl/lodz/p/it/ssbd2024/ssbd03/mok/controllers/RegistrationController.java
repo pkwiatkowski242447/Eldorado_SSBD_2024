@@ -59,7 +59,7 @@ public class RegistrationController {
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      */
     // TODO: This method requires profound changes (transaction initiation needs to be moved to service). After all token TTL has to be changed as well.
-    @PostMapping(value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping( value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) {
         try {
@@ -75,7 +75,11 @@ public class RegistrationController {
             String token = this.tokenService.createRegistrationToken(newAccount);
             // Send a mail with an activation link
             String confirmationURL = "http://localhost:8080/api/v1/accounts/activate-account/" + token;
-            mailProvider.sendRegistrationConfirmEmail(accountRegisterDTO.getFirstName(), accountRegisterDTO.getLastName(), accountRegisterDTO.getEmail(), confirmationURL, accountRegisterDTO.getLanguage());
+            mailProvider.sendRegistrationConfirmEmail(accountRegisterDTO.getFirstName(),
+                    accountRegisterDTO.getLastName(),
+                    accountRegisterDTO.getEmail(),
+                    confirmationURL,
+                    accountRegisterDTO.getLanguage());
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
