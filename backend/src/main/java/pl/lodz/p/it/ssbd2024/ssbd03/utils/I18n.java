@@ -15,6 +15,7 @@ public class I18n {
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
     public static final String AUTH_CONTROLLER_ACCOUNT_BLOCKED = "authentication.controller.account.blocked";
 
+    public static final String AUTH_CONTROLLER_ACCOUNT_LOGOUT = "authentication.controller.account.logout";
     // Mail provider
 
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";

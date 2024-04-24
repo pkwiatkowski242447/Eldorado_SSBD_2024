@@ -80,8 +80,7 @@ public class AuthenticationController {
             logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
             return ResponseEntity.ok().build();
         } catch (Exception exception) {
-            String localeString = request.getLocale().toString();
-            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), localeString));
+            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.AUTH_CONTROLLER_ACCOUNT_LOGOUT, "en"));
         }
     }
 
