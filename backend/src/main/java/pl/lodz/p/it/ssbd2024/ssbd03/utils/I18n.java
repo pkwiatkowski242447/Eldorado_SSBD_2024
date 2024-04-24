@@ -19,6 +19,7 @@ public class I18n {
 
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
     public static final String AUTH_CONTROLLER_ACCOUNT_BLOCKED = "authentication.controller.account.blocked";
+    public static final String AUTH_CONTROLLER_ACCOUNT_LOGOUT = "authentication.controller.account.logout";
 
     // Account service
     public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "account.service.account.not.found.exception";
