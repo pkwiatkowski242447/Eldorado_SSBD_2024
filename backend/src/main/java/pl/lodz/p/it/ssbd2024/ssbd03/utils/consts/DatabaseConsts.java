@@ -32,6 +32,8 @@ public class DatabaseConsts {
     public static final String ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_TIME = "last_unsuccessful_login_time";
     public static final String ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_IP = "last_unsuccessful_login_ip";
 
+    public static final String UNSUCCESSFUL_LOGIN_COUNTER = "unsuccessful_login_counter";
+
     // public.personal_data table
 
     public static final String PERSONAL_DATA_TABLE = "personal_data";

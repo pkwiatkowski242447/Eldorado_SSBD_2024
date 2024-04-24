@@ -5,11 +5,16 @@ import lombok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
+/**
+ * Entity representing Token used in keeping track of various Account related actions.
+ * @see Account
+ */
 @Entity
 @Table(name = DatabaseConsts.TOKEN_TABLE)
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @NamedQueries({
         @NamedQuery(
                 name = "Token.findByTypeAndAccount",
@@ -36,23 +41,29 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
                         WHERE t.tokenValue = :tokenValue"""
 
 
+        ),
+        @NamedQuery(
+                name = "Token.findByTokenType",
+                query = """
+                        SELECT t FROM Token t
+                        WHERE t.type = :tokenType"""
         )
 })
-
 public class Token extends AbstractEntity {
-    public static enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
+    /**
+     * Used to specify the type of the Account action related to the token.
+     */
+    public enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
 
-    @Column(name = DatabaseConsts.TOKEN_TOKEN_VALUE_COLUMN, unique = true, nullable = false)
+    @Column(name = DatabaseConsts.TOKEN_TOKEN_VALUE_COLUMN, unique = true, nullable = false, length = 512)
     @Getter @Setter
     private String tokenValue;
 
     @ManyToOne(cascade = {CascadeType.REFRESH})
     @ToString.Exclude
-    @Getter
     private Account account;
 
     @Column(name = DatabaseConsts.TOKEN_TOKEN_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
-    @Getter
     private TokenType type = TokenType.RESET_PASSWORD;
 }

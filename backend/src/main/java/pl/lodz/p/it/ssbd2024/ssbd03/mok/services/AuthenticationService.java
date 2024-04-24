@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -16,32 +17,75 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateE
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.time.LocalDateTime;
+
+/**
+ * Service managing authentication.
+ */
+@Slf4j
 @Service
 public class AuthenticationService {
 
     private final AuthenticationFacade authenticationFacade;
     private final AuthenticationManager authenticationManager;
+    private final MailProvider mailProvider;
 
+    /**
+     * Autowired constructor for the service.
+     *
+     * @param authenticationFacade
+     * @param authenticationManager
+     */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
-                                 AuthenticationManager authenticationManager) {
+                                 AuthenticationManager authenticationManager, MailProvider mailProvider) {
         this.authenticationFacade = authenticationFacade;
         this.authenticationManager = authenticationManager;
+        this.mailProvider = mailProvider;
     }
 
+    /**
+     * Updates the activity log for the specified Account. When the number of failed logins exceeds the allowed number,
+     * the account is blocked and an email notification is sent.
+     *
+     * @param account     Account which ActivityLog is to be updated.
+     * @param activityLog Updated ActivityLog.
+     * @throws ActivityLogUpdateException Threw when problem retrieving Account occurs.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public void updateActivityLog(Account account, ActivityLog activityLog) throws ActivityLogUpdateException {
         try {
             Account refreshedAccount = authenticationFacade.findAndRefresh(account.getId()).orElseThrow(AccountNotFoundException::new);
             refreshedAccount.setActivityLog(activityLog);
+
+            // Increment the number of failed login attempts
+            if (!refreshedAccount.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= 3) {
+                refreshedAccount.setBlocked(true);
+                refreshedAccount.setBlockedTime(LocalDateTime.now());
+                log.info("Account %s has been blocked".formatted(refreshedAccount.getId()));
+
+                // Sending information email
+                mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(), refreshedAccount.getEmail());
+            }
+
             authenticationFacade.edit(refreshedAccount);
         } catch (AccountNotFoundException exception) {
             throw new ActivityLogUpdateException(I18n.AUTH_ACTIVITY_LOG_UPDATE_EXCEPTION);
         }
     }
 
+    /**
+     * Authenticates a user in the system.
+     *
+     * @param login    Login of the Account.
+     * @param password Password to the Account.
+     * @return Returns an Account with the given credentials.
+     * @throws AuthenticationAccountNotFoundException    Threw when there is no Account with given login.
+     * @throws AuthenticationInvalidCredentialsException Threw when credentials don't match any account.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public Account login(String login, String password) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
         try {
@@ -55,6 +99,13 @@ public class AuthenticationService {
         }
     }
 
+    /**
+     * Retrieves an Account with given login.
+     *
+     * @param login Login of the Account to be retrieved.
+     * @return Returns Account with the specified login.
+     * @throws AuthenticationAccountNotFoundException Threw when there is no Account with given login.
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     public Account findByLogin(String login) throws AuthenticationAccountNotFoundException {
         try {
