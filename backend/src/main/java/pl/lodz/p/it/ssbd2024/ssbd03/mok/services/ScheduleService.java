@@ -41,8 +41,8 @@ public class ScheduleService {
     /**
      * Autowired constructor for the service.
      *
-     * @param accountMOKFacade
-     * @param tokenFacade
+     * @param accountMOKFacade  Facade used for managing user accounts.
+     * @param tokenFacade       Facade used for managing tokens used for many account related activities.
      */
     @Autowired
     public ScheduleService(AccountMOKFacade accountMOKFacade, TokenFacade tokenFacade, MailProvider mailProvider) {
@@ -86,6 +86,10 @@ public class ScheduleService {
         });
     }
 
+    /**
+     * This method will be invoked every hour in order to check if half the time to active registered account has passed.
+     * If so then new registration token will be generated, and new message for activating user account will be sent to specified e-mail address.
+     */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     @Transactional(propagation = Propagation.REQUIRED)
     public void resendConfirmationEmail() {

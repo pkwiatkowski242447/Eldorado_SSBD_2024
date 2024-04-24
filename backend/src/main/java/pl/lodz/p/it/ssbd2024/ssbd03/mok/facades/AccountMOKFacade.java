@@ -160,6 +160,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
+    /**
+     * This method is used to find user account by username. As username needs to be unique, it returns a single result.
+     *
+     * @param login Login of the searched user account.
+     *
+     * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
+     * Otherwise, empty optional is returned.
+     */
     public Optional<Account> findByLogin(String login) {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
@@ -170,6 +178,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         }
     }
 
+    /**
+     * This method is used to find user account by e-mail address. As e-mail address needs to be unique, it returns a single result.
+     *
+     * @param email E-mail address of the searched user account.
+     *
+     * @return If there is user account with given e-mail address in the system, this method returns their account in a form of Optional.
+     * Otherwise, empty optional is returned.
+     */
     public Optional<Account> findByEmail(String email) {
         try {
             TypedQuery<Account> findAccountByEmail = entityManager.createNamedQuery("Account.findAccountByEmail", Account.class);

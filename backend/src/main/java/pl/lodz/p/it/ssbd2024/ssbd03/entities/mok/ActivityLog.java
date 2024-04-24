@@ -34,7 +34,7 @@ public class ActivityLog implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime lastSuccessfulLoginTime;
 
-//    @Pattern(regexp = ActivityLogConsts.IPV4_REGEX, message = ActivityLogMessages.LAST_SUCCESSFUL_LOGIN_IP_NOT_VALID)
+    @Pattern(regexp = ActivityLogConsts.IPV4_REGEX, message = ActivityLogMessages.LAST_SUCCESSFUL_LOGIN_IP_NOT_VALID)
     @Column(name = DatabaseConsts.ACCOUNT_LAST_SUCCESSFUL_LOGIN_IP, length = 17)
     private String lastSuccessfulLoginIp;
 
@@ -42,7 +42,7 @@ public class ActivityLog implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime lastUnsuccessfulLoginTime;
 
-//    @Pattern(regexp = ActivityLogConsts.IPV4_REGEX, message = ActivityLogMessages.LAST_UNSUCCESSFUL_LOGIN_IP_NOT_VALID)
+    @Pattern(regexp = ActivityLogConsts.IPV4_REGEX, message = ActivityLogMessages.LAST_UNSUCCESSFUL_LOGIN_IP_NOT_VALID)
     @Column(name = DatabaseConsts.ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_IP, length = 17)
     private String lastUnsuccessfulLoginIp;
 }

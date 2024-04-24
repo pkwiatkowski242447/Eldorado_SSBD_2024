@@ -38,8 +38,8 @@ public class AuthenticationController {
     /**
      * Autowired constructor for the controller.
      *
-     * @param authenticationService
-     * @param jwtProvider
+     * @param authenticationService Service used for authentication purposes.
+     * @param jwtProvider           Component used in order to generate JWT tokens with specified payload.
      */
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
@@ -96,6 +96,15 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
+     *
+     * @param accountLoginDTO   Data transfer object, containing user credentials with language setting from the browser.
+     *
+     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
+     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
+     */
+    // TODO: This method requires some changes (cause it should use the SecurityContext to retrieve username).
     @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
         try {
@@ -112,10 +121,5 @@ public class AuthenticationController {
         } catch (AuthenticationAccountNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
         }
-    }
-
-    @GetMapping(value = "/test")
-    public void testMethod() {
-        log.info("TEST ENDPOINT");
     }
 }

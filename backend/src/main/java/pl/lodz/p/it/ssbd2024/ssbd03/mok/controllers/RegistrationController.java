@@ -36,9 +36,9 @@ public class RegistrationController {
     /**
      * Autowired constructor for the controller.
      *
-     * @param accountService
-     * @param tokenService
-     * @param mailProvider
+     * @param accountService    Service containing method for account manipulation.
+     * @param tokenService      Service used for token management.
+     * @param mailProvider`     Component used to send e-mail messages to user e-mail address (depending on the actions they perform).
      */
     @Autowired
     public RegistrationController(AccountService accountService,
@@ -50,11 +50,15 @@ public class RegistrationController {
     }
 
     /**
-     * Creates new client and sends account confirmation e-mail.
+     * This endpoint allows both user with administrative user level and with anonymous access to create new account with client user level. After
+     * the account has been created, the activation link is sent to the e-mail address, specified in the accountRegisterDTO.
      *
-     * @param accountRegisterDTO New client's details.
-     * @return Returns HTTP 204 NO CONTENT, if a problem occurs returns HTTP 400 BAD REQUEST and JSON object containing details about the problem.
+     * @param accountRegisterDTO Data transfer object, containing user account data, such as login, password, first name, last name, email and so on.
+     * @return If account registration is successful, then 204 NO CONTENT is returned as a response. In case of Persistence exception being thrown
+     * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
+     * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      */
+    // TODO: This method requires profound changes (transaction initiation needs to be moved to service). After all token TTL has to be changed as well.
     @PostMapping(value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) {
