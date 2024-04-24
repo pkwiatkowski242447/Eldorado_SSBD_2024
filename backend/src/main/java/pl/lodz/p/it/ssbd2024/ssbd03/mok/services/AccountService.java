@@ -56,12 +56,11 @@ public class AccountService {
     /**
      * Autowired constructor for the service.
      *
-     * @param accountFacade
-     * @param passwordEncoder
-     * @param tokenFacade
-     * @param mailProvider
-     * @param jwtProvider
-     * @param validator
+     * @param accountFacade     Facade responsible for users accounts management.
+     * @param passwordEncoder   This component is used to generate hashed passwords for user accounts (not to store them in their original form).
+     * @param tokenFacade       This facade is responsible for manipulating tokens, used for various, user account related operations.
+     * @param mailProvider      This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
+     * @param jwtProvider       This component is used to generate token values for token facade.
      */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
@@ -218,9 +217,11 @@ public class AccountService {
     }
 
     /**
-     * Activate account with a token from URL.
-     * @param token token to activate account
-     * @return
+     * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.
+     *
+     * @param token Last part of the activation URL sent in a message to users e-mail address.
+     *
+     * @return Boolean value indicating whether activation of the account was successful or not.
      */
     public boolean activateAccount(String token) {
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
@@ -237,16 +238,16 @@ public class AccountService {
     }
 
     /**
-     * Retrieve Account that match the parameters.
+     * Retrieve Account that match the parameters, in a given order.
      *
-     * @param login      Account's login. A phrase is sought in the logins.
-     * @param firstName  Account's owner first name. A phrase is sought in the names.
-     * @param lastName   Account's owner last name. A phrase is sought in the last names.
-     * @param order
-     * @param pageNumber
-     * @param pageSize
+     * @param login         Account's login. A phrase is sought in the logins.
+     * @param firstName     Account's owner first name. A phrase is sought in the names.
+     * @param lastName      Account's owner last name. A phrase is sought in the last names.
+     * @param order         Ordering in which user accounts should be returned.
+     * @param pageNumber    Number of the page with searched users accounts.
+     * @param pageSize      Number of the users accounts per page.
      *
-     * @return
+     * @return List of user accounts that match the given parameters.
      */
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
@@ -257,6 +258,14 @@ public class AccountService {
         return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
     }
 
+    /**
+     * Retrieve all accounts in the system.
+     *
+     * @param pageNumber    The page number of the results to return.
+     * @param pageSize      The number of results to return per page.
+     *
+     * @return              A list of all accounts in the system, ordered by account login, with pagination applied.
+     */
     public List<Account> getAllAccounts(int pageNumber, int pageSize) {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }

@@ -71,9 +71,7 @@ import java.util.List;
                         WHERE r.sector.id = :sectorId
                         ORDER BY r.beginTime"""
         )
-}
-)
-
+})
 public class Reservation extends AbstractEntity implements Serializable {
 
     @Serial
@@ -104,7 +102,7 @@ public class Reservation extends AbstractEntity implements Serializable {
     @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     @Getter
-    private List<ParkingEvent> parkingEvents = new ArrayList<>();
+    private final List<ParkingEvent> parkingEvents = new ArrayList<>();
 
     /**
      * Constructs a new reservation for a non-anonymous client.

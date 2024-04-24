@@ -41,8 +41,8 @@ public class AuthenticationController {
     /**
      * Autowired constructor for the controller.
      *
-     * @param authenticationService
-     * @param jwtProvider
+     * @param authenticationService Service used for authentication purposes.
+     * @param jwtProvider           Component used in order to generate JWT tokens with specified payload.
      */
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
@@ -104,6 +104,14 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
+     *
+     * @param accountLoginDTO   Data transfer object, containing user credentials with language setting from the browser.
+     *
+     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
+     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
+     */
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {

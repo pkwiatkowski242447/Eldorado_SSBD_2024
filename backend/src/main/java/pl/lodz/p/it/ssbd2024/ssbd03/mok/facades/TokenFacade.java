@@ -149,6 +149,14 @@ public class TokenFacade extends AbstractFacade<Token> {
         }
 
     }
+
+    /**
+     * This method is used to retrieve all token of a specified TokenType from the database.
+     *
+     * @param tokenType Type of the token. All tokens of a given type will be returned.
+     *
+     * @return List of tokens of the specified token type.
+     */
     public List<Token> findByTokenType(Token.TokenType tokenType) {
         try {
             TypedQuery<Token> query = getEntityManager()

@@ -27,8 +27,8 @@ public class TokenService {
     /**
      * Autowired constructor for the service.
      *
-     * @param tokenFacade
-     * @param jwtProvider
+     * @param tokenFacade   Facade containing method for token manipulation.
+     * @param jwtProvider   Component used to provide JWT token generation mechanism for a certain payload.
      */
     @Autowired
     public TokenService(TokenFacade tokenFacade,
@@ -38,10 +38,10 @@ public class TokenService {
     }
 
     /**
-     * Creates and persists Registration Token for the Account.
+     * Creates and persists registration token for the Account.
      *
      * @param account Account for which the token is created.
-     * @return Returns newly created Registration Token.
+     * @return Returns newly created registration token value.
      */
     @Transactional(propagation = Propagation.MANDATORY)
     public String createRegistrationToken(Account account) {
@@ -53,6 +53,12 @@ public class TokenService {
         return tokenValue;
     }
 
+    /**
+     * Creates and persists email confirmation token for the Account.
+     *
+     * @param account Account for which the token is created.
+     * @return Returns newly created email confirmation token value.
+     */
     public String createEmailConfirmationToken(Account account, String newEmail) {
 
         Token emailConfirmationToken = new Token(newEmail, account, Token.TokenType.CONFIRM_EMAIL);

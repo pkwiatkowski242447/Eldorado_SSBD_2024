@@ -36,8 +36,8 @@ public class AuthenticationService {
     /**
      * Autowired constructor for the service.
      *
-     * @param authenticationFacade
-     * @param authenticationManager
+     * @param authenticationFacade  Facade used for reading users accounts information for authentication purposes.
+     * @param authenticationManager Spring Security component, responsible for performing authentication in the application.
      */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,

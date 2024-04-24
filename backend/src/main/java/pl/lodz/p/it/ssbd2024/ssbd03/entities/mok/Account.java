@@ -1,10 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Entity representing a user account in the system.
+ * Entity representing a user account in the system. It stores information used to authenticate
+ * like login, password, user personal data: first name, last name, email, phone number.
+ * Besides that, account also contain list of available user levels and reference to activity log.
  *
  * @see UserLevel
  * @see Admin
@@ -188,7 +187,7 @@ import java.util.Collection;
 public class Account extends AbstractEntity {
 
     @NotBlank(message = AccountMessages.LOGIN_BLANK)
-    //@Pattern(regexp = AccountsConsts.LOGIN_REGEX, message = AccountMessages.LOGIN_REGEX_NOT_MET)
+    @Pattern(regexp = AccountsConsts.LOGIN_REGEX, message = AccountMessages.LOGIN_REGEX_NOT_MET)
     @Size(min = AccountsConsts.LOGIN_MIN_LENGTH, message = AccountMessages.LOGIN_TOO_SHORT)
     @Size(max = AccountsConsts.LOGIN_MAX_LENGTH, message = AccountMessages.LOGIN_TOO_LONG)
     @Column(name = DatabaseConsts.ACCOUNT_LOGIN_COLUMN, unique = true, nullable = false, updatable = false, length = 32)
@@ -222,7 +221,7 @@ public class Account extends AbstractEntity {
     private LocalDateTime blockedTime;
 
     @NotBlank(message = AccountMessages.NAME_BLANK)
-    //@Pattern(regexp = AccountsConsts.NAME_REGEX, message = AccountMessages.NAME_REGEX_NOT_MET)
+    @Pattern(regexp = AccountsConsts.NAME_REGEX, message = AccountMessages.NAME_REGEX_NOT_MET)
     @Size(min = AccountsConsts.NAME_MIN_LENGTH, message = AccountMessages.NAME_TOO_SHORT)
     @Size(max = AccountsConsts.NAME_MAX_LENGTH, message = AccountMessages.NAME_TOO_LONG)
     @Column(name = DatabaseConsts.PERSONAL_DATA_NAME_COLUMN, table = DatabaseConsts.PERSONAL_DATA_TABLE, nullable = false, length = 32)
@@ -230,7 +229,7 @@ public class Account extends AbstractEntity {
     private String name;
 
     @NotBlank(message = AccountMessages.LASTNAME_BLANK)
-    //@Pattern(regexp = AccountsConsts.LASTNAME_REGEX, message = AccountMessages.LASTNAME_REGEX_NOT_MET)
+    @Pattern(regexp = AccountsConsts.LASTNAME_REGEX, message = AccountMessages.LASTNAME_REGEX_NOT_MET)
     @Size(min = AccountsConsts.LASTNAME_MIN_LENGTH, message = AccountMessages.LASTNAME_TOO_SHORT)
     @Size(max = AccountsConsts.LASTNAME_MAX_LENGTH, message = AccountMessages.LASTNAME_TOO_LONG)
     @Column(name = DatabaseConsts.PERSONAL_DATA_LASTNAME_COLUMN, table = DatabaseConsts.PERSONAL_DATA_TABLE, nullable = false, length = 32)
@@ -255,13 +254,13 @@ public class Account extends AbstractEntity {
     private ActivityLog activityLog = new ActivityLog();
 
     @NotBlank(message = AccountMessages.LANGUAGE_BLANK)
-    //@Pattern(regexp = AccountsConsts.LANGUAGE_REGEX, message = AccountMessages.LANGUAGE_REGEX_NOT_MET)
+    @Pattern(regexp = AccountsConsts.LANGUAGE_REGEX, message = AccountMessages.LANGUAGE_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_LANGUAGE_COLUMN, nullable = false, length = 16)
     @Setter
     private String accountLanguage;
 
     @NotBlank(message = AccountMessages.PHONE_NUMBER_BLANK)
-    //@Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
+    @Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_PHONE_NUMBER_COLUMN, nullable = false, length = 32)
     @Getter
     @Setter
