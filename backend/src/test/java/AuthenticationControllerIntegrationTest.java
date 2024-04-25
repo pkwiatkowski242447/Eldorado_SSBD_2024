@@ -51,12 +51,6 @@ public class AuthenticationControllerIntegrationTest extends TestcontainersConfi
     }
 
     @Test
-    public void testEndpointTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/auth/test"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
-    @Test
     public void loginEndpointTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
