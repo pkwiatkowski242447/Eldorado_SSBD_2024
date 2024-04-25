@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.List;
 
@@ -67,11 +68,8 @@ public class AccountController {
         //call accountServiceMethod [findByLogin()]
         Account account =  accountService.getAccountByLogin(username);
         if (account == null) {
-            log.info("NIE ZNALAZLEM");
-            return ResponseEntity.internalServerError().body("Wystapil blad");
+            return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, "en"));
         } else {
-            log.info("ZNALAZLEM");
-            log.info(account.toString());
             return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
         }
     }
