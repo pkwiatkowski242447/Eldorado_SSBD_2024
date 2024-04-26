@@ -104,14 +104,6 @@ public class AuthenticationController {
         }
     }
 
-    /**
-     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
-     *
-     * @param accountLoginDTO   Data transfer object, containing user credentials with language setting from the browser.
-     *
-     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
-     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
-     */
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -123,6 +115,14 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
+     *
+     * @param accountLoginDTO   Data transfer object, containing user credentials with language setting from the browser.
+     *
+     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
+     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
+     */
     @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
         try {

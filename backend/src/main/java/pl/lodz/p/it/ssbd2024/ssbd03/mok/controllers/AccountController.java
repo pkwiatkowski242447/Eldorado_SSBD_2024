@@ -3,32 +3,33 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.MediaType;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -94,10 +95,8 @@ public class AccountController {
      *
      * @param pageNumber Number of the page, which user accounts will be retrieved from.
      * @param pageSize   Number of user accounts per page.
-     *
      * @return This method returns 200 OK as a response, where in response body a list of user accounts is located, is a JSON format.
      * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
-     *
      * @apiNote This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
      * login alphabetically.
      */
@@ -114,13 +113,12 @@ public class AccountController {
     /**
      * This method is used to retrieve user accounts that match specified criteria.
      *
-     * @param login         Login of the searched user account. Its default value is empty string (in that case this parameter will not have any impact of final result of the search).
-     * @param firstName     First name of the searched users.
-     * @param lastName      Last name of the searched users.
-     * @param order         Ordering of the searched users. Could be either true (for ascending order) or false (for descending order).
-     * @param pageNumber    Number of the page containing searched users.
-     * @param pageSize      Number of the users per page.
-     *
+     * @param login      Login of the searched user account. Its default value is empty string (in that case this parameter will not have any impact of final result of the search).
+     * @param firstName  First name of the searched users.
+     * @param lastName   Last name of the searched users.
+     * @param order      Ordering of the searched users. Could be either true (for ascending order) or false (for descending order).
+     * @param pageNumber Number of the page containing searched users.
+     * @param pageSize   Number of the users per page.
      * @return This method returns 200 OK response, with list of users in the response body, converted to JSON.
      * If the list is empty, then 204 NO CONTENT is returned.
      */
@@ -146,7 +144,6 @@ public class AccountController {
      *
      * @param token Last part of the activation URL, sent to the e-mail address user specified during registration process. It is a JWT token
      *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
-     *
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
      */
@@ -156,6 +153,27 @@ public class AccountController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * This method is used to confirm the change of an e-mail
+     *
+     * @param token Last part of the activation URL, sent to the new e-mail address. It is a JWT token
+     *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
+     * @return This function returns 204 NO CONTENT if method finishes successfully.
+     * It could also return 400 BAD REQUEST if the token is not valid, expired or account does not exist.
+     */
+    @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token, @RequestBody Map<String,String> language) {
+        try {
+            if (accountService.confirmEmail(token)) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.badRequest().body(I18n.getMessage(I18n.TOKEN_INVALID_OR_EXPIRED, language.get("language")));
+            }
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.badRequest().body(I18n.getMessage(e.getMessage(), language.get("language")));
         }
     }
 

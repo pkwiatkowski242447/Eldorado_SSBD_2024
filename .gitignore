@@ -41,3 +41,6 @@ build/
 
 docker_test/
 mail.properties
+
+*.log
+*.lck

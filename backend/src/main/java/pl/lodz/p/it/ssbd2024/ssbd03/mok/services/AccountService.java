@@ -238,6 +238,28 @@ public class AccountService {
     }
 
     /**
+     * Confirm e-mail change with a token from confirmation URL, sent to the new e-mail address.
+     *
+     * @param token Last part of the confirmation URL sent in a message to user's e-mail address.
+     *
+     * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
+     * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
+     */
+    public boolean confirmEmail(String token) throws AccountNotFoundException {
+        Token tokenFromDB = tokenFacade.findByTokenValue(token).orElse(null);
+        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
+        Account account = accountFromDB.orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        if (tokenFromDB == null || !jwtProvider.isTokenValid(token, account)) {
+            return false;
+        } else {
+            account.setVerified(true);
+            accountFacade.edit(account);
+            tokenFacade.remove(tokenFromDB);
+            return true;
+        }
+    }
+
+    /**
      * Retrieve Account that match the parameters, in a given order.
      *
      * @param login         Account's login. A phrase is sought in the logins.

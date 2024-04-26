@@ -27,6 +27,9 @@ public class I18n {
     public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
     public static final String ACCOUNT_EMAIL_COLLISION_EXCEPTION = "account.service.account.email.collision.exception";
 
+    // Account controller
+    public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
+
     // Mail provider
 
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";

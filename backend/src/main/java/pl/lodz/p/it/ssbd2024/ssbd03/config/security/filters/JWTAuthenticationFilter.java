@@ -14,16 +14,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.JWTMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,7 +46,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         log.debug("Started JWT Authentication Filter execution...");
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (authHeader.isBlank() || !authHeader.startsWith(SecurityConstants.BEARER_PREFIX)) {
+        if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith(SecurityConstants.BEARER_PREFIX)) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.getWriter().write(JWTMessages.INCORRECT_TOKEN);
             SecurityContextHolder.clearContext();
