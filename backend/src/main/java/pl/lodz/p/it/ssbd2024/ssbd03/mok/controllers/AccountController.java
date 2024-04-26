@@ -13,13 +13,19 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.util.List;
@@ -171,6 +177,37 @@ public class AccountController {
         }
     }
 
+    /**
+     * This method is used to find user account of currently logged in user.
+     *
+     * @return If user account is found for currently logged user then 200 OK with user account in the response
+     * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
+     */
+    @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getSelf() {
+        //getUserLoginFromSecurityContextHolder
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        //call accountServiceMethod [findByLogin()]
+        Account account = accountService.getAccountByLogin(username);
+        if (account == null) {
+            return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, "en"));
+        } else {
+            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+        }
+    }
+
+    /**
+     * This method is used to change users e-mail address, which later could be used to send
+     * messages about user actions in the application (e.g. messages containing confirmation links).
+     *
+     * @param id Identifier of the user account, whose e-mail will be changed by this method.
+     * @param accountChangeEmailDTO Data transfer object containing new e-mail address.
+     *
+     * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
+     * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
+     * explaining why the error occurred).
+     */
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
         try {
