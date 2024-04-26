@@ -271,6 +271,19 @@ public class AccountService {
     }
 
     /**
+     * Retrieves an Account by the login.
+     *
+     * @param login Login of the searched user account.
+     *
+     * @return If Account with the given login was found returns Account, otherwise returns null.
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Account getAccountByLogin(String login) {
+        Optional<Account> account = accountFacade.findByLoginAndRefresh(login);
+        return account.orElse(null);
+    }
+
+    /**
      * Retrieves from the database account by id.
      *
      * @param id Account's id.
