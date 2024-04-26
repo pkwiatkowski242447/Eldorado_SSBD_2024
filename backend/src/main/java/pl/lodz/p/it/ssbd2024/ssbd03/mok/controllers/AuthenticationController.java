@@ -1,11 +1,14 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
@@ -26,7 +29,7 @@ import java.time.LocalDateTime;
  * Controller used for authentication in the system.
  */
 @Slf4j
-@RestController()
+@RestController
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController {
 
@@ -38,8 +41,8 @@ public class AuthenticationController {
     /**
      * Autowired constructor for the controller.
      *
-     * @param authenticationService
-     * @param jwtProvider
+     * @param authenticationService Service used for authentication purposes.
+     * @param jwtProvider           Component used in order to generate JWT tokens with specified payload.
      */
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
@@ -60,7 +63,7 @@ public class AuthenticationController {
      * @return In case of successful logging in returns HTTP 200 OK and JWT later used to keep track of a session.
      * If any problems occur returns HTTP 400 BAD REQUEST and JSON containing information about the problem.
      */
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) {
         try {
             try {
@@ -70,6 +73,7 @@ public class AuthenticationController {
                 if (account.getActive() && !account.getBlocked()) {
                     activityLog.setLastSuccessfulLoginIp(request.getRemoteAddr());
                     activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
+                    activityLog.setUnsuccessfulLoginCounter(0);
                     authenticationService.updateActivityLog(account, activityLog);
                     return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jwtProvider.generateJWTToken(account));
                 } else if (!account.getActive()) {
@@ -86,6 +90,10 @@ public class AuthenticationController {
                 ActivityLog activityLog = account.getActivityLog();
                 activityLog.setLastUnsuccessfulLoginIp(request.getRemoteAddr());
                 activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
+
+                // Increment the number of failed login attempts
+                activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
+
                 authenticationService.updateActivityLog(account, activityLog);
                 return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), account.getAccountLanguage()));
             }
@@ -93,6 +101,25 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
         } catch (ActivityLogUpdateException exception) {
             return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
+        }
+    }
+
+    /**
+     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
+     *
+     * @param accountLoginDTO   Data transfer object, containing user credentials with language setting from the browser.
+     *
+     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
+     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+            logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+            return ResponseEntity.ok().build();
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.AUTH_CONTROLLER_ACCOUNT_LOGOUT, "en"));
         }
     }
 
@@ -112,10 +139,5 @@ public class AuthenticationController {
         } catch (AuthenticationAccountNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
         }
-    }
-
-    @GetMapping(value = "/test")
-    public void testMethod() {
-        log.info("TEST ENDPOINT");
     }
 }
