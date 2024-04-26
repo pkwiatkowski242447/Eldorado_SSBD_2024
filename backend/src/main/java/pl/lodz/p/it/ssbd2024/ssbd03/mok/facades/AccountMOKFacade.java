@@ -344,21 +344,22 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     }
 
     /**
+     * TODO
      * This method is used to find all users accounts that were blocked by logging incorrectly certain amount of times
      * (so basically status of the account was changed to blocked and blocked time is set).
      *
-     * @param pageNumber    Number of the page with user accounts to be retrieved.
-     * @param pageSize      Number of user accounts per page.
+     * @param amount
+     * @param timeUnit
      *
      * @return List of all users accounts that were blocked by the logging incorrectly certain amount of time.
      * If persistence exception is thrown, then empty list will be returned.
      */
-    public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimesWithPagination(int pageNumber, int pageSize) {
+    public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(long amount, TimeUnit timeUnit) {
         try {
             TypedQuery<Account> findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery = entityManager
                     .createNamedQuery("Account.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes", Account.class);
-            findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery.setMaxResults(pageSize);
+            findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery
+                    .setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
             var list = findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery.getResultList();
             refreshAll(list);
             return list;

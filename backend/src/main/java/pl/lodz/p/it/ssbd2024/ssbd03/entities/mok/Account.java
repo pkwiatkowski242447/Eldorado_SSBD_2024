@@ -122,7 +122,7 @@ import java.util.Collection;
                 name = "Account.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes",
                 query = """
                         SELECT a FROM Account a
-                        WHERE a.blocked = true AND a.blockedTime is not null
+                        WHERE a.blocked = true AND a.blockedTime is not null AND a.blockedTime < :timestamp
                         ORDER BY a.login ASC
                         """
         ),

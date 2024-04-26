@@ -38,6 +38,9 @@ public class ScheduleService {
     @Value("${scheduler.not_verified_account_delete_time}")
     private String deleteTime;
 
+    @Value("${scheduler.blocked_account_unblock_time}")
+    private String unblockTime;
+
     /**
      * Autowired constructor for the service.
      *
@@ -100,7 +103,7 @@ public class ScheduleService {
 
         registerTokens.forEach(token -> {
             Account account = token.getAccount();
-            if (account.getCreationDate().isBefore(LocalDateTime.now().minus(12, ChronoUnit.HOURS))) {
+            if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(12))) {
                 String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token;
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),
                                                           account.getLastname(),
@@ -110,5 +113,46 @@ public class ScheduleService {
                 tokenFacade.removeByTypeAndAccount(Token.TokenType.REGISTER, account.getId());
             }
         });
+    }
+
+    /**
+     * TODO
+     * info
+     */
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = -1L)
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void unblockAccount() throws ScheduleBadProperties {
+        log.info(ScheduleConsts.INVOKING_UNBLOCK_ACCOUNTS_MESS);
+
+        // Find blocked accounts
+        List<Account> blockedAccounts;
+        try {
+            blockedAccounts = accountMOKFacade
+                    .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.MINUTES);
+        } catch (NumberFormatException e) {
+            log.error(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+            throw new ScheduleBadProperties(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+        }
+
+        if (blockedAccounts.isEmpty()) {
+            log.info(ScheduleConsts.NO_ACCOUNTS_TO_UNBLOCK_MESS);
+            return;
+        }
+
+        log.info(ScheduleConsts.LIST_ACCOUNTS_TO_UNBLOCK_IDS, blockedAccounts.stream().map(Account::getId).toList());
+
+        // Unblock accounts
+        blockedAccounts.forEach((a -> {
+            // Remove account blockade
+            a.setBlocked(false);
+            a.setBlockedTime(null);
+
+            // Reset unsuccessful login counter
+            a.getActivityLog().setUnsuccessfulLoginCounter(0);
+            accountMOKFacade.edit(a);
+
+            // Send notification mail
+            mailProvider.sendUnblockAccountInfoEmail(a.getName(), a.getLastname(), a.getEmail());
+        }));
     }
 }
