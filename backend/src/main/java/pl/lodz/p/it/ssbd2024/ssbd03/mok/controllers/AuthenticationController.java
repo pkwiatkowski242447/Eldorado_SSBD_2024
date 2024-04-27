@@ -43,6 +43,8 @@ public class AuthenticationController {
      *
      * @param authenticationService Service used for authentication purposes.
      * @param jwtProvider           Component used in order to generate JWT tokens with specified payload.
+     * @param tokenFacade           Facade used in the `resendEmailConfirmation()` method.
+     * @param mailProvider          Component used to send confirmation emails.
      */
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
