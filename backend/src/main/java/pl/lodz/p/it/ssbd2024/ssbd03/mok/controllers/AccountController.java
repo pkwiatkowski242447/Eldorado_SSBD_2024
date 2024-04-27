@@ -230,10 +230,10 @@ public class AccountController {
         try {
             Account account = accountService.getAccountById(id).orElseThrow(AccountNotFoundException::new);
             accountService.changeEmail(account, accountChangeEmailDTO.getEmail());
-            var tokenId = tokenService.createEmailConfirmationToken(account);
+            var token = tokenService.createEmailConfirmationToken(account);
 
             //TODO make it so the URL is based on some property
-            String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + tokenId;
+            String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
             mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), account.getEmail(), confirmationURL, account.getAccountLanguage());
 
             return ResponseEntity.noContent().build();
