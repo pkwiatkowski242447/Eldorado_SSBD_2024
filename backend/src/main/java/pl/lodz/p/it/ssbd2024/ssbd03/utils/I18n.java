@@ -29,6 +29,7 @@ public class I18n {
 
     // Account controller
     public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
+    public static final String UUID_INVALID = "account.controller.uuid.invalid";
 
     // Mail provider
 
