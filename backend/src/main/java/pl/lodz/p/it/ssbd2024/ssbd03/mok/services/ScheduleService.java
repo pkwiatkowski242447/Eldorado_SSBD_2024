@@ -23,8 +23,9 @@ import java.util.concurrent.TimeUnit;
  * Service managing execution of scheduled tasks.
  * Configuration concerning tasks is set in application.properties.
  */
-@Service
 @Slf4j
+@Service
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ScheduleService {
 
     private final AccountMOKFacade accountMOKFacade;
@@ -59,7 +60,6 @@ public class ScheduleService {
      * @throws ScheduleBadProperties Threw when problem with properties occurs.
      */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    @Transactional(propagation = Propagation.REQUIRED)
     public void deleteNotVerifiedAccount() throws ScheduleBadProperties {
         log.info(ScheduleConsts.INVOKING_DELETE_ACCOUNTS_MESS);
 
@@ -92,7 +92,6 @@ public class ScheduleService {
      * If so then new registration token will be generated, and new message for activating user account will be sent to specified e-mail address.
      */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    @Transactional(propagation = Propagation.REQUIRED)
     public void resendConfirmationEmail() {
         log.info(ScheduleConsts.INVOKING_RESEND_CONFIRMATION_EMAIL);
 
@@ -121,7 +120,6 @@ public class ScheduleService {
      * @throws ScheduleBadProperties Threw when problem with properties occurs.
      */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = -1L)
-    @Transactional(propagation = Propagation.REQUIRED)
     public void unblockAccount() throws ScheduleBadProperties {
         log.info(ScheduleConsts.INVOKING_UNBLOCK_ACCOUNTS_MESS);
 

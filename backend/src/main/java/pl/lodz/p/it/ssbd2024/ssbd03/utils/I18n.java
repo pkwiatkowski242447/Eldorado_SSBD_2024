@@ -55,6 +55,7 @@ public class I18n {
     public static final String UNBLOCK_ACCOUNT_GREETING_MESSAGE = "mail.unblock.account.greeting.message";
     public static final String UNBLOCK_ACCOUNT_MESSAGE_SUBJECT = "mail.unblock.account.message.subject";
     public static final String UNBLOCK_ACCOUNT_RESULT_MESSAGE = "mail.unblock.account.result_message";
+    public static final String UNBLOCK_ACCOUNT_ACTION_DESCRIPTION = "mail.unblock.account.action_description";
     public static final String UNBLOCK_ACCOUNT_NOTE_TITLE = "mail.unblock.account.note_title";
 
     public static String getMessage(String messageKey, String language) {

@@ -140,6 +140,7 @@ public class MailProvider {
                     .replace("$lastname", lastName)
                     .replace("$greeting_message", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_GREETING_MESSAGE, language))
                     .replace("$result_message", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_ACTION_DESCRIPTION, language))
                     .replace("$note_title", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_NOTE_TITLE, language))
                     .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
