@@ -11,17 +11,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.LocalDateTime;
 
@@ -35,8 +32,6 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final JWTProvider jwtProvider;
-    private final TokenFacade tokenFacade;
-    private final MailProvider mailProvider;
 
     /**
      * Autowired constructor for the controller.
@@ -46,13 +41,9 @@ public class AuthenticationController {
      */
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
-                                    JWTProvider jwtProvider,
-                                    TokenFacade tokenFacade,
-                                    MailProvider mailProvider) {
+                                    JWTProvider jwtProvider) {
         this.authenticationService = authenticationService;
         this.jwtProvider = jwtProvider;
-        this.tokenFacade = tokenFacade;
-        this.mailProvider = mailProvider;
     }
 
     /**
@@ -112,32 +103,6 @@ public class AuthenticationController {
             return ResponseEntity.ok().build();
         } catch (Exception exception) {
             return ResponseEntity.badRequest().body(I18n.getMessage(I18n.AUTH_CONTROLLER_ACCOUNT_LOGOUT, "en"));
-        }
-    }
-
-    /**
-     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
-     *
-     * @param accountLoginDTO   Data transfer object, containing user credentials with language setting from the browser.
-     *
-     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
-     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
-     */
-    @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
-        try {
-            // TODO: Verify credentials
-            Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
-            Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow();
-            String confirmationURL = "http://localhost:8080/api/v1/accounts/email/" + token;
-            mailProvider.sendRegistrationConfirmEmail(account.getName(),
-                                                      account.getLastname(),
-                                                      account.getEmail(),
-                                                      confirmationURL,
-                                                      account.getAccountLanguage());
-            return ResponseEntity.noContent().build();
-        } catch (AuthenticationAccountNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
         }
     }
 }
