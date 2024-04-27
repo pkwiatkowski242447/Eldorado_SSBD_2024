@@ -96,15 +96,17 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language Language of the message.
      */
-    public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
+    public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language, boolean adminLock) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
             String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
                     .replace("$firstname", firstName)
                     .replace("$lastname", lastName)
                     .replace("$greeting_message", I18n.getMessage(I18n.BLOCK_ACCOUNT_GREETING_MESSAGE, language))
-                    .replace("$result_message", I18n.getMessage(I18n.BLOCK_ACCOUNT_RESULT_MESSAGE, language))
-                    .replace("$action_description", I18n.getMessage(I18n.BLOCK_ACCOUNT_ACTION_DESCRIPTION, language))
+                    .replace("$result_message",
+                            I18n.getMessage(adminLock ? I18n.BLOCK_ACCOUNT_RESULT_MESSAGE_ADMIN : I18n.BLOCK_ACCOUNT_RESULT_MESSAGE_AUTO, language))
+                    .replace("$action_description",
+                            I18n.getMessage(adminLock ? I18n.BLOCK_ACCOUNT_ACTION_DESCRIPTION_ADMIN : I18n.BLOCK_ACCOUNT_ACTION_DESCRIPTION_AUTO, language))
                     .replace("$note_title", I18n.getMessage(I18n.BLOCK_ACCOUNT_NOTE_TITLE, language))
                     .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);

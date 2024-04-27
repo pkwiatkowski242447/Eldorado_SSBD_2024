@@ -212,12 +212,12 @@ public class Account extends AbstractEntity {
 
     @NotNull(message = AccountMessages.BLOCKED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_COLUMN, nullable = false)
-    @Setter
+//    @Setter
     private Boolean blocked = false;
 
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
-    @Setter
+//    @Setter
     private LocalDateTime blockedTime;
 
     @NotBlank(message = AccountMessages.NAME_BLANK)
@@ -319,18 +319,22 @@ public class Account extends AbstractEntity {
     }
 
     /**
-     * Blocks account and sets the time of applying the blockade to current time.
+     * Blocks account and sets the time of applying the blockade.
      */
-    public void blockAccount() {
+    public void blockAccount(boolean adminLock) {
         this.blocked = true;
-        this.blockedTime = LocalDateTime.now();
+        // When admin blocks the account property blockedTime is not set
+        this.blockedTime = adminLock ? null : LocalDateTime.now();
     }
 
     /**
-     * Unblocks the account and resets the time of applying the blockade.
+     * Unblocks the account and resets the time of applying the blockade and count of unsuccessful logins.
      */
     public void unblockAccount() {
+        // Remove account blockade
         this.blocked = false;
         this.blockedTime = null;
+        // Reset unsuccessful login counter
+        this.getActivityLog().setUnsuccessfulLoginCounter(0);
     }
 }

@@ -48,8 +48,10 @@ public class I18n {
 
     public static final String BLOCK_ACCOUNT_GREETING_MESSAGE = "mail.block.account.greeting.message";
     public static final String BLOCK_ACCOUNT_MESSAGE_SUBJECT = "mail.block.account.message.subject";
-    public static final String BLOCK_ACCOUNT_RESULT_MESSAGE = "mail.block.account.result_message";
-    public static final String BLOCK_ACCOUNT_ACTION_DESCRIPTION = "mail.block.account.action_description";
+    public static final String BLOCK_ACCOUNT_RESULT_MESSAGE_AUTO = "mail.block.account.result_message_auto";
+    public static final String BLOCK_ACCOUNT_RESULT_MESSAGE_ADMIN = "mail.block.account.result_message_admin";
+    public static final String BLOCK_ACCOUNT_ACTION_DESCRIPTION_AUTO = "mail.block.account.action_description_auto";
+    public static final String BLOCK_ACCOUNT_ACTION_DESCRIPTION_ADMIN = "mail.block.account.action_description_admin";
     public static final String BLOCK_ACCOUNT_NOTE_TITLE = "mail.block.account.note_title";
 
     public static final String UNBLOCK_ACCOUNT_GREETING_MESSAGE = "mail.unblock.account.greeting.message";

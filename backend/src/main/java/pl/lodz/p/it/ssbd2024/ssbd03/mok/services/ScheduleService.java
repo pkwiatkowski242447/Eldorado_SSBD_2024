@@ -142,12 +142,7 @@ public class ScheduleService {
 
         // Unblock accounts
         blockedAccounts.forEach((a -> {
-            // Remove account blockade
-            a.setBlocked(false);
-            a.setBlockedTime(null);
-
-            // Reset unsuccessful login counter
-            a.getActivityLog().setUnsuccessfulLoginCounter(0);
+            a.unblockAccount();
             accountMOKFacade.edit(a);
 
             // Send notification mail

@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -118,7 +119,7 @@ public class AccountService {
      */
     public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
-        if (account.getBlocked()) {
+        if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException("This account is already blocked");
         }
         if (SecurityContextHolder.getContext().getAuthentication() != null &&
@@ -127,14 +128,35 @@ public class AccountService {
             throw new IllegalOperationException("You cannot block your own account!");
         }
 
-        account.setBlocked(true);
-        // When admin blocks the account property blockedTime is not set
+        account.blockAccount(true);
         accountFacade.edit(account);
 
         // Sending information email
         mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
-                account.getEmail(), account.getAccountLanguage());
+                account.getEmail(), account.getAccountLanguage(), true);
         ///TODO handle exception for trying to block an account by more than 1 admin???
+    }
+
+    /**
+     * Method for unblocking an account by its UUID.
+     *
+     * @param id Account identifier
+     * @throws AccountNotFoundException Threw when there is no account with given login.
+     * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
+     */
+    public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
+        if (!account.getBlocked()) {
+            throw new AccountAlreadyUnblockedException("This account is already unblocked");
+        }
+
+        account.unblockAccount();
+        accountFacade.edit(account);
+
+        // Sending information email
+        mailProvider.sendUnblockAccountInfoEmail(account.getName(), account.getLastname(),
+                account.getEmail(), account.getAccountLanguage());
+        ///TODO handle exception for trying to unblock an account by more than 1 admin???
     }
 
     /**

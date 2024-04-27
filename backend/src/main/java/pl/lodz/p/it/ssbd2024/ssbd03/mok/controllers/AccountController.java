@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,7 +65,7 @@ public class AccountController {
      * This endpoint allows user with administrative user level to block a user account by its UUID. After
      * the account has been blocked.
      *
-     * @param id
+     * @param id UUID of an Account to block.
      * @return If account blocking is successful, then 204 NO CONTENT is returned as a response.
      * In case of IllegalArgumentException being thrown, during parsing passed id from String to UUID class,
      * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
@@ -85,6 +86,34 @@ public class AccountController {
         } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This endpoint allows user with administrative user level to unblock a user account by its UUID. After
+     * the account has been unblocked.
+     *
+     * @param id UUID of an Account to unblock.
+     * @return If account unblocking is successful, then 204 NO CONTENT is returned as a response.
+     * In case of IllegalArgumentException being thrown, during parsing passed id from String to UUID class,
+     * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
+     * 404 NOT FOUND and when AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
+     */
+    @PostMapping("/{user_id}/unblock")
+    public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
+        try {
+            accountService.unblockAccount(UUID.fromString(id));
+        } catch (IllegalArgumentException iae) {
+            log.error(iae.getMessage());
+            return ResponseEntity.badRequest().body(iae.getMessage());
+        } catch (AccountNotFoundException ignore) {
+            log.error("Account not found");
+            ///TODO ewewntualna zmiana kodu z NF na bad request?
+            return ResponseEntity.notFound().build();
+        } catch (AccountAlreadyUnblockedException aaue) {
+            log.error(aaue.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
         }
         return ResponseEntity.noContent().build();
     }
