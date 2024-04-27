@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -193,6 +194,26 @@ public class AccountController {
             return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, "en"));
         } else {
             return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+        }
+    }
+
+    /**
+     * This method is used to find user account by Id.
+     *
+     * @param id Id of searched of the searched account
+     */
+    @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
+        //conversion String -> UUID
+        try {
+            UUID uuid = UUID.fromString(id);
+            Account account = accountService.getAccountById(uuid).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+        } catch (IllegalArgumentException iae ) {
+            return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
+        } catch (AccountNotFoundException anfe) {
+            return ResponseEntity.badRequest().body(anfe.getMessage());
         }
     }
 
