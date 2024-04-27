@@ -129,6 +129,7 @@ public class AuthenticationController {
             // TODO: Verify credentials
             Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
             Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow();
+            //TODO make it so the URL is based on some property
             String confirmationURL = "http://localhost:8080/api/v1/accounts/email/" + token;
             mailProvider.sendRegistrationConfirmEmail(account.getName(),
                                                       account.getLastname(),

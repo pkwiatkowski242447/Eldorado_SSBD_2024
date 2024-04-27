@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 @Getter @ToString
-public class AbstractEntity {
+public class AbstractEntity implements Signable {
     @Id
     @Column(name = DatabaseConsts.PK_COLUMN, columnDefinition = "UUID", unique = true, nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -68,7 +68,8 @@ public class AuthenticationService {
                 log.info("Account %s has been blocked".formatted(refreshedAccount.getId()));
 
                 // Sending information email
-                mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(), refreshedAccount.getEmail());
+                mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(),
+                        refreshedAccount.getEmail(), account.getAccountLanguage());
             }
 
             authenticationFacade.edit(refreshedAccount);

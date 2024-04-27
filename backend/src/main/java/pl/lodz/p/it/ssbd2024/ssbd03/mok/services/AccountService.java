@@ -132,8 +132,9 @@ public class AccountService {
         accountFacade.edit(account);
 
         // Sending information email
-        mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail());
-        ///TODO obsluga bledu dla proby zablokowania konta użytkownika przez więcej niż 1 administratora???
+        mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
+                account.getEmail(), account.getAccountLanguage());
+        ///TODO handle exception for trying to block an account by more than 1 admin???
     }
 
     /**

@@ -344,12 +344,12 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     }
 
     /**
-     * TODO
      * This method is used to find all users accounts that were blocked by logging incorrectly certain amount of times
      * (so basically status of the account was changed to blocked and blocked time is set).
      *
-     * @param amount
-     * @param timeUnit
+     * @param amount Length of the specified time window, used to unblock accounts, blocked by logging incorrectly
+     *               certain amount of times.
+     * @param timeUnit Time unit, indicating size of the account blockade time window.
      *
      * @return List of all users accounts that were blocked by the logging incorrectly certain amount of time.
      * If persistence exception is thrown, then empty list will be returned.

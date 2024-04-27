@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadProperties;
@@ -17,7 +16,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.ScheduleConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -104,6 +102,7 @@ public class ScheduleService {
         registerTokens.forEach(token -> {
             Account account = token.getAccount();
             if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(12))) {
+                //TODO make it so the URL is based on some property
                 String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token;
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),
                                                           account.getLastname(),
@@ -116,8 +115,10 @@ public class ScheduleService {
     }
 
     /**
-     * TODO
-     * info
+     * Unblock Accounts which have been blocked by login incorrectly certain amount of time.
+     * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
+     *
+     * @throws ScheduleBadProperties Threw when problem with properties occurs.
      */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = -1L)
     @Transactional(propagation = Propagation.REQUIRED)
@@ -152,7 +153,7 @@ public class ScheduleService {
             accountMOKFacade.edit(a);
 
             // Send notification mail
-            mailProvider.sendUnblockAccountInfoEmail(a.getName(), a.getLastname(), a.getEmail());
+            mailProvider.sendUnblockAccountInfoEmail(a.getName(), a.getLastname(), a.getEmail(), a.getAccountLanguage());
         }));
     }
 }
