@@ -26,9 +26,13 @@ public class I18n {
     public static final String ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION = "account.service.account.constraint.validation.exception";
     public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
     public static final String ACCOUNT_EMAIL_COLLISION_EXCEPTION = "account.service.account.email.collision.exception";
+    public static final String ACCOUNT_ALREADY_BLOCKED_EXCEPTION = "account.service.account.already.blocked.exception";
+    public static final String ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION = "account.service.account.already.unblocked.exception";
+    public static final String ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION = "account.service.account.try_to_block_own.exception";
 
     // Account controller
     public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
+    public static final String BAD_UUID_INVALID_FORMAT_EXCEPTION = "account.controller.uuid.invalid.format.exception";
 
     // Mail provider
 
