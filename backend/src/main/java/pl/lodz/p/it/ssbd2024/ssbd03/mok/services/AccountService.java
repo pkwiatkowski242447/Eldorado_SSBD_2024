@@ -44,7 +44,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.VA
  */
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+@Transactional(propagation = Propagation.REQUIRED)
 public class AccountService {
 
     private final AccountMOKFacade accountFacade;
@@ -348,6 +348,7 @@ public class AccountService {
      *                                     Additionally, if the problem was caused by an incorrect new mail,
      *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
      */
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void changeEmail(Account account, String newEmail) throws AccountEmailChangeException {
         try {
             if (account.getEmail().equals(newEmail)) throw new AccountSameEmailException(SAME_EMAIL_EXCEPTION);
