@@ -1,9 +1,7 @@
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -14,15 +12,11 @@ public class TestcontainersConfig {
 
     static final String testDBName = "testDB";
 
-    ///FIXME w przypadku zmiany tworzonego usera w nominalnym dockerze tutaj tez zmienimy :D
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16")
             .withCreateContainerCmdModifier(cmd -> {
                         cmd.withName(testDBName);
                         cmd.withHostName(testDBName);
-                        cmd.withHostConfig(HostConfig.newHostConfig().withPortBindings(
-                                new PortBinding(Ports.Binding.bindPort(5432), new ExposedPort(5432)))
-                        );
                     }
             )
             .withUsername("postgres")
@@ -31,6 +25,11 @@ public class TestcontainersConfig {
             .withCopyFileToContainer(MountableFile.forClasspathResource("sql/init_struct_test.sql"),
                     "/docker-entrypoint-initdb.d/");
 //            .withReuse(true); //hmm?
+
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
+    }
 
     @BeforeAll
     static void beforeAll() {
