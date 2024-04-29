@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,22 +14,17 @@ import org.springframework.validation.Validator;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountSameEmailException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -44,7 +40,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.VA
  */
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AccountService {
 
     private final AccountMOKFacade accountFacade;
@@ -52,7 +48,7 @@ public class AccountService {
     private final TokenFacade tokenFacade;
     private final MailProvider mailProvider;
     private final JWTProvider jwtProvider;
-    private final Validator validator;
+    private final TokenService tokenService;
 
     /**
      * Autowired constructor for the service.
@@ -62,6 +58,7 @@ public class AccountService {
      * @param tokenFacade       This facade is responsible for manipulating tokens, used for various, user account related operations.
      * @param mailProvider      This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
      * @param jwtProvider       This component is used to generate token values for token facade.
+     * @param tokenService      Service used for more complicated token operations.
      */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
@@ -69,13 +66,13 @@ public class AccountService {
                           TokenFacade tokenFacade,
                           MailProvider mailProvider,
                           JWTProvider jwtProvider,
-                          Validator validator) {
+                          TokenService tokenService) {
         this.accountFacade = accountFacade;
         this.passwordEncoder = passwordEncoder;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
         this.jwtProvider = jwtProvider;
-        this.validator = validator;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -268,17 +265,24 @@ public class AccountService {
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
      */
-    public boolean confirmEmail(String token) throws AccountNotFoundException {
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountEmailChangeException.class)
+    public boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException {
         Token tokenFromDB = tokenFacade.findByTokenValue(token).orElse(null);
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
         Account account = accountFromDB.orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (tokenFromDB == null || !jwtProvider.isTokenValid(token, account)) {
             return false;
         } else {
-            account.setVerified(true);
-            accountFacade.edit(account);
-            tokenFacade.remove(tokenFromDB);
-            return true;
+            try {
+                String email = jwtProvider.extractEmail(token);
+                if(email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
+                account.setEmail(email);
+                accountFacade.edit(account);
+                tokenFacade.remove(tokenFromDB);
+                return true;
+            } catch (ConstraintViolationException e){
+                throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
+            }
         }
     }
 
@@ -341,39 +345,21 @@ public class AccountService {
     /**
      * Changes the e-mail of the specified Account.
      *
-     * @param account  Account which the e-mail will be changed.
+     * @param accountId  ID of the account which the e-mail will be changed.
      * @param newEmail New e-mail address.
      * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
      *                                     Contains a key to an internationalized message.
      *                                     Additionally, if the problem was caused by an incorrect new mail,
      *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
      */
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void changeEmail(Account account, String newEmail) throws AccountEmailChangeException {
-        try {
-            if (account.getEmail().equals(newEmail)) throw new AccountSameEmailException(SAME_EMAIL_EXCEPTION);
+    public void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException {
+        Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
+        if(Objects.equals(account.getEmail(), newEmail)) throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION);
+        if(accountFacade.findByEmail(newEmail).isPresent()) throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
 
-            account.setEmail(newEmail);
-            account.setVerified(false);
-            var errors = validator.validateObject(account);
-            if (errors.hasErrors()) throw new AccountValidationException(VALIDATION_EXCEPTION,
-                    errors.getFieldErrors()
-                            .stream()
-                            .map(v -> new AccountValidationException.FieldConstraintViolation(v.getField(),
-                                    Optional.ofNullable(v.getRejectedValue()).orElse(" ").toString(),
-                                    Optional.ofNullable(v.getDefaultMessage()).orElse(" ")))
-                            .collect(Collectors.toSet()));
-            accountFacade.edit(account);
-        } catch (AccountValidationException e) {
-            //TODO internationalization
-            log.error(e.getMessage());
-            throw new AccountEmailChangeException(I18n.ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION, e);
-        } catch (AccountSameEmailException e) {
-            log.error(e.getMessage());
-            throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION, e);
-        } catch (ConstraintViolationException e) {
-            log.error(e.getMessage());
-            throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION, e);
-        }
+        var token = tokenService.createEmailConfirmationToken(account,newEmail);
+        //TODO make it so the URL is based on some property
+        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
+        mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
     }
 }

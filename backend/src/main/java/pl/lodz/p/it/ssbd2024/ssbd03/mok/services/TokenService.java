@@ -70,4 +70,15 @@ public class TokenService {
 
         return emailToken.getTokenValue();
     }
+
+    /**
+     * Removes token from the database if exists.
+     *
+     * @param token Confirmation token to be removed
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void removeAccountsEmailConfirmationToken(String token){
+        tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL,
+                jwtProvider.extractAccountId(token)).ifPresent(tokenFacade::remove);
+    }
 }
