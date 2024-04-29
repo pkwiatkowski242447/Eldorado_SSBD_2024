@@ -126,6 +126,18 @@ public class JWTProvider {
     }
 
     /**
+     * Extracts email from the Token after verifying and decoding it.
+     *
+     * @param jwtToken Token from which the email will be extracted.
+     * @return String containing new email.
+     */
+    public String extractEmail(String jwtToken) {
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey())).build();
+        DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
+        return decodedJWT.getClaim(JWTConsts.EMAIL).asString();
+    }
+
+    /**
      * Checks validity of the token.
      *
      * @param jwtToken Token to be checked.

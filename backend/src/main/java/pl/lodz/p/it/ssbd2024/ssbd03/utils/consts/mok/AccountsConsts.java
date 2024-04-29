@@ -4,7 +4,7 @@ public class AccountsConsts {
 
     public static final int LOGIN_MIN_LENGTH = 4;
     public static final int LOGIN_MAX_LENGTH = 32;
-    public static final String LOGIN_REGEX = "^[a-zA-Z0-9_-]{8,32}$";
+    public static final String LOGIN_REGEX = "^[a-zA-Z0-9_-]{4,32}$";
 
     public static final int PASSWORD_LENGTH = 60;
 
