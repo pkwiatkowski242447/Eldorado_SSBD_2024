@@ -57,6 +57,7 @@ public class MailProvider {
      * @param lastName User's last name.
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param confirmationURL URL used to confirm the account creation.
+     * @param language Language of the message.
      */
     public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
@@ -93,26 +94,68 @@ public class MailProvider {
      * @param firstName User's first name.
      * @param lastName User's last name.
      * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language Language of the message.
      */
-    public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver) {
+    public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language, boolean adminLock) {
         try {
-            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
-            String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
                     .replace("$firstname", firstName)
                     .replace("$lastname", lastName)
-                    .replace("$greeting_message", "Hello")
-                    .replace("$result_message", "Your account has been blocked!")
-                    .replace("$action_description", "TEST TEST.")
-                    .replace("$note_title", "Note")
-                    .replace("$note_message", "This e-mail is generated automatically and does not require any responses to it.")
+                    .replace("$greeting_message", I18n.getMessage(I18n.BLOCK_ACCOUNT_GREETING_MESSAGE, language))
+                    .replace("$result_message",
+                            I18n.getMessage(adminLock ? I18n.BLOCK_ACCOUNT_RESULT_MESSAGE_ADMIN : I18n.BLOCK_ACCOUNT_RESULT_MESSAGE_AUTO, language))
+                    .replace("$action_description",
+                            I18n.getMessage(adminLock ? I18n.BLOCK_ACCOUNT_ACTION_DESCRIPTION_ADMIN : I18n.BLOCK_ACCOUNT_ACTION_DESCRIPTION_AUTO, language))
+                    .replace("$note_title", I18n.getMessage(I18n.BLOCK_ACCOUNT_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
 
             messageHelper.setTo(emailReceiver);
+            messageHelper.setSubject(I18n.getMessage(I18n.BLOCK_ACCOUNT_MESSAGE_SUBJECT, language));
+            messageHelper.setText(emailContent, true);
+            messageHelper.setFrom(senderEmail);
 
-            messageHelper.setSubject("Your account has been blocked");
+            this.mailSender.send(mimeMessage);
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    /**
+     * Sends an account unblocking notification e-mail to the specified e-mail address.
+     *
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language Language of the message.
+     */
+    public void sendUnblockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
+            String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_ACTION_DESCRIPTION, language))
+                    .replace("$note_title", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            messageHelper.setTo(emailReceiver);
+            messageHelper.setSubject(I18n.getMessage(I18n.UNBLOCK_ACCOUNT_MESSAGE_SUBJECT, language));
+            messageHelper.setText(emailContent, true);
+            messageHelper.setFrom(senderEmail);
+
+            this.mailSender.send(mimeMessage);
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
             logger.error(exception.getMessage(), exception.getCause());

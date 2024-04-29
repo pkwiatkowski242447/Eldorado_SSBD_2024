@@ -63,12 +63,12 @@ public class AuthenticationService {
 
             // Increment the number of failed login attempts
             if (!refreshedAccount.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= 3) {
-                refreshedAccount.setBlocked(true);
-                refreshedAccount.setBlockedTime(LocalDateTime.now());
+                refreshedAccount.blockAccount(false);
                 log.info("Account %s has been blocked".formatted(refreshedAccount.getId()));
 
                 // Sending information email
-                mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(), refreshedAccount.getEmail());
+                mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(),
+                        refreshedAccount.getEmail(), account.getAccountLanguage(), false);
             }
 
             authenticationFacade.edit(refreshedAccount);

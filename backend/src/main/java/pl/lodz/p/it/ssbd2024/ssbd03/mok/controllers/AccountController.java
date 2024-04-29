@@ -25,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
@@ -36,6 +37,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeExcepti
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.LangCodes;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.util.List;
@@ -82,29 +84,80 @@ public class AccountController {
      * This endpoint allows user with administrative user level to block a user account by its UUID. After
      * the account has been blocked.
      *
-     * @param id
+     * @param id UUID of an Account to block.
      * @return If account blocking is successful, then 204 NO CONTENT is returned as a response.
      * In case of IllegalArgumentException being thrown, during parsing passed id from String to UUID class,
      * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
      * 404 NOT FOUND and when AccountAlreadyBlockedException or IllegalOperationException is thrown,
      * the response is 409 CONFLICT.
      */
-    @PostMapping("/{user_id}/block")
+    @PostMapping(value = "/{user_id}/block", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) {
         try {
+            if (id.length() != 36) {
+                throw new IllegalArgumentException();
+            }
             accountService.blockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException iae) {
-            log.error(iae.getMessage());
-            return ResponseEntity.badRequest().body(iae.getMessage());
-        } catch (AccountNotFoundException ignore) {
-            log.error("Account not found");
-            ///TODO ewewntualna zmiana kodu z NF na bad request?
+            log.error(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, LangCodes.EN.getCode()));
+            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, getSelfAccountLang()));
+        } catch (AccountNotFoundException anfe) {
+            log.error(I18n.getMessage(anfe.getMessage(), LangCodes.EN.getCode()));
+            ///TODO potentially change from NF to bad request?
+            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.notFound().build();
         } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            log.error(I18n.getMessage(e.getMessage(), LangCodes.EN.getCode()));
+            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.getMessage(e.getMessage(), getSelfAccountLang()));
         }
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This endpoint allows user with administrative user level to unblock a user account by its UUID. After
+     * the account has been unblocked.
+     *
+     * @param id UUID of an Account to unblock.
+     * @return If account unblocking is successful, then 204 NO CONTENT is returned as a response.
+     * In case of IllegalArgumentException being thrown, during parsing passed id from String to UUID class,
+     * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
+     * 404 NOT FOUND and when AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
+     */
+    @PostMapping(value = "/{user_id}/unblock", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
+        try {
+            if (id.length() != 36) {
+                throw new IllegalArgumentException();
+            }
+            accountService.unblockAccount(UUID.fromString(id));
+        } catch (IllegalArgumentException iae) {
+            log.error(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, LangCodes.EN.getCode()));
+            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, getSelfAccountLang()));
+        } catch (AccountNotFoundException anfe) {
+            log.error(I18n.getMessage(anfe.getMessage(), LangCodes.EN.getCode()));
+            ///TODO potentially change from NF to bad request?
+            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
+            return ResponseEntity.notFound().build();
+        } catch (AccountAlreadyUnblockedException aaue) {
+            log.error(I18n.getMessage(aaue.getMessage(), LangCodes.EN.getCode()));
+            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.getMessage(aaue.getMessage(), getSelfAccountLang()));
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    /// FIXME method is discussed
+    private String getSelfAccountLang() {
+        Account account = null;
+        try {
+            String login = SecurityContextHolder.getContext().getAuthentication().getName();
+            account = accountService.getAccountByLogin(login);
+        } catch (Throwable e) {
+            log.error("Error getting account by login from the context");
+            return LangCodes.EN.getCode();
+        }
+        return account != null ? account.getAccountLanguage() : LangCodes.EN.getCode();
     }
 
     /**
@@ -208,7 +261,7 @@ public class AccountController {
         //call accountServiceMethod [findByLogin()]
         Account account = accountService.getAccountByLogin(username);
         if (account == null) {
-            return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, "en"));
+            return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, LangCodes.EN.getCode()));
         } else {
             return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
         }
@@ -268,11 +321,11 @@ public class AccountController {
             if (e.getCause() instanceof AccountValidationException)
                 return response.body(((AccountValidationException) e.getCause()).getConstraintViolations());
             //TODO change to use user's language
-            return response.body(I18n.getMessage(e.getMessage(), "en"));
+            return response.body(I18n.getMessage(e.getMessage(), LangCodes.EN.getCode()));
         } catch (Throwable e) {
             log.error(e.getMessage());
             //TODO change to use user's language
-            return ResponseEntity.internalServerError().body(I18n.getMessage(e.getMessage(), "en"));
+            return ResponseEntity.internalServerError().body(I18n.getMessage(e.getMessage(), LangCodes.EN.getCode()));
         }
     }
 

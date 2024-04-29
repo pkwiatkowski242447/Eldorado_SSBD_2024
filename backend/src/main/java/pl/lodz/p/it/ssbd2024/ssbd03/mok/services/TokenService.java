@@ -54,20 +54,6 @@ public class TokenService {
     }
 
     /**
-     * Creates and persists email confirmation token for the Account.
-     *
-     * @param account Account for which the token is created.
-     * @return Returns newly created email confirmation token value.
-     */
-    public String createEmailConfirmationToken(Account account, String newEmail) {
-
-        Token emailConfirmationToken = new Token(newEmail, account, Token.TokenType.CONFIRM_EMAIL);
-        this.tokenFacade.create(emailConfirmationToken);
-
-        return newEmail;
-    }
-
-    /**
      * Creates and persists E-mail confirmation Token for the Account.
      *
      * @param account Account for which the token is created.

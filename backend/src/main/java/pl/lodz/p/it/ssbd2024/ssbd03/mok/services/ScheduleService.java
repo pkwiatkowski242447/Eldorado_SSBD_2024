@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadProperties;
@@ -17,7 +16,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.ScheduleConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,8 +23,9 @@ import java.util.concurrent.TimeUnit;
  * Service managing execution of scheduled tasks.
  * Configuration concerning tasks is set in application.properties.
  */
-@Service
 @Slf4j
+@Service
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ScheduleService {
 
     private final AccountMOKFacade accountMOKFacade;
@@ -37,6 +36,9 @@ public class ScheduleService {
 
     @Value("${scheduler.not_verified_account_delete_time}")
     private String deleteTime;
+
+    @Value("${scheduler.blocked_account_unblock_time}")
+    private String unblockTime;
 
     /**
      * Autowired constructor for the service.
@@ -58,7 +60,6 @@ public class ScheduleService {
      * @throws ScheduleBadProperties Threw when problem with properties occurs.
      */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    @Transactional(propagation = Propagation.REQUIRED)
     public void deleteNotVerifiedAccount() throws ScheduleBadProperties {
         log.info(ScheduleConsts.INVOKING_DELETE_ACCOUNTS_MESS);
 
@@ -91,7 +92,6 @@ public class ScheduleService {
      * If so then new registration token will be generated, and new message for activating user account will be sent to specified e-mail address.
      */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    @Transactional(propagation = Propagation.REQUIRED)
     public void resendConfirmationEmail() {
         log.info(ScheduleConsts.INVOKING_RESEND_CONFIRMATION_EMAIL);
 
@@ -100,7 +100,8 @@ public class ScheduleService {
 
         registerTokens.forEach(token -> {
             Account account = token.getAccount();
-            if (account.getCreationDate().isBefore(LocalDateTime.now().minus(12, ChronoUnit.HOURS))) {
+            if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(12))) {
+                //TODO make it so the URL is based on some property
                 String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token;
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),
                                                           account.getLastname(),
@@ -110,5 +111,42 @@ public class ScheduleService {
                 tokenFacade.removeByTypeAndAccount(Token.TokenType.REGISTER, account.getId());
             }
         });
+    }
+
+    /**
+     * Unblock Accounts which have been blocked by login incorrectly certain amount of time.
+     * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
+     *
+     * @throws ScheduleBadProperties Threw when problem with properties occurs.
+     */
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    public void unblockAccount() throws ScheduleBadProperties {
+        log.info(ScheduleConsts.INVOKING_UNBLOCK_ACCOUNTS_MESS);
+
+        // Find blocked accounts
+        List<Account> blockedAccounts;
+        try {
+            blockedAccounts = accountMOKFacade
+                    .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.HOURS);
+        } catch (NumberFormatException e) {
+            log.error(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+            throw new ScheduleBadProperties(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+        }
+
+        if (blockedAccounts.isEmpty()) {
+            log.info(ScheduleConsts.NO_ACCOUNTS_TO_UNBLOCK_MESS);
+            return;
+        }
+
+        log.info(ScheduleConsts.LIST_ACCOUNTS_TO_UNBLOCK_IDS, blockedAccounts.stream().map(Account::getId).toList());
+
+        // Unblock accounts
+        blockedAccounts.forEach((a -> {
+            a.unblockAccount();
+            accountMOKFacade.edit(a);
+
+            // Send notification mail
+            mailProvider.sendUnblockAccountInfoEmail(a.getName(), a.getLastname(), a.getEmail(), a.getAccountLanguage());
+        }));
     }
 }

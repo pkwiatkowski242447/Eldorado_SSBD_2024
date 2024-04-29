@@ -510,10 +510,19 @@
             </properties>
         </profile>
         <profile>
-            <id>dev</id>
+            <id>test</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                <database.host>localhost</database.host>
+                <schema-gen.policy>create-drop</schema-gen.policy>
+                <debug-sql.log>false</debug-sql.log>
+                <logging.level>INFO</logging.level>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
             <properties>
                 <database.host>localhost</database.host>
                 <schema-gen.policy>create-drop</schema-gen.policy>

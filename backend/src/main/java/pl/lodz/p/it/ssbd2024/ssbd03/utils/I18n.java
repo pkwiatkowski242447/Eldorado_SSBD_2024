@@ -26,10 +26,14 @@ public class I18n {
     public static final String ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION = "account.service.account.constraint.validation.exception";
     public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
     public static final String ACCOUNT_EMAIL_COLLISION_EXCEPTION = "account.service.account.email.collision.exception";
+    public static final String ACCOUNT_ALREADY_BLOCKED_EXCEPTION = "account.service.account.already.blocked.exception";
+    public static final String ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION = "account.service.account.already.unblocked.exception";
+    public static final String ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION = "account.service.account.try_to_block_own.exception";
 
     // Account controller
     public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
     public static final String UUID_INVALID = "account.controller.uuid.invalid";
+    public static final String BAD_UUID_INVALID_FORMAT_EXCEPTION = "account.controller.uuid.invalid.format.exception";
 
     // Mail provider
 
@@ -46,6 +50,20 @@ public class I18n {
     public static final String CONFIRM_EMAIL_NOTE_TITLE = "mail.confirm.email.note_title";
     public static final String AUTO_GENERATED_MESSAGE_NOTE = "mail.auto.generate.message.note";
     public static final String ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER = "account.controller.account.not.found";
+
+    public static final String BLOCK_ACCOUNT_GREETING_MESSAGE = "mail.block.account.greeting.message";
+    public static final String BLOCK_ACCOUNT_MESSAGE_SUBJECT = "mail.block.account.message.subject";
+    public static final String BLOCK_ACCOUNT_RESULT_MESSAGE_AUTO = "mail.block.account.result_message_auto";
+    public static final String BLOCK_ACCOUNT_RESULT_MESSAGE_ADMIN = "mail.block.account.result_message_admin";
+    public static final String BLOCK_ACCOUNT_ACTION_DESCRIPTION_AUTO = "mail.block.account.action_description_auto";
+    public static final String BLOCK_ACCOUNT_ACTION_DESCRIPTION_ADMIN = "mail.block.account.action_description_admin";
+    public static final String BLOCK_ACCOUNT_NOTE_TITLE = "mail.block.account.note_title";
+
+    public static final String UNBLOCK_ACCOUNT_GREETING_MESSAGE = "mail.unblock.account.greeting.message";
+    public static final String UNBLOCK_ACCOUNT_MESSAGE_SUBJECT = "mail.unblock.account.message.subject";
+    public static final String UNBLOCK_ACCOUNT_RESULT_MESSAGE = "mail.unblock.account.result_message";
+    public static final String UNBLOCK_ACCOUNT_ACTION_DESCRIPTION = "mail.unblock.account.action_description";
+    public static final String UNBLOCK_ACCOUNT_NOTE_TITLE = "mail.unblock.account.note_title";
 
     public static String getMessage(String messageKey, String language) {
         Locale locale = new Locale.Builder().setLanguage(language).build();
