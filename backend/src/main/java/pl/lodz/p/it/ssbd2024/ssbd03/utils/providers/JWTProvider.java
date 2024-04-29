@@ -83,6 +83,25 @@ public class JWTProvider {
     }
 
     /**
+     * Generates JWT used for keeping track of different actions which require confirmation.
+     *
+     * @param account Account to which the change is related to.
+     * @param tokenTTL Token's time to live in hours.
+     *
+     * @return Returns a signed Json Web Token.
+     */
+    public String generateEmailToken(Account account, String email, int tokenTTL) {
+        return JWT.create()
+                .withSubject(account.getLogin())
+                .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
+                .withClaim(JWTConsts.EMAIL, email)
+                .withIssuedAt(Instant.now())
+                .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
+                .withIssuer(JWTConsts.TOKEN_ISSUER)
+                .sign(Algorithm.HMAC256(this.getSingInKey()));
+    }
+
+    /**
      * Extracts AccountID from the Token after verifying and decoding it.
      *
      * @param jwtToken Token from which the AccountID will be extracted.

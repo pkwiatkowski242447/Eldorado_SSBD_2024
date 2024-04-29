@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,8 +34,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import org.springframework.web.bind.annotation.PathVariable;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.LangCodes;
@@ -149,7 +148,7 @@ public class AccountController {
 
     /// FIXME method is discussed
     private String getSelfAccountLang() {
-        Account account = null;
+        Account account;
         try {
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             account = accountService.getAccountByLogin(login);
@@ -300,32 +299,23 @@ public class AccountController {
      * explaining why the error occurred).
      */
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
+    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
         try {
             Account account = accountService.getAccountById(id).orElseThrow(AccountNotFoundException::new);
-            accountService.changeEmail(account, accountChangeEmailDTO.getEmail());
-            var token = tokenService.createEmailConfirmationToken(account);
+            var token = tokenService.createEmailConfirmationToken(account,accountChangeEmailDTO.getEmail());
 
             //TODO make it so the URL is based on some property
             String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
-            mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), account.getEmail(), confirmationURL, account.getAccountLanguage());
+            mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), accountChangeEmailDTO.getEmail(), confirmationURL, account.getAccountLanguage());
 
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
-        } catch (AccountEmailChangeException e) {
-            //TODO improve error message to comply with RFC 9457
-            log.error(e.getMessage());
-            var response = ResponseEntity.badRequest();
-            if (e.getCause() instanceof AccountValidationException)
-                return response.body(((AccountValidationException) e.getCause()).getConstraintViolations());
-            //TODO change to use user's language
-            return response.body(I18n.getMessage(e.getMessage(), LangCodes.EN.getCode()));
         } catch (Throwable e) {
             log.error(e.getMessage());
             //TODO change to use user's language
-            return ResponseEntity.internalServerError().body(I18n.getMessage(e.getMessage(), LangCodes.EN.getCode()));
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
