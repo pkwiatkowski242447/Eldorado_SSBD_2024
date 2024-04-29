@@ -5,27 +5,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountValidationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
@@ -41,24 +51,32 @@ import java.util.UUID;
 @RequestMapping("/api/v1/accounts")
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AccountController {
-
     private final AccountService accountService;
-    private final TokenService tokenService;
     private final MailProvider mailProvider;
+    private final TokenService tokenService;
+    private final TokenFacade tokenFacade;
+    private final AuthenticationService authenticationService;
 
     /**
      * Autowired constructor for the controller.
      * It is basically used to perform dependency injection of AccountService into this controller.
      *
      * @param accountService Service containing various methods for account manipulation.
+     * @param tokenFacade           Facade used in the `resendEmailConfirmation()` method.
+     * @param tokenService          Service used in the `changeEmail()` method.
+     * @param mailProvider          Component used to send confirmation emails.
      */
     @Autowired
     public AccountController(AccountService accountService,
                              TokenService tokenService,
-                             MailProvider mailProvider) {
+                             TokenFacade tokenFacade,
+                             MailProvider mailProvider,
+                             AuthenticationService authenticationService) {
         this.accountService = accountService;
         this.tokenService = tokenService;
+        this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
+        this.authenticationService = authenticationService;
     }
 
     /**
@@ -226,6 +244,26 @@ public class AccountController {
     }
 
     /**
+     * This method is used to find user account by Id.
+     *
+     * @param id Id of searched of the searched account
+     */
+    @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
+        //conversion String -> UUID
+        try {
+            UUID uuid = UUID.fromString(id);
+            Account account = accountService.getAccountById(uuid).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+        } catch (IllegalArgumentException iae ) {
+            return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
+        } catch (AccountNotFoundException anfe) {
+            return ResponseEntity.badRequest().body(anfe.getMessage());
+        }
+    }
+
+    /**
      * This method is used to change users e-mail address, which later could be used to send
      * messages about user actions in the application (e.g. messages containing confirmation links).
      *
@@ -242,10 +280,10 @@ public class AccountController {
         try {
             Account account = accountService.getAccountById(id).orElseThrow(AccountNotFoundException::new);
             accountService.changeEmail(account, accountChangeEmailDTO.getEmail());
-            var tokenId = tokenService.createEmailConfirmationToken(account);
+            var token = tokenService.createEmailConfirmationToken(account);
 
             //TODO make it so the URL is based on some property
-            String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + tokenId;
+            String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
             mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), account.getEmail(), confirmationURL, account.getAccountLanguage());
 
             return ResponseEntity.noContent().build();
@@ -264,6 +302,32 @@ public class AccountController {
             log.error(e.getMessage());
             //TODO change to use user's language
             return ResponseEntity.internalServerError().body(I18n.getMessage(e.getMessage(), "en"));
+        }
+    }
+
+    /**
+     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
+     *
+     * @param accountLoginDTO   Data transfer object, containing user credentials with language setting from the browser.
+     *
+     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
+     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
+     */
+    @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
+        try {
+            // TODO: Verify credentials
+            Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
+            Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow();
+            String confirmationURL = "http://localhost:8080/api/v1/accounts/email/" + token;
+            mailProvider.sendRegistrationConfirmEmail(account.getName(),
+                                                      account.getLastname(),
+                                                      account.getEmail(),
+                                                      confirmationURL,
+                                                      account.getAccountLanguage());
+            return ResponseEntity.noContent().build();
+        } catch (AuthenticationAccountNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
         }
     }
 }

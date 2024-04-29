@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
@@ -43,6 +45,8 @@ public class AuthenticationController {
      *
      * @param authenticationService Service used for authentication purposes.
      * @param jwtProvider           Component used in order to generate JWT tokens with specified payload.
+     * @param tokenFacade          Component used to manage tokens, used for confirming certain user actions.
+     * @param mailProvider          Provider used to send e-mail notifications to given e-mail address.
      */
     @Autowired
     public AuthenticationController(AuthenticationService authenticationService,
@@ -124,6 +128,7 @@ public class AuthenticationController {
      * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
      */
     @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
         try {
             // TODO: Verify credentials
