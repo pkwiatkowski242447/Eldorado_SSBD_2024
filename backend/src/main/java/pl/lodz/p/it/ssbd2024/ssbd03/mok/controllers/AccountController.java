@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -247,32 +248,23 @@ public class AccountController {
      * explaining why the error occurred).
      */
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
+    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
         try {
             Account account = accountService.getAccountById(id).orElseThrow(AccountNotFoundException::new);
-            accountService.changeEmail(account, accountChangeEmailDTO.getEmail());
-            var token = tokenService.createEmailConfirmationToken(account);
+            var token = tokenService.createEmailConfirmationToken(account,accountChangeEmailDTO.getEmail());
 
             //TODO make it so the URL is based on some property
             String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
-            mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), account.getEmail(), confirmationURL, account.getAccountLanguage());
+            mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), accountChangeEmailDTO.getEmail(), confirmationURL, account.getAccountLanguage());
 
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
-        } catch (AccountEmailChangeException e) {
-            //TODO improve error message to comply with RFC 9457
-            log.error(e.getMessage());
-            var response = ResponseEntity.badRequest();
-            if (e.getCause() instanceof AccountValidationException)
-                return response.body(((AccountValidationException) e.getCause()).getConstraintViolations());
-            //TODO change to use user's language
-            return response.body(I18n.getMessage(e.getMessage(), "en"));
         } catch (Throwable e) {
             log.error(e.getMessage());
             //TODO change to use user's language
-            return ResponseEntity.internalServerError().body(I18n.getMessage(e.getMessage(), "en"));
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 

@@ -54,29 +54,17 @@ public class TokenService {
     }
 
     /**
-     * Creates and persists email confirmation token for the Account.
-     *
-     * @param account Account for which the token is created.
-     * @return Returns newly created email confirmation token value.
-     */
-    public String createEmailConfirmationToken(Account account, String newEmail) {
-
-        Token emailConfirmationToken = new Token(newEmail, account, Token.TokenType.CONFIRM_EMAIL);
-        this.tokenFacade.create(emailConfirmationToken);
-
-        return newEmail;
-    }
-
-    /**
      * Creates and persists E-mail confirmation Token for the Account.
+     * Removes any e-mail confirmation tokens related to the given account previously on the database.
      *
      * @param account Account for which the token is created.
      * @return Token's value(JWT).
      */
     @Transactional(propagation = Propagation.MANDATORY)
-    public String createEmailConfirmationToken(Account account) {
-        String tokenValue = this.jwtProvider.generateActionToken(account,24);
+    public String createEmailConfirmationToken(Account account, String email) {
+        tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
 
+        String tokenValue = this.jwtProvider.generateEmailToken(account, email, 24);
         Token emailToken = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
         this.tokenFacade.create(emailToken);
 
