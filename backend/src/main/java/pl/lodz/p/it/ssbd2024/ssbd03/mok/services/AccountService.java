@@ -44,7 +44,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.VA
  */
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+@Transactional(propagation = Propagation.REQUIRED)
 public class AccountService {
 
     private final AccountMOKFacade accountFacade;
@@ -118,14 +118,14 @@ public class AccountService {
      * @throws IllegalOperationException Threw when user try to block their own account.
      */
     public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (account.getBlocked() && account.getBlockedTime() == null) {
-            throw new AccountAlreadyBlockedException("This account is already blocked");
+            throw new AccountAlreadyBlockedException(I18n.ACCOUNT_ALREADY_BLOCKED_EXCEPTION);
         }
         if (SecurityContextHolder.getContext().getAuthentication() != null &&
                 SecurityContextHolder.getContext().getAuthentication().getName().equals(account.getLogin())) {
-            log.error("You cannot block your own account!");
-            throw new IllegalOperationException("You cannot block your own account!");
+            log.error(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
+            throw new IllegalOperationException(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
         }
 
         account.blockAccount(true);
@@ -145,9 +145,9 @@ public class AccountService {
      * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
      */
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (!account.getBlocked()) {
-            throw new AccountAlreadyUnblockedException("This account is already unblocked");
+            throw new AccountAlreadyUnblockedException(I18n.ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION);
         }
 
         account.unblockAccount();
@@ -348,6 +348,7 @@ public class AccountService {
      *                                     Additionally, if the problem was caused by an incorrect new mail,
      *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
      */
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void changeEmail(Account account, String newEmail) throws AccountEmailChangeException {
         try {
             if (account.getEmail().equals(newEmail)) throw new AccountSameEmailException(SAME_EMAIL_EXCEPTION);

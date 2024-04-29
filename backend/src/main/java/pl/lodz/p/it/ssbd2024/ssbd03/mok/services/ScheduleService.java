@@ -119,7 +119,7 @@ public class ScheduleService {
      *
      * @throws ScheduleBadProperties Threw when problem with properties occurs.
      */
-    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = -1L)
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void unblockAccount() throws ScheduleBadProperties {
         log.info(ScheduleConsts.INVOKING_UNBLOCK_ACCOUNTS_MESS);
 
@@ -127,7 +127,7 @@ public class ScheduleService {
         List<Account> blockedAccounts;
         try {
             blockedAccounts = accountMOKFacade
-                    .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.MINUTES);
+                    .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
             log.error(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
             throw new ScheduleBadProperties(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
