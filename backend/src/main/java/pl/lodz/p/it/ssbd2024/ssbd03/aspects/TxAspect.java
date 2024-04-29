@@ -61,7 +61,7 @@ public class TxAspect {
      */
 
     @Around(value = "txPointcut()")
-    private Object aroundTxPointcut(ProceedingJoinPoint proceedingJoinPoint) {
+    private Object aroundTxPointcut(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         String transactionKey;
         StringBuilder message = new StringBuilder("Method call: ");
         Object result = new Object();
@@ -92,6 +92,7 @@ public class TxAspect {
         } catch (Throwable e) {
             message.append(" | Thrown exception: ").append(e);
             log.error(message.toString(), e);
+            throw e;
         }
 
         message.append(" | Returned: ").append(result).append(" ");
