@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountAbstractOutputDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;

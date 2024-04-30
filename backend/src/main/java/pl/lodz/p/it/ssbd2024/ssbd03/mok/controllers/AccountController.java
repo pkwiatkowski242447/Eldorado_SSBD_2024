@@ -1,8 +1,10 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
@@ -25,6 +28,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.LangCodes;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.util.List;
@@ -39,6 +43,7 @@ import java.util.UUID;
 public class AccountController {
     private final AccountService accountService;
     private final MailProvider mailProvider;
+    private final JWTProvider jwtProvider;
     private final TokenService tokenService;
     private final TokenFacade tokenFacade;
     private final AuthenticationService authenticationService;
@@ -57,11 +62,13 @@ public class AccountController {
                              TokenService tokenService,
                              TokenFacade tokenFacade,
                              MailProvider mailProvider,
+                             JWTProvider jwtProvider,
                              AuthenticationService authenticationService) {
         this.accountService = accountService;
         this.tokenService = tokenService;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
+        this.jwtProvider = jwtProvider;
         this.authenticationService = authenticationService;
     }
 
@@ -246,15 +253,17 @@ public class AccountController {
      * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
      */
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSelf() {
+    public ResponseEntity<?> getSelf(HttpServletResponse response) {
         //getUserLoginFromSecurityContextHolder
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         //call accountServiceMethod [findByLogin()]
         Account account = accountService.getAccountByLogin(username);
         if (account == null) {
-            return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, LangCodes.EN.getCode()));
+            return ResponseEntity.internalServerError().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
         } else {
-            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+            AccountOutputDTO accountDTO = AccountMapper.toAccountOutputDto(account);
+            response.setHeader(HttpHeaders.ETAG, jwtProvider.generateSignatureForAccount(accountDTO));
+            return ResponseEntity.ok(accountDTO);
         }
     }
 
@@ -312,6 +321,7 @@ public class AccountController {
     public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
         try {
             // TODO: Verify credentials
+            // FIXME imo it should be accountService ???
             Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
             Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow();
             String confirmationURL = "http://localhost:8080/api/v1/accounts/email/" + token;

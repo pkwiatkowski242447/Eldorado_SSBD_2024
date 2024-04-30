@@ -7,6 +7,11 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountAbstractOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.StaffOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.JWTConsts;
 
@@ -61,7 +66,7 @@ public class JWTProvider {
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
-                .sign(Algorithm.HMAC256(this.getSingInKey()));
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
     /**
@@ -79,7 +84,7 @@ public class JWTProvider {
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
-                .sign(Algorithm.HMAC256(this.getSingInKey()));
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
     /**
@@ -98,7 +103,7 @@ public class JWTProvider {
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
-                .sign(Algorithm.HMAC256(this.getSingInKey()));
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
     /**
@@ -108,7 +113,7 @@ public class JWTProvider {
      * @return Returns AccountID from the Token.
      */
     public UUID extractAccountId(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey())).build();
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
         return UUID.fromString(decodedJWT.getClaim(JWTConsts.ACCOUNT_ID).asString());
     }
@@ -120,7 +125,7 @@ public class JWTProvider {
      * @return Returns username from the Token.
      */
     public String extractUsername(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey())).build();
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
         return decodedJWT.getSubject();
     }
@@ -132,7 +137,7 @@ public class JWTProvider {
      * @return String containing new email.
      */
     public String extractEmail(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey())).build();
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
         return decodedJWT.getClaim(JWTConsts.EMAIL).asString();
     }
@@ -146,7 +151,7 @@ public class JWTProvider {
      */
     public boolean isTokenValid(String jwtToken, Account account) {
         try {
-            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey()))
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey()))
                     .withSubject(account.getLogin())
                     .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
                     .withIssuer(JWTConsts.TOKEN_ISSUER)
@@ -163,8 +168,55 @@ public class JWTProvider {
      *
      * @return Returns signing key.
      */
-    private String getSingInKey() {
+    private String getSignInKey() {
         byte[] keyBytes = Base64.getDecoder().decode(this.secretKey);
         return new String(keyBytes);
     }
+
+    //=================================================JWS==========================================================\\
+
+    public String generateObjectSignature(Map<String, ?> claims) {
+        return JWT
+                .create()
+                .withPayload(claims)
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
+    }
+
+    //FIXME discuss output props
+    public String generateSignatureForAccount(AccountOutputDTO accountOutputDTO) {
+        return generateObjectSignature(Map.ofEntries(
+                Map.entry("id", accountOutputDTO.getId().toString()),
+                Map.entry("login", accountOutputDTO.getLogin()),
+                Map.entry("verified", accountOutputDTO.isVerified()),
+                Map.entry("active", accountOutputDTO.isActive()),
+                Map.entry("blocked", accountOutputDTO.isBlocked()),
+                Map.entry("blockedTime", Objects.requireNonNullElse(accountOutputDTO.getBlockedTime(), "").toString()),
+                Map.entry("creationDate", Objects.requireNonNullElse(accountOutputDTO.getCreationDate(), "").toString()),
+                Map.entry("lastSuccessfulLoginTime", Objects.requireNonNullElse(accountOutputDTO.getLastSuccessfulLoginTime(), "").toString()),
+                Map.entry("lastUnsuccessfulLoginTime", Objects.requireNonNullElse(accountOutputDTO.getLastUnsuccessfulLoginTime(), "").toString()),
+                Map.entry("accountLanguage", accountOutputDTO.getAccountLanguage()),
+                Map.entry("lastSuccessfulLoginIp", Objects.requireNonNullElse(accountOutputDTO.getLastSuccessfulLoginIp(), "")),
+                Map.entry("lastUnsuccessfulLoginIp", Objects.requireNonNullElse(accountOutputDTO.getLastUnsuccessfulLoginIp(), "")),
+                Map.entry("email", accountOutputDTO.getEmail()),
+                Map.entry("rolesDetails", this.getRolesDetailsAsMap(accountOutputDTO.getRolesDetails())))
+        );
+    }
+
+    private List<Map<String, Object>> getRolesDetailsAsMap(List<AccountAbstractOutputDTO> roles) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (int i = 0; i < roles.size(); i++) {
+            list.add(new HashMap<>());
+            list.get(i).put("roleName", roles.get(i).getRoleName());
+            switch(roles.get(i)) {
+                case ClientOutputDTO clientOutputDTO -> list.get(i).put("clientType", clientOutputDTO.getClientType());
+                case StaffOutputDTO staffOutputDTO -> {}
+                case AdminOutputDTO adminOutputDTO -> {}
+                default -> {}
+            }
+        }
+
+        return list;
+    }
+
+    //==============================================================================================================\\
 }
