@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 
@@ -14,7 +15,8 @@ public class AccountMapper {
                 switch (userLevel) {
                     case Client client -> new ClientOutputDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
                     case Staff staff -> new StaffOutputDTO(staff.getClass().getSimpleName().toUpperCase());
-                    default -> new AdminOutputDTO("ADMIN");
+                    case Admin admin -> new AdminOutputDTO(admin.getClass().getSimpleName().toUpperCase());
+                    default -> throw new IllegalArgumentException("Unexpected userlevel: " + userLevel.getClass().getSimpleName());
                 }
         ).toList();
 

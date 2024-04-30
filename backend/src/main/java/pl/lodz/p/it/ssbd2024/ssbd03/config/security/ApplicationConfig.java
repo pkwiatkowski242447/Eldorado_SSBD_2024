@@ -31,9 +31,6 @@ public class ApplicationConfig {
     @Value("${mail.sender.password}")
     private String senderPassword;
 
-    @Value("${mail.sender.email}")
-    private String senderEmail;
-
     @Value("${mail.smtp.auth}")
     private boolean smtpAuth;
 
