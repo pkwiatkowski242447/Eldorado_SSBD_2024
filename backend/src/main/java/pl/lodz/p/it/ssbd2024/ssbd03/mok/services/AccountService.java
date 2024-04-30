@@ -3,35 +3,27 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
 import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Validator;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-
-import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.SAME_EMAIL_EXCEPTION;
-import static pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages.VALIDATION_EXCEPTION;
+import java.util.UUID;
 
 /**
  * Service managing Accounts.
@@ -53,12 +45,12 @@ public class AccountService {
     /**
      * Autowired constructor for the service.
      *
-     * @param accountFacade     Facade responsible for users accounts management.
-     * @param passwordEncoder   This component is used to generate hashed passwords for user accounts (not to store them in their original form).
-     * @param tokenFacade       This facade is responsible for manipulating tokens, used for various, user account related operations.
-     * @param mailProvider      This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
-     * @param jwtProvider       This component is used to generate token values for token facade.
-     * @param tokenService      Service used for more complicated token operations.
+     * @param accountFacade   Facade responsible for users accounts management.
+     * @param passwordEncoder This component is used to generate hashed passwords for user accounts (not to store them in their original form).
+     * @param tokenFacade     This facade is responsible for manipulating tokens, used for various, user account related operations.
+     * @param mailProvider    This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
+     * @param jwtProvider     This component is used to generate token values for token facade.
+     * @param tokenService    Service used for more complicated token operations.
      */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
@@ -78,16 +70,14 @@ public class AccountService {
     /**
      * Create new account, which will have default user level of Client.
      *
-     * @param login         User login, used in order to authenticate to the application.
-     * @param password      User password, used in combination with login to authenticate to the application.
-     * @param firstName     First name of the user.
-     * @param lastName      Last name of the user.
-     * @param email         Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber   Phone number of the user.
-     * @param language      Predefined language constant used for internationalizing all messages for user (initially browser value constant but could be set).
-     *
+     * @param login       User login, used in order to authenticate to the application.
+     * @param password    User password, used in combination with login to authenticate to the application.
+     * @param firstName   First name of the user.
+     * @param lastName    Last name of the user.
+     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
+     * @param phoneNumber Phone number of the user.
+     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser value constant but could be set).
      * @return Newly created account, with given data, and default Client user level.
-     *
      * @throws AccountCreationException When persisting newly created account with client user level results in Persistence exception.
      */
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
@@ -110,9 +100,9 @@ public class AccountService {
      * Method for blocking an account by its UUID.
      *
      * @param id Account identifier
-     * @throws AccountNotFoundException Threw when there is no account with given login.
+     * @throws AccountNotFoundException       Threw when there is no account with given login.
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
-     * @throws IllegalOperationException Threw when user try to block their own account.
+     * @throws IllegalOperationException      Threw when user try to block their own account.
      */
     public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -138,7 +128,7 @@ public class AccountService {
      * Method for unblocking an account by its UUID.
      *
      * @param id Account identifier
-     * @throws AccountNotFoundException Threw when there is no account with given login.
+     * @throws AccountNotFoundException         Threw when there is no account with given login.
      * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
      */
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
@@ -161,14 +151,13 @@ public class AccountService {
      * appropriate register token, save it to the database, and at the - send the account activation
      * email to the given email address.
      *
-     * @param login         User login, used in order to authenticate to the application.
-     * @param password      User password, used in combination with login to authenticate to the application.
-     * @param firstName     First name of the user.
-     * @param lastName      Last name of the user.
-     * @param email         Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber   Phone number of the user.
-     * @param language      Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     *
+     * @param login       User login, used in order to authenticate to the application.
+     * @param password    User password, used in combination with login to authenticate to the application.
+     * @param firstName   First name of the user.
+     * @param lastName    Last name of the user.
+     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
+     * @param phoneNumber Phone number of the user.
+     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
      * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
      */
     public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
@@ -201,14 +190,13 @@ public class AccountService {
      * appropriate register token, save it to the database, and at the - send the account activation
      * email to the given email address.
      *
-     * @param login         User login, used in order to authenticate to the application.
-     * @param password      User password, used in combination with login to authenticate to the application.
-     * @param firstName     First name of the user.
-     * @param lastName      Last name of the user.
-     * @param email         Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber   Phone number of the user.
-     * @param language      Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     *
+     * @param login       User login, used in order to authenticate to the application.
+     * @param password    User password, used in combination with login to authenticate to the application.
+     * @param firstName   First name of the user.
+     * @param lastName    Last name of the user.
+     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
+     * @param phoneNumber Phone number of the user.
+     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
      * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
      */
     public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
@@ -240,7 +228,6 @@ public class AccountService {
      * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.
      *
      * @param token Last part of the activation URL sent in a message to users e-mail address.
-     *
      * @return Boolean value indicating whether activation of the account was successful or not.
      */
     public boolean activateAccount(String token) {
@@ -261,7 +248,6 @@ public class AccountService {
      * Confirm e-mail change with a token from confirmation URL, sent to the new e-mail address.
      *
      * @param token Last part of the confirmation URL sent in a message to user's e-mail address.
-     *
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
      */
@@ -275,12 +261,12 @@ public class AccountService {
         } else {
             try {
                 String email = jwtProvider.extractEmail(token);
-                if(email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
+                if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
                 account.setEmail(email);
                 accountFacade.edit(account);
                 tokenFacade.remove(tokenFromDB);
                 return true;
-            } catch (ConstraintViolationException e){
+            } catch (ConstraintViolationException e) {
                 throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
             }
         }
@@ -289,13 +275,12 @@ public class AccountService {
     /**
      * Retrieve Account that match the parameters, in a given order.
      *
-     * @param login         Account's login. A phrase is sought in the logins.
-     * @param firstName     Account's owner first name. A phrase is sought in the names.
-     * @param lastName      Account's owner last name. A phrase is sought in the last names.
-     * @param order         Ordering in which user accounts should be returned.
-     * @param pageNumber    Number of the page with searched users accounts.
-     * @param pageSize      Number of the users accounts per page.
-     *
+     * @param login      Account's login. A phrase is sought in the logins.
+     * @param firstName  Account's owner first name. A phrase is sought in the names.
+     * @param lastName   Account's owner last name. A phrase is sought in the last names.
+     * @param order      Ordering in which user accounts should be returned.
+     * @param pageNumber Number of the page with searched users accounts.
+     * @param pageSize   Number of the users accounts per page.
      * @return List of user accounts that match the given parameters.
      */
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
@@ -310,10 +295,9 @@ public class AccountService {
     /**
      * Retrieve all accounts in the system.
      *
-     * @param pageNumber    The page number of the results to return.
-     * @param pageSize      The number of results to return per page.
-     *
-     * @return              A list of all accounts in the system, ordered by account login, with pagination applied.
+     * @param pageNumber The page number of the results to return.
+     * @param pageSize   The number of results to return per page.
+     * @return A list of all accounts in the system, ordered by account login, with pagination applied.
      */
     public List<Account> getAllAccounts(int pageNumber, int pageSize) {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
@@ -323,7 +307,6 @@ public class AccountService {
      * Retrieves an Account by the login.
      *
      * @param login Login of the searched user account.
-     *
      * @return If Account with the given login was found returns Account, otherwise returns null.
      */
     @Transactional(propagation = Propagation.REQUIRED)
@@ -345,8 +328,8 @@ public class AccountService {
     /**
      * Changes the e-mail of the specified Account.
      *
-     * @param accountId  ID of the account which the e-mail will be changed.
-     * @param newEmail New e-mail address.
+     * @param accountId ID of the account which the e-mail will be changed.
+     * @param newEmail  New e-mail address.
      * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
      *                                     Contains a key to an internationalized message.
      *                                     Additionally, if the problem was caused by an incorrect new mail,
@@ -354,12 +337,40 @@ public class AccountService {
      */
     public void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
-        if(Objects.equals(account.getEmail(), newEmail)) throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION);
-        if(accountFacade.findByEmail(newEmail).isPresent()) throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
+        if (Objects.equals(account.getEmail(), newEmail))
+            throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION);
+        if (accountFacade.findByEmail(newEmail).isPresent())
+            throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
 
-        var token = tokenService.createEmailConfirmationToken(account,newEmail);
+        var token = tokenService.createEmailConfirmationToken(account, newEmail);
         //TODO make it so the URL is based on some property
         String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
+    }
+
+    /**
+     * Creates a new JWT related to changing of an account's e-mail,
+     * replaces old JWT in the Token in database and sends new confirmation e-mail.
+     *
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
+     * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
+     */
+    public void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account account = accountFacade.findByLogin(login)
+                .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        Token dbToken = tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId())
+                .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
+
+        String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
+        //TODO change ttl to be a parameter set somewhere in properties
+        String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, 24);
+
+        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + newTokenValue;
+        mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
+
+        dbToken.setTokenValue(newTokenValue);
+        tokenFacade.edit(dbToken);
     }
 }

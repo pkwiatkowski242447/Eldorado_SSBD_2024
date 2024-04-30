@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
@@ -302,27 +303,19 @@ public class AccountController {
     }
 
     /**
-     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
+     * This method is used to resend confirmation e-mail message.
+     * It generates a new token used in a confirmation.
      *
-     * @param accountLoginDTO Data transfer object, containing user credentials with language setting from the browser.
-     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
-     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
+     * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
     @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
-        try {
-            // TODO: Verify credentials
-            Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
-            Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow();
-            String confirmationURL = "http://localhost:8080/api/v1/accounts/email/" + token;
-            mailProvider.sendRegistrationConfirmEmail(account.getName(),
-                    account.getLastname(),
-                    account.getEmail(),
-                    confirmationURL,
-                    account.getAccountLanguage());
+    public ResponseEntity<?> resendEmailConfirmation() {
+        try{
+            accountService.resendEmailConfirmation();
             return ResponseEntity.noContent().build();
-        } catch (AuthenticationAccountNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
+        }catch (AccountNotFoundException | TokenNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
+
     }
 }
