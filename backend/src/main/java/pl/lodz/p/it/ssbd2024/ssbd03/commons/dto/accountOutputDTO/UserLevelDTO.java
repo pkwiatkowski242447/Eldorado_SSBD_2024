@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public abstract class AccountAbstractOutputDTO {
+public abstract class UserLevelDTO {
     private String roleName;
 }

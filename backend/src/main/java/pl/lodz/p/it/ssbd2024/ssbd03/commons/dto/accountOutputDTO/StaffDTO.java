@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
-public class StaffOutputDTO extends AccountAbstractOutputDTO {
-    public StaffOutputDTO(String roleName) {
+@ToString(callSuper = true)
+public class StaffDTO extends UserLevelDTO {
+    public StaffDTO(String roleName) {
         super(roleName);
     }
 }

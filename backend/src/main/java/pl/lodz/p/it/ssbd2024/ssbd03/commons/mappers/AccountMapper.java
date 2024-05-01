@@ -11,18 +11,19 @@ import java.util.List;
 public class AccountMapper {
     public static AccountOutputDTO toAccountOutputDto(Account account) {
 
-        List<AccountAbstractOutputDTO> list = account.getUserLevels().stream().map(userLevel ->
+        List<UserLevelDTO> list = account.getUserLevels().stream().map(userLevel ->
                 switch (userLevel) {
-                    case Client client -> new ClientOutputDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
-                    case Staff staff -> new StaffOutputDTO(staff.getClass().getSimpleName().toUpperCase());
-                    case Admin admin -> new AdminOutputDTO(admin.getClass().getSimpleName().toUpperCase());
+                    case Client client -> new ClientDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
+                    case Staff staff -> new StaffDTO(staff.getClass().getSimpleName().toUpperCase());
+                    case Admin admin -> new AdminDTO(admin.getClass().getSimpleName().toUpperCase());
                     default -> throw new IllegalArgumentException("Unexpected userlevel: " + userLevel.getClass().getSimpleName());
                 }
         ).toList();
 
-        AccountOutputDTO outputDTO = new AccountOutputDTO(
-                account.getId(),
+        return new AccountOutputDTO(
                 account.getLogin(),
+                list,
+                account.getId(),
                 account.getVerified(),
                 account.getActive(),
                 account.getBlocked(),
@@ -36,10 +37,7 @@ public class AccountMapper {
                 account.getPhoneNumber(),
                 account.getLastname(),
                 account.getName(),
-                account.getEmail(),
-                list
+                account.getEmail()
         );
-
-        return outputDTO;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
@@ -253,7 +254,7 @@ public class AccountController {
      * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
      */
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSelf(HttpServletResponse response) {
+    public ResponseEntity<?> getSelf() {
         //getUserLoginFromSecurityContextHolder
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         //call accountServiceMethod [findByLogin()]
@@ -262,8 +263,9 @@ public class AccountController {
             return ResponseEntity.internalServerError().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
         } else {
             AccountOutputDTO accountDTO = AccountMapper.toAccountOutputDto(account);
-            response.setHeader(HttpHeaders.ETAG, jwtProvider.generateSignatureForAccount(accountDTO));
-            return ResponseEntity.ok(accountDTO);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountDTO)));
+            return ResponseEntity.ok().headers(headers).body(accountDTO);
         }
     }
 

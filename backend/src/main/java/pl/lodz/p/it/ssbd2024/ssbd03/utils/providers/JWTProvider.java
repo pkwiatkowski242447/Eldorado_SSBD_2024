@@ -7,11 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountAbstractOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.StaffOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.JWTConsts;
 
@@ -72,9 +68,8 @@ public class JWTProvider {
     /**
      * Generates JWT used for keeping track of different actions which require confirmation.
      *
-     * @param account Account to which the change is related to.
+     * @param account  Account to which the change is related to.
      * @param tokenTTL Token's time to live in hours.
-     *
      * @return Returns a signed Json Web Token.
      */
     public String generateActionToken(Account account, int tokenTTL) {
@@ -90,9 +85,8 @@ public class JWTProvider {
     /**
      * Generates JWT used for keeping track of different actions which require confirmation.
      *
-     * @param account Account to which the change is related to.
+     * @param account  Account to which the change is related to.
      * @param tokenTTL Token's time to live in hours.
-     *
      * @return Returns a signed Json Web Token.
      */
     public String generateEmailToken(Account account, String email, int tokenTTL) {
@@ -175,47 +169,11 @@ public class JWTProvider {
 
     //=================================================JWS==========================================================\\
 
-    public String generateObjectSignature(Map<String, ?> claims) {
+    public String generateObjectSignature(SignableDTO signableDTO) {
         return JWT
                 .create()
-                .withPayload(claims)
+                .withPayload(signableDTO.getSigningFields())
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
-    }
-
-    //FIXME discuss output props
-    public String generateSignatureForAccount(AccountOutputDTO accountOutputDTO) {
-        return generateObjectSignature(Map.ofEntries(
-                Map.entry("id", accountOutputDTO.getId().toString()),
-                Map.entry("login", accountOutputDTO.getLogin()),
-                Map.entry("verified", accountOutputDTO.isVerified()),
-                Map.entry("active", accountOutputDTO.isActive()),
-                Map.entry("blocked", accountOutputDTO.isBlocked()),
-                Map.entry("blockedTime", Objects.requireNonNullElse(accountOutputDTO.getBlockedTime(), "").toString()),
-                Map.entry("creationDate", Objects.requireNonNullElse(accountOutputDTO.getCreationDate(), "").toString()),
-                Map.entry("lastSuccessfulLoginTime", Objects.requireNonNullElse(accountOutputDTO.getLastSuccessfulLoginTime(), "").toString()),
-                Map.entry("lastUnsuccessfulLoginTime", Objects.requireNonNullElse(accountOutputDTO.getLastUnsuccessfulLoginTime(), "").toString()),
-                Map.entry("accountLanguage", accountOutputDTO.getAccountLanguage()),
-                Map.entry("lastSuccessfulLoginIp", Objects.requireNonNullElse(accountOutputDTO.getLastSuccessfulLoginIp(), "")),
-                Map.entry("lastUnsuccessfulLoginIp", Objects.requireNonNullElse(accountOutputDTO.getLastUnsuccessfulLoginIp(), "")),
-                Map.entry("email", accountOutputDTO.getEmail()),
-                Map.entry("rolesDetails", this.getRolesDetailsAsMap(accountOutputDTO.getRolesDetails())))
-        );
-    }
-
-    private List<Map<String, Object>> getRolesDetailsAsMap(List<AccountAbstractOutputDTO> roles) {
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (int i = 0; i < roles.size(); i++) {
-            list.add(new HashMap<>());
-            list.get(i).put("roleName", roles.get(i).getRoleName());
-            switch(roles.get(i)) {
-                case ClientOutputDTO clientOutputDTO -> list.get(i).put("clientType", clientOutputDTO.getClientType());
-                case StaffOutputDTO staffOutputDTO -> {}
-                case AdminOutputDTO adminOutputDTO -> {}
-                default -> {}
-            }
-        }
-
-        return list;
     }
 
     //==============================================================================================================\\
