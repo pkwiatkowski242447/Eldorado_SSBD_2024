@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.StaffDTO;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class AccountSignableDTO implements SignableDTO {
     }
 
     private List<Map<String, Object>> getUserLevelsDetailsAsMap(List<UserLevelDTO> levels) {
+        levels.sort(Comparator.comparing(UserLevelDTO::getRoleName, String::compareToIgnoreCase));
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < levels.size(); i++) {
             list.add(new HashMap<>());
