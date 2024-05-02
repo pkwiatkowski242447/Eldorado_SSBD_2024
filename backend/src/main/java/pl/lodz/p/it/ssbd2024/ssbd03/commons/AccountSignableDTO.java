@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminDTO;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @Getter
 public class AccountSignableDTO implements SignableDTO {
@@ -32,12 +34,12 @@ public class AccountSignableDTO implements SignableDTO {
         );
     }
 
-    private List<Map<String, Object>> getUserLevelsDetailsAsMap(List<UserLevelDTO> roles) {
+    private List<Map<String, Object>> getUserLevelsDetailsAsMap(List<UserLevelDTO> levels) {
         List<Map<String, Object>> list = new ArrayList<>();
-        for (int i = 0; i < roles.size(); i++) {
+        for (int i = 0; i < levels.size(); i++) {
             list.add(new HashMap<>());
-            list.get(i).put("roleName", roles.get(i).getRoleName());
-            switch (roles.get(i)) {
+            list.get(i).put("roleName", levels.get(i).getRoleName());
+            switch (levels.get(i)) {
                 case ClientDTO clientOutputDTO -> list.get(i).put("clientType", clientOutputDTO.getClientType());
                 case StaffDTO staffOutputDTO -> {}
                 case AdminDTO adminOutputDTO -> {}

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
@@ -248,7 +249,7 @@ public class AccountController {
     }
 
     /**
-     * This method is used to find user account of currently logged in user.
+     * This method is used to find user account of currently logged-in user.
      *
      * @return If user account is found for currently logged user then 200 OK with user account in the response
      * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
@@ -267,6 +268,28 @@ public class AccountController {
             headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountDTO)));
             return ResponseEntity.ok().headers(headers).body(accountDTO);
         }
+    }
+
+    /**
+     * This method is used to modify personal data of currently logged-in user.
+     * @param
+     * @return TODO
+     */
+    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                               @RequestBody AccountModifyDTO accountModifyDTO) {
+        if (ifMatch == null || ifMatch.isBlank()) {
+            return ResponseEntity.badRequest().body("Missing if-match header");
+        }
+
+        System.out.println(accountModifyDTO);
+        System.out.println("TEST: | " + accountModifyDTO.getUserLevelsDto().get(0).getRoleName() + " |");
+
+        if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity has been compromised");
+        }
+
+        return ResponseEntity.noContent().build();
     }
 
     /**
