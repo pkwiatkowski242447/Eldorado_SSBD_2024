@@ -8,6 +8,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 public class UserLevelMapper {
     public static UserLevel toUserLevel(UserLevelDTO userLevelDTO) {
@@ -19,15 +20,15 @@ public class UserLevelMapper {
                     case "CLIENT" -> Client.ClientType.BASIC;
                     case "STANDARD" -> Client.ClientType.STANDARD;
                     case "PREMIUM" -> Client.ClientType.PREMIUM;
-                    ///TODO change exc
-                    default -> throw new IllegalArgumentException("Unexpected client type: " + clientDTO.getClientType());
+                    ///FIXME good exception or not good
+                    default -> throw new IllegalArgumentException(I18n.UNEXPECTED_CLIENT_TYPE);
                 });
                 yield client;
             }
             case StaffDTO staffDTO -> new Staff();
             case AdminDTO adminDTO -> new Admin();
-            ///TODO change exc
-            default -> throw new IllegalArgumentException("Unexpected userlevel: " + userLevelDTO.getClass().getSimpleName());
+            ///FIXME good exception or not good
+            default -> throw new IllegalArgumentException(I18n.UNEXPECTED_USER_LEVEL);
         };
     }
 
@@ -37,8 +38,8 @@ public class UserLevelMapper {
                     new ClientDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
             case Staff staff -> new StaffDTO(staff.getClass().getSimpleName().toUpperCase());
             case Admin admin -> new AdminDTO(admin.getClass().getSimpleName().toUpperCase());
-            default ->
-                    throw new IllegalArgumentException("Unexpected userlevel: " + userLevel.getClass().getSimpleName());
+            ///FIXME good exception or not good
+            default -> throw new IllegalArgumentException(I18n.UNEXPECTED_USER_LEVEL);
         };
     }
 }
