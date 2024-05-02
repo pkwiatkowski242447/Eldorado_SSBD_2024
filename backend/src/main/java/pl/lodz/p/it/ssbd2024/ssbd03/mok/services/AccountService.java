@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.AccountController;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -234,6 +235,27 @@ public class AccountService {
         } catch (PersistenceException exception) {
             throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
         }
+    }
+
+    /**
+     * This method is used to modify user personal data.
+     * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
+     * @return
+     * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     */
+    public Account modifyAccount(Account modifiedAccount) throws AccountNotFoundException {
+        Account foundAccount = accountFacade.findByLogin(modifiedAccount.getLogin()).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        //TODO optimistic lock
+        foundAccount.setName(modifiedAccount.getName());
+        foundAccount.setLastname(modifiedAccount.getLastname());
+        foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
+
+        ///FIXME ??? usable when UserLevels have additional, editable fields
+        // code handling edited UserLevels
+
+        accountFacade.edit(foundAccount);
+
+        return foundAccount;
     }
 
     /**

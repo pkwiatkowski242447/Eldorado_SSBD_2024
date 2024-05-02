@@ -272,7 +272,8 @@ public class AccountController {
 
     /**
      * This method is used to modify personal data of currently logged-in user.
-     * @param
+     * @param ifMatch Value of If-Match header
+     * @param accountModifyDTO Account properties with potentially changed values.
      * @return TODO
      */
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -282,14 +283,19 @@ public class AccountController {
             return ResponseEntity.badRequest().body("Missing if-match header");
         }
 
-        System.out.println(accountModifyDTO);
-        System.out.println("TEST: | " + accountModifyDTO.getUserLevelsDto().get(0).getRoleName() + " |");
-
         if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity has been compromised");
         }
 
-        return ResponseEntity.noContent().build();
+        try {
+            AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
+                    accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO))
+            );
+            return ResponseEntity.ok().body(accountOutputDTO);
+        } catch (AccountNotFoundException e) {
+            //FIXME BR replaced NF - in other ctrls should also?
+            return ResponseEntity.badRequest().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
+        }
     }
 
     /**

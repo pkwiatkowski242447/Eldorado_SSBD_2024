@@ -169,6 +169,12 @@ public class JWTProvider {
 
     //=================================================JWS==========================================================\\
 
+    /**
+     * Generates JWT used for prevent certain specified fields from being modified between requests.
+     *
+     * @param signableDTO Object that should be signed.
+     * @return Returns a signed Json Web Token.
+     */
     public String generateObjectSignature(SignableDTO signableDTO) {
         return JWT
                 .create()
@@ -176,5 +182,4 @@ public class JWTProvider {
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
-    //==============================================================================================================\\
 }

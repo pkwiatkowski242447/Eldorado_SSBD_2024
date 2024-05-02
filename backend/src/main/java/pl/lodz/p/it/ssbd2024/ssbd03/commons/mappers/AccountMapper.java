@@ -1,24 +1,20 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AccountMapper {
     public static AccountOutputDTO toAccountOutputDto(Account account) {
 
-        List<UserLevelDTO> list = account.getUserLevels().stream().map(userLevel ->
-                switch (userLevel) {
-                    case Client client -> new ClientDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
-                    case Staff staff -> new StaffDTO(staff.getClass().getSimpleName().toUpperCase());
-                    case Admin admin -> new AdminDTO(admin.getClass().getSimpleName().toUpperCase());
-                    default -> throw new IllegalArgumentException("Unexpected userlevel: " + userLevel.getClass().getSimpleName());
-                }
-        ).toList();
+        Set<UserLevelDTO> list = account.getUserLevels()
+                .stream()
+                .map(UserLevelMapper::toUserLevelDTO)
+                .collect(Collectors.toSet());
 
         return new AccountOutputDTO(
                 account.getLogin(),
@@ -39,5 +35,22 @@ public class AccountMapper {
                 account.getName(),
                 account.getEmail()
         );
+    }
+
+    public static Account toAccount(AccountModifyDTO accountModifyDTO) {
+        Account account = new Account(
+                accountModifyDTO.getLogin(),
+                null,
+                accountModifyDTO.getName(),
+                accountModifyDTO.getLastname(),
+                null,
+                accountModifyDTO.getPhoneNumber()
+        );
+
+        accountModifyDTO.getUserLevelsDto()
+                .stream()
+                .map(UserLevelMapper::toUserLevel)
+                .forEach(account::addUserLevel);
+        return account;
     }
 }

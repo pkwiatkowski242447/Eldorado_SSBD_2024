@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +23,7 @@ import java.util.Map;
 public class AccountSignableDTO implements SignableDTO {
 
     private String login;
-    //FIXME change type
-    private List<UserLevelDTO> userLevelsDto;
+    private Set<UserLevelDTO> userLevelsDto;
 
     @JsonIgnore
     @Override
