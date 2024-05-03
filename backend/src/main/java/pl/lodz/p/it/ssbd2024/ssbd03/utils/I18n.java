@@ -30,6 +30,7 @@ public class I18n {
     public static final String ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION = "account.service.account.already.unblocked.exception";
     public static final String ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION = "account.service.account.try_to_block_own.exception";
     public static final String ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION = "account.service.email_from_token_null.exception";
+    public static final String TOKEN_NOT_FOUND_EXCEPTION = "token.not.found.exception";
 
     // Account controller
     public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
