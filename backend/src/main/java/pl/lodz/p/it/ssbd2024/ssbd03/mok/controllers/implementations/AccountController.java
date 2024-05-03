@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -33,14 +33,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.LangCodes;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,36 +49,26 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/accounts")
-public class AccountController {
-    private final AccountService accountService;
-    private final MailProvider mailProvider;
+public class AccountController implements AccountControllerInterface {
+
+    private final AccountServiceInterface accountService;
     private final JWTProvider jwtProvider;
-    private final TokenService tokenService;
-    private final TokenFacade tokenFacade;
-    private final AuthenticationService authenticationService;
+    private final TokenServiceInterface tokenService;
 
     /**
      * Autowired constructor for the controller.
      * It is basically used to perform dependency injection of AccountService into this controller.
      *
      * @param accountService Service containing various methods for account manipulation.
-     * @param tokenFacade    Facade used in the `resendEmailConfirmation()` method.
-     * @param tokenService   Service used in the `changeEmail()` method.
-     * @param mailProvider   Component used to send confirmation emails.
+     * @param tokenService   Service used for token management (in order to confirm certain user's actions).
      */
     @Autowired
-    public AccountController(AccountService accountService,
-                             TokenService tokenService,
-                             TokenFacade tokenFacade,
-                             MailProvider mailProvider,
-                             JWTProvider jwtProvider,
-                             AuthenticationService authenticationService) {
+    public AccountController(AccountServiceInterface accountService,
+                             TokenServiceInterface tokenService,
+                             JWTProvider jwtProvider) {
         this.accountService = accountService;
         this.tokenService = tokenService;
-        this.tokenFacade = tokenFacade;
-        this.mailProvider = mailProvider;
         this.jwtProvider = jwtProvider;
-        this.authenticationService = authenticationService;
     }
 
     /**
@@ -94,6 +82,7 @@ public class AccountController {
      * 404 NOT FOUND and when AccountAlreadyBlockedException or IllegalOperationException is thrown,
      * the response is 409 CONFLICT.
      */
+    @Override
     @PostMapping(value = "/{user_id}/block", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) {
         try {
@@ -127,6 +116,7 @@ public class AccountController {
      * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
      * 404 NOT FOUND and when AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
      */
+    @Override
     @PostMapping(value = "/{user_id}/unblock", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
         try {
@@ -174,6 +164,7 @@ public class AccountController {
      * @apiNote This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
      * login alphabetically.
      */
+    @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllUsers(@RequestParam(name = "pageNumber") int pageNumber, @RequestParam(name = "pageSize") int pageSize) {
         List<AccountListDTO> accountList = accountService.getAllAccounts(pageNumber, pageSize)
@@ -196,6 +187,7 @@ public class AccountController {
      * @return This method returns 200 OK response, with list of users in the response body, converted to JSON.
      * If the list is empty, then 204 NO CONTENT is returned.
      */
+    @Override
     @GetMapping(value = "/match-login-firstname-and-lastname", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
                                                                             @RequestParam(name = "firstName", defaultValue = "") String firstName,
@@ -221,6 +213,7 @@ public class AccountController {
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
      */
+    @Override
     @PostMapping("/activate-account/{token}")
     public ResponseEntity<?> activateAccount(@PathVariable(value = "token") String token) {
         if (accountService.activateAccount(token)) {
@@ -238,6 +231,7 @@ public class AccountController {
      * @return This function returns 204 NO CONTENT if method finishes successfully.
      * It could also return 400 BAD REQUEST if the token is not valid, expired or account does not exist.
      */
+    @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) {
         try {
@@ -263,6 +257,7 @@ public class AccountController {
      * @return If user account is found for currently logged user then 200 OK with user account in the response
      * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
      */
+    @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getSelf() {
         //getUserLoginFromSecurityContextHolder
@@ -288,6 +283,7 @@ public class AccountController {
      * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
      * then 409 CONFLICT is returned.
      */
+    @Override
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                                @RequestBody AccountModifyDTO accountModifyDTO) {
@@ -315,6 +311,7 @@ public class AccountController {
      *
      * @param id Id of searched of the searched account
      */
+    @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
@@ -341,6 +338,7 @@ public class AccountController {
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
      * explaining why the error occurred).
      */
+    @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
         try {
@@ -359,6 +357,7 @@ public class AccountController {
      *
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
+    @Override
     @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> resendEmailConfirmation() {
         try{

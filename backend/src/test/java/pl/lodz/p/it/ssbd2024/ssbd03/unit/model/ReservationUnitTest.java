@@ -1,3 +1,5 @@
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.model;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;

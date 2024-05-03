@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
-
-import java.util.UUID;
 
 /**
  * Service managing Tokens.
@@ -19,7 +18,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
-public class TokenService {
+public class TokenService implements TokenServiceInterface {
 
     private final TokenFacade tokenFacade;
     private final JWTProvider jwtProvider;
@@ -43,6 +42,7 @@ public class TokenService {
      * @param account Account for which the token is created.
      * @return Returns newly created registration token value.
      */
+    @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public String createRegistrationToken(Account account) {
         String tokenValue = this.jwtProvider.generateActionToken(account,24);
@@ -60,6 +60,7 @@ public class TokenService {
      * @param account Account for which the token is created.
      * @return Token's value(JWT).
      */
+    @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public String createEmailConfirmationToken(Account account, String email) {
         tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
@@ -76,8 +77,9 @@ public class TokenService {
      *
      * @param token Confirmation token to be removed
      */
+    @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeAccountsEmailConfirmationToken(String token){
+    public void removeAccountsEmailConfirmationToken(String token) {
         tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL,
                 jwtProvider.extractAccountId(token)).ifPresent(tokenFacade::remove);
     }
