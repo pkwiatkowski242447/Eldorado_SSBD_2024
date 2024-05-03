@@ -10,8 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
@@ -222,6 +231,31 @@ public class AccountService {
         } catch (PersistenceException exception) {
             throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
         }
+    }
+
+    /**
+     * This method is used to modify user personal data.
+     *
+     * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
+     * @return Account object with applied modifications
+     * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     */
+    public Account modifyAccount(Account modifiedAccount) throws AccountNotFoundException {
+        //FIXME SecurityContext there or in controller?
+        Account foundAccount = accountFacade.findByLogin(
+                SecurityContextHolder.getContext().getAuthentication().getName()
+        ).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        //TODO optimistic lock
+        foundAccount.setName(modifiedAccount.getName());
+        foundAccount.setLastname(modifiedAccount.getLastname());
+        foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
+
+        ///FIXME ??? usable when UserLevels have additional, editable fields
+        // code handling edited UserLevels
+
+        accountFacade.edit(foundAccount);
+
+        return foundAccount;
     }
 
     /**

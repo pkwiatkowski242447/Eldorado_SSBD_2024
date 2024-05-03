@@ -15,6 +15,9 @@ public class I18n {
     public static final String STAFF_ACCOUNT_CREATION_EXCEPTION = "account.service.staff.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_CREATION_EXCEPTION = "account.service.admin.account.not.created.exception";
 
+    public static final String UNEXPECTED_USER_LEVEL = "user_level.type.unexpected.exception";
+    public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
+
     // Authentication controller
 
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
@@ -36,6 +39,10 @@ public class I18n {
     public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
     public static final String UUID_INVALID = "account.controller.uuid.invalid";
     public static final String BAD_UUID_INVALID_FORMAT_EXCEPTION = "account.controller.uuid.invalid.format.exception";
+    public static final String MISSING_HEADER_IF_MATCH = "account.controller.missing.header.if_match.exception";
+
+    // JWT
+    public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
 
     // Mail provider
 

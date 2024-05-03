@@ -1,26 +1,25 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AccountMapper {
     public static AccountOutputDTO toAccountOutputDto(Account account) {
 
-        List<AccountAbstractOutputDTO> list = account.getUserLevels().stream().map(userLevel ->
-                switch (userLevel) {
-                    case Client client -> new ClientOutputDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
-                    case Staff staff -> new StaffOutputDTO(staff.getClass().getSimpleName().toUpperCase());
-                    default -> new AdminOutputDTO("ADMIN");
-                }
-        ).toList();
+        Set<UserLevelDTO> list = account.getUserLevels()
+                .stream()
+                .map(UserLevelMapper::toUserLevelDTO)
+                .collect(Collectors.toSet());
 
-        AccountOutputDTO outputDTO = new AccountOutputDTO(
-                account.getId(),
+        return new AccountOutputDTO(
                 account.getLogin(),
+                list,
+                account.getId(),
                 account.getVerified(),
                 account.getActive(),
                 account.getBlocked(),
@@ -34,10 +33,24 @@ public class AccountMapper {
                 account.getPhoneNumber(),
                 account.getLastname(),
                 account.getName(),
-                account.getEmail(),
-                list
+                account.getEmail()
+        );
+    }
+
+    public static Account toAccount(AccountModifyDTO accountModifyDTO) {
+        Account account = new Account(
+                accountModifyDTO.getLogin(),
+                null,
+                accountModifyDTO.getName(),
+                accountModifyDTO.getLastname(),
+                null,
+                accountModifyDTO.getPhoneNumber()
         );
 
-        return outputDTO;
+        accountModifyDTO.getUserLevelsDto()
+                .stream()
+                .map(UserLevelMapper::toUserLevel)
+                .forEach(account::addUserLevel);
+        return account;
     }
 }

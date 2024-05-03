@@ -3,21 +3,34 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -26,6 +39,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.LangCodes;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.util.List;
@@ -40,6 +54,7 @@ import java.util.UUID;
 public class AccountController {
     private final AccountService accountService;
     private final MailProvider mailProvider;
+    private final JWTProvider jwtProvider;
     private final TokenService tokenService;
     private final TokenFacade tokenFacade;
     private final AuthenticationService authenticationService;
@@ -58,11 +73,13 @@ public class AccountController {
                              TokenService tokenService,
                              TokenFacade tokenFacade,
                              MailProvider mailProvider,
+                             JWTProvider jwtProvider,
                              AuthenticationService authenticationService) {
         this.accountService = accountService;
         this.tokenService = tokenService;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
+        this.jwtProvider = jwtProvider;
         this.authenticationService = authenticationService;
     }
 
@@ -241,7 +258,7 @@ public class AccountController {
     }
 
     /**
-     * This method is used to find user account of currently logged in user.
+     * This method is used to find user account of currently logged-in user.
      *
      * @return If user account is found for currently logged user then 200 OK with user account in the response
      * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
@@ -253,9 +270,43 @@ public class AccountController {
         //call accountServiceMethod [findByLogin()]
         Account account = accountService.getAccountByLogin(username);
         if (account == null) {
-            return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, LangCodes.EN.getCode()));
+            return ResponseEntity.internalServerError().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
         } else {
-            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+            AccountOutputDTO accountDTO = AccountMapper.toAccountOutputDto(account);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountDTO)));
+            return ResponseEntity.ok().headers(headers).body(accountDTO);
+        }
+    }
+
+    /**
+     * This method is used to modify personal data of currently logged-in user.
+     * @param ifMatch Value of If-Match header
+     * @param accountModifyDTO Account properties with potentially changed values.
+     * @return In the correct flow returns account object with applied modifications with 200 OK status.
+     * If request has empty IF_MATCH header or account currently logged user was not found,
+     * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
+     * then 409 CONFLICT is returned.
+     */
+    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                               @RequestBody AccountModifyDTO accountModifyDTO) {
+        if (ifMatch == null || ifMatch.isBlank()) {
+            return ResponseEntity.badRequest().body(I18n.MISSING_HEADER_IF_MATCH);
+        }
+
+        if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.DATA_INTEGRITY_COMPROMISED);
+        }
+
+        try {
+            AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
+                    accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO))
+            );
+            return ResponseEntity.ok().body(accountOutputDTO);
+        } catch (AccountNotFoundException e) {
+            //FIXME BR replaced NF - in other ctrls should also?
+            return ResponseEntity.badRequest().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
         }
     }
 
