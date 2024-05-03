@@ -21,6 +21,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -379,5 +380,31 @@ public class AccountService {
         //TODO make it so the URL is based on some property
         String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
+    }
+
+    /**
+     * Creates a new JWT related to changing of an account's e-mail,
+     * replaces old JWT in the Token in database and sends new confirmation e-mail.
+     *
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
+     * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
+     */
+    public void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account account = accountFacade.findByLogin(login)
+                .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        Token dbToken = tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId())
+                .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
+
+        String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
+        //TODO change ttl to be a parameter set somewhere in properties
+        String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, 24);
+
+        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + newTokenValue;
+        mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
+
+        dbToken.setTokenValue(newTokenValue);
+        tokenFacade.edit(dbToken);
     }
 }
