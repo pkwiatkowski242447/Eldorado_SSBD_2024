@@ -3,10 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.ParkingConsts;
@@ -104,5 +101,9 @@ public class Parking extends AbstractEntity {
 
     public void changeSectorWeight(String sectorName, Integer newWeight) {
         ///TODO implement
+    }
+
+    public Parking(Address address) {
+        this.address = address;
     }
 }
