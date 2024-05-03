@@ -76,5 +76,10 @@ public class ReservationUnitTest {
         assertEquals(1, reservation.getParkingEvents().size());
         assertEquals(parkingEvent, reservation.getParkingEvents().getFirst());
     }
+    @Test
+    public void testToString() {
+        String expected = "Reservation(super=AbstractEntity(id=null, version=null), client=" + reservation.getClient() + ", sector=" + reservation.getSector() + ", beginTime=" + reservation.getBeginTime() + ", endTime=" + reservation.getEndTime() + ")";
+        assertEquals(expected, reservation.toString());
+    }
 
 }
