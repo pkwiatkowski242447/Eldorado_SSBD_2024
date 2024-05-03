@@ -1,3 +1,5 @@
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.model;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,11 @@
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.model;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
-
-import java.util.UUID;
 
 public class SectorUnitTest {
 

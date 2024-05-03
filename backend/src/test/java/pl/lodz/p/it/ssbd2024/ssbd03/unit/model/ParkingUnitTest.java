@@ -1,7 +1,8 @@
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.model;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.parameters.P;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
@@ -80,7 +81,7 @@ public class ParkingUnitTest {
         parking.addSector(SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(1, parking.getSectors().size());
 
-        Sector sector = parking.getSectors().get(0);
+        Sector sector = parking.getSectors().getFirst();
         Assertions.assertEquals(SECTOR_NAME_NO_1, sector.getName());
         Assertions.assertEquals(SECTOR_TYPE_NO_1, sector.getType());
         Assertions.assertEquals(MAX_PLACES_NO_1, sector.getMaxPlaces());
@@ -94,7 +95,7 @@ public class ParkingUnitTest {
         parking.addSector(SECTOR_NAME_NO_2, SECTOR_TYPE_NO_2, MAX_PLACES_NO_2, MAX_WEIGHT_NO_2);
 
         parking.deleteSector(SECTOR_NAME_NO_1);
-        Sector sector = parking.getSectors().get(0);
+        Sector sector = parking.getSectors().getFirst();
 
         Assertions.assertEquals(1, parking.getSectors().size());
         Assertions.assertEquals(SECTOR_NAME_NO_2, sector.getName());

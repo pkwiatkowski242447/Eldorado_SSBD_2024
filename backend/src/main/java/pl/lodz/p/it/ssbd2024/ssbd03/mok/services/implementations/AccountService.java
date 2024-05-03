@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
 import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
@@ -42,14 +44,14 @@ import java.util.UUID;
 @Slf4j
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
-public class AccountService {
+public class AccountService implements AccountServiceInterface {
 
     private final AccountMOKFacade accountFacade;
     private final PasswordEncoder passwordEncoder;
     private final TokenFacade tokenFacade;
     private final MailProvider mailProvider;
     private final JWTProvider jwtProvider;
-    private final TokenService tokenService;
+    private final TokenServiceInterface tokenService;
 
     /**
      * Autowired constructor for the service.
@@ -67,7 +69,7 @@ public class AccountService {
                           TokenFacade tokenFacade,
                           MailProvider mailProvider,
                           JWTProvider jwtProvider,
-                          TokenService tokenService) {
+                          TokenServiceInterface tokenService) {
         this.accountFacade = accountFacade;
         this.passwordEncoder = passwordEncoder;
         this.tokenFacade = tokenFacade;
@@ -89,6 +91,7 @@ public class AccountService {
      * @return Newly created account, with given data, and default Client user level.
      * @throws AccountCreationException When persisting newly created account with client user level results in Persistence exception.
      */
+    @Override
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
             Account account = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -113,6 +116,7 @@ public class AccountService {
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
      * @throws IllegalOperationException      Threw when user try to block their own account.
      */
+    @Override
     public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (account.getBlocked() && account.getBlockedTime() == null) {
@@ -140,6 +144,7 @@ public class AccountService {
      * @throws AccountNotFoundException         Threw when there is no account with given login.
      * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
      */
+    @Override
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (!account.getBlocked()) {
@@ -169,6 +174,7 @@ public class AccountService {
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
      * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
      */
+    @Override
     public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
             Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -208,6 +214,7 @@ public class AccountService {
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
      * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
      */
+    @Override
     public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
             Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -240,6 +247,7 @@ public class AccountService {
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
      */
+    @Override
     public Account modifyAccount(Account modifiedAccount) throws AccountNotFoundException {
         //FIXME SecurityContext there or in controller?
         Account foundAccount = accountFacade.findByLogin(
@@ -264,6 +272,7 @@ public class AccountService {
      * @param token Last part of the activation URL sent in a message to users e-mail address.
      * @return Boolean value indicating whether activation of the account was successful or not.
      */
+    @Override
     public boolean activateAccount(String token) {
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
         Account account = accountFromDB.orElse(null);
@@ -285,6 +294,7 @@ public class AccountService {
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
      */
+    @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountEmailChangeException.class)
     public boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException {
         Token tokenFromDB = tokenFacade.findByTokenValue(token).orElse(null);
@@ -317,6 +327,7 @@ public class AccountService {
      * @param pageSize   Number of the users accounts per page.
      * @return List of user accounts that match the given parameters.
      */
+    @Override
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
                                                                         String lastName,
@@ -333,6 +344,7 @@ public class AccountService {
      * @param pageSize   The number of results to return per page.
      * @return A list of all accounts in the system, ordered by account login, with pagination applied.
      */
+    @Override
     public List<Account> getAllAccounts(int pageNumber, int pageSize) {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
@@ -343,6 +355,7 @@ public class AccountService {
      * @param login Login of the searched user account.
      * @return If Account with the given login was found returns Account, otherwise returns null.
      */
+    @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getAccountByLogin(String login) {
         Optional<Account> account = accountFacade.findByLoginAndRefresh(login);
@@ -355,6 +368,7 @@ public class AccountService {
      * @param id Account's id.
      * @return Returns Optional containing the requested account if found, otherwise returns empty Optional.
      */
+    @Override
     public Optional<Account> getAccountById(UUID id) {
         return accountFacade.findAndRefresh(id);
     }
@@ -369,6 +383,7 @@ public class AccountService {
      *                                     Additionally, if the problem was caused by an incorrect new mail,
      *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
      */
+    @Override
     public void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))
@@ -389,6 +404,7 @@ public class AccountService {
      * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
      */
+    @Override
     public void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account account = accountFacade.findByLogin(login)
