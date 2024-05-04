@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAcco
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
@@ -64,7 +65,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
             // Increment the number of failed login attempts
             if (!refreshedAccount.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= 3) {
                 refreshedAccount.blockAccount(false);
-                log.info("Account %s has been blocked".formatted(refreshedAccount.getId()));
+                log.info(AccountLogMessages.ACCOUNT_BLOCKED_INFO.formatted(refreshedAccount.getId()));
 
                 // Sending information email
                 mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(),

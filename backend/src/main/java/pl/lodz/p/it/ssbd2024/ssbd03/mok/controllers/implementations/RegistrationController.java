@@ -112,7 +112,7 @@ public class RegistrationController implements RegistrationControllerInterface {
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {
             log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), accountRegisterDTO.getLanguage()));
+            return ResponseEntity.badRequest().body(exception.getMessage());
         } catch (Throwable exception) {
             log.error(exception.getMessage(), exception);
             return ResponseEntity.badRequest().build();
@@ -143,7 +143,7 @@ public class RegistrationController implements RegistrationControllerInterface {
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {
             log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), accountRegisterDTO.getLanguage()));
+            return ResponseEntity.badRequest().body(exception.getMessage());
         } catch (Throwable exception) {
             log.error(exception.getMessage(), exception);
             return ResponseEntity.badRequest().build();
