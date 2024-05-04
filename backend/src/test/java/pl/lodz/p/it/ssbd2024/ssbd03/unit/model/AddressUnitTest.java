@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class AddressUnitTest {
 
     public static String CITY;
@@ -38,19 +40,19 @@ public class AddressUnitTest {
     @Test
     void addressGetCityTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
-        Assertions.assertEquals(CITY, address.getCity());
+        assertEquals(CITY, address.getCity());
     }
 
     @Test
     void addressGetZipCodeTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
-        Assertions.assertEquals(ZIP_CODE, address.getZipCode());
+        assertEquals(ZIP_CODE, address.getZipCode());
     }
 
     @Test
     void addressGetStreetTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
-        Assertions.assertEquals(STREET, address.getStreet());
+        assertEquals(STREET, address.getStreet());
     }
 
     //Setter tests
@@ -59,20 +61,89 @@ public class AddressUnitTest {
     void addressSetCityTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
         address.setCity(CITY_NO_2);
-        Assertions.assertEquals(CITY_NO_2, address.getCity());
+        assertEquals(CITY_NO_2, address.getCity());
     }
 
     @Test
     void addressSetZipCodeTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
         address.setZipCode(ZIP_CODE_NO_2);
-        Assertions.assertEquals(ZIP_CODE_NO_2, address.getZipCode());
+        assertEquals(ZIP_CODE_NO_2, address.getZipCode());
     }
 
     @Test
     void addressSetStreetTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
         address.setStreet(STREET_NO_2);
-        Assertions.assertEquals(STREET_NO_2, address.getStreet());
+        assertEquals(STREET_NO_2, address.getStreet());
+    }
+
+    @Test
+    void addressToStringTestPositive() {
+        Address addressNo1 = new Address(CITY, ZIP_CODE, STREET);
+        Address addressNo2 = new Address(CITY_NO_2, ZIP_CODE_NO_2, STREET_NO_2);
+
+        String addressStringNo1 = "Address(city=" + CITY + ", zipCode=" + ZIP_CODE + ", street=" + STREET + ")";
+        String addressStringNo2 = "Address(city=" + CITY_NO_2 + ", zipCode=" + ZIP_CODE_NO_2 + ", street=" + STREET_NO_2 + ")";
+
+        assertEquals(addressStringNo1, addressNo1.toString());
+        assertEquals(addressStringNo2, addressNo2.toString());
+    }
+
+    @Test
+    void addressHashCodeTestPositive() {
+        Address addressNo1 = new Address(CITY, ZIP_CODE, STREET);
+        Address addressNo2 = new Address(CITY, ZIP_CODE, STREET);
+
+        assertEquals(addressNo1.hashCode(), addressNo2.hashCode());
+    }
+
+    @Test
+    void addressHashCodeTestNegative() {
+        Address addressNo1 = new Address(CITY, ZIP_CODE, STREET);
+        Address addressNo2 = new Address(CITY_NO_2, ZIP_CODE_NO_2, STREET_NO_2);
+        Address addressNo3 = new Address();
+
+        assertNotEquals(addressNo1.hashCode(), addressNo2.hashCode());
+        assertNotEquals(addressNo1.hashCode(), addressNo3.hashCode());
+    }
+
+    @Test
+    void addressEqualsTestPositive() {
+        class AddressOther extends Address {
+            public AddressOther(String city, String zipCode, String street) {
+                super(city, zipCode, street);
+            }
+            @Override
+            protected boolean canEqual(Object other) {
+                return false;
+            }
+        }
+
+        Address addressNo1 = new Address(CITY, ZIP_CODE, STREET);
+        Address addressNo12 = new Address(CITY, ZIP_CODE, STREET);
+        Address addressNo2 = new Address(CITY_NO_2, ZIP_CODE_NO_2, STREET_NO_2);
+        String addressNo3 = CITY + ", " + ZIP_CODE + ", " + STREET;
+        Address addressNo6 = new Address(CITY, null, null);
+        Address addressNo9 = new Address(CITY, null, STREET);
+        Address addressNo7 = new Address(null, ZIP_CODE, null);
+        Address addressNo8 = new Address(null, null, STREET);
+        Address addressNo10 = new Address(CITY, ZIP_CODE, null);
+        Address addressNo11 = new Address(CITY, ZIP_CODE, null);
+        AddressOther addressOther = new AddressOther(CITY, ZIP_CODE, STREET);
+
+
+        assertEquals(addressNo1, addressNo1);
+        assertNotEquals(addressNo1, addressNo3);
+        assertNotEquals(addressNo1, addressNo2);
+        assertNotEquals(addressNo7, addressNo8);
+        assertNotEquals(addressNo8, addressNo1);
+        assertNotEquals(addressNo1, addressNo6);
+        assertNotEquals(addressNo6, addressNo9);
+        assertNotEquals(addressNo6, addressNo1);
+        assertNotEquals(addressNo1, addressNo10);
+        assertEquals(addressNo10, addressNo11);
+        assertEquals(addressNo1, addressNo12);
+        assertNotEquals(addressNo1, addressOther);
     }
 }

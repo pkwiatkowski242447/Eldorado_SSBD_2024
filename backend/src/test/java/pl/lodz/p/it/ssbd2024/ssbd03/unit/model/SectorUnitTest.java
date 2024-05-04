@@ -131,4 +131,12 @@ public class SectorUnitTest {
         Assertions.assertEquals(MAX_WEIGHT_NO_2, sector.getWeight());
     }
 
+    @Test
+    void sectorToStringPositiveTest() {
+        String testString = "Sector(super=AbstractEntity(id=null, version=null), parking=" + PARKING + ", name=" + SECTOR_NAME_NO_1 + ", type=" + SECTOR_TYPE_NO_1 + ", maxPlaces=" + MAX_PLACES_NO_1 + ", availablePlaces=" + MAX_PLACES_NO_1 + ", weight=" + MAX_WEIGHT_NO_1 + ")";
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
+
+        Assertions.assertEquals(testString, sector.toString());
+    }
+
 }

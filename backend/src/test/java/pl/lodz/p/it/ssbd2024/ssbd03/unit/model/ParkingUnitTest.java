@@ -103,4 +103,26 @@ public class ParkingUnitTest {
         Assertions.assertEquals(MAX_PLACES_NO_2, sector.getMaxPlaces());
         Assertions.assertEquals(MAX_WEIGHT_NO_2, sector.getWeight());
     }
+
+    @Test
+    void parkingToStringPositiveTest() {
+        String testString = "Parking(super=AbstractEntity(id=null, version=null), address=Address(city=" + CITY + ", zipCode=" + ZIP_CODE + ", street=" + STREET + "))";
+        Parking parking = new Parking(ADDRESS);
+        Assertions.assertEquals(testString, parking.toString());
+    }
+
+    @Test
+    void parkingAssignClient() {
+        Parking parking = new Parking(ADDRESS);
+        parking.assignClient();
+        ///TODO implement
+
+    }
+
+    @Test
+    void parkingChangeSectorWeight() {
+        Parking parking = new Parking(ADDRESS);
+        parking.changeSectorWeight(SECTOR_NAME_NO_1, 12);
+        ///TODO implement
+    }
 }
