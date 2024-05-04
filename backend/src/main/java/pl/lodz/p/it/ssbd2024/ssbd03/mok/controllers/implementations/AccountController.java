@@ -1,31 +1,44 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AuthenticationService;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.LangCodes;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,33 +49,26 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/accounts")
-public class AccountController {
-    private final AccountService accountService;
-    private final MailProvider mailProvider;
-    private final TokenService tokenService;
-    private final TokenFacade tokenFacade;
-    private final AuthenticationService authenticationService;
+public class AccountController implements AccountControllerInterface {
+
+    private final AccountServiceInterface accountService;
+    private final JWTProvider jwtProvider;
+    private final TokenServiceInterface tokenService;
 
     /**
      * Autowired constructor for the controller.
      * It is basically used to perform dependency injection of AccountService into this controller.
      *
      * @param accountService Service containing various methods for account manipulation.
-     * @param tokenFacade    Facade used in the `resendEmailConfirmation()` method.
-     * @param tokenService   Service used in the `changeEmail()` method.
-     * @param mailProvider   Component used to send confirmation emails.
+     * @param tokenService   Service used for token management (in order to confirm certain user's actions).
      */
     @Autowired
-    public AccountController(AccountService accountService,
-                             TokenService tokenService,
-                             TokenFacade tokenFacade,
-                             MailProvider mailProvider,
-                             AuthenticationService authenticationService) {
+    public AccountController(AccountServiceInterface accountService,
+                             TokenServiceInterface tokenService,
+                             JWTProvider jwtProvider) {
         this.accountService = accountService;
         this.tokenService = tokenService;
-        this.tokenFacade = tokenFacade;
-        this.mailProvider = mailProvider;
-        this.authenticationService = authenticationService;
+        this.jwtProvider = jwtProvider;
     }
 
     /**
@@ -76,6 +82,7 @@ public class AccountController {
      * 404 NOT FOUND and when AccountAlreadyBlockedException or IllegalOperationException is thrown,
      * the response is 409 CONFLICT.
      */
+    @Override
     @PostMapping(value = "/{user_id}/block", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) {
         try {
@@ -84,17 +91,20 @@ public class AccountController {
             }
             accountService.blockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException iae) {
-            log.error(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, LangCodes.EN.getCode()));
-            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, getSelfAccountLang()));
+            ///TODO move it to if above
+            log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
+            return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
-            log.error(I18n.getMessage(anfe.getMessage(), LangCodes.EN.getCode()));
+            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
             ///TODO potentially change from NF to bad request?
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.notFound().build();
         } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
-            log.error(I18n.getMessage(e.getMessage(), LangCodes.EN.getCode()));
+            log.error(e instanceof AccountAlreadyBlockedException ?
+                    AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION :
+                    AccountLogMessages.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.getMessage(e.getMessage(), getSelfAccountLang()));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         return ResponseEntity.noContent().build();
     }
@@ -109,6 +119,7 @@ public class AccountController {
      * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
      * 404 NOT FOUND and when AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
      */
+    @Override
     @PostMapping(value = "/{user_id}/unblock", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
         try {
@@ -117,32 +128,20 @@ public class AccountController {
             }
             accountService.unblockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException iae) {
-            log.error(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, LangCodes.EN.getCode()));
-            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, getSelfAccountLang()));
+            ///TODO move it to if above
+            log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
+            return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
-            log.error(I18n.getMessage(anfe.getMessage(), LangCodes.EN.getCode()));
+            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
             ///TODO potentially change from NF to bad request?
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.notFound().build();
         } catch (AccountAlreadyUnblockedException aaue) {
-            log.error(I18n.getMessage(aaue.getMessage(), LangCodes.EN.getCode()));
+            log.error(AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION);
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.getMessage(aaue.getMessage(), getSelfAccountLang()));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
         }
         return ResponseEntity.noContent().build();
-    }
-
-    /// FIXME method is discussed
-    private String getSelfAccountLang() {
-        Account account;
-        try {
-            String login = SecurityContextHolder.getContext().getAuthentication().getName();
-            account = accountService.getAccountByLogin(login);
-        } catch (Throwable e) {
-            log.error("Error getting account by login from the context");
-            return LangCodes.EN.getCode();
-        }
-        return account != null ? account.getAccountLanguage() : LangCodes.EN.getCode();
     }
 
     /**
@@ -156,6 +155,7 @@ public class AccountController {
      * @apiNote This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
      * login alphabetically.
      */
+    @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllUsers(@RequestParam(name = "pageNumber") int pageNumber, @RequestParam(name = "pageSize") int pageSize) {
         List<AccountListDTO> accountList = accountService.getAllAccounts(pageNumber, pageSize)
@@ -178,6 +178,7 @@ public class AccountController {
      * @return This method returns 200 OK response, with list of users in the response body, converted to JSON.
      * If the list is empty, then 204 NO CONTENT is returned.
      */
+    @Override
     @GetMapping(value = "/match-login-firstname-and-lastname", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
                                                                             @RequestParam(name = "firstName", defaultValue = "") String firstName,
@@ -203,6 +204,7 @@ public class AccountController {
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
      */
+    @Override
     @PostMapping("/activate-account/{token}")
     public ResponseEntity<?> activateAccount(@PathVariable(value = "token") String token) {
         if (accountService.activateAccount(token)) {
@@ -220,6 +222,7 @@ public class AccountController {
      * @return This function returns 204 NO CONTENT if method finishes successfully.
      * It could also return 400 BAD REQUEST if the token is not valid, expired or account does not exist.
      */
+    @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) {
         try {
@@ -240,11 +243,12 @@ public class AccountController {
     }
 
     /**
-     * This method is used to find user account of currently logged in user.
+     * This method is used to find user account of currently logged-in user.
      *
      * @return If user account is found for currently logged user then 200 OK with user account in the response
      * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
      */
+    @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getSelf() {
         //getUserLoginFromSecurityContextHolder
@@ -252,9 +256,44 @@ public class AccountController {
         //call accountServiceMethod [findByLogin()]
         Account account = accountService.getAccountByLogin(username);
         if (account == null) {
-            return ResponseEntity.internalServerError().body(I18n.getMessage(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER, LangCodes.EN.getCode()));
+            return ResponseEntity.internalServerError().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
         } else {
-            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+            AccountOutputDTO accountDTO = AccountMapper.toAccountOutputDto(account);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountDTO)));
+            return ResponseEntity.ok().headers(headers).body(accountDTO);
+        }
+    }
+
+    /**
+     * This method is used to modify personal data of currently logged-in user.
+     * @param ifMatch Value of If-Match header
+     * @param accountModifyDTO Account properties with potentially changed values.
+     * @return In the correct flow returns account object with applied modifications with 200 OK status.
+     * If request has empty IF_MATCH header or account currently logged user was not found,
+     * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
+     * then 409 CONFLICT is returned.
+     */
+    @Override
+    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                               @RequestBody AccountModifyDTO accountModifyDTO) {
+        if (ifMatch == null || ifMatch.isBlank()) {
+            return ResponseEntity.badRequest().body(I18n.MISSING_HEADER_IF_MATCH);
+        }
+
+        if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.DATA_INTEGRITY_COMPROMISED);
+        }
+
+        try {
+            AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
+                    accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO))
+            );
+            return ResponseEntity.ok().body(accountOutputDTO);
+        } catch (AccountNotFoundException e) {
+            //FIXME BR replaced NF - in other ctrls should also?
+            return ResponseEntity.badRequest().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
         }
     }
 
@@ -263,6 +302,7 @@ public class AccountController {
      *
      * @param id Id of searched of the searched account
      */
+    @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
@@ -289,6 +329,7 @@ public class AccountController {
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
      * explaining why the error occurred).
      */
+    @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
         try {
@@ -302,27 +343,20 @@ public class AccountController {
     }
 
     /**
-     * This method is used to resend confirmation e-mail message, after e-mail was changed to the new one.
+     * This method is used to resend confirmation e-mail message.
+     * It generates a new token used in a confirmation.
      *
-     * @param accountLoginDTO Data transfer object, containing user credentials with language setting from the browser.
-     * @return This method returns 204 NO CONTENT if the mail with new e-mail confirmation message was successfully sent.
-     * Otherwise, it returns 404 NOT FOUND (since user account with specified username could not be found).
+     * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
+    @Override
     @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> resendEmailConfirmation(@RequestBody AccountLoginDTO accountLoginDTO) {
-        try {
-            // TODO: Verify credentials
-            Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
-            Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow();
-            String confirmationURL = "http://localhost:8080/api/v1/accounts/email/" + token;
-            mailProvider.sendRegistrationConfirmEmail(account.getName(),
-                    account.getLastname(),
-                    account.getEmail(),
-                    confirmationURL,
-                    account.getAccountLanguage());
+    public ResponseEntity<?> resendEmailConfirmation() {
+        try{
+            accountService.resendEmailConfirmation();
             return ResponseEntity.noContent().build();
-        } catch (AuthenticationAccountNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
+        }catch (AccountNotFoundException | TokenNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
+
     }
 }

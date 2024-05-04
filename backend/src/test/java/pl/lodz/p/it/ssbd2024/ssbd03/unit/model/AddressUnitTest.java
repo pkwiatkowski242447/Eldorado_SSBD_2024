@@ -1,10 +1,13 @@
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.model;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 
-public class TestAddressUnitTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class AddressUnitTest {
 
     public static String CITY;
     public static String CITY_NO_2;
@@ -37,19 +40,19 @@ public class TestAddressUnitTest {
     @Test
     void addressGetCityTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
-        Assertions.assertEquals(CITY, address.getCity());
+        assertEquals(CITY, address.getCity());
     }
 
     @Test
     void addressGetZipCodeTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
-        Assertions.assertEquals(ZIP_CODE, address.getZipCode());
+        assertEquals(ZIP_CODE, address.getZipCode());
     }
 
     @Test
     void addressGetStreetTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
-        Assertions.assertEquals(STREET, address.getStreet());
+        assertEquals(STREET, address.getStreet());
     }
 
     //Setter tests
@@ -58,21 +61,21 @@ public class TestAddressUnitTest {
     void addressSetCityTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
         address.setCity(CITY_NO_2);
-        Assertions.assertEquals(CITY_NO_2, address.getCity());
+        assertEquals(CITY_NO_2, address.getCity());
     }
 
     @Test
     void addressSetZipCodeTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
         address.setZipCode(ZIP_CODE_NO_2);
-        Assertions.assertEquals(ZIP_CODE_NO_2, address.getZipCode());
+        assertEquals(ZIP_CODE_NO_2, address.getZipCode());
     }
 
     @Test
     void addressSetStreetTestPositive() {
         Address address = new Address(CITY, ZIP_CODE, STREET);
         address.setStreet(STREET_NO_2);
-        Assertions.assertEquals(STREET_NO_2, address.getStreet());
+        assertEquals(STREET_NO_2, address.getStreet());
     }
 
     @Test
@@ -83,8 +86,8 @@ public class TestAddressUnitTest {
         String addressStringNo1 = "Address(city=" + CITY + ", zipCode=" + ZIP_CODE + ", street=" + STREET + ")";
         String addressStringNo2 = "Address(city=" + CITY_NO_2 + ", zipCode=" + ZIP_CODE_NO_2 + ", street=" + STREET_NO_2 + ")";
 
-        Assertions.assertEquals(addressStringNo1, addressNo1.toString());
-        Assertions.assertEquals(addressStringNo2, addressNo2.toString());
+        assertEquals(addressStringNo1, addressNo1.toString());
+        assertEquals(addressStringNo2, addressNo2.toString());
     }
 
     @Test
@@ -92,7 +95,7 @@ public class TestAddressUnitTest {
         Address addressNo1 = new Address(CITY, ZIP_CODE, STREET);
         Address addressNo2 = new Address(CITY, ZIP_CODE, STREET);
 
-        Assertions.assertEquals(addressNo1.hashCode(), addressNo2.hashCode());
+        assertEquals(addressNo1.hashCode(), addressNo2.hashCode());
     }
 
     @Test
@@ -101,8 +104,8 @@ public class TestAddressUnitTest {
         Address addressNo2 = new Address(CITY_NO_2, ZIP_CODE_NO_2, STREET_NO_2);
         Address addressNo3 = new Address();
 
-        Assertions.assertNotEquals(addressNo1.hashCode(), addressNo2.hashCode());
-        Assertions.assertNotEquals(addressNo1.hashCode(), addressNo3.hashCode());
+        assertNotEquals(addressNo1.hashCode(), addressNo2.hashCode());
+        assertNotEquals(addressNo1.hashCode(), addressNo3.hashCode());
     }
 
     @Test
@@ -130,17 +133,17 @@ public class TestAddressUnitTest {
         AddressOther addressOther = new AddressOther(CITY, ZIP_CODE, STREET);
 
 
-        Assertions.assertTrue(addressNo1.equals(addressNo1)); // pierwsze if - o == this
-        Assertions.assertFalse(addressNo1.equals(addressNo3)); // drugie false - nie jest instanceof
-        Assertions.assertFalse(addressNo1.equals(addressNo2)); // zwraca false w pierwszej petli
-        Assertions.assertFalse(addressNo7.equals(addressNo8));
-        Assertions.assertFalse(addressNo8.equals(addressNo1));
-        Assertions.assertFalse(addressNo1.equals(addressNo6));
-        Assertions.assertFalse(addressNo6.equals(addressNo9));
-        Assertions.assertFalse(addressNo6.equals(addressNo1));
-        Assertions.assertFalse(addressNo1.equals(addressNo10));
-        Assertions.assertTrue(addressNo10.equals(addressNo11));
-        Assertions.assertTrue(addressNo1.equals(addressNo12));
-        Assertions.assertFalse(addressNo1.equals(addressOther));
+        assertEquals(addressNo1, addressNo1);
+        assertNotEquals(addressNo1, addressNo3);
+        assertNotEquals(addressNo1, addressNo2);
+        assertNotEquals(addressNo7, addressNo8);
+        assertNotEquals(addressNo8, addressNo1);
+        assertNotEquals(addressNo1, addressNo6);
+        assertNotEquals(addressNo6, addressNo9);
+        assertNotEquals(addressNo6, addressNo1);
+        assertNotEquals(addressNo1, addressNo10);
+        assertEquals(addressNo10, addressNo11);
+        assertEquals(addressNo1, addressNo12);
+        assertNotEquals(addressNo1, addressOther);
     }
 }

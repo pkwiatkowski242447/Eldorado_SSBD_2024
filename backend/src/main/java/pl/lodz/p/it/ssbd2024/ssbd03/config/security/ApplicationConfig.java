@@ -2,7 +2,10 @@ package pl.lodz.p.it.ssbd2024.ssbd03.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -21,7 +24,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import java.util.Properties;
 
 @Configuration
-@PropertySource("classpath:mail.properties")
+@PropertySource(value = {"classpath:application.properties", "classpath:mail.properties"})
 @EnableAspectJAutoProxy
 public class ApplicationConfig {
 
@@ -30,9 +33,6 @@ public class ApplicationConfig {
 
     @Value("${mail.sender.password}")
     private String senderPassword;
-
-    @Value("${mail.sender.email}")
-    private String senderEmail;
 
     @Value("${mail.smtp.auth}")
     private boolean smtpAuth;

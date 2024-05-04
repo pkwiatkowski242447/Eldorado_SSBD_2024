@@ -1,3 +1,5 @@
+package pl.lodz.p.it.ssbd2024.ssbd03;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.test.context.DynamicPropertyRegistry;

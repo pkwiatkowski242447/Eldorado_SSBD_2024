@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadProperties;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.ScheduleConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.ScheduleServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.ScheduleLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
-public class ScheduleService {
+public class ScheduleService implements ScheduleServiceInterface {
 
     private final AccountMOKFacade accountMOKFacade;
 
@@ -59,9 +60,10 @@ public class ScheduleService {
      *
      * @throws ScheduleBadProperties Threw when problem with properties occurs.
      */
+    @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void deleteNotVerifiedAccount() throws ScheduleBadProperties {
-        log.info(ScheduleConsts.INVOKING_DELETE_ACCOUNTS_MESS);
+        log.info(ScheduleLogMessages.INVOKING_DELETE_ACCOUNTS_MESS);
 
         // Find not verified accounts
         List<Account> inactiveAccounts;
@@ -69,16 +71,16 @@ public class ScheduleService {
             inactiveAccounts =
                     accountMOKFacade.findAllAccountsMarkedForDeletion(Long.parseLong(deleteTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
-            log.error(ScheduleConsts.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
-            throw new ScheduleBadProperties(ScheduleConsts.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
+            log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
+            throw new ScheduleBadProperties(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
         }
 
         if (inactiveAccounts.isEmpty()) {
-            log.info(ScheduleConsts.NO_ACCOUNTS_TO_DELETE_MESS);
+            log.info(ScheduleLogMessages.NO_ACCOUNTS_TO_DELETE_MESS);
             return;
         }
 
-        log.info(ScheduleConsts.LIST_ACCOUNTS_TO_DELETE_IDS, inactiveAccounts.stream().map(Account::getId).toList());
+        log.info(ScheduleLogMessages.LIST_ACCOUNTS_TO_DELETE_IDS, inactiveAccounts.stream().map(Account::getId).toList());
 
         // Delete accounts and linked tokens
         inactiveAccounts.forEach(a -> {
@@ -91,9 +93,10 @@ public class ScheduleService {
      * This method will be invoked every hour in order to check if half the time to active registered account has passed.
      * If so then new registration token will be generated, and new message for activating user account will be sent to specified e-mail address.
      */
+    @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void resendConfirmationEmail() {
-        log.info(ScheduleConsts.INVOKING_RESEND_CONFIRMATION_EMAIL);
+        log.info(ScheduleLogMessages.INVOKING_RESEND_CONFIRMATION_EMAIL);
 
         // Find all tokens of type REGISTER
         List<Token> registerTokens = tokenFacade.findByTokenType(Token.TokenType.REGISTER);
@@ -119,9 +122,10 @@ public class ScheduleService {
      *
      * @throws ScheduleBadProperties Threw when problem with properties occurs.
      */
+    @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void unblockAccount() throws ScheduleBadProperties {
-        log.info(ScheduleConsts.INVOKING_UNBLOCK_ACCOUNTS_MESS);
+        log.info(ScheduleLogMessages.INVOKING_UNBLOCK_ACCOUNTS_MESS);
 
         // Find blocked accounts
         List<Account> blockedAccounts;
@@ -129,16 +133,16 @@ public class ScheduleService {
             blockedAccounts = accountMOKFacade
                     .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
-            log.error(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
-            throw new ScheduleBadProperties(ScheduleConsts.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+            log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+            throw new ScheduleBadProperties(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
         }
 
         if (blockedAccounts.isEmpty()) {
-            log.info(ScheduleConsts.NO_ACCOUNTS_TO_UNBLOCK_MESS);
+            log.info(ScheduleLogMessages.NO_ACCOUNTS_TO_UNBLOCK_MESS);
             return;
         }
 
-        log.info(ScheduleConsts.LIST_ACCOUNTS_TO_UNBLOCK_IDS, blockedAccounts.stream().map(Account::getId).toList());
+        log.info(ScheduleLogMessages.LIST_ACCOUNTS_TO_UNBLOCK_IDS, blockedAccounts.stream().map(Account::getId).toList());
 
         // Unblock accounts
         blockedAccounts.forEach((a -> {

@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.TokenService;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.RegistrationControllerInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
@@ -27,10 +28,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/register")
-public class RegistrationController {
+public class RegistrationController implements RegistrationControllerInterface {
 
-    private final AccountService accountService;
-    private final TokenService tokenService;
+    private final AccountServiceInterface accountService;
+    private final TokenServiceInterface tokenService;
     private final MailProvider mailProvider;
 
     /**
@@ -41,8 +42,8 @@ public class RegistrationController {
      * @param mailProvider`     Component used to send e-mail messages to user e-mail address (depending on the actions they perform).
      */
     @Autowired
-    public RegistrationController(AccountService accountService,
-                                  TokenService tokenService,
+    public RegistrationController(AccountServiceInterface accountService,
+                                  TokenServiceInterface tokenService,
                                   MailProvider mailProvider) {
         this.accountService = accountService;
         this.tokenService = tokenService;
@@ -59,6 +60,7 @@ public class RegistrationController {
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      */
     // TODO: This method requires profound changes (transaction initiation needs to be moved to service). After all token TTL has to be changed as well.
+    @Override
     @PostMapping( value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) {
@@ -95,6 +97,7 @@ public class RegistrationController {
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      */
+    @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) {
@@ -109,7 +112,7 @@ public class RegistrationController {
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {
             log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), accountRegisterDTO.getLanguage()));
+            return ResponseEntity.badRequest().body(exception.getMessage());
         } catch (Throwable exception) {
             log.error(exception.getMessage(), exception);
             return ResponseEntity.badRequest().build();
@@ -125,6 +128,7 @@ public class RegistrationController {
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      */
+    @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) {
@@ -139,7 +143,7 @@ public class RegistrationController {
             return ResponseEntity.noContent().build();
         } catch (AccountCreationException exception) {
             log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), accountRegisterDTO.getLanguage()));
+            return ResponseEntity.badRequest().body(exception.getMessage());
         } catch (Throwable exception) {
             log.error(exception.getMessage(), exception);
             return ResponseEntity.badRequest().build();

@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.JWTConsts;
 
@@ -61,15 +62,14 @@ public class JWTProvider {
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
-                .sign(Algorithm.HMAC256(this.getSingInKey()));
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
     /**
      * Generates JWT used for keeping track of different actions which require confirmation.
      *
-     * @param account Account to which the change is related to.
+     * @param account  Account to which the change is related to.
      * @param tokenTTL Token's time to live in hours.
-     *
      * @return Returns a signed Json Web Token.
      */
     public String generateActionToken(Account account, int tokenTTL) {
@@ -79,15 +79,14 @@ public class JWTProvider {
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
-                .sign(Algorithm.HMAC256(this.getSingInKey()));
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
     /**
      * Generates JWT used for keeping track of different actions which require confirmation.
      *
-     * @param account Account to which the change is related to.
+     * @param account  Account to which the change is related to.
      * @param tokenTTL Token's time to live in hours.
-     *
      * @return Returns a signed Json Web Token.
      */
     public String generateEmailToken(Account account, String email, int tokenTTL) {
@@ -98,7 +97,7 @@ public class JWTProvider {
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
-                .sign(Algorithm.HMAC256(this.getSingInKey()));
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
     /**
@@ -108,7 +107,7 @@ public class JWTProvider {
      * @return Returns AccountID from the Token.
      */
     public UUID extractAccountId(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey())).build();
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
         return UUID.fromString(decodedJWT.getClaim(JWTConsts.ACCOUNT_ID).asString());
     }
@@ -120,7 +119,7 @@ public class JWTProvider {
      * @return Returns username from the Token.
      */
     public String extractUsername(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey())).build();
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
         return decodedJWT.getSubject();
     }
@@ -132,7 +131,7 @@ public class JWTProvider {
      * @return String containing new email.
      */
     public String extractEmail(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey())).build();
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
         return decodedJWT.getClaim(JWTConsts.EMAIL).asString();
     }
@@ -146,7 +145,7 @@ public class JWTProvider {
      */
     public boolean isTokenValid(String jwtToken, Account account) {
         try {
-            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(getSingInKey()))
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey()))
                     .withSubject(account.getLogin())
                     .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
                     .withIssuer(JWTConsts.TOKEN_ISSUER)
@@ -163,8 +162,24 @@ public class JWTProvider {
      *
      * @return Returns signing key.
      */
-    private String getSingInKey() {
+    private String getSignInKey() {
         byte[] keyBytes = Base64.getDecoder().decode(this.secretKey);
         return new String(keyBytes);
     }
+
+    //=================================================JWS==========================================================\\
+
+    /**
+     * Generates JWT used for prevent certain specified fields from being modified between requests.
+     *
+     * @param signableDTO Object that should be signed.
+     * @return Returns a signed Json Web Token.
+     */
+    public String generateObjectSignature(SignableDTO signableDTO) {
+        return JWT
+                .create()
+                .withPayload(signableDTO.getSigningFields())
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
+    }
+
 }

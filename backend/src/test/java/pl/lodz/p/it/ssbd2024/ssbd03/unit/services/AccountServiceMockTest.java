@@ -1,3 +1,5 @@
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.services;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.AccountService;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AccountService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

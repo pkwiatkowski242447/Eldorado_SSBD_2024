@@ -3,21 +3,18 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountAbstractOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-@AllArgsConstructor
-@ToString
+@ToString(callSuper = true)
 @Getter
-public class AccountOutputDTO {
+public class AccountOutputDTO extends AccountSignableDTO {
     private UUID id;
-    private String login;
     private boolean verified;
     private boolean active;
     private boolean blocked;
@@ -40,5 +37,27 @@ public class AccountOutputDTO {
     private String lastname;
     private String name;
     private String email;
-    private List<AccountAbstractOutputDTO> rolesDetails;
+
+    public AccountOutputDTO(String login, Set<UserLevelDTO> userLevelsDto, UUID id, boolean verified,
+                            boolean active, boolean blocked, LocalDateTime blockedTime, LocalDateTime creationDate,
+                            LocalDateTime lastSuccessfulLoginTime, LocalDateTime lastUnsuccessfulLoginTime,
+                            String accountLanguage, String lastSuccessfulLoginIp, String lastUnsuccessfulLoginIp,
+                            String phoneNumber, String lastname, String name, String email) {
+        super(login, userLevelsDto);
+        this.id = id;
+        this.verified = verified;
+        this.active = active;
+        this.blocked = blocked;
+        this.blockedTime = blockedTime;
+        this.creationDate = creationDate;
+        this.lastSuccessfulLoginTime = lastSuccessfulLoginTime;
+        this.lastUnsuccessfulLoginTime = lastUnsuccessfulLoginTime;
+        this.accountLanguage = accountLanguage;
+        this.lastSuccessfulLoginIp = lastSuccessfulLoginIp;
+        this.lastUnsuccessfulLoginIp = lastUnsuccessfulLoginIp;
+        this.phoneNumber = phoneNumber;
+        this.lastname = lastname;
+        this.name = name;
+        this.email = email;
+    }
 }

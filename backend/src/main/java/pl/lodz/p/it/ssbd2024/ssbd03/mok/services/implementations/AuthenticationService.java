@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.mok.services;
+package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +17,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateE
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-
-import java.time.LocalDateTime;
 
 /**
  * Service managing authentication.
  */
 @Slf4j
 @Service
-public class AuthenticationService {
+public class AuthenticationService implements AuthenticationServiceInterface {
 
     private final AuthenticationFacade authenticationFacade;
     private final AuthenticationManager authenticationManager;
@@ -55,6 +55,7 @@ public class AuthenticationService {
      * @param activityLog Updated ActivityLog.
      * @throws ActivityLogUpdateException Threw when problem retrieving Account occurs.
      */
+    @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void updateActivityLog(Account account, ActivityLog activityLog) throws ActivityLogUpdateException {
         try {
@@ -64,7 +65,7 @@ public class AuthenticationService {
             // Increment the number of failed login attempts
             if (!refreshedAccount.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= 3) {
                 refreshedAccount.blockAccount(false);
-                log.info("Account %s has been blocked".formatted(refreshedAccount.getId()));
+                log.info(AccountLogMessages.ACCOUNT_BLOCKED_INFO.formatted(refreshedAccount.getId()));
 
                 // Sending information email
                 mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(),
@@ -86,6 +87,7 @@ public class AuthenticationService {
      * @throws AuthenticationAccountNotFoundException    Threw when there is no Account with given login.
      * @throws AuthenticationInvalidCredentialsException Threw when credentials don't match any account.
      */
+    @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public Account login(String login, String password) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
         try {
@@ -106,6 +108,7 @@ public class AuthenticationService {
      * @return Returns Account with the specified login.
      * @throws AuthenticationAccountNotFoundException Threw when there is no Account with given login.
      */
+    @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public Account findByLogin(String login) throws AuthenticationAccountNotFoundException {
         try {
