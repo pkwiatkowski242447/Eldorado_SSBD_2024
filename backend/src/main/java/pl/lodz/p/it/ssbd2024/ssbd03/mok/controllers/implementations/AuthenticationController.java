@@ -77,7 +77,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
                 activityLog.setLastUnsuccessfulLoginIp(request.getRemoteAddr());
                 activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
                 authenticationService.updateActivityLog(account, activityLog);
-                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(I18n.getMessage(responseMessage, accountLoginDTO.getLanguage()));
+                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(responseMessage);
             } catch (AuthenticationInvalidCredentialsException exception) {
                 Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin());
                 ActivityLog activityLog = account.getActivityLog();
@@ -88,12 +88,12 @@ public class AuthenticationController implements AuthenticationControllerInterfa
                 activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
 
                 authenticationService.updateActivityLog(account, activityLog);
-                return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), account.getAccountLanguage()));
+                return ResponseEntity.badRequest().body(exception.getMessage());
             }
         } catch (AuthenticationAccountNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (ActivityLogUpdateException exception) {
-            return ResponseEntity.badRequest().body(I18n.getMessage(exception.getMessage(), accountLoginDTO.getLanguage()));
+            return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }
 
@@ -105,7 +105,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
             return ResponseEntity.ok().build();
         } catch (Exception exception) {
-            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.AUTH_CONTROLLER_ACCOUNT_LOGOUT, "en"));
+            return ResponseEntity.badRequest().body(I18n.AUTH_CONTROLLER_ACCOUNT_LOGOUT);
         }
     }
 }

@@ -37,7 +37,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountController
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.LangCodes;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.util.List;
@@ -91,17 +90,18 @@ public class AccountController implements AccountControllerInterface {
             }
             accountService.blockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException iae) {
-            log.error(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, LangCodes.EN.getCode()));
-            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, getSelfAccountLang()));
+            ///TODO move it to if above
+            log.error("Invalid UUID passed");
+            return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
-            log.error(I18n.getMessage(anfe.getMessage(), LangCodes.EN.getCode()));
+            log.error("Error occurred. Could not find user account");
             ///TODO potentially change from NF to bad request?
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.notFound().build();
         } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
-            log.error(I18n.getMessage(e.getMessage(), LangCodes.EN.getCode()));
+            log.error(e instanceof AccountAlreadyBlockedException ? "This account is already blocked" : "You cannot block your own account");
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.getMessage(e.getMessage(), getSelfAccountLang()));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         return ResponseEntity.noContent().build();
     }
@@ -125,32 +125,20 @@ public class AccountController implements AccountControllerInterface {
             }
             accountService.unblockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException iae) {
-            log.error(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, LangCodes.EN.getCode()));
-            return ResponseEntity.badRequest().body(I18n.getMessage(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, getSelfAccountLang()));
+            ///TODO move it to if above
+            log.error("Invalid UUID passed");
+            return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
-            log.error(I18n.getMessage(anfe.getMessage(), LangCodes.EN.getCode()));
+            log.error("Error occurred. Could not find user account");
             ///TODO potentially change from NF to bad request?
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.notFound().build();
         } catch (AccountAlreadyUnblockedException aaue) {
-            log.error(I18n.getMessage(aaue.getMessage(), LangCodes.EN.getCode()));
+            log.error("This account is already blocked");
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.getMessage(aaue.getMessage(), getSelfAccountLang()));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
         }
         return ResponseEntity.noContent().build();
-    }
-
-    /// FIXME method is discussed
-    private String getSelfAccountLang() {
-        Account account;
-        try {
-            String login = SecurityContextHolder.getContext().getAuthentication().getName();
-            account = accountService.getAccountByLogin(login);
-        } catch (Throwable e) {
-            log.error("Error getting account by login from the context");
-            return LangCodes.EN.getCode();
-        }
-        return account != null ? account.getAccountLanguage() : LangCodes.EN.getCode();
     }
 
     /**
