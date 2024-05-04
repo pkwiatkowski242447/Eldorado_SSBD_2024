@@ -117,7 +117,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -144,7 +143,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -171,7 +169,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -197,7 +194,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -262,7 +258,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -286,7 +281,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -312,7 +306,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -337,7 +330,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -364,7 +356,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -390,7 +381,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -417,7 +407,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -456,7 +445,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }
@@ -483,7 +471,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            //TODO throw exception
             log.error(exception.getMessage());
             return new ArrayList<>();
         }

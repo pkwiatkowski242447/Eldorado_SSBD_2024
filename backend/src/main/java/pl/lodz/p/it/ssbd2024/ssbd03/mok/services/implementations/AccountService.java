@@ -134,7 +134,7 @@ public class AccountService implements AccountServiceInterface {
         // Sending information email
         mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
                 account.getEmail(), account.getAccountLanguage(), true);
-        ///TODO handle exception for trying to block an account by more than 1 admin???
+        ///TODO handle exception for trying to block an account by more than 1 admin??? - optimistic lock
     }
 
     /**
@@ -157,7 +157,7 @@ public class AccountService implements AccountServiceInterface {
         // Sending information email
         mailProvider.sendUnblockAccountInfoEmail(account.getName(), account.getLastname(),
                 account.getEmail(), account.getAccountLanguage());
-        ///TODO handle exception for trying to unblock an account by more than 1 admin???
+        ///TODO handle exception for trying to unblock an account by more than 1 admin??? - optimistic lock
     }
 
     /**
