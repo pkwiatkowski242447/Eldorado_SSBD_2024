@@ -2,12 +2,9 @@ package pl.lodz.p.it.ssbd2024.ssbd03.aspects;
 
 import jakarta.transaction.Synchronization;
 import jakarta.transaction.Transaction;
-import jakarta.transaction.TransactionSynchronizationRegistry;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;

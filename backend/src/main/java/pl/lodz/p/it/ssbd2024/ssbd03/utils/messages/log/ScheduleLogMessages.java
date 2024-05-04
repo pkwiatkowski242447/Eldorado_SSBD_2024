@@ -1,6 +1,6 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok;
+package pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log;
 
-public class ScheduleConsts {
+public class ScheduleLogMessages {
 
     public static String INVOKING_DELETE_ACCOUNTS_MESS = "Deleting unverified scheduler invoked";
     public static String INVOKING_RESEND_CONFIRMATION_EMAIL = "Resending confirmation email";

@@ -37,6 +37,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountController
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.util.List;
@@ -91,15 +92,17 @@ public class AccountController implements AccountControllerInterface {
             accountService.blockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException iae) {
             ///TODO move it to if above
-            log.error("Invalid UUID passed");
+            log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
             return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
-            log.error("Error occurred. Could not find user account");
+            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
             ///TODO potentially change from NF to bad request?
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.notFound().build();
         } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
-            log.error(e instanceof AccountAlreadyBlockedException ? "This account is already blocked" : "You cannot block your own account");
+            log.error(e instanceof AccountAlreadyBlockedException ?
+                    AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION :
+                    AccountLogMessages.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
@@ -126,15 +129,15 @@ public class AccountController implements AccountControllerInterface {
             accountService.unblockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException iae) {
             ///TODO move it to if above
-            log.error("Invalid UUID passed");
+            log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
             return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
-            log.error("Error occurred. Could not find user account");
+            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
             ///TODO potentially change from NF to bad request?
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.notFound().build();
         } catch (AccountAlreadyUnblockedException aaue) {
-            log.error("This account is already blocked");
+            log.error(AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION);
             ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
         }
