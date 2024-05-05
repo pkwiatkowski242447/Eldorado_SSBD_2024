@@ -122,11 +122,6 @@ public class AccountService implements AccountServiceInterface {
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException(I18n.ACCOUNT_ALREADY_BLOCKED_EXCEPTION);
         }
-        if (SecurityContextHolder.getContext().getAuthentication() != null &&
-                SecurityContextHolder.getContext().getAuthentication().getName().equals(account.getLogin())) {
-            log.error(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
-            throw new IllegalOperationException(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
-        }
 
         account.blockAccount(true);
         accountFacade.edit(account);
