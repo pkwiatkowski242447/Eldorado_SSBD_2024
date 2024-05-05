@@ -28,6 +28,9 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.MANDATORY)
 public class TokenFacade extends AbstractFacade<Token> {
 
+    /**
+     * The private autowired entityManager used for managing entities.
+     */
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
     private EntityManager entityManager;
 

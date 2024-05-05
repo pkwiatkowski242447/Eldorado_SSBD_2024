@@ -31,7 +31,13 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController implements AuthenticationControllerInterface {
 
+    /**
+     * The private final authenticationService used for authentication purposes.
+     */
     private final AuthenticationServiceInterface authenticationService;
+    /**
+     * The private final jwtProviderInterface used for operations on JWT TOKEN.
+     */
     private final JWTProvider jwtProvider;
 
     /**
@@ -97,6 +103,13 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         }
     }
 
+    /**
+     * Allows authenticated user to log out from the system.
+     *
+     * @param request HTTP Request in which the credentials.
+     * @return In case of successful logout in returns HTTP 200 OK.
+     * If any problems occur returns HTTP 400 BAD REQUEST and JSON containing information about the problem.
+     */
     @Override
     @PostMapping(value = "/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {

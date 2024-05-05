@@ -29,8 +29,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 @Service
 public class AuthenticationService implements AuthenticationServiceInterface {
 
+    /**
+     * The private final authenticationFacade used for operations on accounts.
+     */
     private final AuthenticationFacade authenticationFacade;
+    /**
+     * The private final authenticationManager used for authenticate user.
+     */
     private final AuthenticationManager authenticationManager;
+    /**
+     * The private final mailProvider used for sending emails.
+     */
     private final MailProvider mailProvider;
 
     /**

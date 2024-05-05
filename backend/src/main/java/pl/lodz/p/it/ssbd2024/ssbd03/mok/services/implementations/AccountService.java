@@ -46,11 +46,29 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AccountService implements AccountServiceInterface {
 
+    /**
+     * The private final accountFacade used for operations on account entities.
+     */
     private final AccountMOKFacade accountFacade;
+    /**
+     * The private final passwordEncoder used for encoding passwords.
+     */
     private final PasswordEncoder passwordEncoder;
+    /**
+     * The private final tokenFacade used for operations on token entities.
+     */
     private final TokenFacade tokenFacade;
+    /**
+     * Component used to send e-mail messages to user e-mail address (depending on the actions they perform).
+     */
     private final MailProvider mailProvider;
+    /**
+     * The private final tokenProvider used for operations on TOKENS.
+     */
     private final JWTProvider jwtProvider;
+    /**
+     * The private final tokenServiceInterface used for operations on tokens.
+     */
     private final TokenServiceInterface tokenService;
 
     /**
@@ -382,6 +400,7 @@ public class AccountService implements AccountServiceInterface {
      *                                     Contains a key to an internationalized message.
      *                                     Additionally, if the problem was caused by an incorrect new mail,
      *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
+     * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
      */
     @Override
     public void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException {

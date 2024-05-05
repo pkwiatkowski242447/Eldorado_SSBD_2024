@@ -20,7 +20,13 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 @Service
 public class TokenService implements TokenServiceInterface {
 
+    /**
+     * The private final tokenFacade used for operations on token entities.
+     */
     private final TokenFacade tokenFacade;
+    /**
+     * The private final jwtProvider used for managing JWT.
+     */
     private final JWTProvider jwtProvider;
 
     /**
