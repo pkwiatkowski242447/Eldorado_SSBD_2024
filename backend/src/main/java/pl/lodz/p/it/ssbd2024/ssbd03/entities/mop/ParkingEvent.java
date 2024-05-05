@@ -53,6 +53,14 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @Setter
     private EventType type;
 
+    /**
+     *
+     * Constructs a new parkingEvent.
+     *
+     * @param reservation ParkingEvent's reservation
+     * @param time ParkingEvent's time
+     * @param type ParkingEvent's type
+     */
     public ParkingEvent(Reservation reservation, LocalDateTime time, EventType type) {
         this.reservation = reservation;
         this.date = time;

@@ -103,6 +103,11 @@ public class Parking extends AbstractEntity {
         ///TODO implement
     }
 
+    /**
+     * Constructs a new parking
+     *
+     * @param address Parking's address
+     */
     public Parking(Address address) {
         this.address = address;
     }
