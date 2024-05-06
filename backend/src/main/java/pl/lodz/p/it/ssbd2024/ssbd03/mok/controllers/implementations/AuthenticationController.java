@@ -32,11 +32,11 @@ import java.time.LocalDateTime;
 public class AuthenticationController implements AuthenticationControllerInterface {
 
     /**
-     * The private final authenticationService used for authentication purposes.
+     * AuthenticationServiceInterface used for authentication purposes.
      */
     private final AuthenticationServiceInterface authenticationService;
     /**
-     * The private final jwtProviderInterface used for operations on JWT TOKEN.
+     * JWTProviderInterface used for operations on JWT TOKEN.
      */
     private final JWTProvider jwtProvider;
 

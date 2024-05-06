@@ -15,7 +15,7 @@ public interface ScheduleServiceInterface {
     void deleteNotVerifiedAccount() throws ScheduleBadProperties;
 
     /**
-     * This method will be invoked every n hours in order to check if half the time to active registered account has passed.
+     * This method will be invoked every hour in order to check if half the time to active registered account has passed.
      */
     void resendConfirmationEmail();
 

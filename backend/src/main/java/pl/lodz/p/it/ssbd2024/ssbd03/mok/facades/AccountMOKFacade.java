@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class AccountMOKFacade extends AbstractFacade<Account> {
 
     /**
-     * The private autowired entityManager used for managing entities.
+     * Autowired entityManager used for managing entities.
      */
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
     private EntityManager entityManager;

@@ -19,7 +19,7 @@ import java.util.UUID;
 public class AuthenticationFacade extends AbstractFacade<Account> {
 
     /**
-     * The private autowired entityManager used for managing entities.
+     * Autowired entityManager used for managing entities.
      */
     @PersistenceContext(unitName = DatabaseConfigConstants.AUTH_PU)
     private EntityManager entityManager;

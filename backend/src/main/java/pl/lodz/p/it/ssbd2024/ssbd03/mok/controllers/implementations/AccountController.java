@@ -52,15 +52,15 @@ import java.util.UUID;
 public class AccountController implements AccountControllerInterface {
 
     /**
-     * The private final accountServiceInterface used for operation on accounts.
+     * AccountServiceInterface used for operation on accounts.
      */
     private final AccountServiceInterface accountService;
     /**
-     * The private final jwtProviderInterface used for operations on JWT TOKEN.
+     * JWTProvider used for operations on JWT TOKEN.
      */
     private final JWTProvider jwtProvider;
     /**
-     * The private final tokenProvider used for operations on TOKENS.
+     * TokenServiceInterface used for operations on tokens.
      */
     private final TokenServiceInterface tokenService;
 

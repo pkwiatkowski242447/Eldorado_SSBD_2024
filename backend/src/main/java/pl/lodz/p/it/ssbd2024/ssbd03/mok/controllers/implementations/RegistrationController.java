@@ -31,17 +31,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 public class RegistrationController implements RegistrationControllerInterface {
 
     /**
-     * The private final accountServiceInterface used for operation on accounts.
+     * AccountServiceInterface used for operation on accounts.
      */
     private final AccountServiceInterface accountService;
 
     /**
-     * The private final tokenProvider used for operations on TOKENS.
+     * TokenProvider used for operations on TOKENS.
      */
     private final TokenServiceInterface tokenService;
 
     /**
-     * The private final mailProvider used for sending emails.
+     * MailProvider used for sending emails.
      */
     private final MailProvider mailProvider;
 

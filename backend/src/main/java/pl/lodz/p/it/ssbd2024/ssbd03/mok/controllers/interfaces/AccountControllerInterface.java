@@ -20,6 +20,7 @@ public interface AccountControllerInterface {
     ResponseEntity<?> blockAccount(String id);
 
     /**
+     * This method allows to unblock a user account by its UUID.
      *
      * @param id Id of account that will be unblocked.
      * @return It returns an HTTP response with a code depending on the result.
@@ -27,6 +28,7 @@ public interface AccountControllerInterface {
     ResponseEntity<?> unblockAccount(String id);
 
     /**
+     * This method retrieves user accounts from the system.
      *
      * @param pageNumber Number of the page, which user accounts will be retrieved from.
      * @param pageSize Number of user accounts per page.
@@ -58,7 +60,7 @@ public interface AccountControllerInterface {
     ResponseEntity<?> activateAccount(String token);
 
     /**
-     * This method is used to confirm the change of an e-mail
+     * This method is used to confirm the change of an e-mail.
      *
      * @param token Last part of the activation URL, sent to the new e-mail address. It is a JWT token
      *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.

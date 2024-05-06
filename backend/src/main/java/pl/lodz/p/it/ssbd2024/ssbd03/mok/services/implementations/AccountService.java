@@ -47,15 +47,15 @@ import java.util.UUID;
 public class AccountService implements AccountServiceInterface {
 
     /**
-     * The private final accountFacade used for operations on account entities.
+     * AccountFacade used for operations on account entities.
      */
     private final AccountMOKFacade accountFacade;
     /**
-     * The private final passwordEncoder used for encoding passwords.
+     * PasswordEncoder used for encoding passwords.
      */
     private final PasswordEncoder passwordEncoder;
     /**
-     * The private final tokenFacade used for operations on token entities.
+     * TokenFacade used for operations on token entities.
      */
     private final TokenFacade tokenFacade;
     /**
@@ -63,11 +63,11 @@ public class AccountService implements AccountServiceInterface {
      */
     private final MailProvider mailProvider;
     /**
-     * The private final tokenProvider used for operations on TOKENS.
+     * TokenProvider used for operations on TOKENS.
      */
     private final JWTProvider jwtProvider;
     /**
-     * The private final tokenServiceInterface used for operations on tokens.
+     * TokenServiceInterface used for operations on tokens.
      */
     private final TokenServiceInterface tokenService;
 
