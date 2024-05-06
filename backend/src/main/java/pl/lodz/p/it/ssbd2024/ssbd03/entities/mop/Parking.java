@@ -58,11 +58,17 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
 @Getter
 public class Parking extends AbstractEntity {
 
+    /**
+     * The address of the parking.
+     */
     @NotNull(message = ParkingMessages.ADDRESS_NULL)
     @Embedded
     @Setter
     private Address address;
 
+    /**
+     * The list of sectors in the parking.
+     */
     @NotNull(message = ParkingMessages.LIST_OF_SECTORS_NULL)
     @Size(min = ParkingConsts.LIST_OF_SECTORS_MIN_SIZE, message = ParkingMessages.LIST_OF_SECTORS_EMPTY)
     @Size(max = ParkingConsts.LIST_OF_SECTORS_MAX_SIZE, message = ParkingMessages.LIST_OF_SECTORS_FULL)

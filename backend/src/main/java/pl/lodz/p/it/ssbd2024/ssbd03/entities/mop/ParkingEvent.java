@@ -25,6 +25,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ParkingEvent extends AbstractEntity implements Serializable {
 
+    /**
+     * Unique identifier for serialization purposes.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -33,12 +36,18 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
      */
     public enum EventType {ENTRY, EXIT}
 
+    /**
+     * The reservation associated with the parking event.
+     */
     @NotNull(message = ParkingEventMessages.RESERVATION_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
     @Getter
     private Reservation reservation;
 
+    /**
+     * The date and time of the parking event.
+     */
     @NotNull(message = ParkingEventMessages.DATE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_DATE_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
@@ -46,6 +55,9 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @Setter
     private LocalDateTime date;
 
+    /**
+     * The type of the parking event (ENTRY or EXIT).
+     */
     @NotNull(message = ParkingEventMessages.EVENT_TYPE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
