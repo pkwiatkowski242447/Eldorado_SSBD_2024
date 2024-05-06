@@ -29,9 +29,15 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class UserLevel extends AbstractEntity implements Serializable {
 
+    /**
+     * Unique identifier for serialization purposes.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The account associated with this user level.
+     */
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = DatabaseConsts.USER_LEVEL_ACCOUNT_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
     @Getter

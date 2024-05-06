@@ -20,11 +20,17 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter @ToString
 public class AbstractEntity implements Signable {
+    /**
+     * The unique identifier (ID) of the entity.
+     */
     @Id
     @Column(name = DatabaseConsts.PK_COLUMN, columnDefinition = "UUID", unique = true, nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    /**
+     * The version of the entity used for optimistic locking.
+     */
     @Version
     @Column(name = DatabaseConsts.VERSION_COLUMN, nullable = false)
     @EqualsAndHashCode.Exclude

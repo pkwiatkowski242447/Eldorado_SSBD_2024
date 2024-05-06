@@ -74,30 +74,48 @@ import java.util.List;
 })
 public class Reservation extends AbstractEntity implements Serializable {
 
+    /**
+     * Unique identifier for serialization purposes.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The client associated with this reservation.
+     */
     @ManyToOne
     @JoinColumn(name = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, updatable = false)
     @Getter
     private Client client;
 
+    /**
+     * The sector in which the parking spot is allocated for this reservation.
+     */
     @NotNull(message = ReservationMessages.SECTOR_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
     @Getter
     private Sector sector;
 
+    /**
+     * The beginning time of this reservation.
+     */
     @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
     @Getter @Setter
     private LocalDateTime beginTime;
 
+    /**
+     * The ending time of this reservation.
+     */
     @Column(name = DatabaseConsts.RESERVATION_END_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
     @Getter @Setter
     private LocalDateTime endTime;
 
+    /**
+     * The list of parking events associated with this reservation.
+     */
     @NotNull(message = ReservationMessages.LIST_OF_PARKING_EVENTS_NULL)
     @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
