@@ -87,23 +87,26 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) {
         try {
             if (id.length() != 36) {
-                throw new IllegalArgumentException();
+                log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
+                return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
             }
+            if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                    SecurityContextHolder.getContext().getAuthentication().getName()
+                            .equals(accountService.getAccountById(UUID.fromString(id)).orElseThrow(
+                                    () -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER)
+                            ).getLogin())) {
+                log.error(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
+                throw new IllegalOperationException(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
+            }
+
             accountService.blockAccount(UUID.fromString(id));
-        } catch (IllegalArgumentException iae) {
-            ///TODO move it to if above
-            log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
-            return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
             log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
-            ///TODO potentially change from NF to bad request?
-            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(anfe.getMessage());
         } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
             log.error(e instanceof AccountAlreadyBlockedException ?
                     AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION :
                     AccountLogMessages.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
-            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         return ResponseEntity.noContent().build();
@@ -124,21 +127,15 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
         try {
             if (id.length() != 36) {
-                throw new IllegalArgumentException();
+                log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
+                return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
             }
             accountService.unblockAccount(UUID.fromString(id));
-        } catch (IllegalArgumentException iae) {
-            ///TODO move it to if above
-            log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
-            return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         } catch (AccountNotFoundException anfe) {
             log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
-            ///TODO potentially change from NF to bad request?
-            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(anfe.getMessage());
         } catch (AccountAlreadyUnblockedException aaue) {
-            log.error(AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION);
-            ///FIXME throwning Internal Error - Unexpected rollback - interceptor will fix that?
+            log.error(AccountLogMessages.ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
         }
         return ResponseEntity.noContent().build();
@@ -233,11 +230,10 @@ public class AccountController implements AccountControllerInterface {
             }
         } catch (AccountNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (AccountEmailChangeException e){
+        } catch (AccountEmailChangeException e) {
             tokenService.removeAccountsEmailConfirmationToken(token);
             return ResponseEntity.badRequest().body(e.getMessage());
-        }
-        catch (AccountEmailNullException e) {
+        } catch (AccountEmailNullException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
@@ -267,7 +263,8 @@ public class AccountController implements AccountControllerInterface {
 
     /**
      * This method is used to modify personal data of currently logged-in user.
-     * @param ifMatch Value of If-Match header
+     *
+     * @param ifMatch          Value of If-Match header
      * @param accountModifyDTO Account properties with potentially changed values.
      * @return In the correct flow returns account object with applied modifications with 200 OK status.
      * If request has empty IF_MATCH header or account currently logged user was not found,
@@ -292,8 +289,7 @@ public class AccountController implements AccountControllerInterface {
             );
             return ResponseEntity.ok().body(accountOutputDTO);
         } catch (AccountNotFoundException e) {
-            //FIXME BR replaced NF - in other ctrls should also?
-            return ResponseEntity.badRequest().body(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -351,10 +347,10 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> resendEmailConfirmation() {
-        try{
+        try {
             accountService.resendEmailConfirmation();
             return ResponseEntity.noContent().build();
-        }catch (AccountNotFoundException | TokenNotFoundException e) {
+        } catch (AccountNotFoundException | TokenNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
