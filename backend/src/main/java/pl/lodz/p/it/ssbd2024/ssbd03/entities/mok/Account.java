@@ -187,7 +187,7 @@ import java.util.Collection;
 public class Account extends AbstractEntity {
 
     /**
-     * User login, a unique identifier used for logging in.
+     * User login, a unique identifier
      */
     @NotBlank(message = AccountMessages.LOGIN_BLANK)
     @Pattern(regexp = AccountsConsts.LOGIN_REGEX, message = AccountMessages.LOGIN_REGEX_NOT_MET)
@@ -232,6 +232,7 @@ public class Account extends AbstractEntity {
 
     /**
      * Time when the account was blocked.
+     * In case this account is blocked by an admin, this time is not set.
      */
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
