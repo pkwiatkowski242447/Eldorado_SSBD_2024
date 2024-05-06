@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +60,12 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Log in", description = "This endpoint is used to authenticate in the application.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication with given credentials was successful."),
+            @ApiResponse(responseCode = "400", description = "Given credentials were invalid or some unknown exception occurred while processing the request."),
+            @ApiResponse(responseCode = "404", description = "User account with given login could not be found")
+    })
     public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) {
         try {
             try {
@@ -97,8 +106,23 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         }
     }
 
+    /**
+     * This method is used to log out from the application, in a situation
+     * when user was previously authenticated.
+     *
+     * @param request   HttpRequest object, associated with the current request.
+     * @param response  HttpResponse object, .
+     *
+     * @return 200 OK is returned when user is logged out successfully. Otherwise, when any exception is thrown, then
+     * 400 BAD REQUEST is returned.
+     */
     @Override
     @PostMapping(value = "/logout")
+    @Operation(summary = "Log out", description = "This endpoint is used to log out a user from the application.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logging out previously authenticated user was successful."),
+            @ApiResponse(responseCode = "400", description = "Unknown exception occurred while processing the request."),
+    })
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
             SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();

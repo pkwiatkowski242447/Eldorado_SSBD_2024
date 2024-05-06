@@ -56,7 +56,7 @@ public class AuthenticationControllerIntegrationTest extends TestcontainersConfi
     @Test
     public void loginEndpointTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
+        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login")
                         .contentType(CONTENT_TYPE)
