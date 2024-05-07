@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.aspects;
+package pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging;
 
 import jakarta.transaction.Synchronization;
 import lombok.Getter;
@@ -38,7 +38,7 @@ public class TransactionSynchronization implements Synchronization {
      *
      * @param transactionKey Identifier of the current transaction.
      *
-     * @see pl.lodz.p.it.ssbd2024.ssbd03.aspects.TxAspect
+     * @see TxAspect
      */
     public TransactionSynchronization(String transactionKey) {
         this.transactionKey = transactionKey;

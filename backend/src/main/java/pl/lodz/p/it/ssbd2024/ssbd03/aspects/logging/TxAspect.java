@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.aspects;
+package pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging;
 
 import jakarta.transaction.Synchronization;
 import jakarta.transaction.Transaction;

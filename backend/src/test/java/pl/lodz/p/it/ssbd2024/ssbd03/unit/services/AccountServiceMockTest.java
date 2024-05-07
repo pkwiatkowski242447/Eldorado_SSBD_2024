@@ -9,7 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AccountService;
 
@@ -29,7 +30,7 @@ public class AccountServiceMockTest {
     private AccountService accountService;
 
     @Test
-    void registerClientTest() throws AccountCreationException {
+    void registerClientTest() throws AccountCreationException, ApplicationBaseException {
         String password = "P@ssw0rd!";
 
         Mockito.doNothing().when(accountMOKFacade).create(Mockito.any(Account.class));

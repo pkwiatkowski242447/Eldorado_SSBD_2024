@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
  * Interface used for managing registration.
@@ -14,7 +15,7 @@ public interface RegistrationControllerInterface {
      * @param accountRegisterDTO Data transfer object, containing user account data, such as login, password, first name, last name, email and so on.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> registerClient(AccountRegisterDTO accountRegisterDTO);
+    ResponseEntity<?> registerClient(AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException;
 
     /**
      * Allows to create new account with staff user level.

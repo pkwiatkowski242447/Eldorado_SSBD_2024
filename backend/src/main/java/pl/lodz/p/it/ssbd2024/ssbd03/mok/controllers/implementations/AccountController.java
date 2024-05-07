@@ -26,11 +26,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDT
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;

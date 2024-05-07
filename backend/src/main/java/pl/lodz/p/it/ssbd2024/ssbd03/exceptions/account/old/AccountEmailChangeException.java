@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account;
+package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old;
 
 /**
  * Used to specify an Exception related with changing an e-mail of an Account.

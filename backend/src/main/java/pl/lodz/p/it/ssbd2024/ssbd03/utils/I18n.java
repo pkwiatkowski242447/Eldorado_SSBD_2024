@@ -5,13 +5,25 @@ import java.util.ResourceBundle;
 
 public class I18n {
 
+    // Account exceptions
+    public static final String ACCOUNT_CONSTRAINT_VIOLATION = "account.constraint.violation.exception";
+
+    // Account internationalization keys
+    public static final String ACCOUNT_LOGIN_ALREADY_TAKEN = "account.login.already.taken.exception";
+    public static final String ACCOUNT_EMAIL_ALREADY_TAKEN = "account.email.already.taken.exception";
+
+    public static final String ACCOUNT_ALREADY_BLOCKED = "account.already.blocked.exception";
+    public static final String ACCOUNT_ALREADY_UNBLOCKED = "account.already.unblocked.exception";
+
+    // Token internationalization keys
+    public static final String TOKEN_VALUE_ALREADY_TAKEN = "token.value.already.taken.exception";
+
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";
     public static final String AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION = "authentication.service.account.login.not.found.exception";
     public static final String AUTH_ACTIVITY_LOG_UPDATE_EXCEPTION = "authentication.service.activity.log.update.exception";
 
     // Account service
-
     public static final String STAFF_ACCOUNT_CREATION_EXCEPTION = "account.service.staff.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_CREATION_EXCEPTION = "account.service.admin.account.not.created.exception";
 
@@ -19,7 +31,6 @@ public class I18n {
     public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
 
     // Authentication controller
-
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
     public static final String AUTH_CONTROLLER_ACCOUNT_BLOCKED = "authentication.controller.account.blocked";
     public static final String AUTH_CONTROLLER_ACCOUNT_LOGOUT = "authentication.controller.account.logout";
@@ -29,8 +40,6 @@ public class I18n {
     public static final String ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION = "account.service.account.constraint.validation.exception";
     public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
     public static final String ACCOUNT_EMAIL_COLLISION_EXCEPTION = "account.service.account.email.collision.exception";
-    public static final String ACCOUNT_ALREADY_BLOCKED_EXCEPTION = "account.service.account.already.blocked.exception";
-    public static final String ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION = "account.service.account.already.unblocked.exception";
     public static final String ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION = "account.service.account.try_to_block_own.exception";
     public static final String ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION = "account.service.email_from_token_null.exception";
     public static final String TOKEN_NOT_FOUND_EXCEPTION = "token.not.found.exception";
@@ -45,7 +54,6 @@ public class I18n {
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
 
     // Mail provider
-
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";
     public static final String CONFIRM_REGISTER_MESSAGE_SUBJECT = "mail.confirm.register.message.subject";
     public static final String CONFIRM_REGISTER_RESULT_MESSAGE = "mail.confirm.register.result_message";

@@ -15,12 +15,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
@@ -110,7 +108,8 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountCreationException When persisting newly created account with client user level results in Persistence exception.
      */
     @Override
-    public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
+    public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
+            throws ApplicationBaseException, AccountCreationException {
         try {
             Account account = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
             account.setAccountLanguage(language);
@@ -138,7 +137,7 @@ public class AccountService implements AccountServiceInterface {
     public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (account.getBlocked() && account.getBlockedTime() == null) {
-            throw new AccountAlreadyBlockedException(I18n.ACCOUNT_ALREADY_BLOCKED_EXCEPTION);
+            throw new AccountAlreadyBlockedException();
         }
 
         account.blockAccount(true);
@@ -161,7 +160,7 @@ public class AccountService implements AccountServiceInterface {
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (!account.getBlocked()) {
-            throw new AccountAlreadyUnblockedException(I18n.ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION);
+            throw new AccountAlreadyUnblockedException();
         }
 
         account.unblockAccount();
