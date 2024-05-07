@@ -34,7 +34,13 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController implements AuthenticationControllerInterface {
 
+    /**
+     * AuthenticationServiceInterface used for authentication purposes.
+     */
     private final AuthenticationServiceInterface authenticationService;
+    /**
+     * JWTProviderInterface used for operations on JWT TOKEN.
+     */
     private final JWTProvider jwtProvider;
 
     /**

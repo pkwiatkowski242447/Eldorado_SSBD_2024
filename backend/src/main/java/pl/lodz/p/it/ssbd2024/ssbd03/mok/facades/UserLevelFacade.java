@@ -25,6 +25,9 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.MANDATORY)
 public class UserLevelFacade extends AbstractFacade<UserLevel> {
 
+    /**
+     * Autowired entityManager used for managing entities.
+     */
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
     private EntityManager entityManager;
 

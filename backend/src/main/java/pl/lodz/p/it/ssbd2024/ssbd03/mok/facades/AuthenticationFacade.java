@@ -18,6 +18,9 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.MANDATORY)
 public class AuthenticationFacade extends AbstractFacade<Account> {
 
+    /**
+     * Autowired entityManager used for managing entities.
+     */
     @PersistenceContext(unitName = DatabaseConfigConstants.AUTH_PU)
     private EntityManager entityManager;
 
@@ -53,7 +56,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
     /**
      * Forces the modification of the entity in the database.
      *
-     * @param account Account to be modified.
+     * @param entity Account to be modified.
      */
     @Override
     public void edit(Account entity) {
