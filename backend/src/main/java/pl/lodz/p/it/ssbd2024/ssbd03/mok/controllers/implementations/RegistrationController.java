@@ -33,8 +33,19 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 @RequestMapping(value = "/api/v1/register")
 public class RegistrationController implements RegistrationControllerInterface {
 
+    /**
+     * AccountServiceInterface used for operation on accounts.
+     */
     private final AccountServiceInterface accountService;
+
+    /**
+     * TokenProvider used for operations on TOKENS.
+     */
     private final TokenServiceInterface tokenService;
+
+    /**
+     * MailProvider used for sending emails.
+     */
     private final MailProvider mailProvider;
 
     /**

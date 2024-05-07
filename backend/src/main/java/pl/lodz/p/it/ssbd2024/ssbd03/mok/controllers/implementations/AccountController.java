@@ -51,8 +51,17 @@ import java.util.UUID;
 @RequestMapping("/api/v1/accounts")
 public class AccountController implements AccountControllerInterface {
 
+    /**
+     * AccountServiceInterface used for operation on accounts.
+     */
     private final AccountServiceInterface accountService;
+    /**
+     * JWTProvider used for operations on JWT TOKEN.
+     */
     private final JWTProvider jwtProvider;
+    /**
+     * TokenServiceInterface used for operations on tokens.
+     */
     private final TokenServiceInterface tokenService;
 
     /**
@@ -61,6 +70,7 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param accountService Service containing various methods for account manipulation.
      * @param tokenService   Service used for token management (in order to confirm certain user's actions).
+     * @param jwtProvider    Service used for JWT management (eg. signing).
      */
     @Autowired
     public AccountController(AccountServiceInterface accountService,
@@ -294,9 +304,11 @@ public class AccountController implements AccountControllerInterface {
     }
 
     /**
-     * This method is used to find user account by Id.
+     * This method is used to modify personal data of currently logged-in user.
      *
-     * @param id Id of searched of the searched account
+     * @param id Id of account to find.
+     * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
+     *         returns 400. When uuid is invalid returns 400.
      */
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")

@@ -29,15 +29,32 @@ import java.util.concurrent.TimeUnit;
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ScheduleService implements ScheduleServiceInterface {
 
+    /**
+     * AccountMOKFacade used for operations on account entities.
+     */
     private final AccountMOKFacade accountMOKFacade;
 
+    /**
+     * TokenFacade used for operations on then accounts.
+     */
     private final TokenFacade tokenFacade;
 
+    /**
+     * MailProvider used for sending emails.
+     */
     private final MailProvider mailProvider;
 
+    /**
+     * String value that specifies time after which deletion will occur.
+     * Deletion time is specified by <code>scheduler.not_verified_account_delete_time</code> property.
+     */
     @Value("${scheduler.not_verified_account_delete_time}")
     private String deleteTime;
 
+    /**
+     * String value that specifies time after which blocked accounts will be unblocked.
+     * Unblock time is specified by <code>scheduler.blocked_account_unblock_time</code> property/
+     */
     @Value("${scheduler.blocked_account_unblock_time}")
     private String unblockTime;
 
