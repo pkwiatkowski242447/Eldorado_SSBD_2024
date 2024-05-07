@@ -6,7 +6,6 @@ import java.util.ResourceBundle;
 public class I18n {
 
     // Account exceptions
-
     public static final String ACCOUNT_CONSTRAINT_VIOLATION = "account.constraint.violation.exception";
 
     // Account internationalization keys
@@ -25,7 +24,6 @@ public class I18n {
     public static final String AUTH_ACTIVITY_LOG_UPDATE_EXCEPTION = "authentication.service.activity.log.update.exception";
 
     // Account service
-
     public static final String STAFF_ACCOUNT_CREATION_EXCEPTION = "account.service.staff.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_CREATION_EXCEPTION = "account.service.admin.account.not.created.exception";
 
@@ -33,7 +31,6 @@ public class I18n {
     public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
 
     // Authentication controller
-
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
     public static final String AUTH_CONTROLLER_ACCOUNT_BLOCKED = "authentication.controller.account.blocked";
     public static final String AUTH_CONTROLLER_ACCOUNT_LOGOUT = "authentication.controller.account.logout";
@@ -57,7 +54,6 @@ public class I18n {
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
 
     // Mail provider
-
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";
     public static final String CONFIRM_REGISTER_MESSAGE_SUBJECT = "mail.confirm.register.message.subject";
     public static final String CONFIRM_REGISTER_RESULT_MESSAGE = "mail.confirm.register.result_message";

@@ -14,10 +14,23 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorExc
 @Component
 public class UserLevelFacadeAspect {
 
+    /**
+     * Pointcut definition for any method within UserLevelFacade.
+     */
     @Pointcut(value = "within(pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade)")
-    private void userLevelFacadeMethodAspect() {}
+    private void userLevelFacadeMethodPointcut() {}
 
-    @Around(value = "userLevelFacadeMethodAspect()")
+    /**
+     * This method is called when userLevelFacadeMethodPointcut is triggered, so basically when any method from UserLevelFacade
+     * is called. The main responsibility of this method is to transform exceptions thrown by the facade into other,
+     * checked exceptions, in order to standardize the exception handling in the application.
+     *
+     * @param proceedingJoinPoint Join point used to execute method that was being intercepted by this aspect.
+     *
+     * @throws Exception When exception is thrown in the intercepted method, then this method will transform in
+     * into other, checked exception and propagate further, or rethrow them in order to process them in the next aspect.
+     */
+    @Around(value = "userLevelFacadeMethodPointcut()")
     private Object handleUserLevelFacadeMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
         try {
             return proceedingJoinPoint.proceed();

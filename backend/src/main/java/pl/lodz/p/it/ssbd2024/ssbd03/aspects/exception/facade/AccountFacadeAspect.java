@@ -25,13 +25,31 @@ import java.util.Set;
 @Component
 public class AccountFacadeAspect {
 
+    /**
+     * Pointcut definition for any method inside AccountMOKFacade.
+     */
     @Pointcut(value = "within(pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade)")
-    private void accountMokFacadeMethodAspect() {}
+    private void accountMokFacadeMethodPointcut() {}
 
+    /**
+     * Pointcut definition for any method inside AuthenticationFacade.
+     */
     @Pointcut(value = "within(pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade)")
-    private void authenticationFacadeMethodAspect() {}
+    private void authenticationFacadeMethodPointcut() {}
 
-    @Around(value = "accountMokFacadeMethodAspect() || authenticationFacadeMethodAspect()")
+    /**
+     * This method is executed when either accountMokFacadeMethodPointcut or authenticationFacadeMethodPointcut was
+     * triggered. The main responsibility is to transform exceptions related to user account into other exceptions
+     * in order to standardize the exception handling in the application.
+     *
+     * @param proceedingJoinPoint Join point used to execute method that was being intercepted by this aspect.
+     *
+     * @return Value returned by the intercepted method.
+     *
+     * @throws Exception When exception is thrown in the intercepted method, then this method will transform in
+     * into other, checked exception and propagate further, or rethrow them in order to process them in the next aspect.
+     */
+    @Around(value = "accountMokFacadeMethodPointcut() || authenticationFacadeMethodPointcut()")
     private Object handleAccountMokFacadeMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
         try {
             return proceedingJoinPoint.proceed();

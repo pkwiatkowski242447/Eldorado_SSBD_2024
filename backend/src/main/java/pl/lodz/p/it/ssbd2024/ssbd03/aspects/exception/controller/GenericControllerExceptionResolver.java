@@ -11,6 +11,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstra
 @ControllerAdvice
 public class GenericControllerExceptionResolver {
 
+    /**
+     * This method is used to transform AccountConstraintViolationException, which could be thrown when user account is created or modified,
+     * that is being propagated from controller component into HTTP response, so that exception is handled without container intervention.
+     *
+     * @param accountConstraintViolationException Exception that will be processed into HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
+     */
     @ExceptionHandler(value = { AccountConstraintViolationException.class })
     public ResponseEntity<?> handleAccountConstraintViolationException(AccountConstraintViolationException accountConstraintViolationException) {
         return ResponseEntity.badRequest()
@@ -18,6 +27,16 @@ public class GenericControllerExceptionResolver {
                 .body(new AccountConstraintViolationExceptionDTO(accountConstraintViolationException));
     }
 
+    /**
+     * This method is used to transform any AccountConflictException or exception that extend it, which could be thrown when
+     * trying to create a new account with login / email already taken. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param accountConflictException AccountConflictException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
+     */
     @ExceptionHandler(value = { AccountConflictException.class })
     public ResponseEntity<?> handleAccountConflictException(AccountConflictException accountConflictException) {
         return ResponseEntity.badRequest()
