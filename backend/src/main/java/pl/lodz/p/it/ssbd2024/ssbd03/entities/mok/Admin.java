@@ -22,6 +22,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class Admin extends UserLevel implements Serializable {
 
+    /**
+     * Unique identifier for serialization purposes.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 }

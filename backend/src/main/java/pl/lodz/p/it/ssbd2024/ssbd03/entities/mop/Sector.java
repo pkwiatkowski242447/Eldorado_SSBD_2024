@@ -56,6 +56,9 @@ import java.io.Serializable;
 })
 public class Sector extends AbstractEntity implements Serializable {
 
+    /**
+     * Unique identifier for serialization purposes.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -67,24 +70,36 @@ public class Sector extends AbstractEntity implements Serializable {
      */
     public enum SectorType {COVERED, UNCOVERED, UNDERGROUND}
 
+    /**
+     * The parking to which this sector belongs.
+     */
     @NotNull(message = SectorMessages.PARKING_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = DatabaseConsts.SECTOR_PARKING_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
     @Getter
     private Parking parking;
 
+    /**
+     * The name of this sector.
+     */
     @Pattern(regexp = SectorConsts.SECTOR_NAME_PATTERN, message = SectorMessages.SECTOR_REGEX_NOT_MET)
     @Size(min = SectorConsts.SECTOR_NAME_LENGTH, max = SectorConsts.SECTOR_NAME_LENGTH, message = SectorMessages.SECTOR_NAME_INVALID)
     @Column(name = DatabaseConsts.SECTOR_NAME_COLUMN, unique = true, nullable = false, length = 5)
     @Getter @Setter
     private String name;
 
+    /**
+     * The type of this sector, which can be COVERED, UNCOVERED, or UNDERGROUND.
+     */
     @NotNull(message = SectorMessages.SECTOR_TYPE_NULL)
     @Column(name =  DatabaseConsts.SECTOR_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
     @Getter @Setter
     private SectorType type;
 
+    /**
+     * The maximum number of parking spots in this sector.
+     */
     @NotNull(message = SectorMessages.SECTOR_MAX_PLACES_NULL)
     @PositiveOrZero(message = SectorMessages.SECTOR_MAX_PLACES_NEGATIVE)
     @Max(value = SectorConsts.SECTOR_MAX_PLACES_MAX_VALUE, message = SectorMessages.SECTOR_MAX_PLACES_FULL)
@@ -92,12 +107,18 @@ public class Sector extends AbstractEntity implements Serializable {
     @Getter @Setter
     private Integer maxPlaces;
 
+    /**
+     * The current number of available parking spots in this sector.
+     */
     @NotNull(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NULL)
     @PositiveOrZero(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NEGATIVE)
     @Column(name = DatabaseConsts.SECTOR_AVAILABLE_PLACES_COLUMN, nullable = false)
     @Getter @Setter
     private Integer availablePlaces = maxPlaces;
 
+    /**
+     * The weight of this sector in spot assigning algorithms.
+     */
     @NotNull(message = SectorMessages.SECTOR_WEIGHT_NULL)
     @Min(value = SectorConsts.SECTOR_WEIGHT_MIN_WEIGHT, message = SectorMessages.SECTOR_WEIGHT_TOO_SMALL)
     @Max(value = SectorConsts.SECTOR_WEIGHT_MAX_WEIGHT, message = SectorMessages.SECTOR_WEIGHT_TOO_LARGE)

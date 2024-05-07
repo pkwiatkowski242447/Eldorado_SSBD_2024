@@ -186,6 +186,9 @@ import java.util.Collection;
 })
 public class Account extends AbstractEntity {
 
+    /**
+     * User login, a unique identifier
+     */
     @NotBlank(message = AccountMessages.LOGIN_BLANK)
     @Pattern(regexp = AccountsConsts.LOGIN_REGEX, message = AccountMessages.LOGIN_REGEX_NOT_MET)
     @Size(min = AccountsConsts.LOGIN_MIN_LENGTH, message = AccountMessages.LOGIN_TOO_SHORT)
@@ -193,6 +196,9 @@ public class Account extends AbstractEntity {
     @Column(name = DatabaseConsts.ACCOUNT_LOGIN_COLUMN, unique = true, nullable = false, updatable = false, length = 32)
     private String login;
 
+    /**
+     * User password, used for authentication.
+     */
     @NotBlank(message = AccountMessages.PASSWORD_BLANK)
     @Size(min = AccountsConsts.PASSWORD_LENGTH, max = AccountsConsts.PASSWORD_LENGTH, message = AccountMessages.PASSWORD_INVALID_LENGTH)
     @Column(name = DatabaseConsts.ACCOUNT_PASSWORD_COLUMN, nullable = false, length = 60)
@@ -200,26 +206,42 @@ public class Account extends AbstractEntity {
     @Setter
     private String password;
 
+    /**
+     * Variable indicating whether the user account is verified.
+     */
     @NotNull(message = AccountMessages.VERIFIED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_VERIFIED_COLUMN, nullable = false)
     @Setter
     private Boolean verified = false;
 
+    /**
+     * Variable indicating whether the user account is active.
+     */
     @NotNull(message = AccountMessages.ACTIVE_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_ACTIVE_COLUMN, nullable = false)
     @Setter
     private Boolean active = false;
 
+    /**
+     * Variable indicating whether the user account is blocked.
+     */
     @NotNull(message = AccountMessages.BLOCKED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_COLUMN, nullable = false)
 //    @Setter
     private Boolean blocked = false;
 
+    /**
+     * Time when the account was blocked.
+     * In case this account is blocked by an admin, this time is not set.
+     */
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
 //    @Setter
     private LocalDateTime blockedTime;
 
+    /**
+     * User's first name.
+     */
     @NotBlank(message = AccountMessages.NAME_BLANK)
     @Pattern(regexp = AccountsConsts.NAME_REGEX, message = AccountMessages.NAME_REGEX_NOT_MET)
     @Size(min = AccountsConsts.NAME_MIN_LENGTH, message = AccountMessages.NAME_TOO_SHORT)
@@ -228,6 +250,9 @@ public class Account extends AbstractEntity {
     @Setter
     private String name;
 
+    /**
+     * User's last name
+     */
     @NotBlank(message = AccountMessages.LASTNAME_BLANK)
     @Pattern(regexp = AccountsConsts.LASTNAME_REGEX, message = AccountMessages.LASTNAME_REGEX_NOT_MET)
     @Size(min = AccountsConsts.LASTNAME_MIN_LENGTH, message = AccountMessages.LASTNAME_TOO_SHORT)
@@ -236,6 +261,9 @@ public class Account extends AbstractEntity {
     @Setter
     private String lastname;
 
+    /**
+     * User's email address
+     */
     @Email(message = AccountMessages.EMAIL_NOT_MET)
     @Size(min = AccountsConsts.EMAIL_MIN_LENGTH, message = AccountMessages.EMAIL_TOO_SHORT)
     @Size(max = AccountsConsts.EMAIL_MAX_LENGTH, message = AccountMessages.EMAIL_TOO_LONG)
@@ -243,22 +271,34 @@ public class Account extends AbstractEntity {
     @Setter
     private String email;
 
+    /**
+     * Collection of user levels associated with the account.
+     */
     @Size(min = AccountsConsts.USER_LEVEL_MIN_SIZE, message = AccountMessages.USER_LEVEL_EMPTY)
     @Size(max = AccountsConsts.USER_LEVEL_MAX_SIZE, message = AccountMessages.USER_LEVEL_FULL)
     @OneToMany(mappedBy = DatabaseConsts.ACCOUNT_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @ToString.Exclude
     private final Collection<UserLevel> userLevels = new ArrayList<>();
 
+    /**
+     * Embedded ActivityLog associated with the account.
+     */
     @Embedded
     @Setter
     private ActivityLog activityLog = new ActivityLog();
 
+    /**
+     * Language preference for the account.
+     */
     @NotBlank(message = AccountMessages.LANGUAGE_BLANK)
     @Pattern(regexp = AccountsConsts.LANGUAGE_REGEX, message = AccountMessages.LANGUAGE_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_LANGUAGE_COLUMN, nullable = false, length = 16)
     @Setter
     private String accountLanguage;
 
+    /**
+     * User's phone number
+     */
     @NotBlank(message = AccountMessages.PHONE_NUMBER_BLANK)
     @Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_PHONE_NUMBER_COLUMN, nullable = false, length = 32)
@@ -266,6 +306,9 @@ public class Account extends AbstractEntity {
     @Setter
     private String phoneNumber;
 
+    /**
+     * Date and time when the account was created.
+     */
     @Column(name = DatabaseConsts.ACCOUNT_CREATION_DATE_COLUMN, nullable = false, updatable = false)
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

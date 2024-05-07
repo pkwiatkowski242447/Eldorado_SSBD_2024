@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,7 +20,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.RegistrationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 /**
@@ -74,6 +76,11 @@ public class RegistrationController implements RegistrationControllerInterface {
     @Override
     @PostMapping( value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Operation(summary = "Register client", description = "Register new user account with client user level, and send account activation e-mail message to given e-mail address.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "New user account with client user level was created successfully and account activation message was sent."),
+            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created.")
+    })
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) {
         try {
             // Create new account
@@ -111,6 +118,11 @@ public class RegistrationController implements RegistrationControllerInterface {
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Register staff", description = "Register new user account with staff user level, and send account activation e-mail message to given e-mail address.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "New user account with staff user level was created successfully and account activation message was sent."),
+            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created.")
+    })
     public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) {
         try {
             this.accountService.registerStaff(accountRegisterDTO.getLogin(),
@@ -142,6 +154,11 @@ public class RegistrationController implements RegistrationControllerInterface {
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Register admin", description = "Register new user account with admin user level, and send account activation e-mail message to given e-mail address.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "New user account with admin user level was created successfully and account activation message was sent."),
+            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created.")
+    })
     public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) {
         try {
             this.accountService.registerAdmin(accountRegisterDTO.getLogin(),

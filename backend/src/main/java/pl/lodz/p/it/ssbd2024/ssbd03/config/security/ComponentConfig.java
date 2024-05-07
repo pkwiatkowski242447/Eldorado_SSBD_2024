@@ -1,12 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,46 +13,18 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 
-import java.util.Properties;
-
 @Configuration
 @PropertySource(value = {"classpath:application.properties", "classpath:mail.properties"})
-@EnableAspectJAutoProxy
-public class ApplicationConfig {
-
-    @Value("${mail.sender.username}")
-    private String senderUsername;
-
-    @Value("${mail.sender.password}")
-    private String senderPassword;
-
-    @Value("${mail.smtp.auth}")
-    private boolean smtpAuth;
-
-    @Value("${mail.smtp.ssl.enable}")
-    private boolean smtpSsl;
-
-    @Value("${mail.smtp.ssl.trust}")
-    private String smtpSslTrust;
-
-    @Value("${mail.smtp.starttls.enable}")
-    private boolean smtpTls;
-
-    @Value("${mail.smtp.host}")
-    private String smtpHost;
-
-    @Value("${mail.smtp.port}")
-    private int smtpPort;
+public class ComponentConfig {
 
     private final AuthenticationFacade authenticationFacade;
 
     @Autowired
-    public ApplicationConfig(AuthenticationFacade authenticationFacade) {
+    public ComponentConfig(AuthenticationFacade authenticationFacade) {
         this.authenticationFacade = authenticationFacade;
     }
 
@@ -93,27 +62,5 @@ public class ApplicationConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean(name = "mvcHandlerMappingIntrospector")
-    public HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
-        return new HandlerMappingIntrospector();
-    }
-
-    @Bean
-    public JavaMailSenderImpl javaMailSender() {
-        Properties mailProperties = new Properties();
-        mailProperties.put("mail.smtp.auth", smtpAuth);
-        mailProperties.put("mail.smtp.starttls.enable", smtpTls);
-        mailProperties.put("mail.smtp.ssl.enable", smtpSsl);
-        mailProperties.put("mail.smtp.ssl.trust", smtpSslTrust);
-        mailProperties.put("mail.smtp.host", smtpHost);
-        mailProperties.put("mail.smtp.port", smtpPort);
-
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setJavaMailProperties(mailProperties);
-        mailSender.setUsername(this.senderUsername);
-        mailSender.setPassword(this.senderPassword);
-        return mailSender;
     }
 }

@@ -25,6 +25,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class Client extends UserLevel implements Serializable {
 
+    /**
+     * Unique identifier for serialization purposes.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -33,6 +36,10 @@ public class Client extends UserLevel implements Serializable {
      */
     public static enum ClientType {BASIC, STANDARD, PREMIUM}
 
+
+    /**
+     * Type of the client, indicating its level in the system.
+     */
     @NotNull(message = ClientMessages.CLIENT_TYPE_NULL)
     @Column(name = DatabaseConsts.CLIENT_DATA_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
