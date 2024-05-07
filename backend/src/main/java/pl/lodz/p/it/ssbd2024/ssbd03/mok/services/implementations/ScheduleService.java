@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadProperties;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.ScheduleServiceInterface;
@@ -58,11 +58,11 @@ public class ScheduleService implements ScheduleServiceInterface {
      * Removes Accounts which have not finished registration.
      * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
      *
-     * @throws ScheduleBadProperties Threw when problem with properties occurs.
+     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void deleteNotVerifiedAccount() throws ScheduleBadProperties {
+    public void deleteNotVerifiedAccount() throws ScheduleBadPropertiesException {
         log.info(ScheduleLogMessages.INVOKING_DELETE_ACCOUNTS_MESS);
 
         // Find not verified accounts
@@ -72,7 +72,7 @@ public class ScheduleService implements ScheduleServiceInterface {
                     accountMOKFacade.findAllAccountsMarkedForDeletion(Long.parseLong(deleteTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
             log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
-            throw new ScheduleBadProperties(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
+            throw new ScheduleBadPropertiesException(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
         }
 
         if (inactiveAccounts.isEmpty()) {
@@ -120,11 +120,11 @@ public class ScheduleService implements ScheduleServiceInterface {
      * Unblock Accounts which have been blocked by login incorrectly certain amount of time.
      * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
      *
-     * @throws ScheduleBadProperties Threw when problem with properties occurs.
+     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void unblockAccount() throws ScheduleBadProperties {
+    public void unblockAccount() throws ScheduleBadPropertiesException {
         log.info(ScheduleLogMessages.INVOKING_UNBLOCK_ACCOUNTS_MESS);
 
         // Find blocked accounts
@@ -134,7 +134,7 @@ public class ScheduleService implements ScheduleServiceInterface {
                     .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
             log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
-            throw new ScheduleBadProperties(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+            throw new ScheduleBadPropertiesException(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
         }
 
         if (blockedAccounts.isEmpty()) {
