@@ -18,6 +18,7 @@ export const AccountStateContextProvider = ({ children }: { children: ReactNode 
         </AccountStateContext.Provider>
     )
 }
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAccountState = () => {
     const accountState = useContext(AccountStateContext)
     if (!accountState) {
