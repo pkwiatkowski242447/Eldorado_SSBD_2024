@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.EmailTemplateNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.ImageNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.MailProviderMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.MailProviderMessages;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

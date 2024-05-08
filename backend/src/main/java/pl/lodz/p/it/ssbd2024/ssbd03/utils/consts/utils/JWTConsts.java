@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.utils.consts;
+package pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils;
 
 public class JWTConsts {
 

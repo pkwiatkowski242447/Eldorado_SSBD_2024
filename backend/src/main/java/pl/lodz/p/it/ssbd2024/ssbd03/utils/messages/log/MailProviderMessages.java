@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.utils.messages;
+package pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log;
 
 public class MailProviderMessages {
 
