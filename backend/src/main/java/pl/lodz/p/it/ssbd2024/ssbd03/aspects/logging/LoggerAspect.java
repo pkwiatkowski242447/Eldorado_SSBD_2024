@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @Aspect
-@Order(1)
+@Order(100)
 @Component
 public class LoggerAspect {
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 
 @Aspect
-@Order(8)
+@Order(10)
 @Component
 public class UserLevelFacadeAspect {
 

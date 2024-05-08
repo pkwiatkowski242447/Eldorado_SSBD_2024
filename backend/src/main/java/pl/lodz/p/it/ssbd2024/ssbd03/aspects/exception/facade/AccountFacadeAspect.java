@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Aspect
-@Order(6)
+@Order(10)
 @Component
 public class AccountFacadeAspect {
 
@@ -50,7 +50,7 @@ public class AccountFacadeAspect {
      * into other, checked exception and propagate further, or rethrow them in order to process them in the next aspect.
      */
     @Around(value = "accountMokFacadeMethodPointcut() || authenticationFacadeMethodPointcut()")
-    private Object handleAccountMokFacadeMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
+    private Object handleAccountRelatedMethodsExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
         try {
             return proceedingJoinPoint.proceed();
         } catch (OptimisticLockException optimisticLockException) {

@@ -16,7 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import java.sql.SQLException;
 
 @Aspect
-@Order(10)
+@Order(5)
 @Component
 public class GenericFacadeAspect {
 
@@ -46,10 +46,10 @@ public class GenericFacadeAspect {
             return proceedingJoinPoint.proceed();
         } catch (OptimisticLockException optimisticLockException) {
             throw new ApplicationOptimisticLockException();
-        } catch (ApplicationBaseException applicationBaseException) {
-            throw applicationBaseException;
         } catch (PersistenceException | SQLException exception) {
             throw new ApplicationDatabaseException(exception);
+        } catch (ApplicationBaseException applicationBaseException) {
+            throw applicationBaseException;
         } catch (Throwable throwable) {
             throw new ApplicationInternalServerErrorException();
         }

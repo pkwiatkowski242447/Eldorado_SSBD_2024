@@ -13,6 +13,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class TokenServiceMockTest {
         String tokenValue = "TOKEN VALUE";
         ArgumentCaptor<Token> tokenArgumentCaptor = ArgumentCaptor.captor();
         Token compareToken = new Token(tokenValue, account, Token.TokenType.REGISTER);
-        Mockito.when(jwtProvider.generateActionToken(account, 24)).thenReturn(tokenValue);
+        Mockito.when(jwtProvider.generateActionToken(account, 24, ChronoUnit.HOURS)).thenReturn(tokenValue);
         Mockito.doNothing().when(tokenFacade).create(any());
 
         assertEquals(tokenValue, tokenService.createRegistrationToken(account));

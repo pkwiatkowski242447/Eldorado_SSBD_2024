@@ -14,7 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorExc
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.conflict.TokenValueAlreadyTakenException;
 
 @Aspect
-@Order(7)
+@Order(10)
 @Component
 public class TokenFacadeAspect {
 

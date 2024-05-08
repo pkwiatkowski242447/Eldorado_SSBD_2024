@@ -51,19 +51,14 @@ public class AccountServiceMockTest {
     private AccountService accountService;
 
     @Test
-    void registerClientTestSuccessful() throws ApplicationBaseException, AccountCreationException {
+    void registerClientTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
 
         Mockito.doNothing().when(accountMOKFacade).create(any(Account.class));
         Mockito.when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
 
-        Account account = accountService.registerClient("Testowy", password, "Imie",
+        accountService.registerClient("Testowy", password, "Imie",
                 "Nazwisko", "test@example.com", "123123123", "pl");
-
-        assertNotNull(account);
-        assertEquals("Testowy", account.getLogin());
-        assertNotNull(account.getPassword());
-        assertNotEquals(password, account.getPassword());
 
         Mockito.verify(accountMOKFacade, Mockito.times(1)).create(any(Account.class));
     }

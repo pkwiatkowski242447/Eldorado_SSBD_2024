@@ -19,7 +19,12 @@ import java.util.List;
 @EnableWebMvc
 @Configuration
 @ComponentScan({"pl.lodz.p.it.ssbd2024.ssbd03", "org.springdoc"})
-@PropertySource(value = {"classpath:application.properties", "classpath:properties/mail.properties"})
+@PropertySource(value = {
+        "classpath:application.properties",
+        "classpath:properties/mail.properties",
+        "classpath:properties/urls.properties",
+        "classpath:properties/time.properties"
+})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class WebConfig implements WebMvcConfigurer {
 

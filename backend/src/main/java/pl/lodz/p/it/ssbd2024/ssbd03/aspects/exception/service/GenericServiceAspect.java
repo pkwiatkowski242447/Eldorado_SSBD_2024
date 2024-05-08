@@ -6,6 +6,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 
 @Aspect
 @Order(15)
@@ -29,7 +31,13 @@ public class GenericServiceAspect {
      * into other, checked exception and propagate further, or rethrow them in order to process them in the next aspect.
      */
     @Around(value = "serviceMethodPointcut()")
-    private Object handleServiceMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        return proceedingJoinPoint.proceed();
+    private Object handleServiceMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
+        try {
+            return proceedingJoinPoint.proceed();
+        } catch (ApplicationBaseException applicationBaseException) {
+            throw applicationBaseException;
+        } catch (Throwable throwable) {
+            throw new ApplicationInternalServerErrorException();
+        }
     }
 }
