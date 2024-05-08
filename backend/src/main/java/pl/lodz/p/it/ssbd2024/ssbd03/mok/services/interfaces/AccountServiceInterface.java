@@ -116,10 +116,10 @@ public interface AccountServiceInterface {
     boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException;
 
     /**
-     * Retrieve Account that match the parameters, in a given order.
+     * Retrieve Accounts that match the parameters, in a given order.
      *
      * @param login      Account's login. A phrase is sought in the logins.
-     * @param firstName  Account's owner first name. A phrase is sought in the names.
+     * @param firstName  Account owner's first name. A phrase is sought in the names.
      * @param lastName   Account's owner last name. A phrase is sought in the last names.
      * @param order      Ordering in which user accounts should be returned.
      * @param pageNumber Number of the page with searched users accounts.
@@ -141,7 +141,7 @@ public interface AccountServiceInterface {
      * Retrieves an Account by the login.
      *
      * @param login Login of the searched user account.
-     * @return If Account with the given login was found returns Account, otherwise returns null.
+     * @return If an Account with the given login was found return Account, otherwise returns null.
      */
     Account getAccountByLogin(String login);
 
@@ -157,8 +157,35 @@ public interface AccountServiceInterface {
      * Creates a new JWT related to changing of an account's e-mail,
      * replaces old JWT in the Token in database and sends new confirmation e-mail.
      *
-     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
+     * @throws AccountNotFoundException Thrown when an account from security context can't be found in the database.
      * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
      */
     void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException;
+
+    /**
+     * Removes the client user level from the account.
+     *
+     * @param id Account's id.
+     * @throws AccountNotFoundException  Threw when there is no account with given login.
+     * @throws AccountUserLevelException Threw when the account has no client user level or this is the only user level of the account.
+     */
+    void removeClientUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+
+    /**
+     * Removes the staff user level from the account.
+     *
+     * @param id Account's id.
+     * @throws AccountNotFoundException  Threw when there is no account with given login.
+     * @throws AccountUserLevelException Threw when the account has no staff user level or this is the only user level of the account.
+     */
+    void removeStaffUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+
+    /**
+     * Removes the admin user level from the account.
+     *
+     * @param id Account's id.
+     * @throws AccountNotFoundException  Threw when there is no account with given login.
+     * @throws AccountUserLevelException Threw when the account has no admin user level or this is the only user level of the account.
+     */
+    void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
 }

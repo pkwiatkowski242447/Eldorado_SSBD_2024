@@ -26,11 +26,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDT
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
@@ -308,7 +304,7 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param id Id of account to find.
      * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
-     *         returns 400. When uuid is invalid returns 400.
+     * returns 400. When uuid is invalid returns 400.
      */
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
@@ -367,4 +363,62 @@ public class AccountController implements AccountControllerInterface {
         }
 
     }
+
+    /**
+     * This method is used to remove client user level from account.
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *             If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     *             explaining why the error occurred).
+     */
+    @Override
+    @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeClientUserlevel(@PathVariable("id") String id) {
+        try {
+            accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException | AccountUserLevelException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * This method is used to remove staff user level from account.
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *             If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     *             explaining why the error occurred).
+     */
+    @Override
+    @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeStafftUserlevel(@PathVariable("id") String id) {
+        try {
+            accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException | AccountUserLevelException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * This method is used to remove admin user level from account.
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *             If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     *             explaining why the error occurred).
+     */
+    @Override
+    @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeAdminUserlevel(@PathVariable("id") String id) {
+        try {
+            accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException | AccountUserLevelException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

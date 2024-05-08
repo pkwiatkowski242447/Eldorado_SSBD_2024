@@ -15,16 +15,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountCreationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -71,6 +67,8 @@ public class AccountService implements AccountServiceInterface {
      */
     private final TokenServiceInterface tokenService;
 
+    private final UserLevelFacade userLevelFacade;
+
     /**
      * Autowired constructor for the service.
      *
@@ -80,6 +78,7 @@ public class AccountService implements AccountServiceInterface {
      * @param mailProvider    This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
      * @param jwtProvider     This component is used to generate token values for token facade.
      * @param tokenService    Service used for more complicated token operations.
+     * @param userLevelFacade It is used to create new tokens, remove them, etc.
      */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
@@ -87,13 +86,15 @@ public class AccountService implements AccountServiceInterface {
                           TokenFacade tokenFacade,
                           MailProvider mailProvider,
                           JWTProvider jwtProvider,
-                          TokenServiceInterface tokenService) {
+                          TokenServiceInterface tokenService,
+                          UserLevelFacade userLevelFacade) {
         this.accountFacade = accountFacade;
         this.passwordEncoder = passwordEncoder;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
         this.jwtProvider = jwtProvider;
         this.tokenService = tokenService;
+        this.userLevelFacade = userLevelFacade;
     }
 
     /**
@@ -436,5 +437,101 @@ public class AccountService implements AccountServiceInterface {
 
         dbToken.setTokenValue(newTokenValue);
         tokenFacade.edit(dbToken);
+    }
+
+    /**
+     * Removes the Client user level from the account.
+     *
+     * @param id ID of the account from which the Client user level will be removed.
+     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
+     * @throws AccountUserLevelException Threw when the account has no Client user level or has only one user level.
+     */
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void removeClientUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Client)) {
+            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            //TODO maybe change to another exception
+        }
+        if (account.getUserLevels().size() == 1) {
+            throw new AccountUserLevelException("User must have at least one user level.");
+            //TODO maybe change to another exception
+        }
+
+        UserLevel clientUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Client).findFirst().orElse(null);
+
+        account.removeUserLevel(clientUserLevel);
+        accountFacade.edit(account);
+
+        userLevelFacade.remove(clientUserLevel);
+    }
+
+    /**
+     * Removes the Staff user level from the account.
+     *
+     * @param id ID of the account from which the Staff user level will be removed.
+     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
+     * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
+     */
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void removeStaffUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Staff)) {
+            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            //TODO maybe change to another exception
+        }
+        if (account.getUserLevels().size() == 1) {
+            throw new AccountUserLevelException("User must have at least one user level.");
+            //TODO maybe change to another exception
+        }
+
+        UserLevel staffUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Staff).findFirst().orElse(null);
+
+        account.removeUserLevel(staffUserLevel);
+        accountFacade.edit(account);
+
+        userLevelFacade.remove(staffUserLevel);
+    }
+
+    /**
+     * Removes the Admin user level from the account.
+     *
+     * @param id
+     * @throws AccountNotFoundException
+     * @throws AccountUserLevelException
+     */
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        String currentAccountLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account currentAccount = accountFacade.findByLogin(currentAccountLogin)
+                .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if (account.equals(currentAccount)) {
+            throw new AccountUserLevelException(I18n.ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION);
+        }
+
+        if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Admin)) {
+            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+        }
+        if (account.getUserLevels().size() == 1) {
+            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+        }
+
+        UserLevel adminUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Admin).findFirst().orElse(null);
+
+        account.removeUserLevel(adminUserLevel);
+        accountFacade.edit(account);
+
+        userLevelFacade.remove(adminUserLevel);
     }
 }
