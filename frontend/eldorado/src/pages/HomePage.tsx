@@ -1,7 +1,8 @@
-import React from "react";
+
 import {useNavigate} from "react-router-dom"; // Import useHistory hook
-import {Button} from "react-bootstrap";
 import {Pathnames} from "../router/pathnames";
+import {Button} from "@/components/ui/button.tsx";
+import eldoLogo from "@/assets/eldorado.png";
 
 function HomePage() {
     const navigate = useNavigate()
@@ -13,7 +14,7 @@ function HomePage() {
 
     return (
         <div>
-            <h1>Nie każdy musi być informatykiem</h1>
+            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-2/3"/>
             <Button onClick={redirectToLoginPage}>Zaloguj się</Button>
         </div>
     );

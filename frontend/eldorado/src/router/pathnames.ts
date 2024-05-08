@@ -4,6 +4,7 @@ export const Pathnames = {
         login: '/login',
         register: '/register',
         test: '/test',
+        activateAccount: '/activate-account/:token',
     },
     admin: {
         home: '/',
@@ -13,7 +14,7 @@ export const Pathnames = {
         'change password': '/changePassword'
 
     },
-    resAdmin: {
+    staff: {
         home: '/',
         clients: '/clients',
         courts: '/courts',

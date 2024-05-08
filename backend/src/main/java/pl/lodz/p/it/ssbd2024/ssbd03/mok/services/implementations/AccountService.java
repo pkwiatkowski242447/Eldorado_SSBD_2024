@@ -212,7 +212,8 @@ public class AccountService implements AccountServiceInterface {
             String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
             tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
 
-            String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
+//            String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
+            String confirmationURL = "http://localhost:3000/activate-account/%s".formatted(tokenValue);
 
             mailProvider.sendRegistrationConfirmEmail(newAdminAccount.getName(),
                     newAdminAccount.getLastname(),

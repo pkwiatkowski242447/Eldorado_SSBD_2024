@@ -86,6 +86,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         return path.startsWith("/api/v1/auth") ||
                 path.startsWith("/api/v1/register/client") ||
                 path.startsWith("/v3/api-docs") ||
-                path.startsWith("/swagger-ui");
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/api/v1/accounts/activate-account");
     }
 }

@@ -1,77 +1,100 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Form} from "react-bootstrap";
-import * as formik from 'formik';
-import * as yup from 'yup';
-import {capitalize} from "lodash";
-// import ModalBasic from "../Modal/ModalBasic";
-import {useAccount} from "../../hooks/useAccount";
-import {FormikHelpers} from "formik";
+import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card"
+import {Input} from "@/components/ui/input"
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components/ui/form"
+import {FormLabel} from "react-bootstrap";
+import {useEffect} from "react";
+import {useAccount} from "@/hooks/useAccount.ts";
+
+const formSchema = z.object({
+    login: z.string().min(2, {message: "Login has to be at least 2 characters long."})
+        .max(32, {message: "Login has to be at most 32 characters long."}), //TODO add regex for login
+    password: z.string().min(2, {message: "Password has to be at least 2 characters long."})
+        .max(60, {message: "Password has to be at most 60 characters long."})
+})
 
 function LoginForm() {
-    // const [showErrorModal,setShowErrorModal] = useState(false);
-    // const [errorModalContent,setErrorModalContent] = useState<string>("");
-    const {Formik} = formik;
-    const schemaUser = yup.object().shape({
-        login: yup.string().required(),
-        password: yup.string().required()
-    });
 
-    const { isAuthenticated, logIn} = useAccount();
+    const {isAuthenticated, logIn, getCurrentAccount} = useAccount();
     useEffect(() => {
-        // getCurrentAccount();
+        getCurrentAccount();
     }, []);
 
-    interface formResult{
-        login:string,
-        password:string
-    }
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            login: "",
+            password: "",
+        },
+    })
 
-    const handleSubmit = (values:formResult, formikHelpers : FormikHelpers<formResult>) =>{
-        logIn(values.login, values.password).catch((error) =>{
-            // setErrorModalContent(JSON.stringify(error.response.data));
-            // setShowErrorModal(true)
+    function onSubmit(values: z.infer<typeof formSchema>) {
+        logIn(values.login, values.password).catch((error) => {
             console.log(error.response.data)
         });
-        formikHelpers.setSubmitting(false);
     }
 
     return (
-        <div>
-            {/*<ModalBasic show={showErrorModal} setShow={setShowErrorModal} title={"Modification Error"} body={errorModalContent} footer={""}/>*/}
-            <Formik
-                validationSchema={schemaUser}
-                initialValues={{
-                    login: '',
-                    password: '',
-                }}
-                onSubmit={handleSubmit}
-            >{props => (
-                <Form onSubmit={props.handleSubmit} noValidate className="m-3 p-3">
-                    <Form.Group controlId="addUserFormLogin" >
-                        <Form.Label>Login:</Form.Label>
-                        <Form.Control onChange={props.handleChange} onBlur={props.handleBlur}
-                                      value={props.values.login}
-                                      isInvalid={props.touched.login && !!props.errors.login}
-                                      isValid={props.touched.login && !props.errors.login} name="login"
-                                      type="text"/>
-                        <Form.Control.Feedback
-                            type="invalid">{capitalize(props.errors.login?.toString())}</Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group controlId="addUserFormPassword">
-                        <Form.Label>Password:</Form.Label>
-                        <Form.Control onChange={props.handleChange} onBlur={props.handleBlur}
-                                      value={props.values.password}
-                                      isInvalid={props.touched.password && !!props.errors.password}
-                                      isValid={props.touched.password && !props.errors.password} name="password"
-                                      type="password"/>
-                        <Form.Control.Feedback
-                            type="invalid">{capitalize(props.errors.password?.toString())}</Form.Control.Feedback>
-                    </Form.Group>
-                    <Button variant="success" type="submit" className="mt-3">Log in</Button>
+        <Card className="mx-auto max-w-sm">
+            <CardHeader>
+                <CardTitle className="text-2xl">Login</CardTitle>
+                <CardDescription>
+                    Enter your login below to login to your account
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form} onSubmit={form.handleSubmit(onSubmit)}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="login"
+                            render={({field}) => (
+                                <FormItem>
+                                    <div className="grid gap-4">
+                                        <FormLabel>Login</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter your login" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({field}) => (
+                                <FormItem>
+                                    <div className="grid gap-4">
+                                        <div className="grid gap-2">
+                                            <FormLabel>Password
+                                                {/*<a href="#" className="ml-auto inline-block text-fuchsia-300 underline">*/}
+                                                {/*    Forgot your password?*/}
+                                                {/*</a>*/}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input type="password" {...field} />
+                                            </FormControl>
+                                        </div>
+                                    </div>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full">Submit</Button>
+                        <div className="mt-4 text-center text-sm">
+                            Don&apos;t have an account?{" "}
+                            <a href="/register" className="font-medium text-black hover:text-blue-500">
+                                Sign up </a>
+                        </div>
+                    </form>
                 </Form>
-            )}</Formik>
-        </div>
-    );
+            </CardContent>
+        </Card>
+    )
 }
 
-export default LoginForm;
+export default LoginForm

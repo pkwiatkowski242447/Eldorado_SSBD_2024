@@ -63,6 +63,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/v1/auth/login/**",
                                 "/api/v1/register/client").permitAll()
+                        .requestMatchers("/api/v1/accounts/activate-account/**").permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers("/**").authenticated());
 
