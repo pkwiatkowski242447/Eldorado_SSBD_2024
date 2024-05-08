@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+import java.util.UUID;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "roleName")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ClientDTO.class, name = "CLIENT"),
@@ -13,7 +14,10 @@ import lombok.Setter;
         @JsonSubTypes.Type(value = AdminDTO.class, name = "ADMIN"),
 }
 )
+@Getter @Setter
 public abstract class UserLevelDTO {
+
+    private UUID id;
     private String roleName;
 
     public UserLevelDTO() {
@@ -21,6 +25,11 @@ public abstract class UserLevelDTO {
     }
 
     public UserLevelDTO(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public UserLevelDTO(UUID id, String roleName) {
+        this.id = id;
         this.roleName = roleName;
     }
 }

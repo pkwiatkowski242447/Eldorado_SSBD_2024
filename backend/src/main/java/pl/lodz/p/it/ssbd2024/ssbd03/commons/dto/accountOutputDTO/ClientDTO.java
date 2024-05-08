@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @Getter @Setter
 @ToString(callSuper = true)
 public class ClientDTO extends UserLevelDTO {
@@ -13,12 +15,13 @@ public class ClientDTO extends UserLevelDTO {
         super("CLIENT");
     }
 
-    public ClientDTO(String clientType) {
+    public ClientDTO(UUID id, String clientType) {
+        super(id, "CLIENT");
         this.clientType = clientType;
     }
 
-    public ClientDTO(String roleName, String clientType) {
-        super(roleName);
+    public ClientDTO(UUID id, String roleName, String clientType) {
+        super(id, roleName);
         this.clientType = clientType;
     }
 }

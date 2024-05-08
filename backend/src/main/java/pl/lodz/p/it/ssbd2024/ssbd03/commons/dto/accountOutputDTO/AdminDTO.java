@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @Getter @Setter
 @ToString(callSuper = true)
 public class AdminDTO extends UserLevelDTO {
@@ -12,7 +14,8 @@ public class AdminDTO extends UserLevelDTO {
         super("ADMIN");
     }
 
-    public AdminDTO(String roleName) {
-        super(roleName);
+    public AdminDTO(String id, String roleName) {
+        super(UUID.fromString(id), roleName);
     }
+
 }

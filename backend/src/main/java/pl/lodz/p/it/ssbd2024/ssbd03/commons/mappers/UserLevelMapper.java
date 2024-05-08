@@ -34,10 +34,10 @@ public class UserLevelMapper {
 
     public static UserLevelDTO toUserLevelDTO(UserLevel userLevel) {
         return switch (userLevel) {
-            case Client client ->
-                    new ClientDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
-            case Staff staff -> new StaffDTO(staff.getClass().getSimpleName().toUpperCase());
-            case Admin admin -> new AdminDTO(admin.getClass().getSimpleName().toUpperCase());
+            case Client client -> new ClientDTO(userLevel.getId(), client.getClass().getSimpleName().toUpperCase(),
+                    client.getType().toString());
+            case Staff staff -> new StaffDTO(userLevel.getId(), staff.getClass().getSimpleName().toUpperCase());
+            case Admin admin -> new AdminDTO(userLevel.getId().toString(), admin.getClass().getSimpleName().toUpperCase());
             ///FIXME good exception or not good
             default -> throw new IllegalArgumentException(I18n.UNEXPECTED_USER_LEVEL);
         };

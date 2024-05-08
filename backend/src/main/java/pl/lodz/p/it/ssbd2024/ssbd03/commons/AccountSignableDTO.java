@@ -40,6 +40,7 @@ public class AccountSignableDTO implements SignableDTO {
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < levels.size(); i++) {
             list.add(new HashMap<>());
+            list.get(i).put("id", levels.get(i).getId().toString());
             list.get(i).put("roleName", levels.get(i).getRoleName());
             switch (levels.get(i)) {
                 case ClientDTO clientOutputDTO -> list.get(i).put("clientType", clientOutputDTO.getClientType());
