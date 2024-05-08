@@ -21,7 +21,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -50,6 +55,9 @@ public class AccountService implements AccountServiceInterface {
 
     @Value("${mail.account.creation.confirmation.url}")
     private String accountCreationConfirmationUrl;
+
+    @Value("${mail.account.reset.password.url}")
+    private String accountPasswordResetUrl;
 
     @Value("${account.creation.confirmation.period.length.hours}")
     private int accountCreationConfirmationPeriodLengthHours;
@@ -222,6 +230,56 @@ public class AccountService implements AccountServiceInterface {
         } catch (PersistenceException exception) {
             throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
         }
+    }
+
+    /**
+     * This method is used to initiate process of resetting current user account password. This method basically 
+     * generates a token of type CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
+     * specified by the user in the form and send to the application with the usage of DTO object.
+     *
+     * @param userEmail Email address that will be used to search for the existing account, and then used for sending
+     *                  e-mail message with password change URL.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void forgetAccountPassword(String userEmail) throws ApplicationBaseException {
+        Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
+
+        if (account.getBlocked()) throw new AccountBlockedException();
+        else if (!account.getActive()) throw new AccountNotActivatedException();
+
+        String tokenValue = this.tokenService.createPasswordResetToken(account);
+        String passwordResetURL = this.accountPasswordResetUrl + tokenValue;
+        
+        this.mailProvider.sendPasswordResetEmail(account.getName(),
+                account.getLastname(),
+                userEmail,
+                passwordResetURL,
+                account.getAccountLanguage());
+    }
+
+    /**
+     * This method is used to change password of the user. This method does read RESET PASSWORD token with
+     * specified token value, and then
+     *
+     * @param token         Value of the token, that will be used to find RESET PASSWORD token in the database.
+     * @param newPassword   New password, transferred to the web application by data transfer object.
+     *
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
+     * method.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
+        Token tokenObject = this.tokenFacade.findByTokenValue(token).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
+        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount())) throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
+
+        Account account = this.accountFacade.findAndRefresh(tokenObject.getAccount().getId()).orElseThrow(AccountIdNotFoundException::new);
+        if (account.getBlocked()) throw new AccountBlockedException();
+        else if (!account.getActive()) throw new AccountNotActivatedException();
+
+        account.setPassword(this.passwordEncoder.encode(newPassword));
+        this.accountFacade.edit(account);
+
+        this.tokenFacade.remove(tokenObject);
     }
 
     /**

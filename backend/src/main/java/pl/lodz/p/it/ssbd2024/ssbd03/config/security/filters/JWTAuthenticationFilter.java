@@ -32,6 +32,19 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private final JWTProvider jwtProvider;
     private final AuthenticationFacade authenticationFacade;
 
+    /**
+     * Whitelist containing all URLs related to paths available to unauthenticated users.
+     */
+    private static final String[] PATHS_WHITELIST = {
+            "/api/v1/auth",
+            "/api/v1/register/client",
+            "/api/v1/accounts/change-password",
+            "/v3/api-docs",
+            "/swagger-ui",
+            "/api/v1/accounts/forgot-password",
+            "/api/v1/accounts/change-password"
+    };
+
     @Autowired
     public JWTAuthenticationFilter(JWTProvider jwtProvider,
                                    AuthenticationFacade authenticationFacade) {
@@ -80,12 +93,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        // TODO: Change this paths to something more civilized.
-
         String path = request.getServletPath();
-        return path.startsWith("/api/v1/auth") ||
-                path.startsWith("/api/v1/register/client") ||
-                path.startsWith("/v3/api-docs") ||
-                path.startsWith("/swagger-ui");
+
+        for (String pathVar : PATHS_WHITELIST) {
+            if (path.startsWith(pathVar)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

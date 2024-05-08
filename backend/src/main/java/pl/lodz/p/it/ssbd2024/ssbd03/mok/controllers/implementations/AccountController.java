@@ -19,13 +19,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
@@ -149,6 +152,43 @@ public class AccountController implements AccountControllerInterface {
             log.error(AccountLogMessages.ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
         }
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This endpoint is used to "forget" password for an unauthenticated user. It does generate RESET PASSWORD token, write
+     * it to the database, and send a message with reset password URL to user e-mail address.
+     *
+     * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for registration
+     *                        to the application or changed later to other e-mail address.
+     *
+     * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
+     * (if there is no account with given e-mail address) or 412 PRECONDITION FAILED (when account is either blocked or
+     * not activated yet).
+     *
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
+     */
+    @Override
+    @PostMapping(value = "/forgot-password")
+    public ResponseEntity<?> forgetAccountPassword(@RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
+        this.accountService.forgetAccountPassword(accountEmailDTO.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This endpoint is used to change password for an unauthenticated user. It does generate RESET PASSWORD token, write
+     * it to the database, and send a message with reset password URL to user e-mail address.
+     *
+     * @param token RESET PASSWORD token required to change password for user account, that was generated when
+     *              forgetAccountPassword() method was called.
+     *
+     * @return 200 OK is returned when changing password goes flawlessly. Otherwise, 400 BAD REQUEST is returned (since
+     * RESET PASSWORD token is no longer valid or not in the database).
+     */
+    @Override
+    @PostMapping(value = "/change-password/{token_id}")
+    public ResponseEntity<?> changeAccountPassword(@PathVariable("token_id") String token, @RequestBody AccountPasswordDTO accountPasswordDTO) throws ApplicationBaseException {
+        this.accountService.changeAccountPassword(token, accountPasswordDTO.getPassword());
         return ResponseEntity.noContent().build();
     }
 
@@ -332,7 +372,7 @@ public class AccountController implements AccountControllerInterface {
      * messages about user actions in the application (e.g. messages containing confirmation links).
      *
      * @param id                    Identifier of the user account, whose e-mail will be changed by this method.
-     * @param accountChangeEmailDTO Data transfer object containing new e-mail address.
+     * @param accountEmailDTO Data transfer object containing new e-mail address.
      * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
@@ -340,9 +380,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
+    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) {
         try {
-            accountService.changeEmail(id, accountChangeEmailDTO.getEmail());
+            accountService.changeEmail(id, accountEmailDTO.getEmail());
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -380,7 +420,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> removeClientUserlevel(@PathVariable("id") String id) {
+    public ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id) {
         try {
             accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
             return ResponseEntity.noContent().build();
@@ -400,7 +440,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> removeStafftUserlevel(@PathVariable("id") String id) {
+    public ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id) {
         try {
             accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
             return ResponseEntity.noContent().build();
@@ -420,7 +460,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> removeAdminUserlevel(@PathVariable("id") String id) {
+    public ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id) {
         try {
             accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
             return ResponseEntity.noContent().build();

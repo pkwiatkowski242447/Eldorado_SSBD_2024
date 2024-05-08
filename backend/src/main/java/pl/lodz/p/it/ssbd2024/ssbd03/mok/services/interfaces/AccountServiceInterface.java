@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
@@ -59,6 +60,28 @@ public interface AccountServiceInterface {
      * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
      */
     void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException;
+
+    /**
+     * This method is used to reset current user account password. This method basically generates a token of type
+     * CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
+     * specified by the user in the form and send to the application with the usage of DTO object.
+     *
+     * @param userEmail Email address that will be used to search for the existing account, and then used for sending
+     *                  e-mail message with password change URL.
+     */
+    void forgetAccountPassword(String userEmail) throws ApplicationBaseException;
+
+    /**
+     * This method is used to change password of the user. This method does read RESET PASSWORD token with
+     * specified token value, and then
+     *
+     * @param token         Value of the token, that will be used to find RESET PASSWORD token in the database.
+     * @param newPassword   New password, transferred to the web application by data transfer object.
+     *
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
+     * method.
+     */
+    void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException;
 
     /**
      * Method for blocking an account by its UUID.
