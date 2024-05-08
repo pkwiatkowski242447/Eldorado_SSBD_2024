@@ -180,11 +180,12 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
                                                                             @RequestParam(name = "firstName", defaultValue = "") String firstName,
                                                                             @RequestParam(name = "lastName", defaultValue = "") String lastName,
+                                                                            @RequestParam(name = "active", defaultValue = "") boolean active,
                                                                             @RequestParam(name = "order", defaultValue = "true") boolean order,
                                                                             @RequestParam(name = "pageNumber") int pageNumber,
                                                                             @RequestParam(name = "pageSize") int pageSize) {
         List<AccountListDTO> accountList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName,
-                        lastName, order, pageNumber, pageSize)
+                        lastName, active,  order, pageNumber, pageSize)
                 .stream()
                 .map(AccountListMapper::toAccountListDTO)
                 .toList();

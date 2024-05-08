@@ -326,10 +326,11 @@ public class AccountService implements AccountServiceInterface {
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
                                                                         String lastName,
+                                                                        boolean active,
                                                                         boolean order,
                                                                         int pageNumber,
                                                                         int pageSize) {
-        return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
+        return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize);
     }
 
     /**

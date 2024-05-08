@@ -11,7 +11,7 @@ public interface AccountControllerInterface {
     ResponseEntity<?> blockAccount(String id);
     ResponseEntity<?> unblockAccount(String id);
     ResponseEntity<?> getAllUsers(int pageNumber, int pageSize);
-    ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean order, int pageNumber, int pageSize);
+    ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize);
     ResponseEntity<?> activateAccount(String token);
     ResponseEntity<?> confirmEmail(String token);
     ResponseEntity<?> getSelf();

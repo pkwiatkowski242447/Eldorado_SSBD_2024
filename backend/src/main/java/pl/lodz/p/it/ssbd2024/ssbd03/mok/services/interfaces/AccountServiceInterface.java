@@ -24,7 +24,7 @@ public interface AccountServiceInterface {
     boolean activateAccount(String token);
     boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException;
 
-    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean order, int pageNumber, int pageSize);
+    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName,boolean active, boolean order, int pageNumber, int pageSize);
     List<Account> getAllAccounts(int pageNumber, int pageSize);
     Account getAccountByLogin(String login);
 

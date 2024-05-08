@@ -143,6 +143,7 @@ import java.util.Collection;
                 query = """
                         SELECT a FROM Account a
                         WHERE
+                            a.active = :active AND
                             (
                                 LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
                                 LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')
