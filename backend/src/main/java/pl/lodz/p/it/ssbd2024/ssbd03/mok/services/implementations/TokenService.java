@@ -11,6 +11,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
+import java.time.temporal.ChronoUnit;
+
 /**
  * Service managing Tokens.
  *
@@ -51,7 +53,7 @@ public class TokenService implements TokenServiceInterface {
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public String createRegistrationToken(Account account) {
-        String tokenValue = this.jwtProvider.generateActionToken(account,24);
+        String tokenValue = this.jwtProvider.generateActionToken(account,24, ChronoUnit.HOURS);
 
         Token registrationToken = new Token(tokenValue, account, Token.TokenType.REGISTER);
         this.tokenFacade.create(registrationToken);
@@ -81,7 +83,7 @@ public class TokenService implements TokenServiceInterface {
     /**
      * Removes token from the database if exists.
      *
-     * @param token Confirmation token to be removed
+     * @param token Confirmation token value of the token to be removed
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)

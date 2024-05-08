@@ -27,6 +27,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
@@ -366,6 +371,7 @@ public class AccountController implements AccountControllerInterface {
 
     /**
      * This method is used to remove client user level from account.
+     *
      * @param id    Identifier of the user account, whose user level will be changed by this method.
      * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
@@ -385,6 +391,7 @@ public class AccountController implements AccountControllerInterface {
 
     /**
      * This method is used to remove staff user level from account.
+     *
      * @param id    Identifier of the user account, whose user level will be changed by this method.
      * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
@@ -404,6 +411,7 @@ public class AccountController implements AccountControllerInterface {
 
     /**
      * This method is used to remove admin user level from account.
+     *
      * @param id    Identifier of the user account, whose user level will be changed by this method.
      * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
@@ -420,5 +428,4 @@ public class AccountController implements AccountControllerInterface {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 }

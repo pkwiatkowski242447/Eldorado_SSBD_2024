@@ -1,7 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 
@@ -24,10 +28,9 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser value constant but could be set).
-     * @return Newly created account, with given data, and default Client user level.
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspects, intercepting facade method invocation.
      */
-    Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException;
+    void registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
 
     /**
      * This method is used to create new account, which will have default user level of Staff.

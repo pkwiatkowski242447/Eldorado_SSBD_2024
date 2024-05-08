@@ -4,6 +4,7 @@ import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
@@ -27,6 +32,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,6 +47,12 @@ import java.util.UUID;
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AccountService implements AccountServiceInterface {
+
+    @Value("${mail.account.creation.confirmation.url}")
+    private String accountCreationConfirmationUrl;
+
+    @Value("${account.creation.confirmation.period.length.hours}")
+    private int accountCreationConfirmationPeriodLengthHours;
 
     /**
      * AccountFacade used for operations on account entities.
@@ -107,71 +119,29 @@ public class AccountService implements AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser value constant but could be set).
-     * @return Newly created account, with given data, and default Client user level.
-     * @throws AccountCreationException When persisting newly created account with client user level results in Persistence exception.
+     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
      */
     @Override
-    public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
-        try {
-            Account account = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
-            account.setAccountLanguage(language);
-            UserLevel clientLevel = new Client();
-            clientLevel.setAccount(account);
-            account.addUserLevel(clientLevel);
+    public void registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
+            throws ApplicationBaseException {
+        Account newClientAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
+        newClientAccount.setAccountLanguage(language);
+        UserLevel clientLevel = new Client();
+        clientLevel.setAccount(newClientAccount);
+        newClientAccount.addUserLevel(clientLevel);
 
-            this.accountFacade.create(account);
+        this.accountFacade.create(newClientAccount);
 
-            return account;
-        } catch (PersistenceException exception) {
-            throw new AccountCreationException(exception.getMessage(), exception);
-        }
-    }
+        String tokenValue = jwtProvider.generateActionToken(newClientAccount, (this.accountCreationConfirmationPeriodLengthHours / 2) * 60, ChronoUnit.MINUTES);
+        tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
 
-    /**
-     * Method for blocking an account by its UUID.
-     *
-     * @param id Account identifier
-     * @throws AccountNotFoundException       Threw when there is no account with given login.
-     * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
-     * @throws IllegalOperationException      Threw when user try to block their own account.
-     */
-    @Override
-    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-        if (account.getBlocked() && account.getBlockedTime() == null) {
-            throw new AccountAlreadyBlockedException(I18n.ACCOUNT_ALREADY_BLOCKED_EXCEPTION);
-        }
+        String confirmationURL = this.accountCreationConfirmationUrl + tokenValue;
 
-        account.blockAccount(true);
-        accountFacade.edit(account);
-
-        // Sending information email
-        mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
-                account.getEmail(), account.getAccountLanguage(), true);
-        ///TODO handle exception for trying to block an account by more than 1 admin??? - optimistic lock
-    }
-
-    /**
-     * Method for unblocking an account by its UUID.
-     *
-     * @param id Account identifier
-     * @throws AccountNotFoundException         Threw when there is no account with given login.
-     * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
-     */
-    @Override
-    public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-        if (!account.getBlocked()) {
-            throw new AccountAlreadyUnblockedException(I18n.ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION);
-        }
-
-        account.unblockAccount();
-        accountFacade.edit(account);
-
-        // Sending information email
-        mailProvider.sendUnblockAccountInfoEmail(account.getName(), account.getLastname(),
-                account.getEmail(), account.getAccountLanguage());
-        ///TODO handle exception for trying to unblock an account by more than 1 admin??? - optimistic lock
+        mailProvider.sendRegistrationConfirmEmail(newClientAccount.getName(),
+                newClientAccount.getLastname(),
+                newClientAccount.getEmail(),
+                confirmationURL,
+                newClientAccount.getAccountLanguage());
     }
 
     /**
@@ -199,7 +169,7 @@ public class AccountService implements AccountServiceInterface {
 
             accountFacade.create(newStaffAccount);
 
-            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12);
+            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
             tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
 
             String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
@@ -239,7 +209,7 @@ public class AccountService implements AccountServiceInterface {
 
             accountFacade.create(newAdminAccount);
 
-            String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12);
+            String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
             tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
 
             String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
@@ -252,6 +222,53 @@ public class AccountService implements AccountServiceInterface {
         } catch (PersistenceException exception) {
             throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
         }
+    }
+
+    /**
+     * Method for blocking an account by its UUID.
+     *
+     * @param id Account identifier
+     * @throws AccountNotFoundException       Threw when there is no account with given login.
+     * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
+     * @throws IllegalOperationException      Threw when user try to block their own account.
+     */
+    @Override
+    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        if (account.getBlocked() && account.getBlockedTime() == null) {
+            throw new AccountAlreadyBlockedException();
+        }
+
+        account.blockAccount(true);
+        accountFacade.edit(account);
+
+        // Sending information email
+        mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
+                account.getEmail(), account.getAccountLanguage(), true);
+        ///TODO handle exception for trying to block an account by more than 1 admin??? - optimistic lock
+    }
+
+    /**
+     * Method for unblocking an account by its UUID.
+     *
+     * @param id Account identifier
+     * @throws AccountNotFoundException         Threw when there is no account with given login.
+     * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
+     */
+    @Override
+    public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        if (!account.getBlocked()) {
+            throw new AccountAlreadyUnblockedException();
+        }
+
+        account.unblockAccount();
+        accountFacade.edit(account);
+
+        // Sending information email
+        mailProvider.sendUnblockAccountInfoEmail(account.getName(), account.getLastname(),
+                account.getEmail(), account.getAccountLanguage());
+        ///TODO handle exception for trying to unblock an account by more than 1 admin??? - optimistic lock
     }
 
     /**
@@ -311,6 +328,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountEmailChangeException.class)
     public boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException {
+        //TODO might remove getting account using facade as it is also part of the tokenFromDB
         Token tokenFromDB = tokenFacade.findByTokenValue(token).orElse(null);
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
         Account account = accountFromDB.orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));

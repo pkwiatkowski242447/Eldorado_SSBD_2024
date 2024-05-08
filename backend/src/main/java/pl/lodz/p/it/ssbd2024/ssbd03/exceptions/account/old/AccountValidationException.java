@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account;
+package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old;
 
 import lombok.Getter;
 

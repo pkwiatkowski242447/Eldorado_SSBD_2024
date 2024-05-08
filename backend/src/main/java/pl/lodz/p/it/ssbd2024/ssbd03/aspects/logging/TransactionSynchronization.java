@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.aspects;
+package pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging;
 
 import jakarta.transaction.Synchronization;
 import lombok.Getter;
@@ -12,7 +12,7 @@ public class TransactionSynchronization implements Synchronization {
      * Enum containing all possible values of transaction.
      * Statuses are ordered by their numerical value as a constant in javax.transaction package.
      *
-     * @see https://javaee.github.io/javaee-spec/javadocs/constant-values.html#javax.transaction.Status.STATUS_ACTIVE
+     * @see <a href="https://javaee.github.io/javaee-spec/javadocs/constant-values.html#javax.transaction.Status.STATUS_ACTIVE">https://javaee.github.io/javaee-spec/javadocs/constant-values.html#javax.transaction.Status.STATUS_ACTIVE</a>
      */
     public enum TransactionStatus {
         STATUS_ACTIVE,
@@ -38,7 +38,7 @@ public class TransactionSynchronization implements Synchronization {
      *
      * @param transactionKey Identifier of the current transaction.
      *
-     * @see pl.lodz.p.it.ssbd2024.ssbd03.aspects.TxAspect
+     * @see TxAspect
      */
     public TransactionSynchronization(String transactionKey) {
         this.transactionKey = transactionKey;
