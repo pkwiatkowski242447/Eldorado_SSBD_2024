@@ -36,13 +36,8 @@ public class AccountServiceMockTest {
         Mockito.doNothing().when(accountMOKFacade).create(Mockito.any(Account.class));
         Mockito.when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
 
-        Account account = accountService.registerClient("Testowy", password, "Imie",
+        accountService.registerClient("Testowy", password, "Imie",
                 "Nazwisko", "test@example.com", "123123123", "pl");
-
-        assertNotNull(account);
-        assertEquals("Testowy", account.getLogin());
-        assertNotNull(account.getPassword());
-        assertNotEquals(password, account.getPassword());
 
         Mockito.verify(accountMOKFacade, Mockito.times(1)).create(Mockito.any(Account.class));
     }

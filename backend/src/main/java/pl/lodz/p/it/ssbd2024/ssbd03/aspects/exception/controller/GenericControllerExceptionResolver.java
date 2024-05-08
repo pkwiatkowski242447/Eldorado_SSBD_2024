@@ -40,7 +40,7 @@ public class GenericControllerExceptionResolver {
     @ExceptionHandler(value = { AccountConflictException.class })
     public ResponseEntity<?> handleAccountConflictException(AccountConflictException accountConflictException) {
         return ResponseEntity.badRequest()
-               .contentType(MediaType.APPLICATION_JSON)
+               .contentType(MediaType.TEXT_PLAIN)
                .body(accountConflictException.getMessage());
     }
 }

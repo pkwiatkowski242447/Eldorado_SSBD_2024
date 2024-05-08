@@ -18,7 +18,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundExcept
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 
 @Configuration
-@PropertySource(value = {"classpath:application.properties", "classpath:mail.properties"})
 public class ComponentConfig {
 
     private final AuthenticationFacade authenticationFacade;

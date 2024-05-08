@@ -4,6 +4,7 @@ import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,6 +45,12 @@ import java.util.UUID;
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AccountService implements AccountServiceInterface {
+
+    @Value("${mail.account.creation.confirmation.url}")
+    private String accountCreationConfirmationUrl;
+
+    @Value("${account.creation.confirmation.period.length.hours}")
+    private int accountCreationConfirmationPeriodLengthHours;
 
     /**
      * AccountFacade used for operations on account entities.
@@ -104,24 +112,108 @@ public class AccountService implements AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser value constant but could be set).
-     * @return Newly created account, with given data, and default Client user level.
-     * @throws AccountCreationException When persisting newly created account with client user level results in Persistence exception.
+     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
      */
     @Override
-    public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
-            throws ApplicationBaseException, AccountCreationException {
+    public void registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
+            throws ApplicationBaseException {
+        Account newClientAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
+        newClientAccount.setAccountLanguage(language);
+        UserLevel clientLevel = new Client();
+        clientLevel.setAccount(newClientAccount);
+        newClientAccount.addUserLevel(clientLevel);
+
+        this.accountFacade.create(newClientAccount);
+
+        String tokenValue = jwtProvider.generateActionToken(newClientAccount, (this.accountCreationConfirmationPeriodLengthHours / 2) * 60, ChronoUnit.MINUTES);
+        tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
+
+        String confirmationURL = this.accountCreationConfirmationUrl + tokenValue;
+
+        mailProvider.sendRegistrationConfirmEmail(newClientAccount.getName(),
+                newClientAccount.getLastname(),
+                newClientAccount.getEmail(),
+                confirmationURL,
+                newClientAccount.getAccountLanguage());
+    }
+
+    /**
+     * This method is used to create new account, which will have default user level of Staff, create
+     * appropriate register token, save it to the database, and at the - send the account activation
+     * email to the given email address.
+     *
+     * @param login       User login, used in order to authenticate to the application.
+     * @param password    User password, used in combination with login to authenticate to the application.
+     * @param firstName   First name of the user.
+     * @param lastName    Last name of the user.
+     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
+     * @param phoneNumber Phone number of the user.
+     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
+     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     */
+    @Override
+    public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
         try {
-            Account account = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
-            account.setAccountLanguage(language);
-            UserLevel clientLevel = new Client();
-            clientLevel.setAccount(account);
-            account.addUserLevel(clientLevel);
+            Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
+            newStaffAccount.setAccountLanguage(language);
+            UserLevel staffUserLevel = new Staff();
+            staffUserLevel.setAccount(newStaffAccount);
+            newStaffAccount.addUserLevel(staffUserLevel);
 
-            this.accountFacade.create(account);
+            accountFacade.create(newStaffAccount);
 
-            return account;
+            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
+            tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
+
+            String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
+
+            mailProvider.sendRegistrationConfirmEmail(newStaffAccount.getName(),
+                    newStaffAccount.getLastname(),
+                    newStaffAccount.getEmail(),
+                    confirmationURL,
+                    newStaffAccount.getAccountLanguage());
         } catch (PersistenceException exception) {
-            throw new AccountCreationException(exception.getMessage(), exception);
+            throw new AccountCreationException(I18n.STAFF_ACCOUNT_CREATION_EXCEPTION);
+        }
+    }
+
+    /**
+     * This method is used to create new account, which will have default user level of Admin, create
+     * appropriate register token, save it to the database, and at the - send the account activation
+     * email to the given email address.
+     *
+     * @param login       User login, used in order to authenticate to the application.
+     * @param password    User password, used in combination with login to authenticate to the application.
+     * @param firstName   First name of the user.
+     * @param lastName    Last name of the user.
+     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
+     * @param phoneNumber Phone number of the user.
+     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
+     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     */
+    @Override
+    public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
+        try {
+            Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
+            newAdminAccount.setAccountLanguage(language);
+            UserLevel adminUserLevel = new Admin();
+            adminUserLevel.setAccount(newAdminAccount);
+            newAdminAccount.addUserLevel(adminUserLevel);
+
+            accountFacade.create(newAdminAccount);
+
+            String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
+            tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
+
+            String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
+
+            mailProvider.sendRegistrationConfirmEmail(newAdminAccount.getName(),
+                    newAdminAccount.getLastname(),
+                    newAdminAccount.getEmail(),
+                    confirmationURL,
+                    newAdminAccount.getAccountLanguage());
+        } catch (PersistenceException exception) {
+            throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
         }
     }
 
@@ -170,86 +262,6 @@ public class AccountService implements AccountServiceInterface {
         mailProvider.sendUnblockAccountInfoEmail(account.getName(), account.getLastname(),
                 account.getEmail(), account.getAccountLanguage());
         ///TODO handle exception for trying to unblock an account by more than 1 admin??? - optimistic lock
-    }
-
-    /**
-     * This method is used to create new account, which will have default user level of Staff, create
-     * appropriate register token, save it to the database, and at the - send the account activation
-     * email to the given email address.
-     *
-     * @param login       User login, used in order to authenticate to the application.
-     * @param password    User password, used in combination with login to authenticate to the application.
-     * @param firstName   First name of the user.
-     * @param lastName    Last name of the user.
-     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber Phone number of the user.
-     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
-     */
-    @Override
-    public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
-        try {
-            Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
-            newStaffAccount.setAccountLanguage(language);
-            UserLevel staffUserLevel = new Staff();
-            staffUserLevel.setAccount(newStaffAccount);
-            newStaffAccount.addUserLevel(staffUserLevel);
-
-            accountFacade.create(newStaffAccount);
-
-            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12);
-            tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
-
-            String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
-
-            mailProvider.sendRegistrationConfirmEmail(newStaffAccount.getName(),
-                    newStaffAccount.getLastname(),
-                    newStaffAccount.getEmail(),
-                    confirmationURL,
-                    newStaffAccount.getAccountLanguage());
-        } catch (PersistenceException exception) {
-            throw new AccountCreationException(I18n.STAFF_ACCOUNT_CREATION_EXCEPTION);
-        }
-    }
-
-    /**
-     * This method is used to create new account, which will have default user level of Admin, create
-     * appropriate register token, save it to the database, and at the - send the account activation
-     * email to the given email address.
-     *
-     * @param login       User login, used in order to authenticate to the application.
-     * @param password    User password, used in combination with login to authenticate to the application.
-     * @param firstName   First name of the user.
-     * @param lastName    Last name of the user.
-     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber Phone number of the user.
-     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
-     */
-    @Override
-    public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
-        try {
-            Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
-            newAdminAccount.setAccountLanguage(language);
-            UserLevel adminUserLevel = new Admin();
-            adminUserLevel.setAccount(newAdminAccount);
-            newAdminAccount.addUserLevel(adminUserLevel);
-
-            accountFacade.create(newAdminAccount);
-
-            String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12);
-            tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
-
-            String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/%s".formatted(tokenValue);
-
-            mailProvider.sendRegistrationConfirmEmail(newAdminAccount.getName(),
-                    newAdminAccount.getLastname(),
-                    newAdminAccount.getEmail(),
-                    confirmationURL,
-                    newAdminAccount.getAccountLanguage());
-        } catch (PersistenceException exception) {
-            throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
-        }
     }
 
     /**
