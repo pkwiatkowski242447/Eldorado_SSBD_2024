@@ -83,7 +83,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    protected Optional<Parking> find(UUID id) {
+    public Optional<Parking> find(UUID id) {
         return super.find(id);
     }
 
