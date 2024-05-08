@@ -309,6 +309,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountEmailChangeException.class)
     public boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException {
+        //TODO might remove getting account using facade as it is also part of the tokenFromDB
         Token tokenFromDB = tokenFacade.findByTokenValue(token).orElse(null);
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
         Account account = accountFromDB.orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));

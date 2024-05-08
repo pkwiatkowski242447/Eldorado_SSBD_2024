@@ -81,7 +81,7 @@ public class TokenService implements TokenServiceInterface {
     /**
      * Removes token from the database if exists.
      *
-     * @param token Confirmation token to be removed
+     * @param token Confirmation token value of the token to be removed
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
