@@ -122,7 +122,7 @@ public class ScheduleService implements ScheduleServiceInterface {
             Account account = token.getAccount();
             if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(12))) {
                 //TODO make it so the URL is based on some property
-                String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token;
+                String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token.getTokenValue();
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),
                                                           account.getLastname(),
                                                           account.getEmail(),
