@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -19,6 +20,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 
+import javax.swing.*;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,6 +53,8 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
     }
 
+
+
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findAndRefreshTestPositive() {
@@ -70,7 +74,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findTestPositive() {
-        Optional<Account> account = authenticationFacade.findAndRefresh(accountIdNo1);
+        Optional<Account> account = authenticationFacade.find(accountIdNo1);
 
         Assertions.assertTrue(account.isPresent());
 
@@ -83,5 +87,33 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
         Assertions.assertEquals(accountLanguageNo1, account.get().getAccountLanguage());
     }
 
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void findByLoginTestPositive() {
+        Optional<Account> account = authenticationFacade.find(accountIdNo1);
 
+        Assertions.assertTrue(account.isPresent());
+
+        Assertions.assertEquals(accountLoginNo2, account.get().getLogin());
+        Assertions.assertEquals(accountPasswordNo1, account.get().getPassword());
+        Assertions.assertEquals(accountFirstNameNo2, account.get().getName());
+        Assertions.assertEquals(accountLastNameNo2, account.get().getLastname());
+        Assertions.assertEquals(accountEmailNo2, account.get().getEmail());
+        Assertions.assertEquals(accountPhoneNumberNo2, account.get().getPhoneNumber());
+        Assertions.assertEquals(accountLanguageNo1, account.get().getAccountLanguage());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void editTestPositive() {
+        Account account = authenticationFacade.find(accountIdNo1).get();
+
+        Assertions.assertTrue(account.getActive());
+        account.setActive(false);
+        authenticationFacade.edit(account); //<--------------------????
+
+        Account account1 = authenticationFacade.findAndRefresh(accountIdNo1).get();
+
+        Assertions.assertFalse(account1.getActive());
+    }
 }

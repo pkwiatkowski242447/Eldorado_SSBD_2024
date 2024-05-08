@@ -741,6 +741,4 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.remove(accountFind2);
     }
 
-
-
 }
