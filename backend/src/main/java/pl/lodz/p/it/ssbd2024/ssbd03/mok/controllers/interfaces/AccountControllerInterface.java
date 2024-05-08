@@ -109,4 +109,8 @@ public interface AccountControllerInterface {
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
     ResponseEntity<?> resendEmailConfirmation();
+
+    ResponseEntity<?> removeClientUserlevel(String id);
+    ResponseEntity<?> removeStafftUserlevel(String id);
+    ResponseEntity<?> removeAdminUserlevel(String id);
 }
