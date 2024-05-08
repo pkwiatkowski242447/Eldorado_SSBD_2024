@@ -9,7 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.JWTConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

@@ -18,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.JWTMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.utils.JWTMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.io.IOException;
