@@ -7,6 +7,7 @@ import {jwtDecode} from "jwt-decode";
 import {RolesEnum, TokenPayload} from "../types/TokenPayload";
 import {usersApi} from "@/api/userApi.ts";
 import {useEffect, useState} from "react";
+import {useToast} from "@/components/ui/use-toast.ts";
 
 export const useAccount = () => {
 
@@ -30,15 +31,21 @@ export const useAccount = () => {
         useAccountState()
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const accountType: RolesEnum[] | null = account?.userTypes ? account.userTypes : null;
+    const {toast} = useToast()
+
+    const navigateToMainPage = () => {
+        navigate(Pathnames.public.home)
+    }
 
     const logOut = async () => {
         try {
             await api.logOut()
-        } catch {
-            alert('Logout failure!')
+        } catch (e) {
+            console.log(e)
         } finally {
             localStorage.removeItem('token')
             setAccount(null)
+            navigateToMainPage()
         }
     }
     const logIn = async (login: string, password: string) => {
@@ -57,10 +64,13 @@ export const useAccount = () => {
             setAccount(user);
             setIsAuthenticated(true);
             console.log(user)
-            navigate(Pathnames.public.home)
+            navigate(Pathnames.public.test)
         } catch (e) {
+            toast({
+                variant: "destructive",
+                description: "Something went wrong. Please try again later.",
+            })
             console.log(e);
-            alert('Logging in error!')
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
