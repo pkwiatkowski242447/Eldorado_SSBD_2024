@@ -15,13 +15,8 @@ public class ClientDTO extends UserLevelDTO {
         super("CLIENT");
     }
 
-    public ClientDTO(UUID id, String clientType) {
-        super(id, "CLIENT");
-        this.clientType = clientType;
-    }
-
-    public ClientDTO(UUID id, String roleName, String clientType) {
-        super(id, roleName);
+    public ClientDTO(UUID id, Long version, String clientType) {
+        super(id, version, "CLIENT");
         this.clientType = clientType;
     }
 }

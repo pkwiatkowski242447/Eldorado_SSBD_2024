@@ -22,8 +22,8 @@ import java.util.Set;
 @ToString
 @Getter
 public class AccountSignableDTO implements SignableDTO {
-
     private String login;
+    private Long version;
     private Set<UserLevelDTO> userLevelsDto;
 
     @JsonIgnore
@@ -31,6 +31,7 @@ public class AccountSignableDTO implements SignableDTO {
     public Map<String, ?> getSigningFields() {
         return Map.ofEntries(
                 Map.entry("login", login),
+                Map.entry("version", version),
                 Map.entry("userLevelsDetails", this.getUserLevelsDetailsAsMap(new ArrayList<>(userLevelsDto)))
         );
     }
@@ -41,6 +42,7 @@ public class AccountSignableDTO implements SignableDTO {
         for (int i = 0; i < levels.size(); i++) {
             list.add(new HashMap<>());
             list.get(i).put("id", levels.get(i).getId().toString());
+            list.get(i).put("version", levels.get(i).getVersion());
             list.get(i).put("roleName", levels.get(i).getRoleName());
             switch (levels.get(i)) {
                 case ClientDTO clientOutputDTO -> list.get(i).put("clientType", clientOutputDTO.getClientType());

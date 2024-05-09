@@ -8,6 +8,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 @Getter @ToString
+@NoArgsConstructor
 public class AbstractEntity implements Signable {
     /**
      * The unique identifier (ID) of the entity.
@@ -35,4 +37,11 @@ public class AbstractEntity implements Signable {
     @Column(name = DatabaseConsts.VERSION_COLUMN, nullable = false)
     @EqualsAndHashCode.Exclude
     private Long version;
+
+    /**
+     * Constructor that sets the object version.
+     */
+    public AbstractEntity(Long version) {
+        this.version = version;
+    }
 }

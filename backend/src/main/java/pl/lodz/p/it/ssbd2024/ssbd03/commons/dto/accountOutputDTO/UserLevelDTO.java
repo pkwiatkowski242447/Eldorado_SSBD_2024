@@ -16,8 +16,8 @@ import java.util.UUID;
 )
 @Getter @Setter
 public abstract class UserLevelDTO {
-
     private UUID id;
+    private Long version;
     private String roleName;
 
     public UserLevelDTO() {
@@ -28,8 +28,9 @@ public abstract class UserLevelDTO {
         this.roleName = roleName;
     }
 
-    public UserLevelDTO(UUID id, String roleName) {
+    public UserLevelDTO(UUID id, Long version, String roleName) {
         this.id = id;
+        this.version = version;
         this.roleName = roleName;
     }
 }

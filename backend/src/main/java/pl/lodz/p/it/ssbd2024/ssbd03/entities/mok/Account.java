@@ -335,6 +335,27 @@ public class Account extends AbstractEntity {
     }
 
     /**
+     * Constructs new Account entity, with version setting.
+     *
+     * @param login       Account's login.
+     * @param password    Account's password.
+     * @param name        Account owner's firstname.
+     * @param lastname    Account owner's lastname.
+     * @param email       Email connected with the account.
+     * @param phoneNumber Phone number connected with the account.
+     * @param version     Object version.
+     */
+    public Account(String login, String password, String name, String lastname, String email, String phoneNumber, Long version) {
+        super(version);
+        this.login = login;
+        this.password = password;
+        this.name = name;
+        this.lastname = lastname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
      * Adds new user level to the account.
      *
      * @param userLevel User level to be added to the account.

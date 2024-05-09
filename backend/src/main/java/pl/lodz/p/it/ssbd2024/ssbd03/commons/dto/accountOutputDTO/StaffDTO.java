@@ -14,7 +14,7 @@ public class StaffDTO extends UserLevelDTO {
         super("STAFF");
     }
 
-    public StaffDTO(UUID id, String roleName) {
-        super(id, roleName);
+    public StaffDTO(UUID id, Long version) {
+        super(id, version, "STAFF");
     }
 }

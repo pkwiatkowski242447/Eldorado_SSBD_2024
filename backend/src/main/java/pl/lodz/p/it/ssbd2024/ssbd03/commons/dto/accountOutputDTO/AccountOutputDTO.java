@@ -38,12 +38,12 @@ public class AccountOutputDTO extends AccountSignableDTO {
     private String name;
     private String email;
 
-    public AccountOutputDTO(String login, Set<UserLevelDTO> userLevelsDto, UUID id, boolean verified,
+    public AccountOutputDTO(String login, Long version, Set<UserLevelDTO> userLevelsDto, UUID id, boolean verified,
                             boolean active, boolean blocked, LocalDateTime blockedTime, LocalDateTime creationDate,
                             LocalDateTime lastSuccessfulLoginTime, LocalDateTime lastUnsuccessfulLoginTime,
                             String accountLanguage, String lastSuccessfulLoginIp, String lastUnsuccessfulLoginIp,
                             String phoneNumber, String lastname, String name, String email) {
-        super(login, userLevelsDto);
+        super(login, version, userLevelsDto);
         this.id = id;
         this.verified = verified;
         this.active = active;

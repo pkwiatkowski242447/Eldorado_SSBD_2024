@@ -14,8 +14,8 @@ public class AdminDTO extends UserLevelDTO {
         super("ADMIN");
     }
 
-    public AdminDTO(String id, String roleName) {
-        super(UUID.fromString(id), roleName);
+    public AdminDTO(String id, Long version) {
+        super(UUID.fromString(id), version, "ADMIN");
     }
 
 }

@@ -18,6 +18,7 @@ public class AccountMapper {
 
         return new AccountOutputDTO(
                 account.getLogin(),
+                account.getVersion(),
                 list,
                 account.getId(),
                 account.getVerified(),
@@ -44,7 +45,8 @@ public class AccountMapper {
                 accountModifyDTO.getName(),
                 accountModifyDTO.getLastname(),
                 null,
-                accountModifyDTO.getPhoneNumber()
+                accountModifyDTO.getPhoneNumber(),
+                accountModifyDTO.getVersion()
         );
 
         accountModifyDTO.getUserLevelsDto()
