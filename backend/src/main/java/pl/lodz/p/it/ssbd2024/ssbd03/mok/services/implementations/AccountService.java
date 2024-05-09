@@ -279,18 +279,13 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
      */
     @Override
-    public Account modifyAccount(Account modifiedAccount) throws AccountNotFoundException {
-        //FIXME SecurityContext there or in controller?
-        Account foundAccount = accountFacade.findByLogin(
-                SecurityContextHolder.getContext().getAuthentication().getName()
-        ).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+    public Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException {
+        Account foundAccount = accountFacade.findByLogin(currentUserLogin)
+                .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         //TODO optimistic lock
         foundAccount.setName(modifiedAccount.getName());
         foundAccount.setLastname(modifiedAccount.getLastname());
         foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
-
-        ///FIXME ??? usable when UserLevels have additional, editable fields
-        // code handling edited UserLevels
 
         accountFacade.edit(foundAccount);
 

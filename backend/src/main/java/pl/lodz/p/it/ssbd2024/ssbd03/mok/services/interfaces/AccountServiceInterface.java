@@ -86,7 +86,7 @@ public interface AccountServiceInterface {
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
      */
-    Account modifyAccount(Account modifiedAccount) throws AccountNotFoundException;
+    Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException;
 
     /**
      * Changes the e-mail of the specified Account.

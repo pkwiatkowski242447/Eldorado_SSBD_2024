@@ -295,9 +295,11 @@ public class AccountController implements AccountControllerInterface {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.DATA_INTEGRITY_COMPROMISED);
         }
 
+        String currentUserLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+
         try {
             AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
-                    accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO))
+                    accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO), currentUserLogin)
             );
             return ResponseEntity.ok().body(accountOutputDTO);
         } catch (AccountNotFoundException e) {
