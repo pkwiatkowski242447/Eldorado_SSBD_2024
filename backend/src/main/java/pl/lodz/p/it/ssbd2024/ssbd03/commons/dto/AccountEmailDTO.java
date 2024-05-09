@@ -18,7 +18,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountChangeEmailDTO {
+public class AccountEmailDTO {
     @Email(message = AccountMessages.EMAIL_CONSTRAINT_NOT_MET)
     @Size(min = AccountsConsts.EMAIL_MIN_LENGTH, message = AccountMessages.EMAIL_TOO_SHORT)
     @Size(max = AccountsConsts.EMAIL_MAX_LENGTH, message = AccountMessages.EMAIL_TOO_LONG)

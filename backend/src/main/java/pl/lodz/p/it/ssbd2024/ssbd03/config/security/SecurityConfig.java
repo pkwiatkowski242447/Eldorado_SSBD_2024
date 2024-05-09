@@ -19,7 +19,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTAuthenticationFil
 
 import java.util.List;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -52,6 +51,17 @@ public class SecurityConfig {
             "/swagger-ui/**"
     };
 
+    /**
+     * Whitelist containing all URLs related to paths available to unauthenticated users.
+     */
+    private static final String[] PATHS_WHITELIST = {
+            "/api/v1/auth/login/**",
+            "/api/v1/register/client",
+            "/api/v1/accounts/change-password/**",
+            "/api/v1/accounts/forgot-password",
+            "/api/v1/accounts/activate-account/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -61,9 +71,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/v1/auth/login/**",
-                                "/api/v1/register/client").permitAll()
-                        .requestMatchers("/api/v1/accounts/activate-account/**").permitAll()
+                        .requestMatchers(PATHS_WHITELIST).permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers("/**").authenticated());
 

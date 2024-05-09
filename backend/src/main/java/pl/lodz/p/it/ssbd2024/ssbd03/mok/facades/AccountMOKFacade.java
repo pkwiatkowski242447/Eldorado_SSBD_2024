@@ -232,7 +232,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         try {
             TypedQuery<Account> findAccountByEmail = entityManager.createNamedQuery("Account.findAccountByEmail", Account.class);
             findAccountByEmail.setParameter("email", email);
-            return Optional.of(findAccountByEmail.getSingleResult());
+            Account account = findAccountByEmail.getSingleResult();
+            entityManager.refresh(account);
+            return Optional.of(account);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
