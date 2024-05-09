@@ -1,9 +1,17 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.mok.facades;
 
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,9 +27,14 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.eq;
+
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 public class TestAccountMOKFacade extends TestcontainersConfig {
 
     @Autowired
@@ -32,6 +45,14 @@ public class TestAccountMOKFacade extends TestcontainersConfig {
     @Autowired
     private AccountMOKFacade accountMOKFacade;
 
+    @Mock
+    private TypedQuery<Account> findAllAccountsMock;
+
+    @InjectMocks
+    private AccountMOKFacade accountFacade;
+
+
+
     @BeforeEach
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
@@ -39,7 +60,8 @@ public class TestAccountMOKFacade extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    void AccountMOKFacadeGetEntityManagerReturnsNotNullTestPositive() {
+    public void AccountMOKFacadeGetEntityManagerReturnsNotNullTestPositive() {
         Assertions.assertNotNull(accountMOKFacade.getEntityManager());
     }
+
 }

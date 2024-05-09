@@ -400,7 +400,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findAllAccountsMarkedForDeletionTestPositive() throws NoSuchFieldException, IllegalAccessException {
-        /*Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
+Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
         userLevelClientNo1.setAccount(account);
@@ -428,7 +428,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         //creationDateField.set(accountToEdit2.get(), LocalDateTime.now().minus(Long.parseLong("5"), TimeUnit.HOURS));
 
         List<Account> accounts0 = accountMOKFacade.findAllAccountsMarkedForDeletion(2, TimeUnit.HOURS);
-        Assertions.assertEquals(0,accounts0.size());*/
+        Assertions.assertEquals(0,accounts0.size());
+
     }
 
     @Test

@@ -90,7 +90,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findByLoginTestPositive() {
-        Optional<Account> account = authenticationFacade.find(accountIdNo1);
+        Optional<Account> account = authenticationFacade.findByLogin(accountLoginNo2);
 
         Assertions.assertTrue(account.isPresent());
 

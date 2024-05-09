@@ -53,7 +53,7 @@ public class AuthenticationControllerIntegrationTest extends TestcontainersConfi
         assertNotNull(webApplicationContext.getBean("authenticationController"));
     }
 
-    /*@Test
+@Test
     public void loginEndpointTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!");
@@ -81,5 +81,6 @@ public class AuthenticationControllerIntegrationTest extends TestcontainersConfi
         }
 
         return null;
-    }*/
+    }
+
 }
