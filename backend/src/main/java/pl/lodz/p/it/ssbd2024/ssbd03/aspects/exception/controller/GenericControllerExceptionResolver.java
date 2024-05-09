@@ -46,7 +46,7 @@ public class GenericControllerExceptionResolver {
     }
 
     /**
-     *
+     * //TODO -> Michal
      * @param mapperBaseException
      * @return
      */

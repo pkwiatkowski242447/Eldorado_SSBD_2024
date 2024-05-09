@@ -2,6 +2,8 @@ package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+//TODO javadoc -> Michal
+
 public class MapperBaseException extends ApplicationBaseException {
 
     public MapperBaseException() {

@@ -10,6 +10,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 import java.util.HashSet;
 import java.util.Set;
 
+//TODO javadoc -> Michal
+
 public class AccountMapper {
     public static AccountOutputDTO toAccountOutputDto(Account account) throws MapperBaseException {
         Set<UserLevelDTO> list= new HashSet<>();

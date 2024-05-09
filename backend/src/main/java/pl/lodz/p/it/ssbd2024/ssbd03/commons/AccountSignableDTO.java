@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+//TODO opisy api + javadoc -> Michal
+
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

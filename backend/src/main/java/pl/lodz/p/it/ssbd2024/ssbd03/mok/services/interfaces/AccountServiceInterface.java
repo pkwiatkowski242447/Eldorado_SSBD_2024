@@ -83,6 +83,7 @@ public interface AccountServiceInterface {
      * This method is used to modify user personal data.
      *
      * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
+     * @param currentUserLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
      */

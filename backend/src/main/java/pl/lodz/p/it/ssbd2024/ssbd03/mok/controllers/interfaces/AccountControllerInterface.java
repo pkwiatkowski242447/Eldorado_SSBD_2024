@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationBaseException;
 
 import java.util.UUID;
 

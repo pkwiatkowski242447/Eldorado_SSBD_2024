@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+//TODO opisy api + javadoc -> Michal
+
 @ToString(callSuper = true)
 @Getter
 public class AccountOutputDTO extends AccountSignableDTO {

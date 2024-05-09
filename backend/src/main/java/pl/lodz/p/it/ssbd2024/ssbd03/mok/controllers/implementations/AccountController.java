@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +86,7 @@ public class AccountController implements AccountControllerInterface {
         this.jwtProvider = jwtProvider;
     }
 
+    //TODO opisy api -> Michal
     /**
      * This endpoint allows user with administrative user level to block a user account by its UUID. After
      * the account has been blocked.
@@ -124,6 +128,7 @@ public class AccountController implements AccountControllerInterface {
         return ResponseEntity.noContent().build();
     }
 
+    //TODO opisy api -> Michal
     /**
      * This endpoint allows user with administrative user level to unblock a user account by its UUID. After
      * the account has been unblocked.
@@ -279,14 +284,20 @@ public class AccountController implements AccountControllerInterface {
      * @param ifMatch          Value of If-Match header
      * @param accountModifyDTO Account properties with potentially changed values.
      * @return In the correct flow returns account object with applied modifications with 200 OK status.
-     * If request has empty IF_MATCH header or account currently logged user was not found,
+     * If request has empty IF_MATCH header or account currently logged user was not found or data are invalid
      * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
      * then 409 CONFLICT is returned.
      */
     @Override
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Modify self account", description = "Modify self account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The account has been modified correctly."),
+            @ApiResponse(responseCode = "400", description = "The account has not been modified due to the correctness of the request or because the account is not available in the database"),
+            @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.")
+    })
     public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
-                                               @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException{
+                                               @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             return ResponseEntity.badRequest().body(I18n.MISSING_HEADER_IF_MATCH);
         }

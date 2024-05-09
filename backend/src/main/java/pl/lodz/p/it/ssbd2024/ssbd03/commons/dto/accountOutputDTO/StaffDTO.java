@@ -6,6 +6,8 @@ import lombok.ToString;
 
 import java.util.UUID;
 
+//TODO javadoc -> Michal
+
 @Getter @Setter
 @ToString(callSuper = true)
 public class StaffDTO extends UserLevelDTO {

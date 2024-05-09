@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper;
 
+//TODO javadoc -> Michal
+
 public class MapperUnexpectedClientTypeException extends MapperBaseException {
 
     public MapperUnexpectedClientTypeException() {

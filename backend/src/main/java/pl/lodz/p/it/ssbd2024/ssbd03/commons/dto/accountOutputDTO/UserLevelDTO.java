@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+//TODO opisy api + javadoc -> Michal
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "roleName")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ClientDTO.class, name = "CLIENT"),

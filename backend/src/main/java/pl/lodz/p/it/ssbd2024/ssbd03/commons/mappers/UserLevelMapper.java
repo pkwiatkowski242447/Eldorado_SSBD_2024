@@ -12,6 +12,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedClientType
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+//TODO javadoc -> Michal
+
 public class UserLevelMapper {
     public static UserLevel toUserLevel(UserLevelDTO userLevelDTO)
             throws MapperUnexpectedUserLevelException, MapperUnexpectedClientTypeException {
