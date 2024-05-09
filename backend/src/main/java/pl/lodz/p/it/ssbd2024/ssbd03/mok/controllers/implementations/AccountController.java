@@ -254,7 +254,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping("/activate-account/{token}")
-    public ResponseEntity<?> activateAccount(@PathVariable(value = "token") String token) {
+    public ResponseEntity<?> activateAccount(@PathVariable("token") String token) {
         if (accountService.activateAccount(token)) {
             return ResponseEntity.noContent().build();
         } else {

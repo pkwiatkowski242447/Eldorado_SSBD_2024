@@ -38,10 +38,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Service managing Accounts.
@@ -130,6 +127,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
             throws ApplicationBaseException {
         Account newClientAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -143,7 +141,8 @@ public class AccountService implements AccountServiceInterface {
         String tokenValue = jwtProvider.generateActionToken(newClientAccount, (this.accountCreationConfirmationPeriodLengthHours / 2) * 60, ChronoUnit.MINUTES);
         tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
 
-        String confirmationURL = this.accountCreationConfirmationUrl + tokenValue;
+        String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
+        String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
         mailProvider.sendRegistrationConfirmEmail(newClientAccount.getName(),
                 newClientAccount.getLastname(),
@@ -177,10 +176,12 @@ public class AccountService implements AccountServiceInterface {
 
             accountFacade.create(newStaffAccount);
 
-            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
+            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS)
+                    .replace(".", "%2E");
             tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
 
-            String confirmationURL = "http://localhost:3000/activate-account/%s".formatted(tokenValue);
+            String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
+            String confirmationURL = "http://localhost:3000/activate-account/%s".formatted(encodedTokenValue);
 
             mailProvider.sendRegistrationConfirmEmail(newStaffAccount.getName(),
                     newStaffAccount.getLastname(),
@@ -220,7 +221,8 @@ public class AccountService implements AccountServiceInterface {
             String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
             tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
 
-            String confirmationURL = "http://localhost:3000/activate-account/%s".formatted(tokenValue);
+            String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
+            String confirmationURL = "http://localhost:3000/activate-account/%s".formatted(encodedTokenValue);
 
             mailProvider.sendRegistrationConfirmEmail(newAdminAccount.getName(),
                     newAdminAccount.getLastname(),
@@ -248,7 +250,8 @@ public class AccountService implements AccountServiceInterface {
         else if (!account.getActive()) throw new AccountNotActivatedException();
 
         String tokenValue = this.tokenService.createPasswordResetToken(account);
-        String passwordResetURL = this.accountPasswordResetUrl + tokenValue;
+        String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
+        String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
         
         this.mailProvider.sendPasswordResetEmail(account.getName(),
                 account.getLastname(),
@@ -269,7 +272,9 @@ public class AccountService implements AccountServiceInterface {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
-        Token tokenObject = this.tokenFacade.findByTokenValue(token).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
+        String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
+        Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue)
+                .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
         if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount())) throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
 
         Account account = this.accountFacade.findAndRefresh(tokenObject.getAccount().getId()).orElseThrow(AccountIdNotFoundException::new);
@@ -363,9 +368,10 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     public boolean activateAccount(String token) {
-        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
+        String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
+        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(decodedTokenValue));
         Account account = accountFromDB.orElse(null);
-        if (!jwtProvider.isTokenValid(token, account)) {
+        if (!jwtProvider.isTokenValid(decodedTokenValue, account)) {
             return false;
         } else {
             account.setActive(true);
@@ -387,10 +393,11 @@ public class AccountService implements AccountServiceInterface {
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountEmailChangeException.class)
     public boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException {
         //TODO might remove getting account using facade as it is also part of the tokenFromDB
-        Token tokenFromDB = tokenFacade.findByTokenValue(token).orElse(null);
+        String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
+        Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElse(null);
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
         Account account = accountFromDB.orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-        if (tokenFromDB == null || !jwtProvider.isTokenValid(token, account)) {
+        if (tokenFromDB == null || !jwtProvider.isTokenValid(decodedTokenValue, account)) {
             return false;
         } else {
             try {
@@ -482,9 +489,10 @@ public class AccountService implements AccountServiceInterface {
         if (accountFacade.findByEmail(newEmail).isPresent())
             throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
 
-        var token = tokenService.createEmailConfirmationToken(account, newEmail);
+        String token = tokenService.createEmailConfirmationToken(account, newEmail);
+        String encodedTokenValue = new String(Base64.getEncoder().encode(token.getBytes()));
         //TODO make it so the URL is based on some property
-        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + token;
+        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + encodedTokenValue;
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
     }
 
@@ -507,8 +515,9 @@ public class AccountService implements AccountServiceInterface {
         String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
         //TODO change ttl to be a parameter set somewhere in properties
         String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, 24);
+        String encodedTokenValue = new String(Base64.getEncoder().encode(newTokenValue.getBytes()));
 
-        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + newTokenValue;
+        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + encodedTokenValue;
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
 
         dbToken.setTokenValue(newTokenValue);
@@ -548,7 +557,7 @@ public class AccountService implements AccountServiceInterface {
     /**
      * Removes the Staff user level from the account.
      *
-     * @param id ID of the account from which the Staff user level will be removed.
+     * @param id Identifier of the account from which the Staff user level will be removed.
      * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
      * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
      */
@@ -578,9 +587,9 @@ public class AccountService implements AccountServiceInterface {
     /**
      * Removes the Admin user level from the account.
      *
-     * @param id
-     * @throws AccountNotFoundException
-     * @throws AccountUserLevelException
+     * @param id Identifier of the account from which the Staff user level will be removed.
+     * @throws AccountNotFoundException Threw when the account with the given ID was not found.
+     * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
      */
 
     @Override

@@ -199,12 +199,14 @@ public class MailProvider {
     }
 
     /**
+     * Send e-mail message to the e-mail address provided by the unauthenticated user, about changing their account
+     * password. Basically, it provides them with a URL to reset their password.
      *
-     * @param firstName
-     * @param lastName
-     * @param emailReceiver
-     * @param confirmationURL
-     * @param language
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param confirmationURL URL used to confirm the account creation.
+     * @param language Language of the message.
      */
     public void sendPasswordResetEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
