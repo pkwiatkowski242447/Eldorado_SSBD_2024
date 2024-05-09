@@ -42,7 +42,7 @@ function LoginForm() {
             <CardHeader>
                 <CardTitle className="text-2xl">Login</CardTitle>
                 <CardDescription>
-                    Enter your login below to login to your account
+                    Enter your login info below to proceed
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -56,7 +56,7 @@ function LoginForm() {
                                     <div className="grid gap-4">
                                         <FormLabel>Login</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Enter your login" {...field} />
+                                            <Input placeholder="" {...field} />
                                         </FormControl>
                                         <FormMessage/>
                                     </div>
