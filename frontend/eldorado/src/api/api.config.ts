@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 export const API_URL = "http://localhost:8080/api/v1"
 export const TIMEOUT_IN_MS = 30000
 export const DEFAULT_HEADERS = {
@@ -25,6 +26,8 @@ apiWithConfig.interceptors.response.use(
 apiWithConfig.interceptors.request.use((config) => {
     let token = window.localStorage.getItem('token');
     token = (token && token !== "null") ? token : null;
-    if (token && config.headers) {config.headers.Authorization = `Bearer ${token}`};
+    if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
     return config
 })

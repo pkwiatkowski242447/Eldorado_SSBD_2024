@@ -42,7 +42,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             "/v3/api-docs",
             "/swagger-ui",
             "/api/v1/accounts/forgot-password",
-            "/api/v1/accounts/change-password"
+            "/api/v1/accounts/change-password",
+            "/api/v1/accounts/activate-account"
     };
 
     @Autowired

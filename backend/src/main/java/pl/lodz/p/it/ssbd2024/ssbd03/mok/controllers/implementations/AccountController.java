@@ -412,11 +412,12 @@ public class AccountController implements AccountControllerInterface {
     /**
      * This method is used to remove client user level from account.
      *
-     * @param id    Identifier of the user account, whose user level will be changed by this method.
-     * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
-     *             If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
-     *             explaining why the error occurred).
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred).
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -432,11 +433,12 @@ public class AccountController implements AccountControllerInterface {
     /**
      * This method is used to remove staff user level from account.
      *
-     * @param id    Identifier of the user account, whose user level will be changed by this method.
-     * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
-     *             If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
-     *             explaining why the error occurred).
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred).
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -452,11 +454,12 @@ public class AccountController implements AccountControllerInterface {
     /**
      * This method is used to remove admin user level from account.
      *
-     * @param id    Identifier of the user account, whose user level will be changed by this method.
-     * @return      If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     *             could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
-     *             If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
-     *             explaining why the error occurred).
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred).
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)

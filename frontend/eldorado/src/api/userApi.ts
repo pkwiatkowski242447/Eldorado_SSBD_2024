@@ -2,7 +2,7 @@
 // import {adminsApi} from "./adminsApi";
 // import {resAdminsApi} from "./resAdminsApi";
 // import {AccountTypeEnum, NewUserType, UserType} from "../types/Users";
-import {RolesEnum} from "../types/TokenPayload";
+import {apiWithConfig} from "@/api/api.config.ts";
 
 export const usersApi = {
     // getUsers: async (): Promise<UserType[]> => {
@@ -76,14 +76,18 @@ export const usersApi = {
     //     }
     // },
 
+    getSelf: async () => {
+        return await apiWithConfig.get(`/accounts/self`);
+    },
+
     // getMe: (role:RolesEnum) => {
     //     switch (role) {
     //         case RolesEnum.CLIENT:
-    //             return clientsApi.getMe();
+    //             return clientApi.getMe();
     //         case RolesEnum.ADMIN:
-    //             return adminsApi.getMe();
+    //             return adminApi.getMe();
     //         case RolesEnum.STAFF:
-    //             return resAdminsApi.getMe();
+    //             return staffApi.getMe();
     //     }
     // },
 

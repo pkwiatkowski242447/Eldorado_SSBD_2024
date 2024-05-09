@@ -8,6 +8,8 @@ import HomePage from "../pages/HomePage";
 // import ReservationsPage from "../pages/ReservationsPage";
 import LoginPage from "../pages/LoginPage";
 import TestPage from "../pages/TestPage";
+import RegisterPage from "@/pages/RegisterPage.tsx";
+import ActivateAccountPage from "@/pages/ActivateAccountPage.tsx";
 // import RegisterPage from "../pages/RegisterPage";
 // import ChangePasswordFormForm from "../components/forms/ChangePasswordForm";
 // import ChangePasswordPage from "../pages/ChangePasswordPage";
@@ -23,9 +25,18 @@ export const PublicRoutes: RouteType[] = [
         Component: LoginPage
     },
     {
+        path: Pathnames.public.register,
+        Component: RegisterPage
+    },
+    {
         path: Pathnames.public.test,
         Component: TestPage
-    }
+    },
+    {
+        path: Pathnames.public.activateAccount,
+        Component: ActivateAccountPage
+    },
+
 ]
 
 export const AdminRoutes: RouteType[] = [

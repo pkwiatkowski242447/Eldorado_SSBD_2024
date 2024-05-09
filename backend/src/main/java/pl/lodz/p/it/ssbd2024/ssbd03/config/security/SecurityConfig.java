@@ -19,7 +19,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTAuthenticationFil
 
 import java.util.List;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -60,7 +59,7 @@ public class SecurityConfig {
             "/api/v1/register/client",
             "/api/v1/accounts/change-password/**",
             "/api/v1/accounts/forgot-password",
-            "/api/v1/accounts/change-password"
+            "/api/v1/accounts/activate-account/**"
     };
 
     @Bean
