@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 
 @ControllerAdvice
 public class GenericControllerExceptionResolver {
@@ -42,5 +43,17 @@ public class GenericControllerExceptionResolver {
         return ResponseEntity.badRequest()
                .contentType(MediaType.TEXT_PLAIN)
                .body(accountConflictException.getMessage());
+    }
+
+    /**
+     *
+     * @param mapperBaseException
+     * @return
+     */
+    @ExceptionHandler(value = { MapperBaseException.class })
+    public ResponseEntity<?> handleMapperBaseException(MapperBaseException mapperBaseException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(mapperBaseException.getMessage());
     }
 }

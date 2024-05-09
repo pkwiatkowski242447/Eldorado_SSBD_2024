@@ -3,6 +3,8 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces;
 import org.springframework.http.ResponseEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationBaseException;
 
 import java.util.UUID;
 
@@ -73,7 +75,7 @@ public interface AccountControllerInterface {
      *
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> getSelf();
+    ResponseEntity<?> getSelf() throws ApplicationBaseException;
 
     /**
      * This method is used to modify personal data of currently logged-in user.
@@ -82,7 +84,7 @@ public interface AccountControllerInterface {
      * @param accountModifyDTO Account properties with potentially changed values.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> modifySelfAccount(String ifMatch, AccountModifyDTO accountModifyDTO);
+    ResponseEntity<?> modifySelfAccount(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
 
     /**
      * This method is used to find user account by Id.
@@ -90,7 +92,7 @@ public interface AccountControllerInterface {
      * @param id Id of account to find.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> getUserById(String id);
+    ResponseEntity<?> getUserById(String id) throws ApplicationBaseException;
 
     /**
      * This method is used to change users e-mail address, which later could be used to send

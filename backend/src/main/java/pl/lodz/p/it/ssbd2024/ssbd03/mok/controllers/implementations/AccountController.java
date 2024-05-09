@@ -26,6 +26,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDT
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
@@ -257,7 +258,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSelf() {
+    public ResponseEntity<?> getSelf() throws ApplicationBaseException {
         //getUserLoginFromSecurityContextHolder
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         //call accountServiceMethod [findByLogin()]
@@ -285,7 +286,7 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
-                                               @RequestBody AccountModifyDTO accountModifyDTO) {
+                                               @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException{
         if (ifMatch == null || ifMatch.isBlank()) {
             return ResponseEntity.badRequest().body(I18n.MISSING_HEADER_IF_MATCH);
         }
@@ -314,7 +315,7 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
+    public ResponseEntity<?> getUserById(@PathVariable("id") String id) throws ApplicationBaseException {
         //conversion String -> UUID
         try {
             UUID uuid = UUID.fromString(id);
