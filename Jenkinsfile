@@ -1,5 +1,6 @@
 pipeline{
     agent any
+    env.JAVA_HOME="${tool 'JDK21'}"
     stages{
         stage('test'){
             steps{
