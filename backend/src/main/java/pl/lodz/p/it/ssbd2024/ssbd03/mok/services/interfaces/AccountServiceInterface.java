@@ -147,12 +147,13 @@ public interface AccountServiceInterface {
      * @param login      Account's login. A phrase is sought in the logins.
      * @param firstName  Account owner's first name. A phrase is sought in the names.
      * @param lastName   Account's owner last name. A phrase is sought in the last names.
+     * @param active     Activity status of the user account (whether it has been activated or not).
      * @param order      Ordering in which user accounts should be returned.
      * @param pageNumber Number of the page with searched users accounts.
      * @param pageSize   Number of the users accounts per page.
      * @return List of user accounts that match the given parameters.
      */
-    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean order, int pageNumber, int pageSize);
+    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize);
 
     /**
      * Retrieve all accounts in the system.

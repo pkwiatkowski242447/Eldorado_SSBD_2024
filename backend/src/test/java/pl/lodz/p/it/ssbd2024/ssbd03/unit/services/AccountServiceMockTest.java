@@ -178,13 +178,13 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void activateAccountTestWithTokenNotBeingBase64String() throws ApplicationBaseException {
+    void activateAccountTestWithTokenNotBeingBase64String() {
         String tokenVal = "InvalidToken...";
         assertThrows(IllegalArgumentException.class, () -> accountService.activateAccount(tokenVal));
     }
 
     @Test
-    void activateAccountTestWhenTokenObjectIsNotFound() throws ApplicationBaseException {
+    void activateAccountTestWhenTokenObjectIsNotFound() {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
 
@@ -194,7 +194,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void activateAccountTestWhenAccountObjectIsNotFound() throws ApplicationBaseException {
+    void activateAccountTestWhenAccountObjectIsNotFound() {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -264,20 +264,21 @@ public class AccountServiceMockTest {
         String firstName = "firstName";
         String lastName = "lastName";
         boolean order = true;
+        boolean active = true;
         int pageNumber = 0;
         int pageSize = 5;
 
         when(accountMOKFacade
-                        .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize))
+                        .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize))
                 .thenReturn(accountList);
 
-        var retList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName, lastName, order, pageNumber, pageSize);
+        var retList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName, lastName, active, order, pageNumber, pageSize);
 
         assertEquals(account, retList.get(0));
         assertEquals(account1, retList.get(1));
 
         Mockito.verify(accountMOKFacade, Mockito.times(1))
-                .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
+                .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize);
     }
 
     @Test

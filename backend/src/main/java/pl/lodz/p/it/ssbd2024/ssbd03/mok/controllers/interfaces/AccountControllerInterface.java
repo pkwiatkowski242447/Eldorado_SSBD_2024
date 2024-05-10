@@ -71,12 +71,13 @@ public interface AccountControllerInterface {
      * @param login Login of the searched user account. Its default value is empty string (in that case this parameter will not have any impact of final result of the search).
      * @param firstName First name of the searched users.
      * @param lastName Last name of the searched users.
+     * @param active Activity status of the user account (whether it has been activated or not).
      * @param order Ordering of the searched users. Could be either true (for ascending order) or false (for descending order).
      * @param pageNumber Number of the page containing searched users.
      * @param pageSize Number of the users per page.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean order, int pageNumber, int pageSize);
+    ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize);
 
     /**
      * This method is used to activate user account, after it was successfully.

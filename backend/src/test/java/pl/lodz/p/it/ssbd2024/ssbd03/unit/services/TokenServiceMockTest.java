@@ -23,10 +23,13 @@ import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 public class TokenServiceMockTest {
+
     @Mock
     private TokenFacade tokenFacade;
+
     @Mock
     private JWTProvider jwtProvider;
+
     @InjectMocks
     private TokenService tokenService;
 
