@@ -156,7 +156,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void activateAccountTestSuccessful() {
+    void activateAccountTestSuccessful() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -176,7 +176,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void activateAccountTestTokenInvalid() {
+    void activateAccountTestTokenInvalid() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");

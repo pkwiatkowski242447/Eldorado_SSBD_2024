@@ -251,10 +251,12 @@ public class AccountController implements AccountControllerInterface {
      *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     * methods in both facade and service component for Account.
      */
     @Override
     @PostMapping("/activate-account/{token}")
-    public ResponseEntity<?> activateAccount(@PathVariable("token") String token) {
+    public ResponseEntity<?> activateAccount(@PathVariable("token") String token) throws ApplicationBaseException {
         if (accountService.activateAccount(token)) {
             return ResponseEntity.noContent().build();
         } else {

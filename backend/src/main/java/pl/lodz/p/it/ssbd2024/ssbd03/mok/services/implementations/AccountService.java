@@ -364,12 +364,13 @@ public class AccountService implements AccountServiceInterface {
      *
      * @param token Last part of the activation URL sent in a message to users e-mail address.
      * @return Boolean value indicating whether activation of the account was successful or not.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
-    public boolean activateAccount(String token) {
+    public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(decodedTokenValue));
-        Account account = accountFromDB.orElse(null);
+        Account account = accountFromDB.orElseThrow(AccountIdNotFoundException::new);
         if (!jwtProvider.isTokenValid(decodedTokenValue, account)) {
             return false;
         } else {

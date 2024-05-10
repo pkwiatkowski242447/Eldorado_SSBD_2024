@@ -129,8 +129,9 @@ public interface AccountServiceInterface {
      *
      * @param token Last part of the activation URL sent in a message to users e-mail address.
      * @return Boolean value indicating whether activation of the account was successful or not.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    boolean activateAccount(String token);
+    boolean activateAccount(String token) throws ApplicationBaseException;
 
     /**
      * Confirm e-mail change with a token from confirmation URL, sent to the new e-mail address.
