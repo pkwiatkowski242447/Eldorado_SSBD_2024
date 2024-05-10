@@ -12,6 +12,8 @@ pipeline{
     stages{
         stage('build'){
             steps{
+                sh 'pwd'
+                sh 'ls'
                 sh 'cp mail.properties ${MAIL_PROPERTIES_TARGET_LOCATION}'
                 sh 'cd backend && mvn -B clean test'
             }
