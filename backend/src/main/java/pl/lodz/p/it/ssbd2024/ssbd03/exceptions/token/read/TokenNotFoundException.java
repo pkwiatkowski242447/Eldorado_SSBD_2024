@@ -1,4 +1,6 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token;
+package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read;
+
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenBaseException;
 
 /**
  * Used to specify an Exception related trying to access a Token that doesn't exist.

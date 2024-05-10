@@ -1,8 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 
 /**
  * Interface used for managing tokens.

@@ -25,7 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFound
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
@@ -369,17 +369,17 @@ public class AccountService implements AccountServiceInterface {
     @Override
     public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
-        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(decodedTokenValue));
-        Account account = accountFromDB.orElseThrow(AccountIdNotFoundException::new);
-        if (!jwtProvider.isTokenValid(decodedTokenValue, account)) {
-            return false;
-        } else {
+        Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
+                .orElseThrow(AccountIdNotFoundException::new);
+        if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
             account.setActive(true);
             account.setVerified(true);
             accountFacade.edit(account);
-            tokenFacade.findByTokenValue(decodedTokenValue).ifPresent(tokenFacade::remove);
+            tokenFacade.remove(tokenFromDB);
             return true;
         }
+        return false;
     }
 
     /**

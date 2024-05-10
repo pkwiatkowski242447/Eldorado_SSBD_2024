@@ -17,6 +17,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationExcept
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -162,9 +164,9 @@ public class AccountServiceMockTest {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Token token = new Token(decodedTokenVal, account, Token.TokenType.REGISTER);
 
-
-        when(jwtProvider.extractAccountId(decodedTokenVal)).thenReturn(UUID.randomUUID());
-        when(accountMOKFacade.find(any(UUID.class))).thenReturn(Optional.of(account));
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(jwtProvider.extractAccountId(decodedTokenVal)).thenReturn(account.getId());
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
         when(jwtProvider.isTokenValid(decodedTokenVal, account)).thenReturn(true);
         doNothing().when(accountMOKFacade).edit(account);
         when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
@@ -176,13 +178,44 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    void activateAccountTestWithTokenNotBeingBase64String() throws ApplicationBaseException {
+        String tokenVal = "InvalidToken...";
+        assertThrows(IllegalArgumentException.class, () -> accountService.activateAccount(tokenVal));
+    }
+
+    @Test
+    void activateAccountTestWhenTokenObjectIsNotFound() throws ApplicationBaseException {
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
+
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.empty());
+
+        assertThrows(TokenNotFoundException.class, () -> accountService.activateAccount(tokenVal));
+    }
+
+    @Test
+    void activateAccountTestWhenAccountObjectIsNotFound() throws ApplicationBaseException {
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
+        Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
+        Token token = new Token(decodedTokenVal, account, Token.TokenType.REGISTER);
+
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.empty());
+
+        assertThrows(AccountIdNotFoundException.class, () -> accountService.activateAccount(tokenVal));
+    }
+
+    @Test
     void activateAccountTestTokenInvalid() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
+        Token token = new Token(decodedTokenVal, account, Token.TokenType.REGISTER);
 
-        when(jwtProvider.extractAccountId(decodedTokenVal)).thenReturn(UUID.randomUUID());
-        when(accountMOKFacade.find(any(UUID.class))).thenReturn(Optional.of(account));
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
+        when(jwtProvider.extractAccountId(decodedTokenVal)).thenReturn(account.getId());
         when(jwtProvider.isTokenValid(decodedTokenVal, account)).thenReturn(false);
 
         assertFalse(account.getActive());
