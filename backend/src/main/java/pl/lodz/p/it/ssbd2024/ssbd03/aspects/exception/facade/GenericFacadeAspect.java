@@ -24,7 +24,7 @@ public class GenericFacadeAspect {
      * Pointcut definition for every method that is inside a class with @Repository annotation (from org.springframework.stereotype)
      * effectively executing corresponding advice method for every method called from any facade component.
      */
-    @Pointcut(value = "@annotation(org.springframework.stereotype.Repository)")
+    @Pointcut(value = "@within(org.springframework.stereotype.Repository)")
     private void facadeMethodPointcut() {}
 
     /**
