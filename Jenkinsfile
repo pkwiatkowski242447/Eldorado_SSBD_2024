@@ -5,10 +5,11 @@ pipeline{
         mvn = '/var/lib/maven/bin/mvn'
     }
     stages{
-        stage('test'){
+        stage('build'){
             steps{
                 sh 'set JAVA_HOME=${JAVA_HOME}'
-                sh '${mvn} -v && ${mvn} -B -f backend clean test';
+                sh 'cd backend'
+                sh '${mvn} -v && ${mvn} -B backend clean test';
             }
         }
     }
