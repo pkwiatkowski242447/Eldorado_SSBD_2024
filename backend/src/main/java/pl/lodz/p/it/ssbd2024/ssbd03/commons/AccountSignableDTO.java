@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,24 +11,29 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.StaffDTO;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-//TODO opisy api + javadoc -> Michal
-
+/**
+ * Data transfer object used as a basis for Account singed DTOs.
+ *
+ * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Getter
-public class AccountSignableDTO implements SignableDTO {
+public abstract class AccountSignableDTO implements SignableDTO {
+    @Schema(description = "String identifier linked with Account", example = "boleslawchrobry", requiredMode = Schema.RequiredMode.REQUIRED)
     private String login;
+    @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long version;
+    @Schema(description = "Set of account user levels", implementation = ClientDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)
     private Set<UserLevelDTO> userLevelsDto;
 
+    /**
+     * This method returns Account DTO properties (names and values) that should be signed.
+     * @return Returns map of properties that should be signed.
+     */
     @JsonIgnore
     @Override
     public Map<String, ?> getSigningFields() {
@@ -38,6 +44,11 @@ public class AccountSignableDTO implements SignableDTO {
         );
     }
 
+    /**
+     * This method returns list of signing properties for each passed user level.
+     * @param levels Signing Account dto user levels.
+     * @return Signing properties for each passed user level.
+     */
     private List<Map<String, Object>> getUserLevelsDetailsAsMap(List<UserLevelDTO> levels) {
         levels.sort(Comparator.comparing(UserLevelDTO::getRoleName, String::compareToIgnoreCase));
         List<Map<String, Object>> list = new ArrayList<>();

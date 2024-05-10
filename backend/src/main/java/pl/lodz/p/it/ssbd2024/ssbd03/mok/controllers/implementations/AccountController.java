@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -86,7 +88,6 @@ public class AccountController implements AccountControllerInterface {
         this.jwtProvider = jwtProvider;
     }
 
-    //TODO opisy api -> Michal
     /**
      * This endpoint allows user with administrative user level to block a user account by its UUID. After
      * the account has been blocked.
@@ -99,7 +100,13 @@ public class AccountController implements AccountControllerInterface {
      * the response is 409 CONFLICT.
      */
     @Override
-    @PostMapping(value = "/{user_id}/block", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{user_id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "Block user account", description = "The endpoint is used to block user account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The account has been blocked correctly."),
+            @ApiResponse(responseCode = "400", description = "The account has not been blocked due to the correctness of the request or because the account is not available in the database"),
+            @ApiResponse(responseCode = "409", description = "The account has not been blocked due to being blocked already or trying to block own account.")
+    })
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) {
         try {
             if (id.length() != 36) {
@@ -128,7 +135,6 @@ public class AccountController implements AccountControllerInterface {
         return ResponseEntity.noContent().build();
     }
 
-    //TODO opisy api -> Michal
     /**
      * This endpoint allows user with administrative user level to unblock a user account by its UUID. After
      * the account has been unblocked.
@@ -140,7 +146,13 @@ public class AccountController implements AccountControllerInterface {
      * 404 NOT FOUND and when AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
      */
     @Override
-    @PostMapping(value = "/{user_id}/unblock", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{user_id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "Unblock user account", description = "The endpoint is used to unblock user account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The account has been unblocked correctly."),
+            @ApiResponse(responseCode = "400", description = "The account has not been unblocked due to the correctness of the request or because the account is not available in the database"),
+            @ApiResponse(responseCode = "409", description = "The account has not been unblocked due to being blocked already.")
+    })
     public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
         try {
             if (id.length() != 36) {
@@ -289,12 +301,13 @@ public class AccountController implements AccountControllerInterface {
      * then 409 CONFLICT is returned.
      */
     @Override
-    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Modify self account", description = "Modify self account.")
+    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @Operation(summary = "Modify self account", description = "The endpoint is used to modify self account.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "The account has been modified correctly."),
-            @ApiResponse(responseCode = "400", description = "The account has not been modified due to the correctness of the request or because the account is not available in the database"),
-            @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.")
+            @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccountOutputDTO.class))),
+            @ApiResponse(responseCode = "400", description = "The account has not been modified due to the correctness of the request or because the account is not available in the database", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)),
+            @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
     })
     public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                                @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
@@ -303,7 +316,7 @@ public class AccountController implements AccountControllerInterface {
         }
 
         if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.DATA_INTEGRITY_COMPROMISED);
+            return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.TEXT_PLAIN).body(I18n.DATA_INTEGRITY_COMPROMISED);
         }
 
         String currentUserLogin = SecurityContextHolder.getContext().getAuthentication().getName();

@@ -1,7 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper;
 
-//TODO javadoc -> Michal
-
+/**
+ * Used to specify an Exception related with mapping entity-DTO with invalid user level.
+ */
 public class MapperUnexpectedUserLevelException extends MapperBaseException {
 
     public MapperUnexpectedUserLevelException() {

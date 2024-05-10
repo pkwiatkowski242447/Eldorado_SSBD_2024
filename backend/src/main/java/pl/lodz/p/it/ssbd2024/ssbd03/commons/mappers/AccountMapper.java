@@ -10,9 +10,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 import java.util.HashSet;
 import java.util.Set;
 
-//TODO javadoc -> Michal
-
+/**
+ * Used to handle Account entity-DTO mapping.
+ */
 public class AccountMapper {
+
+    /**
+     * This method is used to map Account entity to Account output DTO class.
+     * @param account Account to map.
+     * @return Returns mapped Account DTO class.
+     * @throws MapperBaseException Threw when Account contains invalid unhandled user level.
+     */
     public static AccountOutputDTO toAccountOutputDto(Account account) throws MapperBaseException {
         Set<UserLevelDTO> list= new HashSet<>();
         for (UserLevel userLevel : account.getUserLevels()) {
@@ -41,6 +49,12 @@ public class AccountMapper {
         );
     }
 
+    /**
+     * This method is used to map modified Account DTO to Account entity class.
+     * @param accountModifyDTO Account DTO to map.
+     * @return Returns mapped Account entity class.
+     * @throws MapperBaseException Threw when Account DTO contains unhandled user level.
+     */
     public static Account toAccount(AccountModifyDTO accountModifyDTO) throws MapperBaseException {
         Account account = new Account(
                 accountModifyDTO.getLogin(),

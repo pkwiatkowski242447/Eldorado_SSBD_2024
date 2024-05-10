@@ -8,13 +8,23 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedClientTypeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
-//TODO javadoc -> Michal
-
+/**
+ * Used to handle UserLevel entity-DTO mapping.
+ */
 public class UserLevelMapper {
+
+    /**
+     * This method is used to map UserLevel DTO to UserLevel entity class.
+     * @param userLevelDTO UserLevel DTO to map.
+     * @return Returns mapped UserLevel entity class.
+     * @throws MapperUnexpectedUserLevelException Threw when unexpected UserLevel DTO occurred.
+     * @throws MapperUnexpectedClientTypeException Threw when Client user level DTO contains invalid client type.
+     */
     public static UserLevel toUserLevel(UserLevelDTO userLevelDTO)
             throws MapperUnexpectedUserLevelException, MapperUnexpectedClientTypeException {
         return switch (userLevelDTO) {
@@ -34,6 +44,12 @@ public class UserLevelMapper {
         };
     }
 
+    /**
+     * This method is used to map UserLevel entity to UserLevel DTO class.
+     * @param userLevel UserLevel to map.
+     * @return Returns mapped UserLevel DTO class.
+     * @throws MapperUnexpectedUserLevelException Threw when unhandled UserLevel entity occurred.
+     */
     public static UserLevelDTO toUserLevelDTO(UserLevel userLevel) throws MapperUnexpectedUserLevelException {
         return switch (userLevel) {
             case Client client -> new ClientDTO(userLevel.getId(), client.getVersion(), client.getType().toString());
