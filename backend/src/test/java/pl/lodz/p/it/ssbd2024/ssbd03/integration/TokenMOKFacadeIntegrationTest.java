@@ -1,7 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.integration;
 
-
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +19,14 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
@@ -44,16 +44,13 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Autowired
     private AccountMOKFacade accountMOKFacade;
 
-    private UUID uuidNo1 = UUID.fromString("582c432a-c5d9-4758-863a-4999a7d95de5");
-    private Token.TokenType tokenTypeRegister = Token.TokenType.REGISTER;
-    private Token.TokenType tokenTypeResetPassword = Token.TokenType.RESET_PASSWORD;
-    private Token.TokenType tokenTypeConfirmEmail = Token.TokenType.CONFIRM_EMAIL;
-    private Token.TokenType tokenTypeChangeOverwrittenPassword = Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD;
-    private UUID userUuidNo1 = UUID.fromString("f5afc042-79b0-47fe-87ee-710c14af888c");
-    private String tokenValueNo1 = "TEST_VALUE90";
-
-
-
+    private final UUID uuidNo1 = UUID.fromString("582c432a-c5d9-4758-863a-4999a7d95de5");
+    private final Token.TokenType tokenTypeRegister = Token.TokenType.REGISTER;
+    private final Token.TokenType tokenTypeResetPassword = Token.TokenType.RESET_PASSWORD;
+    private final Token.TokenType tokenTypeConfirmEmail = Token.TokenType.CONFIRM_EMAIL;
+    private final Token.TokenType tokenTypeChangeOverwrittenPassword = Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD;
+    private final UUID userUuidNo1 = UUID.fromString("f5afc042-79b0-47fe-87ee-710c14af888c");
+    private final String tokenValueNo1 = "TEST_VALUE90";
 
     @BeforeEach
     public void setup() {
@@ -65,32 +62,32 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     public void findByTokenValue() {
         Optional<Token> token = tokenFacade.findByTokenValue(tokenValueNo1);
 
-        Assertions.assertNotNull(token.get());
+        assertNotNull(token.orElseThrow(NoSuchElementException::new));
 
-        Assertions.assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        Assertions.assertEquals(userUuidNo1 ,token.get().getAccount().getId());
-        Assertions.assertEquals(tokenValueNo1 ,token.get().getTokenValue());
+        assertEquals(tokenTypeConfirmEmail, token.get().getType());
+        assertEquals(userUuidNo1 ,token.get().getAccount().getId());
+        assertEquals(tokenValueNo1 ,token.get().getTokenValue());
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void createAndRemovePositiveTest() {
         String tokenValue = "testValueToken";
-        Account account = accountMOKFacade.findByLoginAndRefresh("jerzybem").get();
+        Account account = accountMOKFacade.findByLoginAndRefresh("jerzybem").orElseThrow(NoSuchElementException::new);
 
-        Assertions.assertNotNull(account);
+        assertNotNull(account);
 
         Token token = new Token(tokenValue, account, tokenTypeChangeOverwrittenPassword);
 
         tokenFacade.create(token);
 
-        Token tokenFind = tokenFacade.findByTokenValue(tokenValue).get();
+        Token tokenFind = tokenFacade.findByTokenValue(tokenValue).orElseThrow(NoSuchElementException::new);
 
         tokenFacade.remove(tokenFind);
 
         Optional<Token> tokenRemoved = tokenFacade.findByTokenValue(tokenValue);
 
-        Assertions.assertTrue(tokenRemoved.isEmpty());
+        assertTrue(tokenRemoved.isEmpty());
     }
 
     @Test
@@ -98,11 +95,11 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     public void findReturnsExistingTokenPositiveTest() {
         Optional<Token> token = tokenFacade.find(uuidNo1);
 
-        Assertions.assertFalse(token.isEmpty());
+        assertFalse(token.isEmpty());
 
-        Assertions.assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        Assertions.assertEquals(userUuidNo1 ,token.get().getAccount().getId());
-        Assertions.assertEquals(tokenValueNo1 ,token.get().getTokenValue());
+        assertEquals(tokenTypeConfirmEmail, token.get().getType());
+        assertEquals(userUuidNo1 ,token.get().getAccount().getId());
+        assertEquals(tokenValueNo1 ,token.get().getTokenValue());
     }
 
     @Test
@@ -110,7 +107,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     public void findAllPositiveTest() {
         List<Token> tokenList = tokenFacade.findAll();
 
-        Assertions.assertEquals(6, tokenList.size());
+        assertEquals(6, tokenList.size());
     }
 
     @Test
@@ -118,7 +115,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     public void countPositiveTest() {
         int count = tokenFacade.count();
 
-        Assertions.assertEquals(6, count);
+        assertEquals(6, count);
     }
 
     @Test
@@ -126,11 +123,11 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     public void findByTypeAndAccountTest() {
         Optional<Token> token = tokenFacade.findByTypeAndAccount(tokenTypeConfirmEmail, UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692"));
 
-        Assertions.assertFalse(token.isEmpty());
+        assertFalse(token.isEmpty());
 
-        Assertions.assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        Assertions.assertEquals(UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692") ,token.get().getAccount().getId());
-        Assertions.assertEquals("TEST_VALUE93" ,token.get().getTokenValue());
+        assertEquals(tokenTypeConfirmEmail, token.get().getType());
+        assertEquals(UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692") ,token.get().getAccount().getId());
+        assertEquals("TEST_VALUE93" ,token.get().getTokenValue());
     }
 
     @Test
@@ -138,7 +135,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     public void findByTokenTypeTest() {
         List<Token> tokens = tokenFacade.findByTokenType(tokenTypeConfirmEmail);
 
-        Assertions.assertEquals(4, tokens.size());
+        assertEquals(4, tokens.size());
     }
 
     @Test
@@ -153,21 +150,21 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").get();
+        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token = new Token("WiktorPtakToken", findAccount, tokenTypeChangeOverwrittenPassword);
 
         tokenFacade.create(token);
 
-        Token findToken = tokenFacade.findByTokenValue("WiktorPtakToken").get();
+        Token findToken = tokenFacade.findByTokenValue("WiktorPtakToken").orElseThrow(NoSuchElementException::new);
 
-        Assertions.assertNotNull(findToken);
+        assertNotNull(findToken);
 
         tokenFacade.removeByAccount(findAccount.getId());
 
-        Optional<Token> doeleteToken = tokenFacade.findByTokenValue("WiktorPtakToken");
+        Optional<Token> deleteToken = tokenFacade.findByTokenValue("WiktorPtakToken");
 
-        Assertions.assertTrue(doeleteToken.isEmpty());
+        assertTrue(deleteToken.isEmpty());
     }
 
     @Test
@@ -182,7 +179,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").get();
+        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token1 = new Token("WiktorPtakToken1", findAccount, tokenTypeChangeOverwrittenPassword);
         Token token2 = new Token("WiktorPtakToken2", findAccount, tokenTypeChangeOverwrittenPassword);
@@ -192,13 +189,13 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
         int count = tokenFacade.count();
 
-        Assertions.assertEquals(8, count);
+        assertEquals(8, count);
 
         tokenFacade.removeByTypeAndAccount(tokenTypeChangeOverwrittenPassword, findAccount.getId());
 
         int countDelete = tokenFacade.count();
 
-        Assertions.assertEquals(6, countDelete);
+        assertEquals(6, countDelete);
     }
 
     @Test
@@ -213,13 +210,13 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").get();
+        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token1 = new Token("WiktorPtakToken1", findAccount, tokenTypeChangeOverwrittenPassword);
 
         tokenFacade.create(token1);
 
-        Token findToken = tokenFacade.findByTokenValue("WiktorPtakToken1").get();
+        Token findToken = tokenFacade.findByTokenValue("WiktorPtakToken1").orElseThrow(NoSuchElementException::new);
 
         findToken.setTokenValue("EDIT");
 
@@ -227,10 +224,10 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
         Optional<Token> findEditedToken = tokenFacade.findByTokenValue("EDIT");
 
-        Assertions.assertFalse(findEditedToken.isEmpty());
-        Assertions.assertEquals(tokenTypeChangeOverwrittenPassword, findEditedToken.get().getType());
-        Assertions.assertEquals(account.getId(), findEditedToken.get().getAccount().getId());
-        Assertions.assertEquals("EDIT", findEditedToken.get().getTokenValue());
+        assertFalse(findEditedToken.isEmpty());
+        assertEquals(tokenTypeChangeOverwrittenPassword, findEditedToken.get().getType());
+        assertEquals(account.getId(), findEditedToken.get().getAccount().getId());
+        assertEquals("EDIT", findEditedToken.get().getTokenValue());
 
         tokenFacade.remove(findEditedToken.get());
     }
