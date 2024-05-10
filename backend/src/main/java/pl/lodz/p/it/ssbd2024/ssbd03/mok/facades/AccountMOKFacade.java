@@ -76,7 +76,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @Override
     public Optional<Account> find(UUID id) {
-        return super.find(id);
+        return super.findAndRefresh(id);
     }
 
     /**

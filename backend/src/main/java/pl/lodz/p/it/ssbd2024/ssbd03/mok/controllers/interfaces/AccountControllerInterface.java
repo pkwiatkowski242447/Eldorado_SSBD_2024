@@ -85,8 +85,10 @@ public interface AccountControllerInterface {
      * @param token Last part of the activation URL, sent to the e-mail address user specified during registration process. It is a JWT token
      *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return It returns an HTTP response with a code depending on the result.
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *      * methods in both facade and service component for Account.
      */
-    ResponseEntity<?> activateAccount(String token);
+    ResponseEntity<?> activateAccount(String token) throws ApplicationBaseException;
 
     /**
      * This method is used to confirm the change of an e-mail.

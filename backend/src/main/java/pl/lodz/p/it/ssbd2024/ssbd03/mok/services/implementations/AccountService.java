@@ -25,7 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFound
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
@@ -176,8 +176,7 @@ public class AccountService implements AccountServiceInterface {
 
             accountFacade.create(newStaffAccount);
 
-            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS)
-                    .replace(".", "%2E");
+            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
             tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
 
             String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
@@ -365,21 +364,22 @@ public class AccountService implements AccountServiceInterface {
      *
      * @param token Last part of the activation URL sent in a message to users e-mail address.
      * @return Boolean value indicating whether activation of the account was successful or not.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
-    public boolean activateAccount(String token) {
+    public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
-        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(decodedTokenValue));
-        Account account = accountFromDB.orElse(null);
-        if (!jwtProvider.isTokenValid(decodedTokenValue, account)) {
-            return false;
-        } else {
+        Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
+                .orElseThrow(AccountIdNotFoundException::new);
+        if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
             account.setActive(true);
             account.setVerified(true);
             accountFacade.edit(account);
-            tokenFacade.findByTokenValue(token).ifPresent(tokenFacade::remove);
+            tokenFacade.remove(tokenFromDB);
             return true;
         }
+        return false;
     }
 
     /**
@@ -401,7 +401,7 @@ public class AccountService implements AccountServiceInterface {
             return false;
         } else {
             try {
-                String email = jwtProvider.extractEmail(token);
+                String email = jwtProvider.extractEmail(decodedTokenValue);
                 if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
                 account.setEmail(email);
                 accountFacade.edit(account);

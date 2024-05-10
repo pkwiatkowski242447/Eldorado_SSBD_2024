@@ -17,6 +17,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationExcept
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -25,13 +27,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceMockTest {
@@ -53,9 +57,11 @@ public class AccountServiceMockTest {
     @Test
     void registerClientTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
+        String testToken = "TestTokenValue";
 
-        Mockito.doNothing().when(accountMOKFacade).create(any(Account.class));
-        Mockito.when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
+        doNothing().when(accountMOKFacade).create(any(Account.class));
+        when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
+        when(jwtProvider.generateActionToken(any(Account.class), anyInt(), any())).thenReturn(testToken);
 
         accountService.registerClient("Testowy", password, "Imie",
                 "Nazwisko", "test@example.com", "123123123", "pl");
@@ -66,10 +72,12 @@ public class AccountServiceMockTest {
     @Test
     void registerStaffTestSuccessful() throws AccountCreationException {
         String password = "P@ssw0rd!";
+        String testToken = "TestTokenValue";
 
-        Mockito.doNothing().when(accountMOKFacade).create(any(Account.class));
-        Mockito.when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
-        Mockito.doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
+        doNothing().when(accountMOKFacade).create(any(Account.class));
+        when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
+        doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
+        when(jwtProvider.generateActionToken(any(Account.class), anyInt(), any())).thenReturn(testToken);
 
         accountService.registerStaff("Testowy", password, "Imie",
                 "Nazwisko", "test@example.com", "123123123", "pl");
@@ -79,10 +87,12 @@ public class AccountServiceMockTest {
     @Test
     void registerAdminTestSuccessful() throws AccountCreationException {
         String password = "P@ssw0rd!";
+        String testToken = "TestTokenValue";
 
-        Mockito.doNothing().when(accountMOKFacade).create(any(Account.class));
-        Mockito.when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
-        Mockito.doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
+        doNothing().when(accountMOKFacade).create(any(Account.class));
+        when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
+        doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
+        when(jwtProvider.generateActionToken(any(Account.class), anyInt(), any())).thenReturn(testToken);
 
         accountService.registerAdmin("Testowy", password, "Imie",
                 "Nazwisko", "test@example.com", "123123123", "pl");
@@ -91,43 +101,43 @@ public class AccountServiceMockTest {
 
     @Test
     void confirmEmailTestSuccessful() throws AccountEmailChangeException, AccountEmailNullException, AccountNotFoundException {
-
-        String tokenVal = "MOCK TOKEN";
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
-        Token token = new Token(tokenVal, account, Token.TokenType.CONFIRM_EMAIL);
+        Token token = new Token(decodedTokenVal, account, Token.TokenType.CONFIRM_EMAIL);
 
-        Mockito.when(tokenFacade.findByTokenValue(tokenVal)).thenReturn(Optional.of(token));
-        Mockito.when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
-        Mockito.when(jwtProvider.isTokenValid(tokenVal, account)).thenReturn(true);
-        Mockito.when(jwtProvider.extractEmail(tokenVal)).thenReturn("new@email.com");
-        Mockito.doNothing().when(accountMOKFacade).edit(account);
-        Mockito.doNothing().when(tokenFacade).remove(token);
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
+        when(jwtProvider.isTokenValid(decodedTokenVal, account)).thenReturn(true);
+        when(jwtProvider.extractEmail(decodedTokenVal)).thenReturn("new@email.com");
+        doNothing().when(accountMOKFacade).edit(account);
+        doNothing().when(tokenFacade).remove(token);
 
         assertTrue(accountService.confirmEmail(tokenVal));
     }
 
     @Test
     void confirmEmailTestTokenInvalid() throws AccountEmailChangeException, AccountEmailNullException, AccountNotFoundException {
-
-        String tokenVal = "MOCK TOKEN";
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
-        Token token = new Token(tokenVal, account, Token.TokenType.CONFIRM_EMAIL);
+        Token token = new Token(decodedTokenVal, account, Token.TokenType.CONFIRM_EMAIL);
 
-        Mockito.when(tokenFacade.findByTokenValue(tokenVal)).thenReturn(Optional.of(token));
-        Mockito.when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
-        Mockito.when(jwtProvider.isTokenValid(tokenVal, account)).thenReturn(false);
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
+        when(jwtProvider.isTokenValid(decodedTokenVal, account)).thenReturn(false);
 
         assertFalse(accountService.confirmEmail(tokenVal));
     }
 
     @Test
     void confirmEmailTestTokenNotInDatabase() throws AccountEmailChangeException, AccountEmailNullException, AccountNotFoundException {
-
-        String tokenVal = "MOCK TOKEN";
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
 
-        Mockito.when(tokenFacade.findByTokenValue(tokenVal)).thenReturn(Optional.empty());
-        Mockito.when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.empty());
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
 
         assertFalse(accountService.confirmEmail(tokenVal));
     }
@@ -139,28 +149,28 @@ public class AccountServiceMockTest {
         a.setAccountLanguage("pl");
         String newEmail = "new@email.com";
 
-        Mockito.when(accountMOKFacade.find(any())).thenReturn(Optional.of(a));
-        Mockito.when(tokenService.createEmailConfirmationToken(a, newEmail)).thenReturn("TOKEN");
-        Mockito.doNothing().when(mailProvider).sendEmailConfirmEmail(eq(a.getName()), eq(a.getLastname()), eq(newEmail), any(), eq(a.getAccountLanguage()));
+        when(accountMOKFacade.find(any())).thenReturn(Optional.of(a));
+        when(tokenService.createEmailConfirmationToken(a, newEmail)).thenReturn("TOKEN");
+        doNothing().when(mailProvider).sendEmailConfirmEmail(eq(a.getName()), eq(a.getLastname()), eq(newEmail), any(), eq(a.getAccountLanguage()));
 
         accountService.changeEmail(UUID.randomUUID(), newEmail);
         Mockito.verify(mailProvider, Mockito.times(1)).sendEmailConfirmEmail(eq(a.getName()), eq(a.getLastname()), eq(newEmail), any(), eq(a.getAccountLanguage()));
     }
 
     @Test
-    void activateAccountTestSuccessful() {
-
-        String tokenVal = "MOCK TOKEN";
+    void activateAccountTestSuccessful() throws ApplicationBaseException {
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
-        Token token = new Token(tokenVal, account, Token.TokenType.REGISTER);
+        Token token = new Token(decodedTokenVal, account, Token.TokenType.REGISTER);
 
-
-        Mockito.when(jwtProvider.extractAccountId(tokenVal)).thenReturn(UUID.randomUUID());
-        Mockito.when(accountMOKFacade.find(any(UUID.class))).thenReturn(Optional.of(account));
-        Mockito.when(jwtProvider.isTokenValid(tokenVal, account)).thenReturn(true);
-        Mockito.doNothing().when(accountMOKFacade).edit(account);
-        Mockito.when(tokenFacade.findByTokenValue(tokenVal)).thenReturn(Optional.of(token));
-        Mockito.doNothing().when(tokenFacade).remove(token);
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(jwtProvider.extractAccountId(decodedTokenVal)).thenReturn(account.getId());
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
+        when(jwtProvider.isTokenValid(decodedTokenVal, account)).thenReturn(true);
+        doNothing().when(accountMOKFacade).edit(account);
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        doNothing().when(tokenFacade).remove(token);
 
         assertFalse(account.getActive());
         assertTrue(accountService.activateAccount(tokenVal));
@@ -168,14 +178,45 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void activateAccountTestTokenInvalid() {
+    void activateAccountTestWithTokenNotBeingBase64String() throws ApplicationBaseException {
+        String tokenVal = "InvalidToken...";
+        assertThrows(IllegalArgumentException.class, () -> accountService.activateAccount(tokenVal));
+    }
 
-        String tokenVal = "MOCK TOKEN";
+    @Test
+    void activateAccountTestWhenTokenObjectIsNotFound() throws ApplicationBaseException {
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
+
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.empty());
+
+        assertThrows(TokenNotFoundException.class, () -> accountService.activateAccount(tokenVal));
+    }
+
+    @Test
+    void activateAccountTestWhenAccountObjectIsNotFound() throws ApplicationBaseException {
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
+        Token token = new Token(decodedTokenVal, account, Token.TokenType.REGISTER);
 
-        Mockito.when(jwtProvider.extractAccountId(tokenVal)).thenReturn(UUID.randomUUID());
-        Mockito.when(accountMOKFacade.find(any(UUID.class))).thenReturn(Optional.of(account));
-        Mockito.when(jwtProvider.isTokenValid(tokenVal, account)).thenReturn(false);
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.empty());
+
+        assertThrows(AccountIdNotFoundException.class, () -> accountService.activateAccount(tokenVal));
+    }
+
+    @Test
+    void activateAccountTestTokenInvalid() throws ApplicationBaseException {
+        String tokenVal = "TU9DSyBUT0tFTg==";
+        String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
+        Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
+        Token token = new Token(decodedTokenVal, account, Token.TokenType.REGISTER);
+
+        when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
+        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
+        when(jwtProvider.extractAccountId(decodedTokenVal)).thenReturn(account.getId());
+        when(jwtProvider.isTokenValid(decodedTokenVal, account)).thenReturn(false);
 
         assertFalse(account.getActive());
         assertFalse(accountService.activateAccount(tokenVal));
@@ -188,9 +229,9 @@ public class AccountServiceMockTest {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
 
-        Mockito.when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
-        Mockito.doNothing().when(accountMOKFacade).edit(account);
-        Mockito.doNothing().when(mailProvider).sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage(), true);
+        when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
+        doNothing().when(accountMOKFacade).edit(account);
+        doNothing().when(mailProvider).sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage(), true);
 
         assertFalse(account.getBlocked());
         accountService.blockAccount(id);
@@ -204,9 +245,9 @@ public class AccountServiceMockTest {
         account.blockAccount(true);
         UUID id = UUID.randomUUID();
 
-        Mockito.when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
-        Mockito.doNothing().when(accountMOKFacade).edit(account);
-        Mockito.doNothing().when(mailProvider).sendUnblockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage());
+        when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
+        doNothing().when(accountMOKFacade).edit(account);
+        doNothing().when(mailProvider).sendUnblockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage());
 
         assertTrue(account.getBlocked());
         accountService.unblockAccount(id);
@@ -226,7 +267,7 @@ public class AccountServiceMockTest {
         int pageNumber = 0;
         int pageSize = 5;
 
-        Mockito.when(accountMOKFacade
+        when(accountMOKFacade
                         .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize))
                 .thenReturn(accountList);
 
@@ -244,7 +285,7 @@ public class AccountServiceMockTest {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
 
-        Mockito.when(accountMOKFacade.findByLoginAndRefresh(account.getLogin())).thenReturn(Optional.of(account));
+        when(accountMOKFacade.findByLoginAndRefresh(account.getLogin())).thenReturn(Optional.of(account));
 
         assertEquals(account, accountService.getAccountByLogin(account.getLogin()));
 
@@ -261,7 +302,7 @@ public class AccountServiceMockTest {
         int pageNumber = 0;
         int pageSize = 5;
 
-        Mockito.when(accountMOKFacade
+        when(accountMOKFacade
                 .findAllAccountsWithPagination(pageNumber, pageSize)).thenReturn(accountList);
 
         var retList = accountService.getAllAccounts(pageNumber, pageSize);
@@ -278,7 +319,7 @@ public class AccountServiceMockTest {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
 
-        Mockito.when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
+        when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
 
         assertEquals(account, accountService.getAccountById(id).orElse(null));
 
