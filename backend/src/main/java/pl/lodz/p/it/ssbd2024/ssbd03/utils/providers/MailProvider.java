@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.EmailTemplateNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.ImageNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.MailProviderMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.MailProviderMessages;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -188,6 +188,45 @@ public class MailProvider {
             messageHelper.setTo(emailReceiver);
 
             messageHelper.setSubject(I18n.getMessage(I18n.CONFIRM_EMAIL_MESSAGE_SUBJECT, language));
+            messageHelper.setText(emailContent, true);
+            messageHelper.setFrom(senderEmail);
+
+            this.mailSender.send(mimeMessage);
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    /**
+     * Send e-mail message to the e-mail address provided by the unauthenticated user, about changing their account
+     * password. Basically, it provides them with a URL to reset their password.
+     *
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param confirmationURL URL used to confirm the account creation.
+     * @param language Language of the message.
+     */
+    public void sendPasswordResetEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("link-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.PASSWORD_RESET_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.PASSWORD_RESET_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.PASSWORD_RESET_ACTION_DESCRIPTION, language))
+                    .replace("$action_link", confirmationURL)
+                    .replace("$note_title", I18n.getMessage(I18n.PASSWORD_RESET_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            messageHelper.setTo(emailReceiver);
+
+            messageHelper.setSubject(I18n.getMessage(I18n.PASSWORD_RESET_MESSAGE_SUBJECT, language));
             messageHelper.setText(emailContent, true);
             messageHelper.setFrom(senderEmail);
 

@@ -9,7 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.JWTConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -68,16 +68,17 @@ public class JWTProvider {
     /**
      * Generates JWT used for keeping track of different actions which require confirmation.
      *
-     * @param account  Account to which the change is related to.
-     * @param tokenTTL Token's time to live in hours.
+     * @param account    Account to which the change is related to.
+     * @param tokenTTL   Token's time to live in specified time unit (by chronoUnit parameter).
+     * @param chronoUnit Unit of time, that will be used to determine how long should the token live.
      * @return Returns a signed Json Web Token.
      */
-    public String generateActionToken(Account account, int tokenTTL) {
+    public String generateActionToken(Account account, int tokenTTL, ChronoUnit chronoUnit) {
         return JWT.create()
                 .withSubject(account.getLogin())
                 .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plus(tokenTTL, ChronoUnit.HOURS))
+                .withExpiresAt(Instant.now().plus(tokenTTL, chronoUnit))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }

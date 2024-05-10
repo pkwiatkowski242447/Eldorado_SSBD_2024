@@ -1,9 +1,10 @@
 import LoginForm from "../components/forms/LoginForm";
+import eldoLogo from "../assets/eldorado.png";
 
 function LoginPage() {
     return (
         <div>
-            <h1>This is a login page</h1>
+            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2" />
             <LoginForm/>
         </div>
     )

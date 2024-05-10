@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
@@ -29,8 +29,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 @Service
 public class AuthenticationService implements AuthenticationServiceInterface {
 
+    /**
+     * AuthenticationFacade used for operations on accounts.
+     */
     private final AuthenticationFacade authenticationFacade;
+    /**
+     * AuthenticationManager used for authenticate user.
+     */
     private final AuthenticationManager authenticationManager;
+    /**
+     * MailProvider used for sending emails.
+     */
     private final MailProvider mailProvider;
 
     /**

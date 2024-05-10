@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
 public class TestAuthenticationMOKFacade extends TestcontainersConfig {
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadProperties;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.ScheduleServiceInterface;
@@ -29,15 +29,32 @@ import java.util.concurrent.TimeUnit;
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ScheduleService implements ScheduleServiceInterface {
 
+    /**
+     * AccountMOKFacade used for operations on account entities.
+     */
     private final AccountMOKFacade accountMOKFacade;
 
+    /**
+     * TokenFacade used for operations on then accounts.
+     */
     private final TokenFacade tokenFacade;
 
+    /**
+     * MailProvider used for sending emails.
+     */
     private final MailProvider mailProvider;
 
+    /**
+     * String value that specifies time after which deletion will occur.
+     * Deletion time is specified by <code>scheduler.not_verified_account_delete_time</code> property.
+     */
     @Value("${scheduler.not_verified_account_delete_time}")
     private String deleteTime;
 
+    /**
+     * String value that specifies time after which blocked accounts will be unblocked.
+     * Unblock time is specified by <code>scheduler.blocked_account_unblock_time</code> property/
+     */
     @Value("${scheduler.blocked_account_unblock_time}")
     private String unblockTime;
 
@@ -58,11 +75,11 @@ public class ScheduleService implements ScheduleServiceInterface {
      * Removes Accounts which have not finished registration.
      * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
      *
-     * @throws ScheduleBadProperties Threw when problem with properties occurs.
+     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void deleteNotVerifiedAccount() throws ScheduleBadProperties {
+    public void deleteNotVerifiedAccount() throws ScheduleBadPropertiesException {
         log.info(ScheduleLogMessages.INVOKING_DELETE_ACCOUNTS_MESS);
 
         // Find not verified accounts
@@ -72,7 +89,7 @@ public class ScheduleService implements ScheduleServiceInterface {
                     accountMOKFacade.findAllAccountsMarkedForDeletion(Long.parseLong(deleteTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
             log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
-            throw new ScheduleBadProperties(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
+            throw new ScheduleBadPropertiesException(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
         }
 
         if (inactiveAccounts.isEmpty()) {
@@ -105,7 +122,7 @@ public class ScheduleService implements ScheduleServiceInterface {
             Account account = token.getAccount();
             if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(12))) {
                 //TODO make it so the URL is based on some property
-                String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token;
+                String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token.getTokenValue();
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),
                                                           account.getLastname(),
                                                           account.getEmail(),
@@ -120,11 +137,11 @@ public class ScheduleService implements ScheduleServiceInterface {
      * Unblock Accounts which have been blocked by login incorrectly certain amount of time.
      * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
      *
-     * @throws ScheduleBadProperties Threw when problem with properties occurs.
+     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void unblockAccount() throws ScheduleBadProperties {
+    public void unblockAccount() throws ScheduleBadPropertiesException {
         log.info(ScheduleLogMessages.INVOKING_UNBLOCK_ACCOUNTS_MESS);
 
         // Find blocked accounts
@@ -134,7 +151,7 @@ public class ScheduleService implements ScheduleServiceInterface {
                     .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.HOURS);
         } catch (NumberFormatException e) {
             log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
-            throw new ScheduleBadProperties(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+            throw new ScheduleBadPropertiesException(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
         }
 
         if (blockedAccounts.isEmpty()) {

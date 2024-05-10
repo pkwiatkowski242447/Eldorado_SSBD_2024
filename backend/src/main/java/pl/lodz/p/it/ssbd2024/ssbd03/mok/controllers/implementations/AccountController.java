@@ -19,19 +19,22 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangeEmailDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
@@ -51,8 +54,17 @@ import java.util.UUID;
 @RequestMapping("/api/v1/accounts")
 public class AccountController implements AccountControllerInterface {
 
+    /**
+     * AccountServiceInterface used for operation on accounts.
+     */
     private final AccountServiceInterface accountService;
+    /**
+     * JWTProvider used for operations on JWT TOKEN.
+     */
     private final JWTProvider jwtProvider;
+    /**
+     * TokenServiceInterface used for operations on tokens.
+     */
     private final TokenServiceInterface tokenService;
 
     /**
@@ -61,6 +73,7 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param accountService Service containing various methods for account manipulation.
      * @param tokenService   Service used for token management (in order to confirm certain user's actions).
+     * @param jwtProvider    Service used for JWT management (eg. signing).
      */
     @Autowired
     public AccountController(AccountServiceInterface accountService,
@@ -142,6 +155,43 @@ public class AccountController implements AccountControllerInterface {
     }
 
     /**
+     * This endpoint is used to "forget" password for an unauthenticated user. It does generate RESET PASSWORD token, write
+     * it to the database, and send a message with reset password URL to user e-mail address.
+     *
+     * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for registration
+     *                        to the application or changed later to other e-mail address.
+     *
+     * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
+     * (if there is no account with given e-mail address) or 412 PRECONDITION FAILED (when account is either blocked or
+     * not activated yet).
+     *
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
+     */
+    @Override
+    @PostMapping(value = "/forgot-password")
+    public ResponseEntity<?> forgetAccountPassword(@RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
+        this.accountService.forgetAccountPassword(accountEmailDTO.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This endpoint is used to change password for an unauthenticated user. It does generate RESET PASSWORD token, write
+     * it to the database, and send a message with reset password URL to user e-mail address.
+     *
+     * @param token RESET PASSWORD token required to change password for user account, that was generated when
+     *              forgetAccountPassword() method was called.
+     *
+     * @return 200 OK is returned when changing password goes flawlessly. Otherwise, 400 BAD REQUEST is returned (since
+     * RESET PASSWORD token is no longer valid or not in the database).
+     */
+    @Override
+    @PostMapping(value = "/change-password/{token_id}")
+    public ResponseEntity<?> changeAccountPassword(@PathVariable("token_id") String token, @RequestBody AccountPasswordDTO accountPasswordDTO) throws ApplicationBaseException {
+        this.accountService.changeAccountPassword(token, accountPasswordDTO.getPassword());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * This method retrieves user accounts from the system. In order to avoid sending huge amounts of user data
      * it used pagination, so that users from a particular page, of a particular size can be retrieved.
      *
@@ -201,10 +251,12 @@ public class AccountController implements AccountControllerInterface {
      *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     * methods in both facade and service component for Account.
      */
     @Override
     @PostMapping("/activate-account/{token}")
-    public ResponseEntity<?> activateAccount(@PathVariable(value = "token") String token) {
+    public ResponseEntity<?> activateAccount(@PathVariable("token") String token) throws ApplicationBaseException {
         if (accountService.activateAccount(token)) {
             return ResponseEntity.noContent().build();
         } else {
@@ -295,9 +347,11 @@ public class AccountController implements AccountControllerInterface {
     }
 
     /**
-     * This method is used to find user account by Id.
+     * This method is used to modify personal data of currently logged-in user.
      *
-     * @param id Id of searched of the searched account
+     * @param id Id of account to find.
+     * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
+     * returns 400. When uuid is invalid returns 400.
      */
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
@@ -320,7 +374,7 @@ public class AccountController implements AccountControllerInterface {
      * messages about user actions in the application (e.g. messages containing confirmation links).
      *
      * @param id                    Identifier of the user account, whose e-mail will be changed by this method.
-     * @param accountChangeEmailDTO Data transfer object containing new e-mail address.
+     * @param accountEmailDTO Data transfer object containing new e-mail address.
      * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
@@ -328,9 +382,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountChangeEmailDTO accountChangeEmailDTO) {
+    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) {
         try {
-            accountService.changeEmail(id, accountChangeEmailDTO.getEmail());
+            accountService.changeEmail(id, accountEmailDTO.getEmail());
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -355,5 +409,68 @@ public class AccountController implements AccountControllerInterface {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
+    }
+
+    /**
+     * This method is used to remove client user level from account.
+     *
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred).
+     */
+    @Override
+    @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id) {
+        try {
+            accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException | AccountUserLevelException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * This method is used to remove staff user level from account.
+     *
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred).
+     */
+    @Override
+    @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id) {
+        try {
+            accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException | AccountUserLevelException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * This method is used to remove admin user level from account.
+     *
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred).
+     */
+    @Override
+    @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id) {
+        try {
+            accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException | AccountUserLevelException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

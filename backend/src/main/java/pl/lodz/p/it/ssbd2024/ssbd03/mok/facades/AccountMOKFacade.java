@@ -31,6 +31,9 @@ import java.util.concurrent.TimeUnit;
 @Transactional(propagation = Propagation.MANDATORY)
 public class AccountMOKFacade extends AbstractFacade<Account> {
 
+    /**
+     * Autowired entityManager used for managing entities.
+     */
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
     private EntityManager entityManager;
 
@@ -73,7 +76,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @Override
     public Optional<Account> find(UUID id) {
-        return super.find(id);
+        return super.findAndRefresh(id);
     }
 
     /**
@@ -229,7 +232,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         try {
             TypedQuery<Account> findAccountByEmail = entityManager.createNamedQuery("Account.findAccountByEmail", Account.class);
             findAccountByEmail.setParameter("email", email);
-            return Optional.of(findAccountByEmail.getSingleResult());
+            Account account = findAccountByEmail.getSingleResult();
+            entityManager.refresh(account);
+            return Optional.of(account);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }

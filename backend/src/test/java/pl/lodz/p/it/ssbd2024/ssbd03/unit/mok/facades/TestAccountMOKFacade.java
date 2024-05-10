@@ -1,8 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.mok.facades;
 
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,10 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -26,11 +21,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.eq;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
@@ -51,8 +41,6 @@ public class TestAccountMOKFacade extends TestcontainersConfig {
     @InjectMocks
     private AccountMOKFacade accountFacade;
 
-
-
     @BeforeEach
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
@@ -63,5 +51,4 @@ public class TestAccountMOKFacade extends TestcontainersConfig {
     public void AccountMOKFacadeGetEntityManagerReturnsNotNullTestPositive() {
         Assertions.assertNotNull(accountMOKFacade.getEntityManager());
     }
-
 }

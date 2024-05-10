@@ -28,6 +28,9 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.MANDATORY)
 public class TokenFacade extends AbstractFacade<Token> {
 
+    /**
+     * Autowired entityManager used for managing entities.
+     */
     @PersistenceContext(unitName = DatabaseConfigConstants.MOK_PU)
     private EntityManager entityManager;
 
@@ -141,13 +144,12 @@ public class TokenFacade extends AbstractFacade<Token> {
             TypedQuery<Token> query = getEntityManager()
                     .createNamedQuery("Token.findByTokenValue", Token.class)
                     .setParameter("tokenValue", tokenValue);
-            return Optional.of(query.getSingleResult());
-
+            Token token = query.getSingleResult();
+            entityManager.refresh(token);
+            return Optional.of(token);
         } catch (PersistenceException e) {
             return Optional.empty();
-
         }
-
     }
 
     /**
