@@ -3,7 +3,7 @@ pipeline{
     stages{
         stage('test'){
             steps{
-                sh 'mvn -B -f /backend clean test';
+                sh 'mvn -B -f ./backend clean test';
             }
         }
     }
