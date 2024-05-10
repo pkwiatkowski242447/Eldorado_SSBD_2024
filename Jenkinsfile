@@ -7,7 +7,7 @@ pipeline{
         stage('test'){
             steps{
                 sh 'set JAVA_HOME=${JAVA_HOME}'
-                sh 'mvn -v && mvn -B -f backend clean test';
+                sh 'mvn -v && mvn -B -f backend clean package';
             }
         }
     }
