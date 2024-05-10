@@ -176,8 +176,7 @@ public class AccountService implements AccountServiceInterface {
 
             accountFacade.create(newStaffAccount);
 
-            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS)
-                    .replace(".", "%2E");
+            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
             tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
 
             String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
@@ -377,7 +376,7 @@ public class AccountService implements AccountServiceInterface {
             account.setActive(true);
             account.setVerified(true);
             accountFacade.edit(account);
-            tokenFacade.findByTokenValue(token).ifPresent(tokenFacade::remove);
+            tokenFacade.findByTokenValue(decodedTokenValue).ifPresent(tokenFacade::remove);
             return true;
         }
     }
@@ -401,7 +400,7 @@ public class AccountService implements AccountServiceInterface {
             return false;
         } else {
             try {
-                String email = jwtProvider.extractEmail(token);
+                String email = jwtProvider.extractEmail(decodedTokenValue);
                 if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
                 account.setEmail(email);
                 accountFacade.edit(account);
