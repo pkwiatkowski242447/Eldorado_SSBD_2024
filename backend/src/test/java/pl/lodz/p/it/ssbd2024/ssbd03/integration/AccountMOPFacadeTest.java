@@ -107,7 +107,7 @@ public class AccountMOPFacadeTest extends TestcontainersConfig {
         assertNotNull(account1);
 
     }
-//
+
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
 //    void findAndRefreshTest() {
@@ -117,13 +117,18 @@ public class AccountMOPFacadeTest extends TestcontainersConfig {
 //
 //        Account refreshedAccount = optionalAccount.get();
 //        assertNotNull(refreshedAccount);
+//        // ERROR
+//        //Caused by: org.postgresql.util.PSQLException: ERROR: permission denied for table staff_data
 //    }
-//
+
 
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
 //    public void findAllTest() {
 //        List<Account> accounts = accountMOPFacade.findAll();
+          // ERROR
+//        //Caused by: org.postgresql.util.PSQLException: ERROR: permission denied for table staff_data
+//
 //    }
 //
 }

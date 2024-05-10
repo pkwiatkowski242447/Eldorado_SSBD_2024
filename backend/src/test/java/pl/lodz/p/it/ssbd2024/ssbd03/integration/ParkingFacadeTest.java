@@ -159,10 +159,6 @@ public class ParkingFacadeTest extends TestcontainersConfig {
     }
 
 
-
- //   /////////////////////////////////////////
-
-
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findAllWithPaginationTest(){
@@ -240,8 +236,7 @@ public class ParkingFacadeTest extends TestcontainersConfig {
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
 //    public void findSectorInParkingBySectorTypesTest(){
-//        // Given
-//        Address address = new Address("ul. Testowa 1", "Miasto", "00-001");
+//        Address address = new Address("tt", "Mi", "ttt");
 //        Parking parking1 = new Parking(address);
 //
 //        parking1.addSector("Sektor testowy 1", Sector.SectorType.COVERED, 100, 200);
@@ -251,7 +246,8 @@ public class ParkingFacadeTest extends TestcontainersConfig {
 //
 //        List<Sector> sectors = parkingFacade.findSectorInParkingBySectorTypes(parking.getId(), 0, 10, true);
 //
-//        assertEquals(3, sectors.size()); // Oczekujemy znalezienia 3 sektorów w parkingu
+//        assertEquals(3, sectors.size());
+//        //org.hibernate.QueryParameterException: No argument for named parameter ':sectorTypes'
 //    }
 
     @Test
@@ -271,6 +267,7 @@ public class ParkingFacadeTest extends TestcontainersConfig {
         parkingFacade.editSector(sector1);
         //findSectorById protected
         assertEquals(1, parking1.getSectors().size());
+
     }
 
     @Test

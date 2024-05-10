@@ -77,10 +77,7 @@ public class ParkingEventFacadeTest extends TestcontainersConfig {
         parkingEventFacade.create(parkingEvent);
         parkingEventFacade.create(parkingEvent);
 
-        // Act: Call the count method
         int count = parkingEventFacade.count();
-
-        // Assert: Check if the count is correct
         assertEquals(5, count);
     }
     @Test
