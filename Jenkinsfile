@@ -4,11 +4,15 @@ pipeline{
         maven 'maven'
         jdk 'jdk'
     }
+
+      environment {
+            MAIL_PROPERTIES_TARGET_LOCATION = 'backend/src/main/resources/properties/'
+        }
+
     stages{
         stage('build'){
             steps{
-                sh 'groups'
-                sh 'docker ps -a'
+                sh 'cp mail.properties ${MAIL_PROPERTIES_TARGET_LOCATION}'
                 sh 'cd backend && mvn -B clean test'
             }
         }
