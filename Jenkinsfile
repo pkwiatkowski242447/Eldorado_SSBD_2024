@@ -1,5 +1,5 @@
 pipeline{
-    agent {label 'master'}
+    agent {label 'built-in'}
     tools{
         maven 'maven'
         jdk 'jdk'
