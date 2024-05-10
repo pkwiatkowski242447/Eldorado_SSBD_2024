@@ -8,6 +8,7 @@ pipeline{
         stage('build'){
             steps{
                 sh 'set JAVA_HOME=${JAVA_HOME}'
+                sh 'systemctl status docker'
                 sh 'cd backend && ${mvn} -B clean test';
             }
         }
