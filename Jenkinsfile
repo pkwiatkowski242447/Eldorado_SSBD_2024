@@ -2,12 +2,16 @@ pipeline{
     agent any
     environment {
         JAVA_HOME = tool name: 'JDK21'
-        mvn = '/var/lib/maven/bin/mvn'
     }
+    tools{
+        maven 'maven'
+        jdk 'jdk'
+    }
+
     stages{
         stage('build'){
             steps{
-                sh 'cd backend && mvn -B clean test';
+                sh 'cd backend && mvn -B clean test'
             }
         }
     }
