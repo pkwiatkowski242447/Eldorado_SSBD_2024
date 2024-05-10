@@ -3,8 +3,7 @@ pipeline{
     stages{
         stage('test'){
             steps{
-                sh 'whoami'
-                sh 'mvn -v';
+                sh 'mvn -v && mvn -B -f ./backend clean test';
             }
         }
     }
