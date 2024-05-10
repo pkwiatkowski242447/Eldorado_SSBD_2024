@@ -7,7 +7,6 @@ pipeline{
     stages{
         stage('build'){
             steps{
-                sh 'echo &0'
                 sh 'systemctl status docker'
                 sh 'cd backend && mvn -B clean test';
             }
