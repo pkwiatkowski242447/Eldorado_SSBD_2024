@@ -4,6 +4,7 @@ pipeline{
     stages{
         stage('build'){
             steps{
+                sh 'echo $SHELL'
                 sh 'cd backend && mvn -B clean test'
             }
         }
