@@ -21,7 +21,7 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter @ToString
 @NoArgsConstructor
-public class AbstractEntity implements Signable {
+public class AbstractEntity {
     /**
      * The unique identifier (ID) of the entity.
      */

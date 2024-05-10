@@ -17,7 +17,7 @@ public class GenericServiceAspect {
     /**
      * Pointcut for any method definition inside classes annotated with annotation @Service from (org.springframework.stereotype)
      */
-    @Pointcut(value = "@annotation(org.springframework.stereotype.Service)")
+    @Pointcut(value = "@within(org.springframework.stereotype.Service)")
     private void serviceMethodPointcut() {}
 
     /**

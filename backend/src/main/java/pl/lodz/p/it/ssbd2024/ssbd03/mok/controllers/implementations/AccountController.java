@@ -38,6 +38,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUn
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
@@ -312,11 +313,11 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                                @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
-            return ResponseEntity.badRequest().body(I18n.MISSING_HEADER_IF_MATCH);
+            throw new InvalidRequestHeaderIfMatchException();
         }
 
         if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.TEXT_PLAIN).body(I18n.DATA_INTEGRITY_COMPROMISED);
+            throw new AccountDataIntegrityCompromisedException();
         }
 
         String currentUserLogin = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -325,7 +326,6 @@ public class AccountController implements AccountControllerInterface {
                 accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO), currentUserLogin)
         );
         return ResponseEntity.ok().body(accountOutputDTO);
-
     }
 
     /**

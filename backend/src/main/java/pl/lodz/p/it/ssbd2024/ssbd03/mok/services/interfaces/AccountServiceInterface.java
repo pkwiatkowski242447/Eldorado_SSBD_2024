@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
@@ -87,8 +88,9 @@ public interface AccountServiceInterface {
      * @param currentUserLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     * @throws ApplicationOptimisticLockException Threw if while editing the account, a parallel editing action occurred.
      */
-    Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException;
+    Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException, ApplicationOptimisticLockException;
 
     /**
      * Changes the e-mail of the specified Account.

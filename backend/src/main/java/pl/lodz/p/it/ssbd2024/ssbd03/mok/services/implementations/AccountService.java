@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
+import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -16,6 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
@@ -245,7 +247,6 @@ public class AccountService implements AccountServiceInterface {
         // Sending information email
         mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
                 account.getEmail(), account.getAccountLanguage(), true);
-        ///TODO Michal handle exception for trying to block an account by more than 1 admin??? - optimistic lock
     }
 
     /**
@@ -268,22 +269,25 @@ public class AccountService implements AccountServiceInterface {
         // Sending information email
         mailProvider.sendUnblockAccountInfoEmail(account.getName(), account.getLastname(),
                 account.getEmail(), account.getAccountLanguage());
-        ///TODO Michal handle exception for trying to unblock an account by more than 1 admin??? - optimistic lock
     }
 
     /**
      * This method is used to modify user personal data.
      *
-     * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
+     * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
      * @param currentUserLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
-    public Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException {
-        Account foundAccount = accountFacade.findByLogin(currentUserLogin)
-                .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-        //TODO optimistic lock
+    public Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException, ApplicationOptimisticLockException {
+        Account foundAccount = accountFacade.findByLogin(currentUserLogin).orElseThrow(AccountNotFoundException::new);
+
+        if (!modifiedAccount.getVersion().equals(foundAccount.getVersion())) {
+            throw new ApplicationOptimisticLockException();
+        }
+
         foundAccount.setName(modifiedAccount.getName());
         foundAccount.setLastname(modifiedAccount.getLastname());
         foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
