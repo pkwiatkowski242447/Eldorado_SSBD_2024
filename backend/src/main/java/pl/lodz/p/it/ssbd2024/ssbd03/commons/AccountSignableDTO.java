@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +28,7 @@ public abstract class AccountSignableDTO implements SignableDTO {
     private String login;
     @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long version;
-    @Schema(description = "Set of account user levels", implementation = ClientDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Set of account user levels", requiredMode = Schema.RequiredMode.REQUIRED)
     private Set<UserLevelDTO> userLevelsDto;
 
     /**

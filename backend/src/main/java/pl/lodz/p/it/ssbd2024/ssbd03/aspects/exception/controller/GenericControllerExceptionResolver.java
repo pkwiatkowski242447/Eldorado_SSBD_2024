@@ -1,10 +1,12 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
@@ -36,24 +38,41 @@ public class GenericControllerExceptionResolver {
      * @param accountConflictException AccountConflictException that was caught in order to be transformed to HTTP Response.
      *
      * @return When specified exception is propagated from controller component this method will catch it and transform
-     * to HTTP Response with status code 400 BAD REQUEST
+     * to HTTP Response with status code 409 CONFLICT
      */
     @ExceptionHandler(value = { AccountConflictException.class })
     public ResponseEntity<?> handleAccountConflictException(AccountConflictException accountConflictException) {
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                .contentType(MediaType.TEXT_PLAIN)
                .body(accountConflictException.getMessage());
     }
 
     /**
-     * //TODO -> Michal
-     * @param mapperBaseException
-     * @return
+     * This method is used to transform any MapperBaseException or exception that extend it, which could be thrown when
+     * trying to map not handled/ invalid data. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param mapperBaseException MapperBaseException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
      */
     @ExceptionHandler(value = { MapperBaseException.class })
     public ResponseEntity<?> handleMapperBaseException(MapperBaseException mapperBaseException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(mapperBaseException.getMessage());
+    }
+
+    /**
+     * TODO Michal
+     * @param accountNotFoundException
+     * @return
+     */
+    @ExceptionHandler(value = {AccountNotFoundException.class})
+    public ResponseEntity<?> handleAccountNotFoundException(AccountNotFoundException accountNotFoundException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountNotFoundException.getMessage());
     }
 }

@@ -24,7 +24,7 @@ public abstract class UserLevelDTO {
     private UUID id;
     @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long version;
-    @Schema(description = "Name of user level representing by this object", example = "CLIENT", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Name of user level representing by this object", requiredMode = Schema.RequiredMode.REQUIRED)
     private String roleName;
 
     /**
