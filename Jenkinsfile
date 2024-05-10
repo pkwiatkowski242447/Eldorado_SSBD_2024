@@ -1,5 +1,5 @@
 pipeline{
-    agent any
+    agent {label 'master'}
     tools{
         maven 'maven'
         jdk 'jdk'
@@ -7,6 +7,7 @@ pipeline{
     stages{
         stage('build'){
             steps{
+                sh 'groups'
                 sh 'docker ps -a'
                 sh 'cd backend && mvn -B clean test'
             }
