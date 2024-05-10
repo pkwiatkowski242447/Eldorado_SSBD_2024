@@ -14,7 +14,7 @@ pipeline{
             steps{
                 sh 'pwd'
                 sh 'ls'
-                sh 'cp mail.properties ${MAIL_PROPERTIES_TARGET_LOCATION}'
+                sh 'cp ${JENKINS_HOME}/mail.properties ${MAIL_PROPERTIES_TARGET_LOCATION}'
                 sh 'cd backend && mvn -B clean test'
             }
         }
