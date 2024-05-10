@@ -9,7 +9,7 @@ pipeline{
             steps{
                 sh 'set JAVA_HOME=${JAVA_HOME}'
                 sh 'cd backend'
-                sh '${mvn} -v && ${mvn} -B backend clean test';
+                sh '${mvn} -v && ${mvn} -B clean test';
             }
         }
     }
