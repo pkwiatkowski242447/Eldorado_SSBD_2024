@@ -7,8 +7,6 @@ pipeline{
     stages{
         stage('build'){
             steps{
-                sh 'ls ~/'
-                sh 'cat ~/.bashrc'
                 sh 'cd backend && mvn -B clean test';
             }
         }
