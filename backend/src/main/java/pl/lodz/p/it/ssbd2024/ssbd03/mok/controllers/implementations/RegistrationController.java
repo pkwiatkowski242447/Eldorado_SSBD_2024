@@ -76,7 +76,9 @@ public class RegistrationController implements RegistrationControllerInterface {
     @Operation(summary = "Register client", description = "Register new user account with client user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with client user level was created successfully and account activation message was sent."),
-            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created.")
+            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created."),
+            @ApiResponse(responseCode = "409", description = "User account with given login or password already exists."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
         this.accountService.registerClient(accountRegisterDTO.getLogin(),
@@ -104,25 +106,19 @@ public class RegistrationController implements RegistrationControllerInterface {
     @Operation(summary = "Register staff", description = "Register new user account with staff user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with staff user level was created successfully and account activation message was sent."),
-            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created.")
+            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created."),
+            @ApiResponse(responseCode = "409", description = "User account with given login or password already exists."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) {
-        try {
-            this.accountService.registerStaff(accountRegisterDTO.getLogin(),
-                    accountRegisterDTO.getPassword(),
-                    accountRegisterDTO.getFirstName(),
-                    accountRegisterDTO.getLastName(),
-                    accountRegisterDTO.getEmail(),
-                    accountRegisterDTO.getPhoneNumber(),
-                    accountRegisterDTO.getLanguage());
-            return ResponseEntity.noContent().build();
-        } catch (AccountCreationException exception) {
-            log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().body(exception.getMessage());
-        } catch (Throwable exception) {
-            log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
+        this.accountService.registerStaff(accountRegisterDTO.getLogin(),
+                accountRegisterDTO.getPassword(),
+                accountRegisterDTO.getFirstName(),
+                accountRegisterDTO.getLastName(),
+                accountRegisterDTO.getEmail(),
+                accountRegisterDTO.getPhoneNumber(),
+                accountRegisterDTO.getLanguage());
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -140,24 +136,18 @@ public class RegistrationController implements RegistrationControllerInterface {
     @Operation(summary = "Register admin", description = "Register new user account with admin user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with admin user level was created successfully and account activation message was sent."),
-            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created.")
+            @ApiResponse(responseCode = "400", description = "New user account with given data could not be created."),
+            @ApiResponse(responseCode = "409", description = "User account with given login or password already exists."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) {
-        try {
-            this.accountService.registerAdmin(accountRegisterDTO.getLogin(),
-                    accountRegisterDTO.getPassword(),
-                    accountRegisterDTO.getFirstName(),
-                    accountRegisterDTO.getLastName(),
-                    accountRegisterDTO.getEmail(),
-                    accountRegisterDTO.getPhoneNumber(),
-                    accountRegisterDTO.getLanguage());
-            return ResponseEntity.noContent().build();
-        } catch (AccountCreationException exception) {
-            log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().body(exception.getMessage());
-        } catch (Throwable exception) {
-            log.error(exception.getMessage(), exception);
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
+        this.accountService.registerAdmin(accountRegisterDTO.getLogin(),
+                accountRegisterDTO.getPassword(),
+                accountRegisterDTO.getFirstName(),
+                accountRegisterDTO.getLastName(),
+                accountRegisterDTO.getEmail(),
+                accountRegisterDTO.getPhoneNumber(),
+                accountRegisterDTO.getLanguage());
+        return ResponseEntity.noContent().build();
     }
 }
