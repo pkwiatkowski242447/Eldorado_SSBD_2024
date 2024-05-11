@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -50,7 +51,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Optional<Account> find(UUID id) {
-        return super.find(id);
+        return super.findAndRefresh(id);
     }
 
     /**
@@ -86,7 +87,9 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
         try {
             TypedQuery<Account> tq = getEntityManager().createNamedQuery("Account.findByLogin", Account.class);
             tq.setParameter("login", login);
-            return Optional.of(tq.getSingleResult());
+            Account foundAccount = tq.getSingleResult();
+            entityManager.refresh(foundAccount);
+            return Optional.of(foundAccount);
         } catch (PersistenceException pe) {
             return Optional.empty();
         }

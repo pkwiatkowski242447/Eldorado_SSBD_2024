@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,15 +13,22 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.ActivityLogUpdateException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+
+import java.time.LocalDateTime;
 
 /**
  * Service managing authentication.
@@ -29,18 +37,33 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 @Service
 public class AuthenticationService implements AuthenticationServiceInterface {
 
+    @Value("${account.maximum.failed.login.attempt.counter}")
+    private int failedLoginAttemptMaxVal;
+
     /**
-     * AuthenticationFacade used for operations on accounts.
+     * Facade component used for operations on accounts.
      */
     private final AuthenticationFacade authenticationFacade;
+
+    /**
+     * Facade component used for operations conducted on activity log object inside account object instance.
+     */
+    private final AccountMOKFacade accountMOKFacade;
+
     /**
      * AuthenticationManager used for authenticate user.
      */
     private final AuthenticationManager authenticationManager;
+
     /**
      * MailProvider used for sending emails.
      */
     private final MailProvider mailProvider;
+
+    /**
+     * JWT Provider used for generation JWT token, after successful authentication.
+     */
+    private final JWTProvider jwtProvider;
 
     /**
      * Autowired constructor for the service.
@@ -50,41 +73,15 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
-                                 AuthenticationManager authenticationManager, MailProvider mailProvider) {
+                                 AccountMOKFacade accountMOKFacade,
+                                 AuthenticationManager authenticationManager,
+                                 MailProvider mailProvider,
+                                 JWTProvider jwtProvider) {
         this.authenticationFacade = authenticationFacade;
+        this.accountMOKFacade = accountMOKFacade;
         this.authenticationManager = authenticationManager;
         this.mailProvider = mailProvider;
-    }
-
-    /**
-     * Updates the activity log for the specified Account. When the number of failed logins exceeds the allowed number,
-     * the account is blocked and an email notification is sent.
-     *
-     * @param account     Account which ActivityLog is to be updated.
-     * @param activityLog Updated ActivityLog.
-     * @throws ActivityLogUpdateException Threw when problem retrieving Account occurs.
-     */
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void updateActivityLog(Account account, ActivityLog activityLog) throws ActivityLogUpdateException {
-        try {
-            Account refreshedAccount = authenticationFacade.findAndRefresh(account.getId()).orElseThrow(AccountNotFoundException::new);
-            refreshedAccount.setActivityLog(activityLog);
-
-            // Increment the number of failed login attempts
-            if (!refreshedAccount.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= 3) {
-                refreshedAccount.blockAccount(false);
-                log.info(AccountLogMessages.ACCOUNT_BLOCKED_INFO.formatted(refreshedAccount.getId()));
-
-                // Sending information email
-                mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(),
-                        refreshedAccount.getEmail(), account.getAccountLanguage(), false);
-            }
-
-            authenticationFacade.edit(refreshedAccount);
-        } catch (AccountNotFoundException exception) {
-            throw new ActivityLogUpdateException(I18n.AUTH_ACTIVITY_LOG_UPDATE_EXCEPTION);
-        }
+        this.jwtProvider = jwtProvider;
     }
 
     /**
@@ -98,16 +95,49 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public Account login(String login, String password) throws AuthenticationAccountNotFoundException, AuthenticationInvalidCredentialsException {
+    public String login(String login, String password, String ipAddr) throws ApplicationBaseException {
+        String token = "";
+        Account account = authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            return authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException(I18n.AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION));
-        } catch (AccountNotFoundException exception) {
-            throw new AuthenticationAccountNotFoundException(exception.getMessage(), exception);
+            ActivityLog activityLog = account.getActivityLog();
+            if (!account.getActive() || account.getBlocked()) {
+                activityLog.setLastUnsuccessfulLoginIp(ipAddr);
+                activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
+                account.setActivityLog(activityLog);
+                authenticationFacade.edit(account);
+                if (!account.getActive()) {
+                    throw new AccountNotActivatedException();
+                } else if (account.getBlockedTime() != null) {
+                    throw new AccountBlockedByAdminException();
+                } else {
+                    throw new AccountBlockedByFailedLoginAttemptsException();
+                }
+            } else if (activityLog.getUnsuccessfulLoginCounter() > this.failedLoginAttemptMaxVal) {
+                throw new AccountBlockedByFailedLoginAttemptsException();
+            } else {
+                Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                activityLog.setLastSuccessfulLoginIp(ipAddr);
+                activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
+                activityLog.setUnsuccessfulLoginCounter(0);
+                account.setActivityLog(activityLog);
+                authenticationFacade.edit(account);
+                token = jwtProvider.generateJWTToken(account);
+            }
         } catch (BadCredentialsException exception) {
-            throw new AuthenticationInvalidCredentialsException(I18n.AUTH_CREDENTIALS_INVALID_EXCEPTION, exception);
+            Account refreshedAccount = authenticationFacade.findAndRefresh(account.getId()).orElseThrow(InvalidLoginAttemptException::new);
+            ActivityLog activityLog = refreshedAccount.getActivityLog();
+            activityLog.setLastUnsuccessfulLoginIp(ipAddr);
+            activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
+            activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
+            refreshedAccount.setActivityLog(activityLog);
+            authenticationFacade.edit(refreshedAccount);
+            mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(),
+                    refreshedAccount.getEmail(), account.getAccountLanguage(), false);
+            throw new InvalidLoginAttemptException();
         }
+        return token;
     }
 
     /**

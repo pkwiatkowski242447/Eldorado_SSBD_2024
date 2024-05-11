@@ -180,7 +180,7 @@ public class AccountController implements AccountControllerInterface {
      *                        to the application or changed later to other e-mail address.
      *
      * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
-     * (if there is no account with given e-mail address) or 412 PRECONDITION FAILED (when account is either blocked or
+     * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
      *
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
@@ -372,7 +372,7 @@ public class AccountController implements AccountControllerInterface {
     /**
      * This method is used to modify personal data of currently logged-in user.
      *
-     * @param id Id of account to find.
+     * @param id Identifier of account to find.
      * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
      * returns 400. When uuid is invalid returns 400.
      */

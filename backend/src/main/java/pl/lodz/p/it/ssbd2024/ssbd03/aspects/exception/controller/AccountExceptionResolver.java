@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountStatusException;
@@ -81,7 +82,7 @@ public class AccountExceptionResolver {
      */
     @ExceptionHandler(value = { AccountStatusException.class })
     public ResponseEntity<?> handleAccountStatusException(AccountStatusException accountStatusException) {
-        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+        return ResponseEntity.badRequest()
                .contentType(MediaType.TEXT_PLAIN)
                .body(accountStatusException.getMessage());
     }
@@ -117,5 +118,20 @@ public class AccountExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(accountDataIntegrityCompromisedException.getMessage());
+    }
+
+    /**
+     * This method handles InvalidLoginException, which is thrown during login attempt when either given credentials
+     * are invalid or user account in not found in the database (it is a safety measure not to "scan" for logins that
+     * have accounts associated with them).
+     *
+     * @return 401 UNAUTHORIZED is returned when this exception is caught while propagating
+     * from controller component.
+     */
+    @ExceptionHandler(value = { InvalidLoginAttemptException.class })
+    public ResponseEntity<?> handleInvalidLoginAttemptException(InvalidLoginAttemptException invalidLoginAttemptException) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+               .contentType(MediaType.TEXT_PLAIN)
+               .body(invalidLoginAttemptException.getMessage());
     }
 }
