@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
@@ -493,4 +490,11 @@ public class AccountController implements AccountControllerInterface {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @Override
+    public ResponseEntity<?> changePasswordSelf(AccountChangePasswordDTO accountChangePasswordDTO) {
+        return null;
+    }
+
+
 }

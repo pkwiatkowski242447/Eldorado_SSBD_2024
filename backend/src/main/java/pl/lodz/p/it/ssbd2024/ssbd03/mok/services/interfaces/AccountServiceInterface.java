@@ -219,4 +219,6 @@ public interface AccountServiceInterface {
      * @throws AccountUserLevelException Threw when the account has no admin user level or this is the only user level of the account.
      */
     void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+
+    void changePasswordSelf(String oldPassword, String newPassword);
 }

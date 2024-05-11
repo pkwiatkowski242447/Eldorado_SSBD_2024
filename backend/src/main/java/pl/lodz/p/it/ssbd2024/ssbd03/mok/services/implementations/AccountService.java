@@ -620,4 +620,9 @@ public class AccountService implements AccountServiceInterface {
 
         userLevelFacade.remove(adminUserLevel);
     }
+
+    @Override
+    public void changePasswordSelf(String oldPassword, String newPassword) {
+
+    }
 }
