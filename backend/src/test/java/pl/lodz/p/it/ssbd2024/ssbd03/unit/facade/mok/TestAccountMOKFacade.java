@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.unit.mok.facades;
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.facade.mok;
 
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Assertions;

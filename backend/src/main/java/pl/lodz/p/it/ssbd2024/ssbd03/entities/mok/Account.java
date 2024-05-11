@@ -278,7 +278,7 @@ public class Account extends AbstractEntity {
     @Size(min = AccountsConsts.USER_LEVEL_MIN_SIZE, message = AccountMessages.USER_LEVEL_EMPTY)
     @Size(max = AccountsConsts.USER_LEVEL_MAX_SIZE, message = AccountMessages.USER_LEVEL_FULL)
     @OneToMany(mappedBy = DatabaseConsts.ACCOUNT_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
-    //TODO TEST KASKADY REFRESH
+    //TODO: Rozwiązanie konfliktu z uprawnieniami przy wykonywaniu operacji Refresh (gdyż jest kasada) + uprawnienia do edycji (i ewentualnie rozwiązanie kwestii kasady Merge)
     @ToString.Exclude
     private final Collection<UserLevel> userLevels = new ArrayList<>();
 
@@ -328,6 +328,27 @@ public class Account extends AbstractEntity {
      * @param phoneNumber Phone number connected with the account.
      */
     public Account(String login, String password, String name, String lastname, String email, String phoneNumber) {
+        this.login = login;
+        this.password = password;
+        this.name = name;
+        this.lastname = lastname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * Constructs new Account entity, with version setting.
+     *
+     * @param login       Account's login.
+     * @param password    Account's password.
+     * @param name        Account owner's firstname.
+     * @param lastname    Account owner's lastname.
+     * @param email       Email connected with the account.
+     * @param phoneNumber Phone number connected with the account.
+     * @param version     Object version.
+     */
+    public Account(String login, String password, String name, String lastname, String email, String phoneNumber, Long version) {
+        super(version);
         this.login = login;
         this.password = password;
         this.name = name;

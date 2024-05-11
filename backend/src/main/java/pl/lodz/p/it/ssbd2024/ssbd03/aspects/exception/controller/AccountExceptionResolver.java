@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountStatusException;
@@ -41,13 +42,30 @@ public class AccountExceptionResolver {
      * @param accountConflictException AccountConflictException that was caught in order to be transformed to HTTP Response.
      *
      * @return When specified exception is propagated from controller component this method will catch it and transform
-     * to HTTP Response with status code 400 BAD REQUEST
+     * to HTTP Response with status code 409 CONFLICT.
      */
     @ExceptionHandler(value = { AccountConflictException.class })
     public ResponseEntity<?> handleAccountConflictException(AccountConflictException accountConflictException) {
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                .contentType(MediaType.TEXT_PLAIN)
                .body(accountConflictException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any AccountNotFoundException or exception that extend it, which could be thrown when
+     * wanted account is not available in database. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param accountNotFoundException AccountNotFoundException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
+     */
+    @ExceptionHandler(value = { pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException.class })
+    public ResponseEntity<?> handleAccountNotFoundException(pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException accountNotFoundException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountNotFoundException.getMessage());
     }
 
     /**
@@ -82,5 +100,22 @@ public class AccountExceptionResolver {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(accountNotFoundException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any AccountDataIntegrityCompromisedException or exception that extend it, which could be thrown when
+     * the request contains an account object with modified signature-protected fields. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param accountDataIntegrityCompromisedException AccountDataIntegrityCompromisedException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
+     */
+    @ExceptionHandler(value = { AccountDataIntegrityCompromisedException.class })
+    public ResponseEntity<?> handleAccountDataIntegrityCompromisedException(AccountDataIntegrityCompromisedException accountDataIntegrityCompromisedException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountDataIntegrityCompromisedException.getMessage());
     }
 }

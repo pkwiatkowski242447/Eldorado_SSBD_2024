@@ -1,5 +1,10 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +38,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBl
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
@@ -96,7 +102,13 @@ public class AccountController implements AccountControllerInterface {
      * the response is 409 CONFLICT.
      */
     @Override
-    @PostMapping(value = "/{user_id}/block", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{user_id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "Block user account", description = "The endpoint is used to block user account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The account has been blocked correctly."),
+            @ApiResponse(responseCode = "400", description = "The account has not been blocked due to the correctness of the request or because the account is not available in the database"),
+            @ApiResponse(responseCode = "409", description = "The account has not been blocked due to being blocked already or trying to block own account.")
+    })
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) {
         try {
             if (id.length() != 36) {
@@ -136,7 +148,13 @@ public class AccountController implements AccountControllerInterface {
      * 404 NOT FOUND and when AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
      */
     @Override
-    @PostMapping(value = "/{user_id}/unblock", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{user_id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "Unblock user account", description = "The endpoint is used to unblock user account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The account has been unblocked correctly."),
+            @ApiResponse(responseCode = "400", description = "The account has not been unblocked due to the correctness of the request or because the account is not available in the database"),
+            @ApiResponse(responseCode = "409", description = "The account has not been unblocked due to being blocked already.")
+    })
     public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
         try {
             if (id.length() != 36) {
@@ -299,7 +317,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSelf() {
+    public ResponseEntity<?> getSelf() throws ApplicationBaseException {
         //getUserLoginFromSecurityContextHolder
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         //call accountServiceMethod [findByLogin()]
@@ -320,30 +338,35 @@ public class AccountController implements AccountControllerInterface {
      * @param ifMatch          Value of If-Match header
      * @param accountModifyDTO Account properties with potentially changed values.
      * @return In the correct flow returns account object with applied modifications with 200 OK status.
-     * If request has empty IF_MATCH header or account currently logged user was not found,
+     * If request has empty IF_MATCH header or account currently logged user was not found or data are invalid
      * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
      * then 409 CONFLICT is returned.
      */
     @Override
-    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @Operation(summary = "Modify self account", description = "The endpoint is used to modify self account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccountOutputDTO.class))),
+            @ApiResponse(responseCode = "400", description = "The account has not been modified due to the correctness of the request or because the account is not available in the database", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)),
+            @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
+    })
     public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
-                                               @RequestBody AccountModifyDTO accountModifyDTO) {
+                                               @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
-            return ResponseEntity.badRequest().body(I18n.MISSING_HEADER_IF_MATCH);
+            throw new InvalidRequestHeaderIfMatchException();
         }
 
         if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(I18n.DATA_INTEGRITY_COMPROMISED);
+            throw new AccountDataIntegrityCompromisedException();
         }
 
-        try {
-            AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
-                    accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO))
-            );
-            return ResponseEntity.ok().body(accountOutputDTO);
-        } catch (AccountNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        String currentUserLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
+                accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO), currentUserLogin)
+        );
+        return ResponseEntity.ok().body(accountOutputDTO);
     }
 
     /**
@@ -356,7 +379,7 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
+    public ResponseEntity<?> getUserById(@PathVariable("id") String id) throws ApplicationBaseException {
         //conversion String -> UUID
         try {
             UUID uuid = UUID.fromString(id);
@@ -414,7 +437,6 @@ public class AccountController implements AccountControllerInterface {
     /**
      * This method is used to remove client user level from account.
      *
-     *
      * @param id Identifier of the user account, whose user level will be changed by this method.
      * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
@@ -435,7 +457,6 @@ public class AccountController implements AccountControllerInterface {
     /**
      * This method is used to remove staff user level from account.
      *
-     *
      * @param id Identifier of the user account, whose user level will be changed by this method.
      * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
@@ -455,7 +476,6 @@ public class AccountController implements AccountControllerInterface {
 
     /**
      * This method is used to remove admin user level from account.
-     *
      *
      * @param id Identifier of the user account, whose user level will be changed by this method.
      * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account

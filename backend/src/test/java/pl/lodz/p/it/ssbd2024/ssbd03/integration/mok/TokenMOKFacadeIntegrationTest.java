@@ -1,17 +1,13 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.integration;
+package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
@@ -32,10 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
 public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
 
     //INITIAL DATA
     @Autowired
@@ -51,11 +43,6 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     private final Token.TokenType tokenTypeChangeOverwrittenPassword = Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD;
     private final UUID userUuidNo1 = UUID.fromString("f5afc042-79b0-47fe-87ee-710c14af888c");
     private final String tokenValueNo1 = "TEST_VALUE90";
-
-    @BeforeEach
-    public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-    }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)

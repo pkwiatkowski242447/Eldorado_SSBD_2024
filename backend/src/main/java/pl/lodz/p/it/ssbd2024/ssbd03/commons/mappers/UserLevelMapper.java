@@ -8,38 +8,54 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedClientTypeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+/**
+ * Used to handle UserLevel entity-DTO mapping.
+ */
 public class UserLevelMapper {
-    public static UserLevel toUserLevel(UserLevelDTO userLevelDTO) {
-        //TODO maybe dynamic mapper??
+
+    /**
+     * This method is used to map UserLevel DTO to UserLevel entity class.
+     * @param userLevelDTO UserLevel DTO to map.
+     * @return Returns mapped UserLevel entity class.
+     * @throws MapperUnexpectedUserLevelException Threw when unexpected UserLevel DTO occurred.
+     * @throws MapperUnexpectedClientTypeException Threw when Client user level DTO contains invalid client type.
+     */
+    public static UserLevel toUserLevel(UserLevelDTO userLevelDTO)
+            throws MapperUnexpectedUserLevelException, MapperUnexpectedClientTypeException {
         return switch (userLevelDTO) {
             case ClientDTO clientDTO -> {
                 Client client = new Client();
                 client.setType(switch (clientDTO.getClientType().toUpperCase()) {
-                    case "CLIENT" -> Client.ClientType.BASIC;
+                    case "BASIC" -> Client.ClientType.BASIC;
                     case "STANDARD" -> Client.ClientType.STANDARD;
                     case "PREMIUM" -> Client.ClientType.PREMIUM;
-                    ///FIXME good exception or not good
-                    default -> throw new IllegalArgumentException(I18n.UNEXPECTED_CLIENT_TYPE);
+                    default -> throw new MapperUnexpectedClientTypeException(I18n.UNEXPECTED_CLIENT_TYPE);
                 });
                 yield client;
             }
             case StaffDTO staffDTO -> new Staff();
             case AdminDTO adminDTO -> new Admin();
-            ///FIXME good exception or not good
-            default -> throw new IllegalArgumentException(I18n.UNEXPECTED_USER_LEVEL);
+            default -> throw new MapperUnexpectedUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
         };
     }
 
-    public static UserLevelDTO toUserLevelDTO(UserLevel userLevel) {
+    /**
+     * This method is used to map UserLevel entity to UserLevel DTO class.
+     * @param userLevel UserLevel to map.
+     * @return Returns mapped UserLevel DTO class.
+     * @throws MapperUnexpectedUserLevelException Threw when unhandled UserLevel entity occurred.
+     */
+    public static UserLevelDTO toUserLevelDTO(UserLevel userLevel) throws MapperUnexpectedUserLevelException {
         return switch (userLevel) {
-            case Client client ->
-                    new ClientDTO(client.getClass().getSimpleName().toUpperCase(), client.getType().toString());
-            case Staff staff -> new StaffDTO(staff.getClass().getSimpleName().toUpperCase());
-            case Admin admin -> new AdminDTO(admin.getClass().getSimpleName().toUpperCase());
-            ///FIXME good exception or not good
-            default -> throw new IllegalArgumentException(I18n.UNEXPECTED_USER_LEVEL);
+            case Client client -> new ClientDTO(userLevel.getId(), client.getVersion(), client.getType().toString());
+            case Staff staff -> new StaffDTO(userLevel.getId(), staff.getVersion());
+            case Admin admin -> new AdminDTO(userLevel.getId().toString(), admin.getVersion());
+            default -> throw new MapperUnexpectedUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
         };
     }
 }
