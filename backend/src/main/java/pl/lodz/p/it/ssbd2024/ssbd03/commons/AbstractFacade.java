@@ -81,7 +81,7 @@ public abstract class AbstractFacade<T> {
      * @return If an entity with the given ID was found returns an Optional containing the entity, otherwise returns an empty Optional.
      */
     protected Optional<T> findAndRefresh(UUID id) {
-        Optional<T> optEntity = find(id);
+        Optional<T> optEntity = Optional.ofNullable(this.getEntityManager().find(entityClass, id));
         optEntity.ifPresent(t -> getEntityManager().refresh(t));
         return optEntity;
     }

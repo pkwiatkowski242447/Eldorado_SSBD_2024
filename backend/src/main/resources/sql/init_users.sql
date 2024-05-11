@@ -15,6 +15,8 @@ GRANT SELECT                         ON TABLE public.account        TO ssbd03mop
 GRANT SELECT                         ON TABLE public.personal_data  TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.user_level     TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.client_data    TO ssbd03mop;
+--GRANT SELECT                         ON TABLE public.staff_data    TO ssbd03mop;
+
 
 GRANT SELECT, UPDATE                 ON TABLE public.account        TO ssbd03auth;
 GRANT SELECT                         ON TABLE public.personal_data  TO ssbd03auth;
@@ -29,7 +31,7 @@ GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.token          TO ssbd03mok
 -- Admin
 INSERT INTO public.account (id, login, password, verified, active, language, phone_number, creation_date, version, blocked) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'jerzybem', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, 'PL', '111111111', current_timestamp, 0, false);
 
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'Jerzy', 'Bem', 'relav81691@dxice.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'Jerzy', 'Bem', 'beleka5909@rencr.com');
 
 -- Admin - admin role
 INSERT INTO public.user_level (id, level, account_id, version) VALUES ('bdb52e59-0054-4ec5-a2af-3e0d2b187ce0', 'ADMIN', 'b3b8c2ac-21ff-434b-b490-aa6d717447c0', 0);

@@ -29,4 +29,13 @@ public interface TokenServiceInterface {
      * @param token Confirmation token to be removed
      */
     void removeAccountsEmailConfirmationToken(String token);
+
+    /**
+     * Creates and persists password reset token for the Account.
+     *
+     * @param account Account for which the token is created.
+     *
+     * @return Returns newly created password reset token value.
+     */
+    String createPasswordResetToken(Account account);
 }

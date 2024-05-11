@@ -144,13 +144,12 @@ public class TokenFacade extends AbstractFacade<Token> {
             TypedQuery<Token> query = getEntityManager()
                     .createNamedQuery("Token.findByTokenValue", Token.class)
                     .setParameter("tokenValue", tokenValue);
-            return Optional.of(query.getSingleResult());
-
+            Token token = query.getSingleResult();
+            entityManager.refresh(token);
+            return Optional.of(token);
         } catch (PersistenceException e) {
             return Optional.empty();
-
         }
-
     }
 
     /**

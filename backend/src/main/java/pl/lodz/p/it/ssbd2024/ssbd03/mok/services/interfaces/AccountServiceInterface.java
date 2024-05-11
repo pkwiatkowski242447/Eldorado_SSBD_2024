@@ -8,7 +8,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 
 import java.util.List;
@@ -63,6 +63,28 @@ public interface AccountServiceInterface {
     void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException;
 
     /**
+     * This method is used to reset current user account password. This method basically generates a token of type
+     * CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
+     * specified by the user in the form and send to the application with the usage of DTO object.
+     *
+     * @param userEmail Email address that will be used to search for the existing account, and then used for sending
+     *                  e-mail message with password change URL.
+     */
+    void forgetAccountPassword(String userEmail) throws ApplicationBaseException;
+
+    /**
+     * This method is used to change password of the user. This method does read RESET PASSWORD token with
+     * specified token value, and then
+     *
+     * @param token         Value of the token, that will be used to find RESET PASSWORD token in the database.
+     * @param newPassword   New password, transferred to the web application by data transfer object.
+     *
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
+     * method.
+     */
+    void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException;
+
+    /**
      * Method for blocking an account by its UUID.
      *
      * @param id Account identifier
@@ -110,8 +132,9 @@ public interface AccountServiceInterface {
      *
      * @param token Last part of the activation URL sent in a message to users e-mail address.
      * @return Boolean value indicating whether activation of the account was successful or not.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    boolean activateAccount(String token);
+    boolean activateAccount(String token) throws ApplicationBaseException;
 
     /**
      * Confirm e-mail change with a token from confirmation URL, sent to the new e-mail address.
@@ -128,12 +151,13 @@ public interface AccountServiceInterface {
      * @param login      Account's login. A phrase is sought in the logins.
      * @param firstName  Account owner's first name. A phrase is sought in the names.
      * @param lastName   Account's owner last name. A phrase is sought in the last names.
+     * @param active     Activity status of the user account (whether it has been activated or not).
      * @param order      Ordering in which user accounts should be returned.
      * @param pageNumber Number of the page with searched users accounts.
      * @param pageSize   Number of the users accounts per page.
      * @return List of user accounts that match the given parameters.
      */
-    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean order, int pageNumber, int pageSize);
+    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize);
 
     /**
      * Retrieve all accounts in the system.

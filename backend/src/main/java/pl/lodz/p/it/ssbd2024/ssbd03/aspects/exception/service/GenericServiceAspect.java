@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 
 @Aspect
 @Order(15)
@@ -34,6 +35,8 @@ public class GenericServiceAspect {
     private Object handleServiceMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
         try {
             return proceedingJoinPoint.proceed();
+        } catch (IllegalArgumentException exception) {
+            throw new TokenNotValidException();
         } catch (ApplicationBaseException applicationBaseException) {
             throw applicationBaseException;
         } catch (Throwable throwable) {

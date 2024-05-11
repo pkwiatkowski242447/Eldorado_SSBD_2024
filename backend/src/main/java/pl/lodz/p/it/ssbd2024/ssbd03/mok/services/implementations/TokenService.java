@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,9 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 @Service
 public class TokenService implements TokenServiceInterface {
+
+    @Value("${account.password.reset.period.length.minutes}")
+    private int passwordResetPeriodLengthMinutes;
 
     /**
      * TokenFacade used for operations on token entities.
@@ -78,6 +82,25 @@ public class TokenService implements TokenServiceInterface {
         this.tokenFacade.create(emailToken);
 
         return emailToken.getTokenValue();
+    }
+
+    /**
+     * Creates and persists password reset token for the Account.
+     *
+     * @param account Account for which the token is created.
+     *
+     * @return Returns newly created password reset token value.
+     */
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public String createPasswordResetToken(Account account) {
+        tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).ifPresent(tokenFacade::remove);
+
+        String tokenValue = this.jwtProvider.generateActionToken(account, this.passwordResetPeriodLengthMinutes, ChronoUnit.MINUTES);
+        Token passwordToken = new Token(tokenValue, account, Token.TokenType.RESET_PASSWORD);
+        this.tokenFacade.create(passwordToken);
+
+        return passwordToken.getTokenValue();
     }
 
     /**

@@ -76,7 +76,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @Override
     public Optional<Account> find(UUID id) {
-        return super.find(id);
+        return super.findAndRefresh(id);
     }
 
     /**
@@ -232,7 +232,9 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
         try {
             TypedQuery<Account> findAccountByEmail = entityManager.createNamedQuery("Account.findAccountByEmail", Account.class);
             findAccountByEmail.setParameter("email", email);
-            return Optional.of(findAccountByEmail.getSingleResult());
+            Account account = findAccountByEmail.getSingleResult();
+            entityManager.refresh(account);
+            return Optional.of(account);
         } catch (PersistenceException exception) {
             return Optional.empty();
         }
@@ -429,6 +431,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     public List<Account> findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(String login,
                                                                                                       String firstName,
                                                                                                       String lastName,
+                                                                                                      boolean active,
                                                                                                       boolean order,
                                                                                                       int pageNumber,
                                                                                                       int pageSize) {
@@ -444,6 +447,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccountsMatchingCriteriaQuery.setParameter("login", login);
             findAllAccountsMatchingCriteriaQuery.setParameter("firstName", firstName);
             findAllAccountsMatchingCriteriaQuery.setParameter("lastName", lastName);
+            findAllAccountsMatchingCriteriaQuery.setParameter("active", active);
             var list = findAllAccountsMatchingCriteriaQuery.getResultList();
             refreshAll(list);
             return list;
@@ -464,12 +468,13 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
-    public List<Account> findAllAccountsWithoutRecentActivityWithPagination(LocalDateTime lastSuccessfulLogin, int pageNumber, int pageSize) {
+    public List<Account> findAllAccountsWithoutRecentActivityWithPagination(LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) {
         try {
             TypedQuery<Account> findAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.findAccountsWithoutAnyActivityFrom", Account.class);
             findAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
             findAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);
             findAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
+            findAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
             var list = findAllAccountsWithoutRecentActivityQuery.getResultList();
             refreshAll(list);
             return list;
@@ -490,12 +495,13 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return Optional containing a number of inactive users accounts in the system. In case of persistence exception
      * empty optional is returned.
      */
-    public Optional<Integer> countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime lastSuccessfulLogin, int pageNumber, int pageSize) {
+    public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) {
         try {
-            TypedQuery<Integer> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Integer.class);
+            TypedQuery<Long> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Long.class);
             countAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
             countAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);
             countAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
+            countAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
             return Optional.of(countAllAccountsWithoutRecentActivityQuery.getSingleResult());
         } catch (PersistenceException exception) {
             return Optional.empty();
