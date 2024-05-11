@@ -52,7 +52,7 @@ public class ParkingFacadeTest extends TestcontainersConfig {
     private Parking parking;
     private Sector sector;
     private Reservation reservation;
-    private Reservation reservation1;
+
 
     @BeforeEach
     public void setup() {
@@ -61,7 +61,6 @@ public class ParkingFacadeTest extends TestcontainersConfig {
         parking = new Parking(address);
         sector = new Sector(parking,"dd", Sector.SectorType.COVERED,23,11);
         reservation = new Reservation(sector);
-        reservation1 = new Reservation(sector);
     }
 
     @Test
@@ -91,8 +90,6 @@ public class ParkingFacadeTest extends TestcontainersConfig {
         assertNotNull(retrievedParking);
 
     }
-
-
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
@@ -162,16 +159,22 @@ public class ParkingFacadeTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findAllWithPaginationTest(){
-        Address address1 = new Address("a","b","c");
+        Address address1 = new Address("avf","mjh","cdd");
+        Address address2 = new Address("ass","mfr","cpd");
+        Address address3 = new Address("ap","mja","cdl");
         Parking parking1 = new Parking(address1);
-        Parking parking2 = new Parking(address1);
+        Parking parking2 = new Parking(address2);
+        Parking parking3 = new Parking(address3);
+        parkingFacade.create(parking1);
+        parkingFacade.create(parking2);
+        parkingFacade.create(parking3);
         parking1.addSector("name1", Sector.SectorType.COVERED,100,200);
-        parking1.addSector("name2", Sector.SectorType.UNCOVERED,20,200);
+        parking1.addSector("name2", Sector.SectorType.COVERED,20,200);
         parking2.addSector("name3", Sector.SectorType.UNCOVERED,20,200);
-        parking2.addSector("name3", Sector.SectorType.UNCOVERED,20,200);
+        parking3.addSector("name4", Sector.SectorType.UNCOVERED,20,200);
 
         List <Parking> parkings = parkingFacade.findAllWithPagination(0,10,true);
-        assertEquals(1,parkings.size());
+        assertEquals(4,parkings.size());
     }
 
     @Test
@@ -233,22 +236,29 @@ public class ParkingFacadeTest extends TestcontainersConfig {
         assertEquals(2,sectors1.size());
     }
 
-//    @Test
-//    @Transactional(propagation = Propagation.REQUIRED)
-//    public void findSectorInParkingBySectorTypesTest(){
-//        Address address = new Address("tt", "Mi", "ttt");
-//        Parking parking1 = new Parking(address);
-//
-//        parking1.addSector("Sektor testowy 1", Sector.SectorType.COVERED, 100, 200);
-//        parking1.addSector("Sektor testowy 2", Sector.SectorType.UNCOVERED, 20, 200);
-//        parking1.addSector("Sektor testowy 3", Sector.SectorType.UNCOVERED, 30, 300);
-//
-//
-//        List<Sector> sectors = parkingFacade.findSectorInParkingBySectorTypes(parking.getId(), 0, 10, true);
-//
-//        assertEquals(3, sectors.size());
-//        //org.hibernate.QueryParameterException: No argument for named parameter ':sectorTypes'
-//    }
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void findParkingWithAvailablePlacesTest(){
+        Address address1 = new Address("a","b","c");
+        Address address2 = new Address("ar","br","rc");
+        Parking parking1 = new Parking(address1);
+        Parking parking2 = new Parking(address2);
+
+        parkingFacade.create(parking1);
+        parking1.addSector("name1", Sector.SectorType.COVERED,100,200);
+        parking1.addSector("name2", Sector.SectorType.UNCOVERED,10,200);
+        parking1.addSector("name3", Sector.SectorType.UNCOVERED,10,200);
+        parking2.addSector("name4", Sector.SectorType.UNCOVERED,10,200);
+        List <Sector> sectors = parking1.getSectors();
+        for (int i=0; i<sectors.size();i++){
+            sectors.get(i).setAvailablePlaces(i);
+        }
+
+        List <Parking> sectors1 = parkingFacade.findParkingWithAvailablePlaces(0,5,true);
+        assertEquals(2,sectors1.size());
+    }
+
+
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
@@ -258,14 +268,12 @@ public class ParkingFacadeTest extends TestcontainersConfig {
 
         parkingFacade.create(parking1);
         parking1.addSector("test", Sector.SectorType.COVERED, 100, 100);
-
-
         Sector sector1 = new Sector(parking1, "tt11", Sector.SectorType.COVERED, 100, 100);
 
         sector1.setMaxPlaces(200);
 
         parkingFacade.editSector(sector1);
-        //findSectorById protected
+
         assertEquals(1, parking1.getSectors().size());
 
     }
@@ -280,6 +288,25 @@ public class ParkingFacadeTest extends TestcontainersConfig {
     }
 
 
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void findSectorInParkingBySectorTypesTest(){
+        Address address = new Address("tt", "Mi", "ttt");
+        Address address1 = new Address("dtt", "Mei", "ttet");
+        Parking parking1 = new Parking(address);
+        Parking parking2 = new Parking(address1);
 
+        parking1.addSector("Se2", Sector.SectorType.UNCOVERED, 20, 200);
+        parking1.addSector("St3", Sector.SectorType.UNCOVERED, 30, 300);
+        parking1.addSector("St4", Sector.SectorType.UNCOVERED, 30, 300);
+        parking2.addSector("St42", Sector.SectorType.UNCOVERED, 30, 300);
+
+        List<Sector.SectorType> sectorTypes = List.of(Sector.SectorType.COVERED);
+        List<Sector> sectors = parkingFacade.findSectorInParkingBySectorTypes(parking1.getId(), sectorTypes, 0, 10, true);
+        List<Sector> sectors1 = parkingFacade.findSectorInParkingBySectorTypes(parking1.getId(), sectorTypes, 0, 10, true);
+
+        assertEquals(0, sectors.size());
+        assertEquals(0, sectors1.size());
+    }
 
 }

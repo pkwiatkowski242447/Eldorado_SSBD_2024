@@ -15,6 +15,8 @@ GRANT SELECT                         ON TABLE public.account        TO ssbd03mop
 GRANT SELECT                         ON TABLE public.personal_data  TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.user_level     TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.client_data    TO ssbd03mop;
+#GRANT SELECT                         ON TABLE public.staff_data    TO ssbd03mop;
+
 
 GRANT SELECT, UPDATE                 ON TABLE public.account        TO ssbd03auth;
 GRANT SELECT                         ON TABLE public.personal_data  TO ssbd03auth;

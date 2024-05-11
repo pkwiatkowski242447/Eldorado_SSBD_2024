@@ -122,13 +122,6 @@ public class AccountMOPFacadeTest extends TestcontainersConfig {
 //    }
 
 
-//    @Test
-//    @Transactional(propagation = Propagation.REQUIRED)
-//    public void findAllTest() {
-//        List<Account> accounts = accountMOPFacade.findAll();
-          // ERROR
-//        //Caused by: org.postgresql.util.PSQLException: ERROR: permission denied for table staff_data
-//
-//    }
-//
+
+
 }
