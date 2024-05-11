@@ -83,7 +83,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    protected Optional<Parking> find(UUID id) {
+    public Optional<Parking> find(UUID id) {
         return super.find(id);
     }
 
@@ -208,9 +208,10 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     @Transactional
-    public List<Sector> findSectorInParkingBySectorTypes(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
+    public List<Sector> findSectorInParkingBySectorTypes(UUID parkingId, List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive){
         var list = getEntityManager().createNamedQuery("Sector.findBySectorTypes", Sector.class)
-                .setParameter("parkingId",parkingId)
+                .setParameter("parkingId", parkingId)
+                .setParameter("sectorTypes", sectorTypes)
                 .setParameter("showOnlyActive", showOnlyActive)
                 .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)

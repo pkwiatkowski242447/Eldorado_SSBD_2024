@@ -10,7 +10,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,17 +65,6 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
     @Override
     public Optional<Account> findAndRefresh(UUID id) {
         return super.findAndRefresh(id);
-    }
-
-    /**
-     * Retrieves all Accounts.
-     *
-     * @return List containing all Accounts.
-     */
-    @Transactional
-    @Override
-    public List<Account> findAll() {
-        return super.findAll();
     }
 
     /**
