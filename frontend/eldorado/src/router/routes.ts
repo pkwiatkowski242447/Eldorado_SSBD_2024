@@ -10,6 +10,8 @@ import LoginPage from "../pages/LoginPage";
 import TestPage from "../pages/TestPage";
 import RegisterPage from "@/pages/RegisterPage.tsx";
 import ActivateAccountPage from "@/pages/ActivateAccountPage.tsx";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage.tsx";
+import ResetPasswordPage from "@/pages/ResetPasswordPage.tsx";
 // import RegisterPage from "../pages/RegisterPage";
 // import ChangePasswordFormForm from "../components/forms/ChangePasswordForm";
 // import ChangePasswordPage from "../pages/ChangePasswordPage";
@@ -35,6 +37,14 @@ export const PublicRoutes: RouteType[] = [
     {
         path: Pathnames.public.activateAccount,
         Component: ActivateAccountPage
+    },
+    {
+        path: Pathnames.public.forgotPassword,
+        Component: ForgotPasswordPage
+    },
+    {
+        path: Pathnames.public.resetPassword,
+        Component: ResetPasswordPage
     },
 
 ]

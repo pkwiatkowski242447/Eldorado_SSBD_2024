@@ -1,4 +1,3 @@
-import {useAccount} from '../hooks/useAccount';
 import {useAccountState} from '../context/AccountContext';
 import eldoLogo from "@/assets/eldorado.png";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
@@ -10,10 +9,17 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {Button} from "@/components/ui/button.tsx";
+import {api} from "@/api/api.ts";
 
 function TestPage() {
-    const {account, setAccount} = useAccountState();
-    const {logOut} = useAccount();
+    const {account} = useAccountState();
+
+    function onClick() {
+        api.logOut().then(() => {
+            localStorage.removeItem('account');
+            localStorage.removeItem('token');
+        });
+    }
 
     console.log(account);
 
@@ -28,7 +34,7 @@ function TestPage() {
                     <DropdownMenuContent className="w-56">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator/>
-                        <Button onClick={logOut}>Log out</Button>
+                        <Button onClick={onClick}>Log out</Button>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

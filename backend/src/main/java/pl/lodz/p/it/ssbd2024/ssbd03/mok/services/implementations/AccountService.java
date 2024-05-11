@@ -143,7 +143,7 @@ public class AccountService implements AccountServiceInterface {
         String tokenValue = jwtProvider.generateActionToken(newClientAccount, (this.accountCreationConfirmationPeriodLengthHours / 2) * 60, ChronoUnit.MINUTES);
         tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
 
-        String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
         String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
         mailProvider.sendRegistrationConfirmEmail(newClientAccount.getName(),
@@ -236,7 +236,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     /**
-     * This method is used to initiate process of resetting current user account password. This method basically 
+     * This method is used to initiate process of resetting current user account password. This method basically
      * generates a token of type CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
      * specified by the user in the form and send to the application with the usage of DTO object.
      *
@@ -253,7 +253,7 @@ public class AccountService implements AccountServiceInterface {
         String tokenValue = this.tokenService.createPasswordResetToken(account);
         String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
         String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
-        
+
         this.mailProvider.sendPasswordResetEmail(account.getName(),
                 account.getLastname(),
                 userEmail,
@@ -265,18 +265,18 @@ public class AccountService implements AccountServiceInterface {
      * This method is used to change password of the user. This method does read RESET PASSWORD token with
      * specified token value, and then
      *
-     * @param token         Value of the token, that will be used to find RESET PASSWORD token in the database.
-     * @param newPassword   New password, transferred to the web application by data transfer object.
-     *
+     * @param token       Value of the token, that will be used to find RESET PASSWORD token in the database.
+     * @param newPassword New password, transferred to the web application by data transfer object.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
-     * method.
+     *                                  method.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
         Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue)
                 .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
-        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount())) throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
+        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount()))
+            throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
 
         Account account = this.accountFacade.findAndRefresh(tokenObject.getAccount().getId()).orElseThrow(AccountIdNotFoundException::new);
         if (account.getBlocked()) throw new AccountBlockedException();
@@ -339,7 +339,7 @@ public class AccountService implements AccountServiceInterface {
      * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
      * @param currentUserLogin Login associated with the modified account.
      * @return Account object with applied modifications
-     * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     * @throws AccountNotFoundException           Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
@@ -367,12 +367,14 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean activateAccount(String token) throws ApplicationBaseException {
-        String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
+        String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
         Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
                 .orElseThrow(AccountIdNotFoundException::new);
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
+            log.info(account.toString());
             account.setActive(true);
             account.setVerified(true);
             accountFacade.edit(account);
@@ -589,7 +591,7 @@ public class AccountService implements AccountServiceInterface {
      * Removes the Admin user level from the account.
      *
      * @param id Identifier of the account from which the Staff user level will be removed.
-     * @throws AccountNotFoundException Threw when the account with the given ID was not found.
+     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
      * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
      */
 

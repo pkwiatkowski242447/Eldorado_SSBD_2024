@@ -5,6 +5,8 @@ export const Pathnames = {
         register: '/register',
         test: '/test',
         activateAccount: '/activate-account/:token',
+        forgotPassword: '/forgot-password/',
+        resetPassword: '/reset-password/:token',
     },
     admin: {
         home: '/',
