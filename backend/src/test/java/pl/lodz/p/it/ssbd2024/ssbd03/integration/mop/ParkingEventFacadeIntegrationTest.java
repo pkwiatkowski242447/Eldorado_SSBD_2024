@@ -1,20 +1,14 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.integration;
+package pl.lodz.p.it.ssbd2024.ssbd03.integration.mop;
 
-import jakarta.servlet.ServletContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
@@ -25,25 +19,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
-public class ParkingEventFacadeTest extends TestcontainersConfig {
-
+public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @Autowired
     ParkingEventFacade parkingEventFacade;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
-
-    private static final String CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
 
     private Address address;
     private Parking parking;
@@ -53,60 +37,46 @@ public class ParkingEventFacadeTest extends TestcontainersConfig {
 
     @BeforeEach
     public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
         address = new Address("dd","casc","wqc");
         parking = new Parking(address);
         sector = new Sector(parking,"dd", Sector.SectorType.COVERED,23,11);
         reservation = new Reservation(sector);
         parkingEvent = new ParkingEvent(reservation,LocalDateTime.now(),ParkingEvent.EventType.ENTRY);
-
-    }
-
-    @Test
-    public void initializationContextTest() {
-        ServletContext servletContext = webApplicationContext.getServletContext();
-        assertNotNull(servletContext);
-        assertInstanceOf(MockServletContext.class, servletContext);
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void testCount() {
-
-
+    public void parkingEventFacadeCountParkingEventsTest() {
         parkingEventFacade.create(parkingEvent);
         parkingEventFacade.create(parkingEvent);
 
-        int count = parkingEventFacade.count();
-        assertEquals(5, count);
+        int parkingEventCount = parkingEventFacade.count();
+        assertEquals(5, parkingEventCount);
     }
+
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createParkingEventTest() {
+    public void parkingFacadeCreateParkingEventTest() {
         assertNotNull(parkingEvent);
         parkingEventFacade.create(parkingEvent);
 
-
         assertEquals("dd",parkingEvent.getReservation().getSector().getName());
-
     }
-
-
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findParkingEventTest(){
+    public void parkingFacadeFindParkingEventTest(){
         parkingEventFacade.create(parkingEvent);
         Optional<ParkingEvent> parkingEventOptional = parkingEventFacade.find(parkingEvent.getId());
         assertTrue(parkingEventOptional.isPresent());
 
-        ParkingEvent parkingEvent1 = parkingEventOptional.get();
-        assertNotNull(parkingEvent1);
+        ParkingEvent parkingEvent = parkingEventOptional.get();
+        assertNotNull(parkingEvent);
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editTest() {
+    public void parkingFacadeEditParkingEventTest() {
         parkingEvent.setDate(LocalDateTime.now());
         parkingEventFacade.create(parkingEvent);
 
@@ -123,7 +93,7 @@ public class ParkingEventFacadeTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    void findAndRefreshTest() {
+    public void parkingFacadeFindAndRefreshParkingEventTest() {
         parkingEventFacade.create(parkingEvent);
         UUID parkingEventId = parkingEvent.getId();
 
@@ -134,28 +104,26 @@ public class ParkingEventFacadeTest extends TestcontainersConfig {
         assertNotNull(refreshedParkingEvent);
     }
 
-
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeReservationTest(){
+    public void parkingFacadeRemoveReservationTest(){
         parkingEventFacade.create(parkingEvent);
-        Optional<ParkingEvent> retrivedParkingEventOptional = parkingEventFacade.find(parkingEvent.getId());
-        assertTrue(retrivedParkingEventOptional.isPresent());
+        Optional<ParkingEvent> retrievedParkingEventOptional = parkingEventFacade.find(parkingEvent.getId());
+        assertTrue(retrievedParkingEventOptional.isPresent());
 
-        ParkingEvent retrievedParkingEvent = retrivedParkingEventOptional.get();
+        ParkingEvent retrievedParkingEvent = retrievedParkingEventOptional.get();
         assertNotNull(retrievedParkingEvent);
-        parkingEventFacade.remove(parkingEvent);
 
+        parkingEventFacade.remove(parkingEvent);
         Optional <ParkingEvent> deleted = parkingEventFacade.find(parkingEvent.getId());
         assertTrue(deleted.isEmpty());
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void testFindAll() {
-        List<ParkingEvent> parkingEvents = parkingEventFacade.findAll();
-        assertNotNull(parkingEvents);
-        assertFalse(parkingEvents.isEmpty());
+    public void parkingFacadeFindAllParkingEventsTest() {
+        List<ParkingEvent> listOfParkingEvents = parkingEventFacade.findAll();
+        assertNotNull(listOfParkingEvents);
+        assertFalse(listOfParkingEvents.isEmpty());
     }
-
 }
