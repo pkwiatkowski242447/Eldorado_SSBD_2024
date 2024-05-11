@@ -12,6 +12,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param account Entity to be persisted.
      */
     @Override
-    public void create(Account account) {
+    public void create(Account account) throws ApplicationBaseException {
         super.create(account);
     }
 

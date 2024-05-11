@@ -142,7 +142,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeEmailTestSuccessful() throws AccountEmailChangeException, AccountNotFoundException {
+    void changeEmailTestSuccessful() throws ApplicationBaseException, AccountEmailChangeException, AccountNotFoundException {
 
         Account a = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         a.setAccountLanguage("pl");

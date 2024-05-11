@@ -1,7 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
-import jakarta.persistence.OptimisticLockException;
-import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -475,7 +473,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
      */
     @Override
-    public void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException {
+    public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException, AccountEmailChangeException, AccountNotFoundException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))
             throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION);

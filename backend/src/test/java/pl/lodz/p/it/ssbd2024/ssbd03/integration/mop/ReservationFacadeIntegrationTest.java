@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 
 import java.time.LocalDateTime;
@@ -50,7 +51,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeCreateReservationTest() {
+    public void reservationFacadeCreateReservationTest() throws ApplicationBaseException {
         assertNotNull(reservation);
         reservationFacade.create(reservation);
 
@@ -59,7 +60,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeFindReservationTest(){
+    public void reservationFacadeFindReservationTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
         Optional<Reservation> retrievedReservationOptional = reservationFacade.find(reservation.getId());
         assertTrue(retrievedReservationOptional.isPresent());
@@ -70,7 +71,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeEditReservationTest() {
+    public void reservationFacadeEditReservationTest() throws ApplicationBaseException {
         reservation.setBeginTime(LocalDateTime.now());
         reservationFacade.create(reservation);
 
@@ -87,7 +88,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    void reservationFacadeFindAndRefreshTest() {
+    void reservationFacadeFindAndRefreshTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
 
         UUID reservationId = reservation.getId();
@@ -101,7 +102,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeCountTest() {
+    public void reservationFacadeCountTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
         int count = reservationFacade.count();
         assertEquals(4,count);
@@ -109,7 +110,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeRemoveReservationTest(){
+    public void reservationFacadeRemoveReservationTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
         Optional<Reservation> retrievedReservationOptional = reservationFacade.find(reservation.getId());
         assertTrue(retrievedReservationOptional.isPresent());
@@ -137,7 +138,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeFindAllReservationsWithPaginationTest() {
+    public void reservationFacadeFindAllReservationsWithPaginationTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
 
         List<Reservation> reservations = reservationFacade.findAllWithPagination(0,8);

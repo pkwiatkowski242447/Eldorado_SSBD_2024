@@ -124,8 +124,9 @@ public interface AccountServiceInterface {
      *                                     Additionally, if the problem was caused by an incorrect new mail,
      *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
      * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
-    void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException;
+    void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException, AccountEmailChangeException, AccountNotFoundException;
 
     /**
      * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.

@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 
@@ -58,7 +59,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createAndRemovePositiveTest() {
+    public void createAndRemovePositiveTest() throws ApplicationBaseException {
         String tokenValue = "testValueToken";
         Account account = accountMOKFacade.findByLogin("jerzybem").orElseThrow(NoSuchElementException::new);
 
@@ -127,7 +128,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeByAccountTest() {
+    public void removeByAccountTest() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
         UserLevel userLevelClientNo1 = new Client();
@@ -156,7 +157,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeByTypeAndAccount() {
+    public void removeByTypeAndAccount() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
         UserLevel userLevelClientNo1 = new Client();
@@ -187,7 +188,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editTestPositive() {
+    public void editTestPositive() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
         UserLevel userLevelClientNo1 = new Client();

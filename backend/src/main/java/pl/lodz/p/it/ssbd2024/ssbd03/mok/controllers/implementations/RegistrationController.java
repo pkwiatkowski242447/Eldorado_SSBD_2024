@@ -15,11 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.RegistrationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 /**
  * Controller used to create new Accounts in the system.
@@ -37,29 +34,13 @@ public class RegistrationController implements RegistrationControllerInterface {
     private final AccountServiceInterface accountService;
 
     /**
-     * TokenProvider used for operations on TOKENS.
-     */
-    private final TokenServiceInterface tokenService;
-
-    /**
-     * MailProvider used for sending emails.
-     */
-    private final MailProvider mailProvider;
-
-    /**
      * Autowired constructor for the controller.
      *
      * @param accountService Service containing method for account manipulation.
-     * @param tokenService   Service used for token management.
-     * @param mailProvider`  Component used to send e-mail messages to user e-mail address (depending on the actions they perform).
      */
     @Autowired
-    public RegistrationController(AccountServiceInterface accountService,
-                                  TokenServiceInterface tokenService,
-                                  MailProvider mailProvider) {
+    public RegistrationController(AccountServiceInterface accountService) {
         this.accountService = accountService;
-        this.tokenService = tokenService;
-        this.mailProvider = mailProvider;
     }
 
     /**

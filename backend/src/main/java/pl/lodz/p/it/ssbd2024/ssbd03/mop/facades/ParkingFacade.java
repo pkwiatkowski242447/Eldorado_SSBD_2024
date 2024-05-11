@@ -9,6 +9,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    public void create(Parking entity) {
+    public void create(Parking entity) throws ApplicationBaseException {
         super.create(entity);
     }
 

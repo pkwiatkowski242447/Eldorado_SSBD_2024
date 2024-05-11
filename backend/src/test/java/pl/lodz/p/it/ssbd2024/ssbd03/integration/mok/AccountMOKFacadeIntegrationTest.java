@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import java.util.concurrent.TimeUnit;
 
@@ -229,7 +230,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createAndRemoveMethodPositiveTest() {
+    public void createAndRemoveMethodPositiveTest() throws ApplicationBaseException {
         //Create account with user level
         Account account = new Account(accountLoginNo1, accountPasswordNo1, accountFirstNameNo1, accountLastNameNo1,
                 accountEmailNo1, accountPhoneNumberNo1);
@@ -258,7 +259,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllInactiveAccountsWithPaginationPositiveTest() {
+    public void findAllInactiveAccountsWithPaginationPositiveTest() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -306,12 +307,11 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         assertEquals(2, accounts2.size());
         assertEquals(1, accounts3.size());
         assertEquals(1, accounts4.size());
-
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsMatchingLoginWithPagination() {
+    public void findAllAccountsMatchingLoginWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -347,7 +347,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editPositiveTest() {
+    public void editPositiveTest() throws ApplicationBaseException {
 
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -373,7 +373,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsMarkedForDeletionTestPositive() throws NoSuchFieldException {
+    public void findAllAccountsMarkedForDeletionTestPositive() throws ApplicationBaseException, NoSuchFieldException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -408,7 +408,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsByBlockedTestPositive() throws NoSuchFieldException, IllegalAccessException {
+    public void findAllAccountsByBlockedTestPositive() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -458,7 +458,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllBlockedAccountsThatWereBlockedByAdminWithPagination() throws IllegalAccessException, NoSuchFieldException {
+    public void findAllBlockedAccountsThatWereBlockedByAdminWithPagination() throws ApplicationBaseException, IllegalAccessException, NoSuchFieldException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -547,7 +547,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination() {
+    public void findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -583,7 +583,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsWithoutRecentActivityWithPagination() {
+    public void findAllAccountsWithoutRecentActivityWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -626,7 +626,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void countAllAccountsWithoutRecentActivityWithPagination() {
+    public void countAllAccountsWithoutRecentActivityWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -669,7 +669,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes() throws NoSuchFieldException, IllegalAccessException {
+    public void findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -698,7 +698,6 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         blockedField.set(accountFind1, true);
         blockedTimeField.set(accountFind2, LocalDateTime.of(2018, 5, 8, 15, 30));
         blockedField.set(accountFind2, true);
-
 
         //accountFind1.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2017, 5, 8, 15, 30));
         //accountFind2.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2018, 5, 8, 15, 30));
