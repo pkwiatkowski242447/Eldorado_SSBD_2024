@@ -456,7 +456,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getAccountByLogin(String login) {
-        Optional<Account> account = accountFacade.findByLoginAndRefresh(login);
+        Optional<Account> account = accountFacade.findByLogin(login);
         return account.orElse(null);
     }
 

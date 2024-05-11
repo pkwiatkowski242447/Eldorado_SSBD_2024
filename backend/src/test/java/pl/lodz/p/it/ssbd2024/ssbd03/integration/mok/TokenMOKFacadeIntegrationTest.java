@@ -60,7 +60,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     public void createAndRemovePositiveTest() {
         String tokenValue = "testValueToken";
-        Account account = accountMOKFacade.findByLoginAndRefresh("jerzybem").orElseThrow(NoSuchElementException::new);
+        Account account = accountMOKFacade.findByLogin("jerzybem").orElseThrow(NoSuchElementException::new);
 
         assertNotNull(account);
 
@@ -137,7 +137,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
+        Account findAccount = accountMOKFacade.findByLogin("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token = new Token("WiktorPtakToken", findAccount, tokenTypeChangeOverwrittenPassword);
 
@@ -166,7 +166,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
+        Account findAccount = accountMOKFacade.findByLogin("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token1 = new Token("WiktorPtakToken1", findAccount, tokenTypeChangeOverwrittenPassword);
         Token token2 = new Token("WiktorPtakToken2", findAccount, tokenTypeChangeOverwrittenPassword);
@@ -197,7 +197,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
+        Account findAccount = accountMOKFacade.findByLogin("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token1 = new Token("WiktorPtakToken1", findAccount, tokenTypeChangeOverwrittenPassword);
 

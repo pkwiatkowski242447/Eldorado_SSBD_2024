@@ -20,7 +20,7 @@ import java.util.List;
         "classpath:application.properties",
         "classpath:properties/mail.properties",
         "classpath:properties/urls.properties",
-        "classpath:properties/time.properties"
+        "classpath:properties/consts.properties"
 })
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class WebConfig implements WebMvcConfigurer {

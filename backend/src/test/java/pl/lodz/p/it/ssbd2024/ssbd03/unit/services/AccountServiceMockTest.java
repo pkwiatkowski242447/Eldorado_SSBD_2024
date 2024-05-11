@@ -286,12 +286,12 @@ public class AccountServiceMockTest {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
 
-        when(accountMOKFacade.findByLoginAndRefresh(account.getLogin())).thenReturn(Optional.of(account));
+        when(accountMOKFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
 
         assertEquals(account, accountService.getAccountByLogin(account.getLogin()));
 
         Mockito.verify(accountMOKFacade, Mockito.times(1))
-                .findByLoginAndRefresh(account.getLogin());
+                .findByLogin(account.getLogin());
     }
 
     @Test
