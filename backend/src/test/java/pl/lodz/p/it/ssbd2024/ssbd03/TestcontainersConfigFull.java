@@ -27,11 +27,6 @@ public class TestcontainersConfigFull {
     static PostgreSQLContainer<?> postgres;
     static GenericContainer<?> tomcat;
 
-    @DynamicPropertySource
-    static void postgresProperties(DynamicPropertyRegistry registry) {
-        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
-    }
-
     @BeforeAll
     static void beforeAll() throws IOException {
         ResourcePropertySource props = new ResourcePropertySource("classpath:testcontainers-config.properties");
@@ -88,8 +83,8 @@ public class TestcontainersConfigFull {
         tomcat.start();
 
         // Enable logging Tomcat logs
-        Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(LoggerFactory.getLogger("TestcontainersConfig"));
-        tomcat.followOutput(logConsumer);
+//        Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(LoggerFactory.getLogger("TestcontainersConfig"));
+//        tomcat.followOutput(logConsumer);
     }
 
     @AfterAll

@@ -521,7 +521,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <database.host>localhost</database.host>
+                <database.host>db</database.host>
                 <schema-gen.policy>create-drop</schema-gen.policy>
                 <debug-sql.log>false</debug-sql.log>
                 <logging.level>INFO</logging.level>
