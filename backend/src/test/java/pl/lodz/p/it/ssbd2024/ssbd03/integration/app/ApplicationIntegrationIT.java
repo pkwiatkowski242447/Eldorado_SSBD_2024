@@ -13,7 +13,7 @@ import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ApplicationIntegrationTest extends TestcontainersConfigFull {
+public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     private static final String CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
 

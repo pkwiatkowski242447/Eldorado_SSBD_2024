@@ -3,7 +3,6 @@ package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,10 +89,11 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void countTestPositive() {
-        ///TODO hmmm??
-//        int count = userLevelFacade.count();
-//
-//        Assertions.assertEquals(8, count);
+        teardown();
+
+        int count = userLevelFacade.count();
+
+        Assertions.assertEquals(8, count);
     }
 
     @Test
