@@ -25,8 +25,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUn
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.CurrentPasswordAndNewPasswordAreTheSameException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -236,7 +239,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     /**
-     * This method is used to initiate process of resetting current user account password. This method basically 
+     * This method is used to initiate process of resetting current user account password. This method basically
      * generates a token of type CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
      * specified by the user in the form and send to the application with the usage of DTO object.
      *
@@ -253,7 +256,7 @@ public class AccountService implements AccountServiceInterface {
         String tokenValue = this.tokenService.createPasswordResetToken(account);
         String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
         String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
-        
+
         this.mailProvider.sendPasswordResetEmail(account.getName(),
                 account.getLastname(),
                 userEmail,
@@ -265,18 +268,18 @@ public class AccountService implements AccountServiceInterface {
      * This method is used to change password of the user. This method does read RESET PASSWORD token with
      * specified token value, and then
      *
-     * @param token         Value of the token, that will be used to find RESET PASSWORD token in the database.
-     * @param newPassword   New password, transferred to the web application by data transfer object.
-     *
+     * @param token       Value of the token, that will be used to find RESET PASSWORD token in the database.
+     * @param newPassword New password, transferred to the web application by data transfer object.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
-     * method.
+     *                                  method.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
         Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue)
                 .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
-        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount())) throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
+        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount()))
+            throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
 
         Account account = this.accountFacade.findAndRefresh(tokenObject.getAccount().getId()).orElseThrow(AccountIdNotFoundException::new);
         if (account.getBlocked()) throw new AccountBlockedException();
@@ -339,7 +342,7 @@ public class AccountService implements AccountServiceInterface {
      * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
      * @param currentUserLogin Login associated with the modified account.
      * @return Account object with applied modifications
-     * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     * @throws AccountNotFoundException           Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
@@ -589,7 +592,7 @@ public class AccountService implements AccountServiceInterface {
      * Removes the Admin user level from the account.
      *
      * @param id Identifier of the account from which the Staff user level will be removed.
-     * @throws AccountNotFoundException Threw when the account with the given ID was not found.
+     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
      * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
      */
 
@@ -621,8 +624,35 @@ public class AccountService implements AccountServiceInterface {
         userLevelFacade.remove(adminUserLevel);
     }
 
+    /***
+     * This method is used to change own password.
+     *
+     * @param oldPassword The OldPassword is the old password that the user must provide for authentication.
+     * @param newPassword The new password is the password that the user wants to set.
+     * @param login The login retrieved from the security context.
+     * @throws ApplicationBaseException - IncorrectPasswordException (when oldPassword parameter and password in database
+     * are not equal), CurrentPasswordAndNewPasswordAreTheSameException (when newPassword parameter and password in database
+     * are not equal). AccountNotFoundException (when account not found).
+     */
     @Override
-    public void changePasswordSelf(String oldPassword, String newPassword) {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationBaseException.class)
+    public void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException {
 
+        String newPasswordEncoded = passwordEncoder.encode(newPassword);
+
+        Account account = accountFacade.findByLoginAndRefresh(login).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        String passwordFromDatabase = account.getPassword();
+
+        if (!passwordEncoder.matches(oldPassword, passwordFromDatabase)) {
+            throw new IncorrectPasswordException();
+        }
+
+        if (passwordEncoder.matches(newPassword, passwordFromDatabase)) {
+            throw new CurrentPasswordAndNewPasswordAreTheSameException();
+        }
+
+        account.setPassword(newPasswordEncoded);
+        accountFacade.edit(account);
     }
 }

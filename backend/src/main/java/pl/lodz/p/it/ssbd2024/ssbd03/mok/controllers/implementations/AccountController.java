@@ -175,11 +175,9 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for registration
      *                        to the application or changed later to other e-mail address.
-     *
      * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 412 PRECONDITION FAILED (when account is either blocked or
      * not activated yet).
-     *
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
      */
     @Override
@@ -195,7 +193,6 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param token RESET PASSWORD token required to change password for user account, that was generated when
      *              forgetAccountPassword() method was called.
-     *
      * @return 200 OK is returned when changing password goes flawlessly. Otherwise, 400 BAD REQUEST is returned (since
      * RESET PASSWORD token is no longer valid or not in the database).
      */
@@ -250,7 +247,7 @@ public class AccountController implements AccountControllerInterface {
                                                                             @RequestParam(name = "pageNumber") int pageNumber,
                                                                             @RequestParam(name = "pageSize") int pageSize) {
         List<AccountListDTO> accountList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName,
-                        lastName, active,  order, pageNumber, pageSize)
+                        lastName, active, order, pageNumber, pageSize)
                 .stream()
                 .map(AccountListMapper::toAccountListDTO)
                 .toList();
@@ -267,7 +264,7 @@ public class AccountController implements AccountControllerInterface {
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
      * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
-     * methods in both facade and service component for Account.
+     *                                  methods in both facade and service component for Account.
      */
     @Override
     @PostMapping("/activate-account/{token}")
@@ -393,7 +390,7 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to change users e-mail address, which later could be used to send
      * messages about user actions in the application (e.g. messages containing confirmation links).
      *
-     * @param id                    Identifier of the user account, whose e-mail will be changed by this method.
+     * @param id              Identifier of the user account, whose e-mail will be changed by this method.
      * @param accountEmailDTO Data transfer object containing new e-mail address.
      * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
@@ -491,10 +488,27 @@ public class AccountController implements AccountControllerInterface {
         }
     }
 
+
+    /**
+     * This method is used to change own password.
+     *
+     * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
+     * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
+     * is the same as current password returns 400 BAD REQUEST HTTP response.
+     * @throws ApplicationBaseException thrown when problems occur when password is changing.
+     */
     @Override
-    public ResponseEntity<?> changePasswordSelf(AccountChangePasswordDTO accountChangePasswordDTO) {
-        return null;
+    @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
+        String oldPassword = accountChangePasswordDTO.getOldPassword();
+        String newPassword = accountChangePasswordDTO.getNewPassword();
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        log.info(username);
+
+        accountService.changePasswordSelf(oldPassword, newPassword, username);
+
+        return ResponseEntity.ok().build();
     }
-
-
 }

@@ -176,5 +176,13 @@ public interface AccountControllerInterface {
      */
     ResponseEntity<?> removeAdminUserLevel(String id);
 
-    ResponseEntity<?> changePasswordSelf(AccountChangePasswordDTO accountChangePasswordDTO);
+    /**
+     * This method is used to change own password.
+     *
+     * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
+     * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
+     * is the same as current password returns 400 BAD REQUEST HTTP response.
+     * @throws ApplicationBaseException thrown when problems occur when password is changing.
+     */
+    ResponseEntity<?> changePasswordSelf(AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException;
 }
