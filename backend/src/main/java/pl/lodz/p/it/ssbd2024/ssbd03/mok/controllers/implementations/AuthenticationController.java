@@ -35,7 +35,6 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * Autowired constructor for the controller.
      *
      * @param authenticationService Service used for authentication purposes.
-     * @param jwtProvider           Component used in order to generate JWT tokens with specified payload.
      */
     @Autowired
     public AuthenticationController(AuthenticationServiceInterface authenticationService) {

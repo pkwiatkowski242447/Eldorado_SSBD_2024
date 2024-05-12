@@ -370,12 +370,6 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
         <!--JWT-->
         <dependency>
             <groupId>com.auth0</groupId>
@@ -463,6 +457,14 @@
                 <configuration>
                     <show>private</show>
                     <nohelp>true</nohelp>
+                    <doclint>all,-missing</doclint>
+                    <tags>
+                        <tag>
+                            <name>note</name>
+                            <placement>a</placement>
+                            <head>To Do:</head>
+                        </tag>
+                    </tags>
                 </configuration>
             </plugin>
 
@@ -515,6 +517,14 @@
                 <version>3.6.3</version>
                 <configuration>
                     <show>public</show>
+                    <doclint>all,-missing</doclint>
+                    <tags>
+                        <tag>
+                            <name>note.</name>
+                            <placement>a</placement>
+                            <head>Note:</head>
+                        </tag>
+                    </tags>
                 </configuration>
             </plugin>
         </plugins>

@@ -73,6 +73,8 @@ public class AccountMapper {
 
         userLevels.forEach(account::addUserLevel);
 
+        account.setAccountLanguage(accountModifyDTO.getAccountLanguage());
+
         return account;
     }
 }

@@ -25,4 +25,8 @@ public class Staff extends UserLevel implements Serializable {
      */
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public Staff(Long version) {
+        super(version);
+    }
 }
