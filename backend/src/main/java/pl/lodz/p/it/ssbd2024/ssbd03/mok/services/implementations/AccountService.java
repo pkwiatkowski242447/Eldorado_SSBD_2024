@@ -522,16 +522,14 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void removeClientUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+    public void removeClientUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Client)) {
             throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
-            //TODO maybe change to another exception
         }
         if (account.getUserLevels().size() == 1) {
-            throw new AccountUserLevelException("User must have at least one user level.");
-            //TODO maybe change to another exception
+            throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
         UserLevel clientUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Client).findFirst().orElse(null);
@@ -552,16 +550,14 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void removeStaffUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+    public void removeStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Staff)) {
             throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
-            //TODO maybe change to another exception
         }
         if (account.getUserLevels().size() == 1) {
-            throw new AccountUserLevelException("User must have at least one user level.");
-            //TODO maybe change to another exception
+            throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
         UserLevel staffUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Staff).findFirst().orElse(null);
@@ -582,7 +578,7 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+    public void removeAdminUserLevel(String id) throws ApplicationBaseException{
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         String currentAccountLogin = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -597,7 +593,7 @@ public class AccountService implements AccountServiceInterface {
             throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
         }
         if (account.getUserLevels().size() == 1) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
         UserLevel adminUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Admin).findFirst().orElse(null);

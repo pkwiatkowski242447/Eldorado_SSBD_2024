@@ -196,7 +196,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException  Threw when there is no account with given login.
      * @throws AccountUserLevelException Threw when the account has no client user level or this is the only user level of the account.
      */
-    void removeClientUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+    void removeClientUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * Removes the staff user level from the account.
@@ -205,7 +205,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException  Threw when there is no account with given login.
      * @throws AccountUserLevelException Threw when the account has no staff user level or this is the only user level of the account.
      */
-    void removeStaffUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+    void removeStaffUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * Removes the admin user level from the account.
@@ -214,7 +214,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException  Threw when there is no account with given login.
      * @throws AccountUserLevelException Threw when the account has no admin user level or this is the only user level of the account.
      */
-    void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+    void removeAdminUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * Adds the Client user level to the account.

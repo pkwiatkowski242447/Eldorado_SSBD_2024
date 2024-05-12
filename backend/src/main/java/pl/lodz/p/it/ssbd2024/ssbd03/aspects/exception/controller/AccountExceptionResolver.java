@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
@@ -149,5 +150,20 @@ public class AccountExceptionResolver {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                .contentType(MediaType.TEXT_PLAIN)
                .body(invalidLoginAttemptException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any AccountUserLevelException or exception that extends it. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param accountUserLevelException AccountUserException that was caught in order to be transformed to HTTP Response.
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST.
+     */
+    @ExceptionHandler(value = { AccountUserLevelException.class })
+    public ResponseEntity<?> handleAccountUserLevelException(AccountUserLevelException accountUserLevelException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountUserLevelException.getMessage());
     }
 }
