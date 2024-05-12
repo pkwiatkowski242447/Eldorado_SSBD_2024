@@ -7,7 +7,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 
@@ -125,7 +128,7 @@ public interface AccountServiceInterface {
      *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
      * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
      */
-    void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException;
+    void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException ;
 
     /**
      * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.
@@ -143,7 +146,7 @@ public interface AccountServiceInterface {
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
      */
-    boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException;
+    boolean confirmEmail(String token) throws ApplicationBaseException;
 
     /**
      * Retrieve Accounts that match the parameters, in a given order.

@@ -1,9 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
-import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,23 +10,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -236,7 +235,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     /**
-     * This method is used to initiate process of resetting current user account password. This method basically 
+     * This method is used to initiate process of resetting current user account password. This method basically
      * generates a token of type CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
      * specified by the user in the form and send to the application with the usage of DTO object.
      *
@@ -253,7 +252,7 @@ public class AccountService implements AccountServiceInterface {
         String tokenValue = this.tokenService.createPasswordResetToken(account);
         String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
         String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
-        
+
         this.mailProvider.sendPasswordResetEmail(account.getName(),
                 account.getLastname(),
                 userEmail,
@@ -265,18 +264,18 @@ public class AccountService implements AccountServiceInterface {
      * This method is used to change password of the user. This method does read RESET PASSWORD token with
      * specified token value, and then
      *
-     * @param token         Value of the token, that will be used to find RESET PASSWORD token in the database.
-     * @param newPassword   New password, transferred to the web application by data transfer object.
-     *
+     * @param token       Value of the token, that will be used to find RESET PASSWORD token in the database.
+     * @param newPassword New password, transferred to the web application by data transfer object.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
-     * method.
+     *                                  method.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
         Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue)
                 .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
-        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount())) throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
+        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount()))
+            throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
 
         Account account = this.accountFacade.findAndRefresh(tokenObject.getAccount().getId()).orElseThrow(AccountIdNotFoundException::new);
         if (account.getBlocked()) throw new AccountBlockedException();
@@ -339,7 +338,7 @@ public class AccountService implements AccountServiceInterface {
      * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
      * @param currentUserLogin Login associated with the modified account.
      * @return Account object with applied modifications
-     * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     * @throws AccountNotFoundException           Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
@@ -388,29 +387,27 @@ public class AccountService implements AccountServiceInterface {
      * @param token Last part of the confirmation URL sent in a message to user's e-mail address.
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
+     * @throws TokenNotFoundException Threw if the token does not exist in the database.
+     * @throws AccountEmailNullException Threw if the email extracted from the token was for some strange reason null.
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountEmailChangeException.class)
-    public boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException {
-        //TODO might remove getting account using facade as it is also part of the tokenFromDB
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public boolean confirmEmail(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
-        Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElse(null);
-        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
+        Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
+
+        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(decodedTokenValue));
         Account account = accountFromDB.orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-        if (tokenFromDB == null || !jwtProvider.isTokenValid(decodedTokenValue, account)) {
-            return false;
-        } else {
-            try {
-                String email = jwtProvider.extractEmail(decodedTokenValue);
-                if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
-                account.setEmail(email);
-                accountFacade.edit(account);
-                tokenFacade.remove(tokenFromDB);
-                return true;
-            } catch (ConstraintViolationException e) {
-                throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
-            }
+
+        if (jwtProvider.isTokenValid(decodedTokenValue, account)) {
+            String email = jwtProvider.extractEmail(decodedTokenValue);
+            if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
+            account.setEmail(email);
+            accountFacade.edit(account);
+            tokenFacade.remove(tokenFromDB);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -483,12 +480,12 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
      */
     @Override
-    public void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException {
+    public void changeEmail(UUID accountId, String newEmail) throws AccountNotFoundException, AccountEmailAlreadyTakenException, AccountSameEmailException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))
-            throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION);
+            throw new AccountSameEmailException();
         if (accountFacade.findByEmail(newEmail).isPresent())
-            throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
+            throw new AccountEmailAlreadyTakenException();
 
         String token = tokenService.createEmailConfirmationToken(account, newEmail);
         String encodedTokenValue = new String(Base64.getEncoder().encode(token.getBytes()));
@@ -589,7 +586,7 @@ public class AccountService implements AccountServiceInterface {
      * Removes the Admin user level from the account.
      *
      * @param id Identifier of the account from which the Staff user level will be removed.
-     * @throws AccountNotFoundException Threw when the account with the given ID was not found.
+     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
      * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
      */
 
