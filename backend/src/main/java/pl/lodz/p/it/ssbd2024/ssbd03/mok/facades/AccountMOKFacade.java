@@ -111,8 +111,11 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @return List of all user accounts from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
+<<<<<<< HEAD
+=======
      *
-     * @apiNote Accounts are be default ordered (in the returned list) by the login.
+     * @note. Accounts are be default ordered (in the returned list) by the login.
+>>>>>>> 317d64e1237e34ea3d45a47aecf9ceb516280e07
      */
     public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize) {
         try {
@@ -137,7 +140,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of all active user accounts from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
      *
-     * @apiNote Accounts are be default ordered (in the returned list) by the login.
+     * @note. Accounts are be default ordered (in the returned list) by the login.
      */
     public List<Account> findAllActiveAccountsWithPagination(int pageNumber, int pageSize) {
         try {
@@ -163,7 +166,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of all inactive user accounts from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
      *
-     * @apiNote Accounts are be default ordered (in the returned list) by the login.
+     * @note. counts are be default ordered (in the returned list) by the login.
      */
     public List<Account> findAllInactiveAccountsWithPagination(int pageNumber, int pageSize) {
         try {

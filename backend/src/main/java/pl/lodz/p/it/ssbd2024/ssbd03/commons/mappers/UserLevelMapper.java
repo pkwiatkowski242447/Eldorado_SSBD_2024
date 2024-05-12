@@ -28,7 +28,7 @@ public class UserLevelMapper {
             throws MapperUnexpectedUserLevelException, MapperUnexpectedClientTypeException {
         return switch (userLevelDTO) {
             case ClientDTO clientDTO -> {
-                Client client = new Client();
+                Client client = new Client(clientDTO.getVersion());
                 client.setType(switch (clientDTO.getClientType().toUpperCase()) {
                     case "BASIC" -> Client.ClientType.BASIC;
                     case "STANDARD" -> Client.ClientType.STANDARD;

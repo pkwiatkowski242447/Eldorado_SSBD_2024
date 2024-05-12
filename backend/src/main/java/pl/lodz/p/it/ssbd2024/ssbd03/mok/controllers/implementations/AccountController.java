@@ -34,16 +34,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
@@ -63,29 +62,23 @@ public class AccountController implements AccountControllerInterface {
      * AccountServiceInterface used for operation on accounts.
      */
     private final AccountServiceInterface accountService;
+
     /**
      * JWTProvider used for operations on JWT TOKEN.
      */
     private final JWTProvider jwtProvider;
-    /**
-     * TokenServiceInterface used for operations on tokens.
-     */
-    private final TokenServiceInterface tokenService;
 
     /**
      * Autowired constructor for the controller.
      * It is basically used to perform dependency injection of AccountService into this controller.
      *
      * @param accountService Service containing various methods for account manipulation.
-     * @param tokenService   Service used for token management (in order to confirm certain user's actions).
      * @param jwtProvider    Service used for JWT management (eg. signing).
      */
     @Autowired
     public AccountController(AccountServiceInterface accountService,
-                             TokenServiceInterface tokenService,
                              JWTProvider jwtProvider) {
         this.accountService = accountService;
-        this.tokenService = tokenService;
         this.jwtProvider = jwtProvider;
     }
 
@@ -213,7 +206,8 @@ public class AccountController implements AccountControllerInterface {
      * @param pageSize   Number of user accounts per page.
      * @return This method returns 200 OK as a response, where in response body a list of user accounts is located, is a JSON format.
      * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
-     * @apiNote This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
+     *
+     * @note. This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
      * login alphabetically.
      */
     @Override
@@ -319,6 +313,7 @@ public class AccountController implements AccountControllerInterface {
         }
     }
 
+    ///TODO czy taki path (w dokumentacji jest /account xd)????
     /**
      * This method is used to modify personal data of currently logged-in user.
      *
@@ -338,7 +333,7 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "400", description = "The account has not been modified due to the correctness of the request or because the account is not available in the database", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)),
             @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
     })
-    public ResponseEntity<?> modifySelfAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+    public ResponseEntity<?> modifyAccountSelf(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                                @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
@@ -352,6 +347,41 @@ public class AccountController implements AccountControllerInterface {
 
         AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
                 accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO), currentUserLogin)
+        );
+        return ResponseEntity.ok().body(accountOutputDTO);
+    }
+
+    /**
+     * This method is used to modify personal data user by other user with administrative privileges.
+     *
+     * @param ifMatch          Value of If-Match header
+     * @param accountModifyDTO Account properties with potentially changed values.
+     * @return In the correct flow returns account object with applied modifications with 200 OK status.
+     * If request has empty IF_MATCH header or account currently logged user was not found or data are invalid
+     * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
+     * then 409 CONFLICT is returned.
+     */
+    @Override
+    @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @Operation(summary = "Modify self account", description = "The endpoint is used to modify user account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccountOutputDTO.class))),
+            @ApiResponse(responseCode = "400", description = "The account has not been modified due to the correctness of the request or because the account is not available in the database", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)),
+            @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
+    })
+    public ResponseEntity<?> modifyUserAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                               @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
+        if (ifMatch == null || ifMatch.isBlank()) {
+            throw new InvalidRequestHeaderIfMatchException();
+        }
+
+        if (!ifMatch.equals(jwtProvider.generateObjectSignature(accountModifyDTO))) {
+            throw new AccountDataIntegrityCompromisedException();
+        }
+
+        AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
+                accountService.modifyAccount(AccountMapper.toAccount(accountModifyDTO), accountModifyDTO.getLogin())
         );
         return ResponseEntity.ok().body(accountOutputDTO);
     }
@@ -371,7 +401,12 @@ public class AccountController implements AccountControllerInterface {
         try {
             UUID uuid = UUID.fromString(id);
             Account account = accountService.getAccountById(uuid).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-            return ResponseEntity.ok(AccountMapper.toAccountOutputDto(account));
+
+            AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(account);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountOutputDTO)));
+
+            return ResponseEntity.ok().headers(headers).body(accountOutputDTO);
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
         } catch (AccountNotFoundException anfe) {

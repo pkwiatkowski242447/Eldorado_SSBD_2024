@@ -76,6 +76,10 @@ public class I18n {
     // JWT
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
 
+    // Util
+    public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
+
+
     // Mail provider
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";
     public static final String CONFIRM_REGISTER_MESSAGE_SUBJECT = "mail.confirm.register.message.subject";
