@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,23 +9,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -381,29 +379,27 @@ public class AccountService implements AccountServiceInterface {
      * @param token Last part of the confirmation URL sent in a message to user's e-mail address.
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
+     * @throws TokenNotFoundException Threw if the token does not exist in the database.
+     * @throws AccountEmailNullException Threw if the email extracted from the token was for some strange reason null.
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountEmailChangeException.class)
-    public boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException {
-        //TODO might remove getting account using facade as it is also part of the tokenFromDB
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public boolean confirmEmail(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
-        Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElse(null);
-        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(token));
+        Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
+
+        Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(decodedTokenValue));
         Account account = accountFromDB.orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-        if (tokenFromDB == null || !jwtProvider.isTokenValid(decodedTokenValue, account)) {
-            return false;
-        } else {
-            try {
-                String email = jwtProvider.extractEmail(decodedTokenValue);
-                if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
-                account.setEmail(email);
-                accountFacade.edit(account);
-                tokenFacade.remove(tokenFromDB);
-                return true;
-            } catch (ConstraintViolationException e) {
-                throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
-            }
+
+        if (jwtProvider.isTokenValid(decodedTokenValue, account)) {
+            String email = jwtProvider.extractEmail(decodedTokenValue);
+            if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
+            account.setEmail(email);
+            accountFacade.edit(account);
+            tokenFacade.remove(tokenFromDB);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -469,19 +465,15 @@ public class AccountService implements AccountServiceInterface {
      *
      * @param accountId ID of the account which the e-mail will be changed.
      * @param newEmail  New e-mail address.
-     * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
-     *                                     Contains a key to an internationalized message.
-     *                                     Additionally, if the problem was caused by an incorrect new mail,
-     *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
-     * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
     @Override
-    public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException, AccountEmailChangeException, AccountNotFoundException {
+    public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))
-            throw new AccountEmailChangeException(I18n.ACCOUNT_SAME_EMAIL_EXCEPTION);
+            throw new AccountSameEmailException();
         if (accountFacade.findByEmail(newEmail).isPresent())
-            throw new AccountEmailChangeException(I18n.ACCOUNT_EMAIL_COLLISION_EXCEPTION);
+            throw new AccountEmailAlreadyTakenException();
 
         String token = tokenService.createEmailConfirmationToken(account, newEmail);
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(token.getBytes()));

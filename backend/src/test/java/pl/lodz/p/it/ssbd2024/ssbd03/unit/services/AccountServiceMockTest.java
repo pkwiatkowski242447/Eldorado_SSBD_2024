@@ -11,11 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -99,7 +98,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void confirmEmailTestSuccessful() throws AccountEmailChangeException, AccountEmailNullException, AccountNotFoundException {
+    void confirmEmailTestSuccessful() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -116,7 +115,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void confirmEmailTestTokenInvalid() throws AccountEmailChangeException, AccountEmailNullException, AccountNotFoundException {
+    void confirmEmailTestTokenInvalid() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -130,20 +129,18 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void confirmEmailTestTokenNotInDatabase() throws AccountEmailChangeException, AccountEmailNullException, AccountNotFoundException {
+    void confirmEmailTestTokenNotInDatabase() {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
 
         when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.empty());
-        when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
 
-        assertFalse(accountService.confirmEmail(tokenVal));
+        assertThrows(TokenNotFoundException.class, () -> accountService.confirmEmail(tokenVal));
     }
 
     @Test
-    void changeEmailTestSuccessful() throws ApplicationBaseException, AccountEmailChangeException, AccountNotFoundException {
-
+    void changeEmailTestSuccessful() throws ApplicationBaseException, AccountEmailChangeException {
         Account a = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         a.setAccountLanguage("pl");
         String newEmail = "new@email.com";
@@ -268,7 +265,7 @@ public class AccountServiceMockTest {
         int pageSize = 5;
 
         when(accountMOKFacade
-                        .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize))
+                .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize))
                 .thenReturn(accountList);
 
         var retList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName, lastName, active, order, pageNumber, pageSize);

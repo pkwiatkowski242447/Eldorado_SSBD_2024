@@ -119,14 +119,9 @@ public interface AccountServiceInterface {
      *
      * @param accountId ID of the account which the e-mail will be changed.
      * @param newEmail  New e-mail address.
-     * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
-     *                                     Contains a key to an internationalized message.
-     *                                     Additionally, if the problem was caused by an incorrect new mail,
-     *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
-     * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
-    void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException, AccountEmailChangeException, AccountNotFoundException;
+    void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException;
 
     /**
      * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.
@@ -144,7 +139,7 @@ public interface AccountServiceInterface {
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
      */
-    boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException;
+    boolean confirmEmail(String token) throws ApplicationBaseException;
 
     /**
      * Retrieve Accounts that match the parameters, in a given order.
