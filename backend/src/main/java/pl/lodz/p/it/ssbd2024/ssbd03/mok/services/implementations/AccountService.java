@@ -608,6 +608,76 @@ public class AccountService implements AccountServiceInterface {
         userLevelFacade.remove(adminUserLevel);
     }
 
+    /**
+     * Adds the Client user level to the account.
+     *
+     * @param id Identifier of the account to which the Client user level will be added.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void addClientUserLevel(String id) throws ApplicationBaseException {
+
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if(account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
+            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
+        }
+        UserLevel clientUserLevel = new Client();
+        account.addUserLevel(clientUserLevel);
+        accountFacade.edit(account);
+
+        userLevelFacade.create(clientUserLevel);
+    }
+
+    /**
+     * Adds the Staff user level to the account.
+     *
+     * @param id Identifier of the account to which the Staff user level will be added.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void addStaffUserLevel(String id) throws ApplicationBaseException{
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if(account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
+            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
+        }
+        UserLevel staffUserLevel = new Staff();
+        account.addUserLevel(staffUserLevel);
+        accountFacade.edit(account);
+
+        userLevelFacade.create(staffUserLevel);
+    }
+
+    /**
+     * Adds the Admin user level to the account.
+     *
+     * @param id Identifier of the account to which the Admin user level will be added.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void addAdminUserLevel(String id) throws ApplicationBaseException{
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if(account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Admin)) {
+            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
+        }
+        UserLevel adminUserLevel = new Admin();
+        account.addUserLevel(adminUserLevel);
+        accountFacade.edit(account);
+
+        userLevelFacade.create(adminUserLevel);
+    }
+
     /***
      * This method is used to change own password.
      *

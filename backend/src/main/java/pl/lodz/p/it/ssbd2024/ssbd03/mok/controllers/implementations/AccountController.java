@@ -289,7 +289,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) throws ApplicationBaseException{
+    public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) throws ApplicationBaseException {
         if (accountService.confirmEmail(token)) {
             return ResponseEntity.noContent().build();
         } else {
@@ -495,6 +495,62 @@ public class AccountController implements AccountControllerInterface {
         }
     }
 
+    /**
+     * This method is used to client user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    @Override
+    @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This method is used to staff user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    @Override
+    @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This method is used to admin user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    @Override
+    @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
 
     /**
      * This method is used to change own password.
@@ -502,7 +558,7 @@ public class AccountController implements AccountControllerInterface {
      * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
      * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
      * is the same as current password returns 400 BAD REQUEST HTTP response.
-     * @throws ApplicationBaseException thrown when problems occur when password is changing.
+     * @throws ApplicationBaseException Thrown when problems occur when password is changing.
      */
     @Override
     @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)

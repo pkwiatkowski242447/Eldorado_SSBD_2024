@@ -85,7 +85,7 @@ public interface AccountControllerInterface {
      *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return It returns an HTTP response with a code depending on the result.
      * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
-     *                                  * methods in both facade and service component for Account.
+     * methods in both facade and service component for Account.
      */
     ResponseEntity<?> activateAccount(String token) throws ApplicationBaseException;
 
@@ -183,12 +183,59 @@ public interface AccountControllerInterface {
     ResponseEntity<?> removeAdminUserLevel(String id);
 
     /**
+     * This method is used to client user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    ResponseEntity<?> addClientUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     * This method is used to add staff user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    ResponseEntity<?> addStaffUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     * This method is used to add admin user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    ResponseEntity<?> addAdminUserLevel(String id) throws ApplicationBaseException;
+
+    /**
      * This method is used to change own password.
      *
      * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
      * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
      * is the same as current password returns 400 BAD REQUEST HTTP response.
-     * @throws ApplicationBaseException thrown when problems occur when password is changing.
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
      */
     ResponseEntity<?> changePasswordSelf(AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException;
 }
+
+
+
+

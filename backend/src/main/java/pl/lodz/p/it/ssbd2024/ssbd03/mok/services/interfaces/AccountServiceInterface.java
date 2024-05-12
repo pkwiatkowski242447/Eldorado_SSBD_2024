@@ -216,6 +216,37 @@ public interface AccountServiceInterface {
      */
     void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
 
+    /**
+     * Adds the Client user level to the account.
+     *
+     * @param id Account's id.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    void addClientUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     *
+     * Adds the Staff user level to the account.
+     *
+     * @param id Account's id.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    void addStaffUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     * Adds the Admin user level to the account.
+     *
+     * @param id Account's id.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    void addAdminUserLevel(String id) throws ApplicationBaseException;
+
     /** Change own password.
      *
      * @param oldPassword The OldPassword is the old password that the user must provide for authentication.
