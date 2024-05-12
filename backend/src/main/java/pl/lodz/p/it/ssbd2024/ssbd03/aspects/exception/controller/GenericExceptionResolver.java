@@ -86,7 +86,13 @@ public class GenericExceptionResolver {
     }
 
     /**
+     * This method is used to transform any InvalidDataFormatException or exception that extend it, which could be thrown when
+     * passed invalid data. After such exception is propagated from controller it will be caught and transformed into HTTP Response.
      *
+     * @param invalidDataFormatException InvalidDataFormatException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
      */
     @ExceptionHandler(value = { InvalidDataFormatException.class })
     public ResponseEntity<?> handleInvalidDataFormatException(InvalidDataFormatException invalidDataFormatException) {
@@ -96,7 +102,14 @@ public class GenericExceptionResolver {
     }
 
     /**
+     * This method is used to transform any IllegalOperationException or exception that extend it, which could be thrown when
+     * trying to perform a prohibited operation. After such exception is propagated from controller it will be caught
+     * and transformed into HTTP Response.
      *
+     * @param illegalOperationException IllegalOperationException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
      */
     @ExceptionHandler(value = { IllegalOperationException.class })
     public ResponseEntity<?> handleIllegalOperationException(IllegalOperationException illegalOperationException) {
