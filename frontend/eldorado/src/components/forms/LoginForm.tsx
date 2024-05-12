@@ -6,7 +6,6 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components/ui/form"
 import {FormLabel} from "react-bootstrap";
-import {useEffect} from "react";
 import {useAccount} from "@/hooks/useAccount.ts";
 
 const formSchema = z.object({
@@ -18,10 +17,7 @@ const formSchema = z.object({
 
 function LoginForm() {
 
-    const {logIn, getCurrentAccount} = useAccount();
-    useEffect(() => {
-        getCurrentAccount();
-    }, []);
+    const {logIn} = useAccount();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -71,7 +67,8 @@ function LoginForm() {
                                     <div className="grid gap-4">
                                         <div className="grid gap-2">
                                             <FormLabel className="text-left">Password
-                                                <a href="/forgot-password" className="ml-auto inline-block text-black underline text-right">
+                                                <a href="/forgot-password"
+                                                   className="ml-auto inline-block text-black underline text-right">
                                                     Forgot your password?
                                                 </a>
                                             </FormLabel>

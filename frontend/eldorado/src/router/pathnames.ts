@@ -1,33 +1,33 @@
 export const Pathnames = {
     public: {
-        home: '/',
+        landingPage: '/',
         login: '/login',
         register: '/register',
-        test: '/test',
+        home: '/home',
         activateAccount: '/activate-account/:token',
         forgotPassword: '/forgot-password/',
         resetPassword: '/reset-password/:token',
     },
-    admin: {
-        home: '/',
-        users: '/users',
-        clients: '/clients',
-        'add user': '/addUser',
-        'change password': '/changePassword'
-
-    },
-    staff: {
-        home: '/',
-        clients: '/clients',
-        courts: '/courts',
-        reservations: '/reservations',
-        'change password': '/changePassword'
-    },
-    client: {
-        home: '/',
-        courts: '/courts',
-        reservations: '/reservations',
-        'change password': '/changePassword',
-        'change details': '/changeDetails'
-    },
+    // admin: {
+    //     home: '/',
+    //     users: '/users',
+    //     clients: '/clients',
+    //     'add user': '/addUser',
+    //     'change password': '/changePassword'
+    //
+    // },
+    // staff: {
+    //     home: '/',
+    //     clients: '/clients',
+    //     courts: '/courts',
+    //     reservations: '/reservations',
+    //     'change password': '/changePassword'
+    // },
+    // client: {
+    //     home: '/',
+    //     courts: '/courts',
+    //     reservations: '/reservations',
+    //     'change password': '/changePassword',
+    //     'change details': '/changeDetails'
+    // },
 }

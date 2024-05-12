@@ -5,15 +5,15 @@ interface AccountState {
     account: UserType | null
     setAccount: (item: UserType | null) => void
 }
+
 const AccountStateContext = createContext<AccountState | null>(null)
-export const AccountStateContextProvider = ({ children }: { children: ReactNode }) => {
+export const AccountStateContextProvider = ({children}: { children: ReactNode }) => {
     const [account, setAccount] = useState<UserType | null>(null);
-    console.log(account)
     useEffect(() => {
     }, [account]);
     return (
         <AccountStateContext.Provider
-            value={{ account, setAccount}}>
+            value={{account, setAccount}}>
             {children}
         </AccountStateContext.Provider>
     )
