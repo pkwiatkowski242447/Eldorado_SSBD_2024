@@ -167,7 +167,7 @@ public interface AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      */
-    ResponseEntity<?> removeClientUserLevel(String id);
+    ResponseEntity<?> removeClientUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * This method is used to remove staff user level from account.
@@ -178,7 +178,7 @@ public interface AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      */
-    ResponseEntity<?> removeStaffUserLevel(String id);
+    ResponseEntity<?> removeStaffUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * This method is used to remove admin user level from account.
@@ -189,7 +189,7 @@ public interface AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      */
-    ResponseEntity<?> removeAdminUserLevel(String id);
+    ResponseEntity<?> removeAdminUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * This method is used to client user level to the user account with given identifier which

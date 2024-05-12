@@ -37,9 +37,9 @@ public class UserLevelMapper {
                 });
                 yield client;
             }
-            case StaffDTO staffDTO -> new Staff(staffDTO.getVersion());
-            case AdminDTO adminDTO -> new Admin(adminDTO.getVersion());
-            default -> throw new MapperUnexpectedUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            case StaffDTO staffDTO -> new Staff();
+            case AdminDTO adminDTO -> new Admin();
+            default -> throw new MapperUnexpectedUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         };
     }
 
@@ -54,7 +54,7 @@ public class UserLevelMapper {
             case Client client -> new ClientDTO(userLevel.getId(), client.getVersion(), client.getType().toString());
             case Staff staff -> new StaffDTO(userLevel.getId(), staff.getVersion());
             case Admin admin -> new AdminDTO(userLevel.getId().toString(), admin.getVersion());
-            default -> throw new MapperUnexpectedUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            default -> throw new MapperUnexpectedUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         };
     }
 }

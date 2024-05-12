@@ -34,8 +34,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
@@ -481,13 +480,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id) {
-        try {
-            accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
-            return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException | AccountUserLevelException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException{
+        accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -501,13 +496,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id) {
-        try {
-            accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
-            return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException | AccountUserLevelException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException{
+        accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -521,13 +512,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id) {
-        try {
-            accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
-            return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException | AccountUserLevelException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException{
+        accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
     }
 
     /**
