@@ -44,4 +44,7 @@ public abstract class UserLevel extends AbstractEntity implements Serializable {
     @Setter
     private Account account;
 
+    public UserLevel(Long version) {
+        super(version);
+    }
 }

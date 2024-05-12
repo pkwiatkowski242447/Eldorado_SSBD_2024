@@ -21,6 +21,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
@@ -238,7 +239,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     /**
-     * This method is used to initiate process of resetting current user account password. This method basically 
+     * This method is used to initiate process of resetting current user account password. This method basically
      * generates a token of type CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
      * specified by the user in the form and send to the application with the usage of DTO object.
      *
@@ -255,7 +256,7 @@ public class AccountService implements AccountServiceInterface {
         String tokenValue = this.tokenService.createPasswordResetToken(account);
         String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
         String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
-        
+
         this.mailProvider.sendPasswordResetEmail(account.getName(),
                 account.getLastname(),
                 userEmail,
@@ -339,14 +340,14 @@ public class AccountService implements AccountServiceInterface {
      * This method is used to modify user personal data.
      *
      * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
-     * @param currentUserLogin Login associated with the modified account.
+     * @param userLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
-    public Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException, ApplicationOptimisticLockException {
-        Account foundAccount = accountFacade.findByLogin(currentUserLogin).orElseThrow(AccountNotFoundException::new);
+    public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
+        Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
 
         if (!modifiedAccount.getVersion().equals(foundAccount.getVersion())) {
             throw new ApplicationOptimisticLockException();
@@ -355,6 +356,17 @@ public class AccountService implements AccountServiceInterface {
         foundAccount.setName(modifiedAccount.getName());
         foundAccount.setLastname(modifiedAccount.getLastname());
         foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
+        foundAccount.setAccountLanguage(modifiedAccount.getAccountLanguage());
+
+        for (UserLevel foundUserLevel : foundAccount.getUserLevels()) {
+            UserLevel modifiedUserLevel = modifiedAccount.getUserLevels().stream()
+                    .filter((level) -> level.getClass().getSimpleName().equalsIgnoreCase(foundUserLevel.getClass().getSimpleName()))
+                    .findFirst().orElseThrow(UserLevelMissingException::new);
+
+            if (!foundUserLevel.getVersion().equals(modifiedUserLevel.getVersion())) {
+                throw new ApplicationOptimisticLockException();
+            }
+        }
 
         accountFacade.edit(foundAccount);
 

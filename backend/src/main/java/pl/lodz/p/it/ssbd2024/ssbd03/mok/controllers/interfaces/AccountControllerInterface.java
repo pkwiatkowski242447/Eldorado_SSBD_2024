@@ -114,10 +114,19 @@ public interface AccountControllerInterface {
      * @param accountModifyDTO Account properties with potentially changed values.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> modifySelfAccount(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
+    ResponseEntity<?> modifyAccountSelf(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
 
     /**
-     * This method is used to find user account by Id.
+     * This method is used to modify personal data user by other user with administrative privileges.
+     *
+     * @param ifMatch Value of If-Match header
+     * @param accountModifyDTO Account properties with potentially changed values.
+     * @return It returns an HTTP response with a code depending on the result.
+     */
+    ResponseEntity<?> modifyUserAccount(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
+
+    /**
+     * This method is used to find user account by id.
      *
      * @param id Identifier of account to find.
      * @return It returns an HTTP response with a code depending on the result.
