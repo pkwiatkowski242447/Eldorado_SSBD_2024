@@ -7,6 +7,9 @@ export const Pathnames = {
         activateAccount: '/activate-account/:token',
         forgotPassword: '/forgot-password/',
         resetPassword: '/reset-password/:token',
+        userManagement: '/manage-users',
+        accountSettings: '/account-settings',
+        changeUserLevel: '/change-user-level',
     },
     // admin: {
     //     home: '/',

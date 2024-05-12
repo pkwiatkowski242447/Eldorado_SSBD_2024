@@ -8,7 +8,7 @@ function HomePage() {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
-            <div className="flex justify-between items-center mx-auto">
+            <div className="flex justify-between items-center mx-auto p-10">
                 <Card>
                     <CardHeader>
                         <CardTitle>Hello, {account?.id}</CardTitle>

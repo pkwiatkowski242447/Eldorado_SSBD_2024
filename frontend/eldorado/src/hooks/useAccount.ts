@@ -6,6 +6,7 @@ import {Pathnames} from "../router/pathnames";
 import {usersApi} from "@/api/userApi.ts";
 import {useEffect, useState} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
+import {RolesEnum} from "@/types/TokenPayload.ts";
 
 export const useAccount = () => {
 
@@ -59,6 +60,22 @@ export const useAccount = () => {
             if (tokenRaw && tokenRaw !== 'null') {
                 const token = await usersApi.getSelf();
                 localStorage.setItem('token', token.data);
+                let activeUserLevel = token.data.userLevelsDto[0];
+                console.log(activeUserLevel)
+                for (const i in token.data.userLevelsDto.length) {
+                    if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
+                        if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
+                            activeUserLevel = token.data.userLevelsDto[i];
+                            break;
+                        }
+                    } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
+                        if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
+                            activeUserLevel = token.data.userLevelsDto[i];
+                            break;
+                        }
+                    }
+                }
+                console.log(activeUserLevel)
                 const user: UserType = {
                     accountLanguage: token.data.accountLanguage,
                     active: token.data.active,
@@ -72,14 +89,14 @@ export const useAccount = () => {
                     token: tokenRaw,
                     phone: token.data.phone,
                     userLevels: token.data.userLevelsDto,
-                    activeUserLevel: token.data.userLevelsDto[0],
+                    activeUserLevel: activeUserLevel,
                     verified: token.data.verified,
                 };
+                console.log(activeUserLevel)
                 setAccount(user)
                 localStorage.setItem('account', JSON.stringify(user));
             }
-
-        } catch {
+        } catch (e) {
             if (account !== null) {
                 alert('Unable to get current account!');
                 await logOut();
