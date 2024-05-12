@@ -460,9 +460,9 @@
                     <doclint>all,-missing</doclint>
                     <tags>
                         <tag>
-                            <name>note</name>
+                            <name>note.</name>
                             <placement>a</placement>
-                            <head>To Do:</head>
+                            <head>Note:</head>
                         </tag>
                     </tags>
                 </configuration>
