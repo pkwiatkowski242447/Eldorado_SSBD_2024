@@ -217,7 +217,8 @@ public class AccountController implements AccountControllerInterface {
      * @param pageSize   Number of user accounts per page.
      * @return This method returns 200 OK as a response, where in response body a list of user accounts is located, is a JSON format.
      * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
-     * @apiNote This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
+     *
+     * @note. This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
      * login alphabetically.
      */
     @Override
