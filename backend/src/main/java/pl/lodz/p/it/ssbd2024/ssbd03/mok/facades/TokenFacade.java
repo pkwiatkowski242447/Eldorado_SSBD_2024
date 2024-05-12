@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param entity Token to be persisted.
      */
     @Override
-    public void create(Token entity) {
+    public void create(Token entity) throws ApplicationBaseException {
         super.create(entity);
     }
 

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
@@ -56,7 +57,7 @@ public class TokenService implements TokenServiceInterface {
      */
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
-    public String createRegistrationToken(Account account) {
+    public String createRegistrationToken(Account account) throws ApplicationBaseException {
         String tokenValue = this.jwtProvider.generateActionToken(account,24, ChronoUnit.HOURS);
 
         Token registrationToken = new Token(tokenValue, account, Token.TokenType.REGISTER);
@@ -71,10 +72,12 @@ public class TokenService implements TokenServiceInterface {
      *
      * @param account Account for which the token is created.
      * @return Token's value(JWT).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade
+     * layer.
      */
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
-    public String createEmailConfirmationToken(Account account, String email) {
+    public String createEmailConfirmationToken(Account account, String email) throws ApplicationBaseException{
         tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
 
         String tokenValue = this.jwtProvider.generateEmailToken(account, email, 24);
@@ -90,10 +93,12 @@ public class TokenService implements TokenServiceInterface {
      * @param account Account for which the token is created.
      *
      * @return Returns newly created password reset token value.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade
+     * layer.
      */
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
-    public String createPasswordResetToken(Account account) {
+    public String createPasswordResetToken(Account account) throws ApplicationBaseException {
         tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).ifPresent(tokenFacade::remove);
 
         String tokenValue = this.jwtProvider.generateActionToken(account, this.passwordResetPeriodLengthMinutes, ChronoUnit.MINUTES);

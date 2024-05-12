@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
-import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +18,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBl
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
@@ -56,6 +53,9 @@ public class AccountService implements AccountServiceInterface {
 
     @Value("${mail.account.reset.password.url}")
     private String accountPasswordResetUrl;
+
+    @Value("${mail.account.confirm.email.url}")
+    private String accountConfirmEmail;
 
     @Value("${account.creation.confirmation.period.length.hours}")
     private int accountCreationConfirmationPeriodLengthHours;
@@ -142,7 +142,7 @@ public class AccountService implements AccountServiceInterface {
         String tokenValue = jwtProvider.generateActionToken(newClientAccount, (this.accountCreationConfirmationPeriodLengthHours / 2) * 60, ChronoUnit.MINUTES);
         tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
 
-        String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
         String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
         mailProvider.sendRegistrationConfirmEmail(newClientAccount.getName(),
@@ -164,33 +164,29 @@ public class AccountService implements AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
-    public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
-        try {
-            Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
-            newStaffAccount.setAccountLanguage(language);
-            UserLevel staffUserLevel = new Staff();
-            staffUserLevel.setAccount(newStaffAccount);
-            newStaffAccount.addUserLevel(staffUserLevel);
+    public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
+        Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
+        newStaffAccount.setAccountLanguage(language);
+        UserLevel staffUserLevel = new Staff();
+        staffUserLevel.setAccount(newStaffAccount);
+        newStaffAccount.addUserLevel(staffUserLevel);
 
-            accountFacade.create(newStaffAccount);
+        accountFacade.create(newStaffAccount);
 
-            String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
-            tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
+        String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
+        tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
 
-            String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
-            String confirmationURL = "http://localhost:3000/activate-account/%s".formatted(encodedTokenValue);
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
+        String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
-            mailProvider.sendRegistrationConfirmEmail(newStaffAccount.getName(),
-                    newStaffAccount.getLastname(),
-                    newStaffAccount.getEmail(),
-                    confirmationURL,
-                    newStaffAccount.getAccountLanguage());
-        } catch (PersistenceException exception) {
-            throw new AccountCreationException(I18n.STAFF_ACCOUNT_CREATION_EXCEPTION);
-        }
+        mailProvider.sendRegistrationConfirmEmail(newStaffAccount.getName(),
+                newStaffAccount.getLastname(),
+                newStaffAccount.getEmail(),
+                confirmationURL,
+                newStaffAccount.getAccountLanguage());
     }
 
     /**
@@ -205,33 +201,29 @@ public class AccountService implements AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
-    public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException {
-        try {
-            Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
-            newAdminAccount.setAccountLanguage(language);
-            UserLevel adminUserLevel = new Admin();
-            adminUserLevel.setAccount(newAdminAccount);
-            newAdminAccount.addUserLevel(adminUserLevel);
+    public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
+        Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
+        newAdminAccount.setAccountLanguage(language);
+        UserLevel adminUserLevel = new Admin();
+        adminUserLevel.setAccount(newAdminAccount);
+        newAdminAccount.addUserLevel(adminUserLevel);
 
-            accountFacade.create(newAdminAccount);
+        accountFacade.create(newAdminAccount);
 
-            String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
-            tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
+        String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
+        tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
 
-            String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
-            String confirmationURL = "http://localhost:3000/activate-account/%s".formatted(encodedTokenValue);
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
+        String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
-            mailProvider.sendRegistrationConfirmEmail(newAdminAccount.getName(),
-                    newAdminAccount.getLastname(),
-                    newAdminAccount.getEmail(),
-                    confirmationURL,
-                    newAdminAccount.getAccountLanguage());
-        } catch (PersistenceException exception) {
-            throw new AccountCreationException(I18n.ADMIN_ACCOUNT_CREATION_EXCEPTION);
-        }
+        mailProvider.sendRegistrationConfirmEmail(newAdminAccount.getName(),
+                newAdminAccount.getLastname(),
+                newAdminAccount.getEmail(),
+                confirmationURL,
+                newAdminAccount.getAccountLanguage());
     }
 
     /**
@@ -250,7 +242,7 @@ public class AccountService implements AccountServiceInterface {
         else if (!account.getActive()) throw new AccountNotActivatedException();
 
         String tokenValue = this.tokenService.createPasswordResetToken(account);
-        String encodedTokenValue = new String(Base64.getEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
         String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
 
         this.mailProvider.sendPasswordResetEmail(account.getName(),
@@ -271,7 +263,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
-        String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
+        String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue)
                 .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
         if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount()))
@@ -367,7 +359,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     public boolean activateAccount(String token) throws ApplicationBaseException {
-        String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
+        String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
         Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
                 .orElseThrow(AccountIdNotFoundException::new);
@@ -393,7 +385,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean confirmEmail(String token) throws ApplicationBaseException {
-        String decodedTokenValue = new String(Base64.getDecoder().decode(token.getBytes()));
+        String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
 
         Optional<Account> accountFromDB = accountFacade.find(jwtProvider.extractAccountId(decodedTokenValue));
@@ -473,14 +465,10 @@ public class AccountService implements AccountServiceInterface {
      *
      * @param accountId ID of the account which the e-mail will be changed.
      * @param newEmail  New e-mail address.
-     * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
-     *                                     Contains a key to an internationalized message.
-     *                                     Additionally, if the problem was caused by an incorrect new mail,
-     *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
-     * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
     @Override
-    public void changeEmail(UUID accountId, String newEmail) throws AccountNotFoundException, AccountEmailAlreadyTakenException, AccountSameEmailException {
+    public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))
             throw new AccountSameEmailException();
@@ -488,9 +476,9 @@ public class AccountService implements AccountServiceInterface {
             throw new AccountEmailAlreadyTakenException();
 
         String token = tokenService.createEmailConfirmationToken(account, newEmail);
-        String encodedTokenValue = new String(Base64.getEncoder().encode(token.getBytes()));
-        //TODO make it so the URL is based on some property
-        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + encodedTokenValue;
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(token.getBytes()));
+        String confirmationURL = accountConfirmEmail + encodedTokenValue;
+
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
     }
 
@@ -511,11 +499,11 @@ public class AccountService implements AccountServiceInterface {
                 .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
 
         String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
-        //TODO change ttl to be a parameter set somewhere in properties
         String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, 24);
-        String encodedTokenValue = new String(Base64.getEncoder().encode(newTokenValue.getBytes()));
 
-        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + encodedTokenValue;
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(newTokenValue.getBytes()));
+        String confirmationURL = accountConfirmEmail + encodedTokenValue;
+
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
 
         dbToken.setTokenValue(newTokenValue);

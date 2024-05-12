@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
  * Implementation of AbstractFacade that provides CRUD operations
@@ -47,7 +48,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public void create(Reservation entity) {
+    public void create(Reservation entity) throws ApplicationBaseException {
         super.create(entity);
     }
 

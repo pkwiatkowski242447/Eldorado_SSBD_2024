@@ -14,11 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -72,7 +68,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void registerStaffTestSuccessful() throws AccountCreationException {
+    void registerStaffTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
         String testToken = "TestTokenValue";
 
@@ -87,7 +83,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void registerAdminTestSuccessful() throws AccountCreationException {
+    void registerAdminTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
         String testToken = "TestTokenValue";
 
@@ -133,7 +129,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void confirmEmailTestTokenNotInDatabase() throws ApplicationBaseException {
+    void confirmEmailTestTokenNotInDatabase() {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -144,8 +140,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeEmailTestSuccessful() throws AccountNotFoundException, AccountSameEmailException, AccountEmailAlreadyTakenException {
-
+    void changeEmailTestSuccessful() throws ApplicationBaseException, AccountEmailChangeException {
         Account a = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         a.setAccountLanguage("pl");
         String newEmail = "new@email.com";

@@ -5,9 +5,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
 
 import java.util.UUID;
 
