@@ -6,8 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.ResetOwnPasswordException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountStatusException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 
@@ -41,13 +44,30 @@ public class AccountExceptionResolver {
      * @param accountConflictException AccountConflictException that was caught in order to be transformed to HTTP Response.
      *
      * @return When specified exception is propagated from controller component this method will catch it and transform
-     * to HTTP Response with status code 400 BAD REQUEST
+     * to HTTP Response with status code 409 CONFLICT.
      */
     @ExceptionHandler(value = { AccountConflictException.class })
     public ResponseEntity<?> handleAccountConflictException(AccountConflictException accountConflictException) {
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                .contentType(MediaType.TEXT_PLAIN)
                .body(accountConflictException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any AccountNotFoundException or exception that extend it, which could be thrown when
+     * wanted account is not available in database. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param accountNotFoundException AccountNotFoundException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
+     */
+    @ExceptionHandler(value = { pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException.class })
+    public ResponseEntity<?> handleAccountNotFoundException(pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException accountNotFoundException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountNotFoundException.getMessage());
     }
 
     /**
@@ -63,7 +83,7 @@ public class AccountExceptionResolver {
      */
     @ExceptionHandler(value = { AccountStatusException.class })
     public ResponseEntity<?> handleAccountStatusException(AccountStatusException accountStatusException) {
-        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+        return ResponseEntity.badRequest()
                .contentType(MediaType.TEXT_PLAIN)
                .body(accountStatusException.getMessage());
     }
@@ -82,5 +102,52 @@ public class AccountExceptionResolver {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(accountNotFoundException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any AccountDataIntegrityCompromisedException or exception that extend it, which could be thrown when
+     * the request contains an account object with modified signature-protected fields. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param accountDataIntegrityCompromisedException AccountDataIntegrityCompromisedException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
+     */
+    @ExceptionHandler(value = { AccountDataIntegrityCompromisedException.class })
+    public ResponseEntity<?> handleAccountDataIntegrityCompromisedException(AccountDataIntegrityCompromisedException accountDataIntegrityCompromisedException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountDataIntegrityCompromisedException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any ResetOwnPasswordException or exception that extends it. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param resetOwnPasswordException ResetOwnPasswordException that was caught in order to be transformed to HTTP Response.
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST.
+     */
+    @ExceptionHandler(value = { ResetOwnPasswordException.class })
+    public ResponseEntity<?> handleResetOwnPasswordException(ResetOwnPasswordException resetOwnPasswordException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(resetOwnPasswordException.getMessage());
+    }
+
+    /**
+     * This method handles InvalidLoginException, which is thrown during login attempt when either given credentials
+     * are invalid or user account in not found in the database (it is a safety measure not to "scan" for logins that
+     * have accounts associated with them).
+     *
+     * @return 401 UNAUTHORIZED is returned when this exception is caught while propagating
+     * from controller component.
+     */
+    @ExceptionHandler(value = { InvalidLoginAttemptException.class })
+    public ResponseEntity<?> handleInvalidLoginAttemptException(InvalidLoginAttemptException invalidLoginAttemptException) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+               .contentType(MediaType.TEXT_PLAIN)
+               .body(invalidLoginAttemptException.getMessage());
     }
 }

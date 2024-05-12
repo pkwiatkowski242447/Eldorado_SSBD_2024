@@ -1,10 +1,12 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old;
+package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read;
+
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
  * Used to specify an Exception related with null value of the email address.
  * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account
  */
-public class AccountEmailNullException extends Exception
+public class AccountEmailNullException extends ApplicationBaseException
 {
     public AccountEmailNullException(String message) {
         super(message);

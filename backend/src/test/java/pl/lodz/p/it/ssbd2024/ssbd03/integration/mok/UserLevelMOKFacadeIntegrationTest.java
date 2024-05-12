@@ -1,15 +1,16 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.integration;
+package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -19,6 +20,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
 
 import java.util.List;
@@ -34,7 +36,18 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private MockMvc mockMvc;
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
+    }
+
+    @AfterEach
+    void teardown() {
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAdmin")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAuth")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOP")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOK")).close();
+    }
 
     //INITIAL DATA
     @Autowired
@@ -44,11 +57,6 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     private final UUID uuidUserLevelNo1 = UUID.fromString("69507c7f-4c03-4087-85e6-3ae3b6fc2201");
     private final UUID uuidAccountNo1 = UUID.fromString("b3b8c2ac-21ff-434b-b490-aa6d717447c0");
     private final UUID uuidAccountNo2 = UUID.fromString("0ca02f7e-d8e9-45d3-a332-a56015acb822");
-
-    @BeforeEach
-    public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-    }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
@@ -82,6 +90,8 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void countTestPositive() {
+        teardown();
+
         int count = userLevelFacade.count();
 
         Assertions.assertEquals(8, count);
@@ -89,7 +99,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createAndRemoveTestPositive() {
+    public void createAndRemoveTestPositive() throws ApplicationBaseException {
         UserLevel userLevel = userLevelFacade.find(uuidUserLevelNo1).orElseThrow(NoSuchElementException::new);
         Account account = userLevel.getAccount();
 
@@ -120,7 +130,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editTestPositive() {
+    public void editTestPositive() throws ApplicationBaseException {
         //pobieram user level staff dla klienta
         UserLevel staffUserLevel = userLevelFacade.find(UUID.fromString("2488831d-c7c4-4f61-b48a-3be87364271f")).orElseThrow(NoSuchElementException::new);
         //UserLevel userLevel = userLevelFacade.find(uuidUserLevelNo1).get();

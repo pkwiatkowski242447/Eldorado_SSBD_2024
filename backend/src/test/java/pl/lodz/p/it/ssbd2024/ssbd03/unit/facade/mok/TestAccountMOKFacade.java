@@ -1,6 +1,8 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.unit.mok.facades;
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.facade.mok;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
 import jakarta.persistence.TypedQuery;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,6 +33,19 @@ public class TestAccountMOKFacade extends TestcontainersConfig {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
+    }
+
+    @AfterEach
+    void teardown() {
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAdmin")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAuth")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOP")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOK")).close();
+    }
 
     private MockMvc mockMvc;
 

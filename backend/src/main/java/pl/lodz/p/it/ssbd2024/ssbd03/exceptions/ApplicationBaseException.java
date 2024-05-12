@@ -1,9 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.exceptions;
 
-public class ApplicationBaseException extends Exception{
+public class ApplicationBaseException extends Exception {
 
-    public ApplicationBaseException() {
-    }
+    public ApplicationBaseException() {}
 
     public ApplicationBaseException(String message) {
         super(message);

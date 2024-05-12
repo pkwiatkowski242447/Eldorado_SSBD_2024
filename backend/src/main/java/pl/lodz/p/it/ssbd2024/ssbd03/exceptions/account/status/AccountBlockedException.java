@@ -13,7 +13,15 @@ public class AccountBlockedException extends AccountStatusException {
         super(I18n.ACCOUNT_BLOCKED_EXCEPTION);
     }
 
+    public AccountBlockedException(String message) {
+        super(message);
+    }
+
     public AccountBlockedException(Throwable cause) {
         super(I18n.ACCOUNT_BLOCKED_EXCEPTION, cause);
+    }
+
+    public AccountBlockedException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

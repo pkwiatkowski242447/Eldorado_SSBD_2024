@@ -1,14 +1,15 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.integration;
+package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -18,6 +19,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 
@@ -32,10 +34,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
 public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private MockMvc mockMvc;
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
+    }
+
+    @AfterEach
+    void teardown() {
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAdmin")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAuth")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOP")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOK")).close();
+    }
 
     //INITIAL DATA
     @Autowired
@@ -52,11 +66,6 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     private final UUID userUuidNo1 = UUID.fromString("f5afc042-79b0-47fe-87ee-710c14af888c");
     private final String tokenValueNo1 = "TEST_VALUE90";
 
-    @BeforeEach
-    public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-    }
-
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findByTokenValue() {
@@ -71,9 +80,9 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createAndRemovePositiveTest() {
+    public void createAndRemovePositiveTest() throws ApplicationBaseException {
         String tokenValue = "testValueToken";
-        Account account = accountMOKFacade.findByLoginAndRefresh("jerzybem").orElseThrow(NoSuchElementException::new);
+        Account account = accountMOKFacade.findByLogin("jerzybem").orElseThrow(NoSuchElementException::new);
 
         assertNotNull(account);
 
@@ -140,7 +149,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeByAccountTest() {
+    public void removeByAccountTest() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
         UserLevel userLevelClientNo1 = new Client();
@@ -150,7 +159,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
+        Account findAccount = accountMOKFacade.findByLogin("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token = new Token("WiktorPtakToken", findAccount, tokenTypeChangeOverwrittenPassword);
 
@@ -169,7 +178,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeByTypeAndAccount() {
+    public void removeByTypeAndAccount() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
         UserLevel userLevelClientNo1 = new Client();
@@ -179,7 +188,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
+        Account findAccount = accountMOKFacade.findByLogin("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token1 = new Token("WiktorPtakToken1", findAccount, tokenTypeChangeOverwrittenPassword);
         Token token2 = new Token("WiktorPtakToken2", findAccount, tokenTypeChangeOverwrittenPassword);
@@ -200,7 +209,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editTestPositive() {
+    public void editTestPositive() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
         UserLevel userLevelClientNo1 = new Client();
@@ -210,7 +219,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage("PL");
         accountMOKFacade.create(account);
 
-        Account findAccount = accountMOKFacade.findByLoginAndRefresh("wiktorptak").orElseThrow(NoSuchElementException::new);
+        Account findAccount = accountMOKFacade.findByLogin("wiktorptak").orElseThrow(NoSuchElementException::new);
 
         Token token1 = new Token("WiktorPtakToken1", findAccount, tokenTypeChangeOverwrittenPassword);
 

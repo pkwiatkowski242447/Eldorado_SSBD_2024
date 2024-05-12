@@ -29,6 +29,9 @@ import java.util.concurrent.TimeUnit;
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ScheduleService implements ScheduleServiceInterface {
 
+    @Value("${mail.account.creation.confirmation.url}")
+    private String accountCreationConfirmationUrl;
+
     /**
      * AccountMOKFacade used for operations on account entities.
      */
@@ -121,8 +124,8 @@ public class ScheduleService implements ScheduleServiceInterface {
         registerTokens.forEach(token -> {
             Account account = token.getAccount();
             if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(12))) {
-                //TODO make it so the URL is based on some property
-                String confirmationURL = "http://localhost:8080/api/v1/account/activate-account/" + token.getTokenValue();
+                String confirmationURL = accountCreationConfirmationUrl + token.getTokenValue();
+
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),
                                                           account.getLastname(),
                                                           account.getEmail(),

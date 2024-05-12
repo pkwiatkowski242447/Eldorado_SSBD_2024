@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @param userLevel UserLevel to be persisted.
      */
     @Override
-    public void create(UserLevel userLevel) {
+    public void create(UserLevel userLevel) throws ApplicationBaseException {
         super.create(userLevel);
     }
 

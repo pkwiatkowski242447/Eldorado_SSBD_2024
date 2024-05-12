@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,7 @@ public abstract class AbstractFacade<T> {
      *
      * @param entity Entity to be persisted.
      */
-    protected void create(T entity) {
+    protected void create(T entity) throws ApplicationBaseException {
         getEntityManager().persist(entity);
         getEntityManager().flush();
     }

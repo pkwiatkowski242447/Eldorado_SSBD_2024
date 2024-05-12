@@ -2,6 +2,8 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
@@ -42,9 +44,9 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspects, intercepting facade method invocation.
      */
-    void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException;
+    void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
 
     /**
      * This method is used to create new account, which will have default user level of Admin.
@@ -56,9 +58,9 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspects, intercepting facade method invocation.
      */
-    void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException;
+    void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
 
     /**
      * This method is used to reset current user account password. This method basically generates a token of type
@@ -105,23 +107,21 @@ public interface AccountServiceInterface {
      * This method is used to modify user personal data.
      *
      * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
+     * @param currentUserLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
+     * @throws ApplicationOptimisticLockException Threw if while editing the account, a parallel editing action occurred.
      */
-    Account modifyAccount(Account modifiedAccount) throws AccountNotFoundException;
+    Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException, ApplicationOptimisticLockException;
 
     /**
      * Changes the e-mail of the specified Account.
      *
      * @param accountId ID of the account which the e-mail will be changed.
      * @param newEmail  New e-mail address.
-     * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
-     *                                     Contains a key to an internationalized message.
-     *                                     Additionally, if the problem was caused by an incorrect new mail,
-     *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
-     * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
-    void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException;
+    void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException;
 
     /**
      * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.
@@ -139,7 +139,7 @@ public interface AccountServiceInterface {
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
      */
-    boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException;
+    boolean confirmEmail(String token) throws ApplicationBaseException;
 
     /**
      * Retrieve Accounts that match the parameters, in a given order.
@@ -246,4 +246,13 @@ public interface AccountServiceInterface {
      * AccountUserLevelException - when account already has this user level
      */
     void addAdminUserLevel(String id) throws ApplicationBaseException;
+
+    /** Change own password.
+     *
+     * @param oldPassword The OldPassword is the old password that the user must provide for authentication.
+     * @param newPassword The new password is the password that the user wants to set.
+     * @param login The login retrieved from the security context.
+     * @throws ApplicationBaseException Threw when credentials are incorrect or account not found.
+     */
+    void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException;
 }

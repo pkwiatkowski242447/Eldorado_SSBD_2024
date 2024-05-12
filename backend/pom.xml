@@ -76,7 +76,7 @@
         </developer>
         <developer>
             <id>242415</id>
-            <name>Adam Karaszewski</name>
+            <name>Adam Karaszewsk</name>
             <email>242415@edu.p.lodz.pl</email>
         </developer>
         <developer>
@@ -465,6 +465,21 @@
                     <nohelp>true</nohelp>
                 </configuration>
             </plugin>
+
+            <!--Maven Failsafe Plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <!--Enable using pom properties in other files-->
@@ -513,27 +528,30 @@
                 <schema-gen.policy>update</schema-gen.policy>
                 <debug-sql.log>false</debug-sql.log>
                 <logging.level>INFO</logging.level>
+                <url.host>https://team-3.proj-sum.it.p.lodz.pl</url.host>
             </properties>
         </profile>
         <profile>
             <id>test</id>
+            <properties>
+                <database.host>db</database.host>
+                <schema-gen.policy>create-drop</schema-gen.policy>
+                <debug-sql.log>false</debug-sql.log>
+                <logging.level>INFO</logging.level>
+                <url.host>http://localhost:3000</url.host>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <database.host>localhost</database.host>
                 <schema-gen.policy>create-drop</schema-gen.policy>
-                <debug-sql.log>false</debug-sql.log>
-                <logging.level>INFO</logging.level>
-            </properties>
-        </profile>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <database.host>localhost</database.host>
-                <schema-gen.policy>create-drop</schema-gen.policy>
                 <debug-sql.log>true</debug-sql.log>
                 <logging.level>DEBUG</logging.level>
+                <url.host>http://localhost:3000</url.host>
             </properties>
         </profile>
     </profiles>

@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
@@ -34,7 +35,7 @@ public class TokenServiceMockTest {
     private TokenService tokenService;
 
     @Test
-    void createRegistrationTokenTest(){
+    void createRegistrationTokenTest() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         String tokenValue = "TOKEN VALUE";
         ArgumentCaptor<Token> tokenArgumentCaptor = ArgumentCaptor.captor();
@@ -51,7 +52,7 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void createEmailConfirmationTokenTest(){
+    void createEmailConfirmationTokenTest() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         String newEmail = "new@email.com";
         String tokenValue = "TOKEN VALUE";
@@ -69,7 +70,7 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void removeAccountEmailConfirmationTokenTestSuccessful(){
+    void removeAccountEmailConfirmationTokenTestSuccessful() {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         String tokenValue = "TOKEN VALUE";
         Token token = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
@@ -82,7 +83,7 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void removeAccountEmailConfirmationTokenTestNoSuchToken(){
+    void removeAccountEmailConfirmationTokenTestNoSuchToken() {
         String tokenValue = "TOKEN VALUE";
         Mockito.when(tokenFacade.findByTypeAndAccount(eq(Token.TokenType.CONFIRM_EMAIL), any())).thenReturn(Optional.empty());
         Mockito.when(jwtProvider.extractAccountId(tokenValue)).thenReturn(UUID.randomUUID());
