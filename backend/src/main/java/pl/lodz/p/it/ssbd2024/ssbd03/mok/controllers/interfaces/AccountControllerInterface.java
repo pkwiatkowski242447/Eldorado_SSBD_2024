@@ -147,7 +147,7 @@ public interface AccountControllerInterface {
      *
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
-    ResponseEntity<?> resendEmailConfirmation();
+    ResponseEntity<?> resendEmailConfirmation() throws ApplicationBaseException;
 
     /**
      * This method is used to remove client user level from account.

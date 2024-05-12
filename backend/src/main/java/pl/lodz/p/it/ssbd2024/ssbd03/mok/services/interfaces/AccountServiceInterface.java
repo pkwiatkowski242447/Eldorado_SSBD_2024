@@ -187,7 +187,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException Thrown when an account from security context can't be found in the database.
      * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
      */
-    void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException;
+    void resendEmailConfirmation() throws ApplicationBaseException;
 
     /**
      * Removes the client user level from the account.

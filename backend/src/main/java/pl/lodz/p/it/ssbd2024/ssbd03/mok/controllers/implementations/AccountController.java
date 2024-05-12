@@ -425,14 +425,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/resend-email-confirmation")
-    public ResponseEntity<?> resendEmailConfirmation() {
-        try {
-            accountService.resendEmailConfirmation();
-            return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException | TokenNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+    public ResponseEntity<?> resendEmailConfirmation() throws ApplicationBaseException{
+        accountService.resendEmailConfirmation();
+        return ResponseEntity.noContent().build();
     }
 
     /**
