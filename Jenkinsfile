@@ -13,7 +13,7 @@ pipeline{
         stage('build'){
             steps{
                 sh 'cp ${JENKINS_HOME}/mail.properties ${MAIL_PROPERTIES_TARGET_LOCATION}'
-                sh 'cd backend && mvn -B clean test'
+                sh 'cd backend && mvn -B -Ptest clean verify'
             }
         }
     }
