@@ -64,14 +64,11 @@ public class AccountController implements AccountControllerInterface {
      * AccountServiceInterface used for operation on accounts.
      */
     private final AccountServiceInterface accountService;
+
     /**
      * JWTProvider used for operations on JWT TOKEN.
      */
     private final JWTProvider jwtProvider;
-    /**
-     * TokenServiceInterface used for operations on tokens.
-     */
-    private final TokenServiceInterface tokenService;
 
     /**
      * Autowired constructor for the controller.
@@ -214,8 +211,6 @@ public class AccountController implements AccountControllerInterface {
      * @param pageSize   Number of user accounts per page.
      * @return This method returns 200 OK as a response, where in response body a list of user accounts is located, is a JSON format.
      * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
-     * @apiNote This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
-     * login alphabetically.
      */
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

@@ -463,6 +463,14 @@
                 <configuration>
                     <show>private</show>
                     <nohelp>true</nohelp>
+                    <doclint>all,-missing</doclint>
+                    <tags>
+                        <tag>
+                            <name>note</name>
+                            <placement>a</placement>
+                            <head>Note:</head>
+                        </tag>
+                    </tags>
                 </configuration>
             </plugin>
 
@@ -515,6 +523,14 @@
                 <version>3.6.3</version>
                 <configuration>
                     <show>public</show>
+                    <doclint>all,-missing</doclint>
+                    <tags>
+                        <tag>
+                            <name>note</name>
+                            <placement>a</placement>
+                            <head>Note:</head>
+                        </tag>
+                    </tags>
                 </configuration>
             </plugin>
         </plugins>

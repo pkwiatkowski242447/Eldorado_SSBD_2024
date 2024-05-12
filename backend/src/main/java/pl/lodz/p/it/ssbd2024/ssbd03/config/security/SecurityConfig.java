@@ -55,7 +55,7 @@ public class SecurityConfig {
      * Whitelist containing all URLs related to paths available to unauthenticated users.
      */
     private static final String[] PATHS_WHITELIST = {
-            "/api/v1/auth/login/**",
+            "/api/v1/auth/**",
             "/api/v1/register/client",
             "/api/v1/accounts/change-password/**",
             "/api/v1/accounts/forgot-password",
