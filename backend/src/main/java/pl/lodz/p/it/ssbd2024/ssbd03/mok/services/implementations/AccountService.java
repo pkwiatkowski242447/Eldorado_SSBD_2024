@@ -142,7 +142,7 @@ public class AccountService implements AccountServiceInterface {
 
         this.accountFacade.create(newClientAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newClientAccount, (this.accountCreationConfirmationPeriodLengthHours / 2) * 60, ChronoUnit.MINUTES);
+        String tokenValue = jwtProvider.generateActionToken(newClientAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
         tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
@@ -170,6 +170,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newStaffAccount.setAccountLanguage(language);
@@ -179,7 +180,7 @@ public class AccountService implements AccountServiceInterface {
 
         accountFacade.create(newStaffAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
+        String tokenValue = jwtProvider.generateActionToken(newStaffAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
         tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
@@ -207,6 +208,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newAdminAccount.setAccountLanguage(language);
@@ -216,7 +218,7 @@ public class AccountService implements AccountServiceInterface {
 
         accountFacade.create(newAdminAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
+        String tokenValue = jwtProvider.generateActionToken(newAdminAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
         tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
@@ -384,6 +386,10 @@ public class AccountService implements AccountServiceInterface {
             account.setVerified(true);
             accountFacade.edit(account);
             tokenFacade.remove(tokenFromDB);
+            mailProvider.sendActivationConfirmationEmail(account.getName(),
+                    account.getLastname(),
+                    account.getEmail(),
+                    account.getAccountLanguage());
             return true;
         }
         return false;

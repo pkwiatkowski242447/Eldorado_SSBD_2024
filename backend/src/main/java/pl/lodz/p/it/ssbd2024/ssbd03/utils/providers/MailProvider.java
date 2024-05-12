@@ -42,6 +42,7 @@ public class MailProvider {
 
     /**
      * Autowired constructor for the component.
+     *
      * @param javaMailSender
      */
     @Autowired
@@ -51,11 +52,12 @@ public class MailProvider {
 
     /**
      * Sends an account creation confirmation e-mail to the specified e-mail address.
-     * @param firstName User's first name.
-     * @param lastName User's last name.
-     * @param emailReceiver E-mail address to which the message will be sent.
+     *
+     * @param firstName       User's first name.
+     * @param lastName        User's last name.
+     * @param emailReceiver   E-mail address to which the message will be sent.
      * @param confirmationURL URL used to confirm the account creation.
-     * @param language Language of the message.
+     * @param language        Language of the message.
      */
     public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
@@ -89,15 +91,15 @@ public class MailProvider {
     /**
      * Sends an account blocking notification e-mail to the specified e-mail address.
      *
-     * @param firstName User's first name.
-     * @param lastName User's last name.
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
      * @param emailReceiver E-mail address to which the message will be sent.
-     * @param language Language of the message.
+     * @param language      Language of the message.
      */
     public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language, boolean adminLock) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
-            String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
                     .replace("$firstname", firstName)
                     .replace("$lastname", lastName)
                     .replace("$greeting_message", I18n.getMessage(I18n.BLOCK_ACCOUNT_GREETING_MESSAGE, language))
@@ -127,15 +129,15 @@ public class MailProvider {
     /**
      * Sends an account unblocking notification e-mail to the specified e-mail address.
      *
-     * @param firstName User's first name.
-     * @param lastName User's last name.
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
      * @param emailReceiver E-mail address to which the message will be sent.
-     * @param language Language of the message.
+     * @param language      Language of the message.
      */
     public void sendUnblockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
-            String emailContent = this.loadTemplate("block-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
                     .replace("$firstname", firstName)
                     .replace("$lastname", lastName)
                     .replace("$greeting_message", I18n.getMessage(I18n.UNBLOCK_ACCOUNT_GREETING_MESSAGE, language))
@@ -163,11 +165,11 @@ public class MailProvider {
     /**
      * Sends an e-mail change confirmation e-mail to the specified e-mail address.
      *
-     * @param firstName User's first name.
-     * @param lastName User's last name.
-     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param firstName       User's first name.
+     * @param lastName        User's last name.
+     * @param emailReceiver   E-mail address to which the message will be sent.
      * @param confirmationURL URL used to confirm the e-mail address.
-     * @param language Language of the message.
+     * @param language        Language of the message.
      */
     public void sendEmailConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
@@ -202,11 +204,11 @@ public class MailProvider {
      * Send e-mail message to the e-mail address provided by the unauthenticated user, about changing their account
      * password. Basically, it provides them with a URL to reset their password.
      *
-     * @param firstName User's first name.
-     * @param lastName User's last name.
-     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param firstName       User's first name.
+     * @param lastName        User's last name.
+     * @param emailReceiver   E-mail address to which the message will be sent.
      * @param confirmationURL URL used to confirm the account creation.
-     * @param language Language of the message.
+     * @param language        Language of the message.
      */
     public void sendPasswordResetEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
@@ -237,8 +239,40 @@ public class MailProvider {
         }
     }
 
+    public void sendActivationConfirmationEmail(String firstName, String lastName, String emailReceiver, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.CONFIRM_ACCOUNT_ACTIVATION_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.CONFIRM_ACCOUNT_ACTIVATION_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.CONFIRM_ACCOUNT_ACTIVATION_ACTION_DESCRIPTION, language))
+                    .replace("$note_title", I18n.getMessage(I18n.CONFIRM_ACCOUNT_ACTIVATION_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.CONFIRM_ACCOUNT_ACTIVATION_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException | NullPointerException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    private void sendEmail(String emailContent, String emailReceiver, String senderEmail, String emailSubject) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+        messageHelper.setTo(emailReceiver);
+
+        messageHelper.setSubject(emailSubject);
+        messageHelper.setText(emailContent, true);
+        messageHelper.setFrom(senderEmail);
+
+        this.mailSender.send(mimeMessage);
+    }
+
     /**
      * Loads e-mail template from the /resources/templates folder.
+     *
      * @param templateName Name of the template file.
      * @return Returns a String containing the loaded template.
      * If an exception occurs while reading the template file it will return everything read up to this point.
@@ -259,6 +293,7 @@ public class MailProvider {
 
     /**
      * Loads an image from the /resources/templates/images folder.
+     *
      * @param imageName Name of the image file.
      * @return Returns a String containing the loaded image.
      * If an exception occurs while reading the image file it will return everything read up to this point.
