@@ -183,6 +183,32 @@ public class AccountController implements AccountControllerInterface {
     }
 
     /**
+     * This endpoint is used to reset user account password by the administrator. It does generate RESET PASSWORD token, write
+     * it to the database, and send a message with reset password URL to user e-mail address.
+     *
+     * @param id Identifier of the account of which the password will be resetted.
+     *
+     * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
+     * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
+     * not activated yet).
+     * @throws ApplicationBaseException 
+     */
+    @Override
+    @PostMapping(value = "/reset-password/{id}")
+    @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
+    public ResponseEntity<?> resetAccountPassword(@PathVariable("id") String id) throws ApplicationBaseException {
+        try {
+            UUID uuid = UUID.fromString(id);
+            Account account = accountService.getAccountById(uuid).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+            this.accountService.forgetAccountPassword(account.getEmail());
+
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException anfe) {
+            return ResponseEntity.badRequest().body(anfe.getMessage());
+        }
+    }
+
+    /**
      * This endpoint is used to change password for an unauthenticated user. It does generate RESET PASSWORD token, write
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
