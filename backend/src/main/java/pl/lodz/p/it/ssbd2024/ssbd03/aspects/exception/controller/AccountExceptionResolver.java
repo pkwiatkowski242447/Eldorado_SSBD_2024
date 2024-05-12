@@ -10,6 +10,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompr
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.ResetOwnPasswordException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountStatusException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 
@@ -118,6 +119,21 @@ public class AccountExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(accountDataIntegrityCompromisedException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any ResetOwnPasswordException or exception that extends it. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param resetOwnPasswordException ResetOwnPasswordException that was caught in order to be transformed to HTTP Response.
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST.
+     */
+    @ExceptionHandler(value = { ResetOwnPasswordException.class })
+    public ResponseEntity<?> handleResetOwnPasswordException(ResetOwnPasswordException resetOwnPasswordException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(resetOwnPasswordException.getMessage());
     }
 
     /**

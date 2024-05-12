@@ -14,7 +14,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
@@ -483,5 +493,29 @@ public class AccountController implements AccountControllerInterface {
         } catch (AccountNotFoundException | AccountUserLevelException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+
+    /**
+     * This method is used to change own password.
+     *
+     * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
+     * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
+     * is the same as current password returns 400 BAD REQUEST HTTP response.
+     * @throws ApplicationBaseException thrown when problems occur when password is changing.
+     */
+    @Override
+    @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
+        String oldPassword = accountChangePasswordDTO.getOldPassword();
+        String newPassword = accountChangePasswordDTO.getNewPassword();
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        log.info(username);
+
+        accountService.changePasswordSelf(oldPassword, newPassword, username);
+
+        return ResponseEntity.ok().build();
     }
 }

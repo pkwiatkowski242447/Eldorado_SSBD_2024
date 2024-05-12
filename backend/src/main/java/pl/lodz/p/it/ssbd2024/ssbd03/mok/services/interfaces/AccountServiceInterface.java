@@ -215,4 +215,13 @@ public interface AccountServiceInterface {
      * @throws AccountUserLevelException Threw when the account has no admin user level or this is the only user level of the account.
      */
     void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+
+    /** Change own password.
+     *
+     * @param oldPassword The OldPassword is the old password that the user must provide for authentication.
+     * @param newPassword The new password is the password that the user wants to set.
+     * @param login The login retrieved from the security context.
+     * @throws ApplicationBaseException Threw when credentials are incorrect or account not found.
+     */
+    void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException;
 }

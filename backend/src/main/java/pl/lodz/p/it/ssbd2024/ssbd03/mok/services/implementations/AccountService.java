@@ -21,10 +21,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmail
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.CurrentPasswordAndNewPasswordAreTheSameException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -604,5 +606,37 @@ public class AccountService implements AccountServiceInterface {
         accountFacade.edit(account);
 
         userLevelFacade.remove(adminUserLevel);
+    }
+
+    /***
+     * This method is used to change own password.
+     *
+     * @param oldPassword The OldPassword is the old password that the user must provide for authentication.
+     * @param newPassword The new password is the password that the user wants to set.
+     * @param login The login retrieved from the security context.
+     * @throws ApplicationBaseException - IncorrectPasswordException (when oldPassword parameter and password in database
+     * are not equal), CurrentPasswordAndNewPasswordAreTheSameException (when newPassword parameter and password in database
+     * are not equal). AccountNotFoundException (when account not found).
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationBaseException.class)
+    public void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException {
+
+        String newPasswordEncoded = passwordEncoder.encode(newPassword);
+
+        Account account = accountFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        String passwordFromDatabase = account.getPassword();
+
+        if (!passwordEncoder.matches(oldPassword, passwordFromDatabase)) {
+            throw new IncorrectPasswordException();
+        }
+
+        if (passwordEncoder.matches(newPassword, passwordFromDatabase)) {
+            throw new CurrentPasswordAndNewPasswordAreTheSameException();
+        }
+
+        account.setPassword(newPasswordEncoded);
+        accountFacade.edit(account);
     }
 }

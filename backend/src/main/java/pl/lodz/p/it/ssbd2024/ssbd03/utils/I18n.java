@@ -12,6 +12,10 @@ public class I18n {
     public static final String ACCOUNT_BLOCKED_EXCEPTION = "account.status.blocked.exception";
     public static final String ACCOUNT_INACTIVE_EXCEPTION = "account.status.inactive.exception";
 
+    // Account reset own password exceptions
+    public static final String SET_NEW_PASSWORD_IS_THE_SAME_AS_CURRENT_ONE = "account.reset.password.same.passwords.exception";
+    public static final String INCORRECT_PASSWORD = "account.reset.password.incorrect.current.password";
+
     // Account internationalization keys
     public static final String ACCOUNT_LOGIN_ALREADY_TAKEN = "account.login.already.taken.exception";
     public static final String ACCOUNT_EMAIL_ALREADY_TAKEN = "account.email.already.taken.exception";
