@@ -215,4 +215,35 @@ public interface AccountServiceInterface {
      * @throws AccountUserLevelException Threw when the account has no admin user level or this is the only user level of the account.
      */
     void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+
+    /**
+     * Adds the Client user level to the account.
+     *
+     * @param id Account's id.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    void addClientUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     *
+     * Adds the Staff user level to the account.
+     *
+     * @param id Account's id.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    void addStaffUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     * Adds the Admin user level to the account.
+     *
+     * @param id Account's id.
+     * @throws ApplicationBaseException
+     * AccountNotFoundException - when account is not found
+     * AccountUserLevelException - when account already has this user level
+     */
+    void addAdminUserLevel(String id) throws ApplicationBaseException;
 }

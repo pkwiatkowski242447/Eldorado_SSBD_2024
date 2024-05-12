@@ -39,6 +39,7 @@ public class I18n {
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
     public static final String UNEXPECTED_USER_LEVEL = "user_level.type.unexpected.exception";
     public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
+    public static final String USER_LEVEL_DUPLICATED = "user_level.type.duplicated.exception";
 
     // Authentication controller
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";

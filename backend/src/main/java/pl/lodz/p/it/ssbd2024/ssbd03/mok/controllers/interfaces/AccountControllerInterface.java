@@ -174,4 +174,38 @@ public interface AccountControllerInterface {
      *             explaining why the error occurred).
      */
     ResponseEntity<?> removeAdminUserLevel(String id);
+
+    /**
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message  explaining why the error occurred).
+     */
+    ResponseEntity<?> addClientUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message  explaining why the error occurred).
+     */
+    ResponseEntity<?> addStaffUserLevel(String id) throws ApplicationBaseException;
+
+    /**
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     */
+    ResponseEntity<?> addAdminUserLevel(String id) throws ApplicationBaseException;
 }
+
+
+
+

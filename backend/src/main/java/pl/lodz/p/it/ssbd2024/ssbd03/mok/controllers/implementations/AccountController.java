@@ -473,4 +473,25 @@ public class AccountController implements AccountControllerInterface {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @Override
+    @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        return  ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
 }
