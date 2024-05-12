@@ -44,7 +44,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
@@ -75,15 +74,12 @@ public class AccountController implements AccountControllerInterface {
      * It is basically used to perform dependency injection of AccountService into this controller.
      *
      * @param accountService Service containing various methods for account manipulation.
-     * @param tokenService   Service used for token management (in order to confirm certain user's actions).
      * @param jwtProvider    Service used for JWT management (eg. signing).
      */
     @Autowired
     public AccountController(AccountServiceInterface accountService,
-                             TokenServiceInterface tokenService,
                              JWTProvider jwtProvider) {
         this.accountService = accountService;
-        this.tokenService = tokenService;
         this.jwtProvider = jwtProvider;
     }
 
