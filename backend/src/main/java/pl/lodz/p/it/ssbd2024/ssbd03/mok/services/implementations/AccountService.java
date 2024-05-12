@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
@@ -330,14 +331,14 @@ public class AccountService implements AccountServiceInterface {
      * This method is used to modify user personal data.
      *
      * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
-     * @param currentUserLogin Login associated with the modified account.
+     * @param userLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException           Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
-    public Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException, ApplicationOptimisticLockException {
-        Account foundAccount = accountFacade.findByLogin(currentUserLogin).orElseThrow(AccountNotFoundException::new);
+    public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
+        Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
 
         if (!modifiedAccount.getVersion().equals(foundAccount.getVersion())) {
             throw new ApplicationOptimisticLockException();
@@ -346,6 +347,17 @@ public class AccountService implements AccountServiceInterface {
         foundAccount.setName(modifiedAccount.getName());
         foundAccount.setLastname(modifiedAccount.getLastname());
         foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
+        foundAccount.setAccountLanguage(modifiedAccount.getAccountLanguage());
+
+        for (UserLevel foundUserLevel : foundAccount.getUserLevels()) {
+            UserLevel modifiedUserLevel = modifiedAccount.getUserLevels().stream()
+                    .filter((level) -> level.getClass().getSimpleName().equalsIgnoreCase(foundUserLevel.getClass().getSimpleName()))
+                    .findFirst().orElseThrow(UserLevelMissingException::new);
+
+            if (!foundUserLevel.getVersion().equals(modifiedUserLevel.getVersion())) {
+                throw new ApplicationOptimisticLockException();
+            }
+        }
 
         accountFacade.edit(foundAccount);
 

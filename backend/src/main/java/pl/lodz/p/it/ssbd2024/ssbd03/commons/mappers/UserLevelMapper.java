@@ -8,7 +8,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedClientTypeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -29,7 +28,7 @@ public class UserLevelMapper {
             throws MapperUnexpectedUserLevelException, MapperUnexpectedClientTypeException {
         return switch (userLevelDTO) {
             case ClientDTO clientDTO -> {
-                Client client = new Client();
+                Client client = new Client(clientDTO.getVersion());
                 client.setType(switch (clientDTO.getClientType().toUpperCase()) {
                     case "BASIC" -> Client.ClientType.BASIC;
                     case "STANDARD" -> Client.ClientType.STANDARD;
@@ -38,8 +37,8 @@ public class UserLevelMapper {
                 });
                 yield client;
             }
-            case StaffDTO staffDTO -> new Staff();
-            case AdminDTO adminDTO -> new Admin();
+            case StaffDTO staffDTO -> new Staff(staffDTO.getVersion());
+            case AdminDTO adminDTO -> new Admin(adminDTO.getVersion());
             default -> throw new MapperUnexpectedUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
         };
     }

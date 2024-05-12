@@ -15,6 +15,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Entity representing a user account in the system. It stores information used to authenticate
@@ -280,7 +282,7 @@ public class Account extends AbstractEntity {
     @OneToMany(mappedBy = DatabaseConsts.ACCOUNT_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     //TODO: Rozwiązanie konfliktu z uprawnieniami przy wykonywaniu operacji Refresh (gdyż jest kasada) + uprawnienia do edycji (i ewentualnie rozwiązanie kwestii kasady Merge)
     @ToString.Exclude
-    private final Collection<UserLevel> userLevels = new ArrayList<>();
+    private final Set<UserLevel> userLevels = new HashSet<>();
 
     /**
      * Embedded ActivityLog associated with the account.

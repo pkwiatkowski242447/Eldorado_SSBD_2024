@@ -370,12 +370,6 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
         <!--JWT-->
         <dependency>
             <groupId>com.auth0</groupId>
@@ -466,7 +460,7 @@
                     <doclint>all,-missing</doclint>
                     <tags>
                         <tag>
-                            <name>note</name>
+                            <name>note.</name>
                             <placement>a</placement>
                             <head>Note:</head>
                         </tag>
@@ -526,7 +520,7 @@
                     <doclint>all,-missing</doclint>
                     <tags>
                         <tag>
-                            <name>note</name>
+                            <name>note.</name>
                             <placement>a</placement>
                             <head>Note:</head>
                         </tag>
