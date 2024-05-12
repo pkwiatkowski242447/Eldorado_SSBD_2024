@@ -504,7 +504,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
      */
     @Override
-    public void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException {
+    public void resendEmailConfirmation() throws ApplicationBaseException{
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account account = accountFacade.findByLogin(login)
                 .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
