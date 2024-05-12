@@ -76,7 +76,7 @@
         </developer>
         <developer>
             <id>242415</id>
-            <name>Adam Karaszewski</name>
+            <name>Adam Karaszewsk</name>
             <email>242415@edu.p.lodz.pl</email>
         </developer>
         <developer>
@@ -370,12 +370,6 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
         <!--JWT-->
         <dependency>
             <groupId>com.auth0</groupId>
@@ -463,7 +457,30 @@
                 <configuration>
                     <show>private</show>
                     <nohelp>true</nohelp>
+                    <doclint>all,-missing</doclint>
+                    <tags>
+                        <tag>
+                            <name>note.</name>
+                            <placement>a</placement>
+                            <head>Note:</head>
+                        </tag>
+                    </tags>
                 </configuration>
+            </plugin>
+
+            <!--Maven Failsafe Plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 
@@ -500,6 +517,14 @@
                 <version>3.6.3</version>
                 <configuration>
                     <show>public</show>
+                    <doclint>all,-missing</doclint>
+                    <tags>
+                        <tag>
+                            <name>note.</name>
+                            <placement>a</placement>
+                            <head>Note:</head>
+                        </tag>
+                    </tags>
                 </configuration>
             </plugin>
         </plugins>
@@ -513,27 +538,30 @@
                 <schema-gen.policy>update</schema-gen.policy>
                 <debug-sql.log>false</debug-sql.log>
                 <logging.level>INFO</logging.level>
+                <url.host>https://team-3.proj-sum.it.p.lodz.pl</url.host>
             </properties>
         </profile>
         <profile>
             <id>test</id>
+            <properties>
+                <database.host>db</database.host>
+                <schema-gen.policy>create-drop</schema-gen.policy>
+                <debug-sql.log>false</debug-sql.log>
+                <logging.level>INFO</logging.level>
+                <url.host>http://localhost:3000</url.host>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <database.host>localhost</database.host>
                 <schema-gen.policy>create-drop</schema-gen.policy>
-                <debug-sql.log>false</debug-sql.log>
-                <logging.level>INFO</logging.level>
-            </properties>
-        </profile>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <database.host>localhost</database.host>
-                <schema-gen.policy>create-drop</schema-gen.policy>
                 <debug-sql.log>true</debug-sql.log>
                 <logging.level>DEBUG</logging.level>
+                <url.host>http://localhost:3000</url.host>
             </properties>
         </profile>
     </profiles>

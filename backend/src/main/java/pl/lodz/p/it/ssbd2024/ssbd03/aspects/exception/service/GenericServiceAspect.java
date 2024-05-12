@@ -10,6 +10,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 
+import java.lang.reflect.UndeclaredThrowableException;
+
 @Aspect
 @Order(15)
 @Component
@@ -32,7 +34,7 @@ public class GenericServiceAspect {
      * into other, checked exception and propagate further, or rethrow them in order to process them in the next aspect.
      */
     @Around(value = "serviceMethodPointcut()")
-    private Object handleServiceMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
+    private Object handleServiceMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         try {
             return proceedingJoinPoint.proceed();
         } catch (IllegalArgumentException exception) {

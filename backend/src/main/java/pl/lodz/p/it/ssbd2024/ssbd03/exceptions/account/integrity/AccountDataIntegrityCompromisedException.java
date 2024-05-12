@@ -1,5 +1,6 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account;
+package pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 /**
@@ -9,5 +10,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 public class AccountDataIntegrityCompromisedException extends AccountBaseException {
     public AccountDataIntegrityCompromisedException() {
         super(I18n.DATA_INTEGRITY_COMPROMISED);
+    }
+
+    public AccountDataIntegrityCompromisedException(String message) {
+        super(message);
     }
 }

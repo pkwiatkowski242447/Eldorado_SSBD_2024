@@ -23,6 +23,8 @@ public class AccountModifyDTO extends AccountSignableDTO {
     private String lastname;
     @Schema(description = "Phone number of the user", example = "111222333", requiredMode = Schema.RequiredMode.REQUIRED)
     private String phoneNumber;
+    @Schema(description = "Language used natively in user browser", example = "pl", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String accountLanguage;
 
     /**
      * All arguments constructor
@@ -32,12 +34,14 @@ public class AccountModifyDTO extends AccountSignableDTO {
      * @param name First name of the user.
      * @param lastname Last name of the user.
      * @param phoneNumber Phone number of the user.
+     * @param accountLanguage Language used natively in user browser.
      */
     public AccountModifyDTO(String login, Long version, Set<UserLevelDTO> userLevelsDto,
-                            String name, String lastname, String phoneNumber) {
+                            String name, String lastname, String phoneNumber, String accountLanguage) {
         super(login, version, userLevelsDto);
         this.name = name;
         this.lastname = lastname;
         this.phoneNumber = phoneNumber;
+        this.accountLanguage = accountLanguage;
     }
 }

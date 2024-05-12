@@ -46,4 +46,8 @@ public class Client extends UserLevel implements Serializable {
     @Getter
     @Setter
     private ClientType type = ClientType.BASIC;
+
+    public Client(Long version) {
+        super(version);
+    }
 }

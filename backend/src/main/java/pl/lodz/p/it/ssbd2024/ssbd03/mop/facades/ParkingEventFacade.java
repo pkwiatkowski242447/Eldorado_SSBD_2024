@@ -7,6 +7,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @param entity ParkingEvent to be persisted.
      */
     @Override
-    public void create(ParkingEvent entity) {
+    public void create(ParkingEvent entity) throws ApplicationBaseException {
         super.create(entity);
     }
 

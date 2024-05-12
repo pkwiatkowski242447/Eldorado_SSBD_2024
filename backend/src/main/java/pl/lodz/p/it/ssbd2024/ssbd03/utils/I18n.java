@@ -12,6 +12,10 @@ public class I18n {
     public static final String ACCOUNT_BLOCKED_EXCEPTION = "account.status.blocked.exception";
     public static final String ACCOUNT_INACTIVE_EXCEPTION = "account.status.inactive.exception";
 
+    // Account reset own password exceptions
+    public static final String SET_NEW_PASSWORD_IS_THE_SAME_AS_CURRENT_ONE = "account.reset.password.same.passwords.exception";
+    public static final String INCORRECT_PASSWORD = "account.reset.password.incorrect.current.password";
+
     // Account internationalization keys
     public static final String ACCOUNT_LOGIN_ALREADY_TAKEN = "account.login.already.taken.exception";
     public static final String ACCOUNT_EMAIL_ALREADY_TAKEN = "account.email.already.taken.exception";
@@ -31,6 +35,9 @@ public class I18n {
     // Optimistic lock
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "optimistic.lock.exception";
 
+    // Application internal server error
+    public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
+
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";
     public static final String AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION = "authentication.service.account.login.not.found.exception";
@@ -40,8 +47,10 @@ public class I18n {
     public static final String STAFF_ACCOUNT_CREATION_EXCEPTION = "account.service.staff.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_CREATION_EXCEPTION = "account.service.admin.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
-    public static final String UNEXPECTED_USER_LEVEL = "user_level.type.unexpected.exception";
+    public static final String NO_SUCH_USER_LEVEL_EXCEPTION = "user_level.no.such.user.level.exception";
+    public static final String ONE_USER_LEVEL = "user_level.one.user.level";
     public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
+    public static final String USER_LEVEL_DUPLICATED = "user_level.type.duplicated.exception";
 
     // Authentication controller
     public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
@@ -66,6 +75,10 @@ public class I18n {
 
     // JWT
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
+
+    // Util
+    public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
+
 
     // Mail provider
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";
