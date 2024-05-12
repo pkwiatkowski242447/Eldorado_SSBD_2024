@@ -64,8 +64,8 @@ public class AccountExceptionResolver {
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException.class })
-    public ResponseEntity<?> handleAccountNotFoundException(pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException accountNotFoundException) {
+    @ExceptionHandler(value = { AccountNotFoundException.class })
+    public ResponseEntity<?> handleAccountNotFoundException(AccountNotFoundException accountNotFoundException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(accountNotFoundException.getMessage());
@@ -87,22 +87,6 @@ public class AccountExceptionResolver {
         return ResponseEntity.badRequest()
                .contentType(MediaType.TEXT_PLAIN)
                .body(accountStatusException.getMessage());
-    }
-
-    /**
-     * Method used to transform AccountNotFound exception and its subclasses to HTTP Response 404 NOT FOUND, and will return
-     * message, extracted from caught exception and put it into ResponseEntity as plaintext.
-     *
-     * @param accountNotFoundException AccountNotFound exception and its subclasses, related to not finding specified account object
-     *                                 in the database.
-     *
-     * @return HTTP Response status 404 NOT FOUND.
-     */
-    @ExceptionHandler(value = { AccountNotFoundException.class })
-    public ResponseEntity<?> handleAccountNotFoundException(AccountNotFoundException accountNotFoundException) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(accountNotFoundException.getMessage());
     }
 
     /**

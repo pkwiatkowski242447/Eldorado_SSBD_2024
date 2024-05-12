@@ -12,7 +12,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
@@ -526,7 +526,7 @@ public class AccountService implements AccountServiceInterface {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Client)) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
         if (account.getUserLevels().size() == 1) {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
@@ -554,7 +554,7 @@ public class AccountService implements AccountServiceInterface {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Staff)) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
         if (account.getUserLevels().size() == 1) {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
@@ -590,7 +590,7 @@ public class AccountService implements AccountServiceInterface {
         }
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Admin)) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
         if (account.getUserLevels().size() == 1) {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
