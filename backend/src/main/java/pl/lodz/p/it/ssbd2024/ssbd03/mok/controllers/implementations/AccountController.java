@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
@@ -33,13 +34,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -179,11 +178,9 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for registration
      *                        to the application or changed later to other e-mail address.
-     *
      * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
-     *
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
      */
     @Override
@@ -199,7 +196,6 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param token RESET PASSWORD token required to change password for user account, that was generated when
      *              forgetAccountPassword() method was called.
-     *
      * @return 200 OK is returned when changing password goes flawlessly. Otherwise, 400 BAD REQUEST is returned (since
      * RESET PASSWORD token is no longer valid or not in the database).
      */
@@ -255,7 +251,7 @@ public class AccountController implements AccountControllerInterface {
                                                                             @RequestParam(name = "pageNumber") int pageNumber,
                                                                             @RequestParam(name = "pageSize") int pageSize) {
         List<AccountListDTO> accountList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName,
-                        lastName, active,  order, pageNumber, pageSize)
+                        lastName, active, order, pageNumber, pageSize)
                 .stream()
                 .map(AccountListMapper::toAccountListDTO)
                 .toList();
@@ -272,7 +268,7 @@ public class AccountController implements AccountControllerInterface {
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
      * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
-     * methods in both facade and service component for Account.
+     *                                  methods in both facade and service component for Account.
      */
     @Override
     @PostMapping("/activate-account/{token}")
@@ -294,20 +290,11 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) {
-        try {
-            if (accountService.confirmEmail(token)) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.badRequest().body(I18n.TOKEN_INVALID_OR_EXPIRED);
-            }
-        } catch (AccountNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (AccountEmailChangeException e) {
-            tokenService.removeAccountsEmailConfirmationToken(token);
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (AccountEmailNullException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+    public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) throws ApplicationBaseException {
+        if (accountService.confirmEmail(token)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().body(I18n.TOKEN_INVALID_OR_EXPIRED);
         }
     }
 
@@ -439,7 +426,7 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to change users e-mail address, which later could be used to send
      * messages about user actions in the application (e.g. messages containing confirmation links).
      *
-     * @param id                    Identifier of the user account, whose e-mail will be changed by this method.
+     * @param id              Identifier of the user account, whose e-mail will be changed by this method.
      * @param accountEmailDTO Data transfer object containing new e-mail address.
      * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
      * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
@@ -448,15 +435,28 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) {
-        try {
-            accountService.changeEmail(id, accountEmailDTO.getEmail());
-            return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (AccountEmailChangeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
+        accountService.changeEmail(id, accountEmailDTO.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This method allows user to change their e-mail address, which later could be used to send
+     * messages about user actions in the application (e.g. messages containing confirmation links).
+     *
+     * @param accountEmailDTO Data transfer object containing new e-mail address.
+     * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
+     * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
+     * explaining why the error occurred).
+     */
+    @Override
+    @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changeEmailSelf(@Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account user = accountService.getAccountByLogin(login);
+        accountService.changeEmail(user.getId(), accountEmailDTO.getEmail());
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -466,7 +466,7 @@ public class AccountController implements AccountControllerInterface {
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
     @Override
-    @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/resend-email-confirmation")
     public ResponseEntity<?> resendEmailConfirmation() {
         try {
             accountService.resendEmailConfirmation();
@@ -535,5 +535,85 @@ public class AccountController implements AccountControllerInterface {
         } catch (AccountNotFoundException | AccountUserLevelException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    /**
+     * This method is used to client user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    @Override
+    @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This method is used to staff user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    @Override
+    @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This method is used to admin user level to the user account with given identifier which
+     * is passed as a String to this method.
+     *
+     * @param id    Identifier of the user account, whose user level will be changed by this method.
+     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     *              (with a message explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
+     *                                  methods in both facade and service component for Account.
+     */
+    @Override
+    @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
+        accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This method is used to change own password.
+     *
+     * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
+     * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
+     * is the same as current password returns 400 BAD REQUEST HTTP response.
+     * @throws ApplicationBaseException Thrown when problems occur when password is changing.
+     */
+    @Override
+    @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
+        String oldPassword = accountChangePasswordDTO.getOldPassword();
+        String newPassword = accountChangePasswordDTO.getNewPassword();
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        log.info(username);
+
+        accountService.changePasswordSelf(oldPassword, newPassword, username);
+
+        return ResponseEntity.ok().build();
     }
 }
