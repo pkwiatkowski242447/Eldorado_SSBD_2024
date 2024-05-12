@@ -1,13 +1,18 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
@@ -25,6 +30,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
 public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
+    }
+
+    @AfterEach
+    void teardown() {
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAdmin")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAuth")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOP")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOK")).close();
+    }
 
     //INITIAL DATA
     @Autowired

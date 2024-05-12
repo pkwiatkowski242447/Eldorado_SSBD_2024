@@ -56,6 +56,9 @@ public class AccountService implements AccountServiceInterface {
     @Value("${mail.account.reset.password.url}")
     private String accountPasswordResetUrl;
 
+    @Value("${mail.account.confirm.email.url}")
+    private String accountConfirmEmail;
+
     @Value("${account.creation.confirmation.period.length.hours}")
     private int accountCreationConfirmationPeriodLengthHours;
 
@@ -482,8 +485,8 @@ public class AccountService implements AccountServiceInterface {
 
         String token = tokenService.createEmailConfirmationToken(account, newEmail);
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(token.getBytes()));
-        //TODO make it so the URL is based on some property
-        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + encodedTokenValue;
+        String confirmationURL = accountConfirmEmail + encodedTokenValue;
+
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
     }
 
@@ -504,11 +507,11 @@ public class AccountService implements AccountServiceInterface {
                 .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
 
         String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
-        //TODO change ttl to be a parameter set somewhere in properties
         String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, 24);
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(newTokenValue.getBytes()));
 
-        String confirmationURL = "http://localhost:8080/api/v1/account/change-email/" + encodedTokenValue;
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(newTokenValue.getBytes()));
+        String confirmationURL = accountConfirmEmail + encodedTokenValue;
+
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
 
         dbToken.setTokenValue(newTokenValue);
