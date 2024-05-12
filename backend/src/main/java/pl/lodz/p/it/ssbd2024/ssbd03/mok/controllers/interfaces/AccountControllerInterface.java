@@ -28,7 +28,7 @@ public interface AccountControllerInterface {
      * @param id Identifier of account that will be unblocked.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> unblockAccount(String id);
+    ResponseEntity<?> unblockAccount(String id) throws ApplicationBaseException;
 
     /**
      * This endpoint is used to "forget" password for an unauthenticated user. It does generate RESET PASSWORD token, write
