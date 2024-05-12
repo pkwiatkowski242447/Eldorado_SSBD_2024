@@ -44,9 +44,9 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspects, intercepting facade method invocation.
      */
-    void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException;
+    void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
 
     /**
      * This method is used to create new account, which will have default user level of Admin.
@@ -58,9 +58,9 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws AccountCreationException This exception will be thrown if any Persistence exception occurs.
+     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspects, intercepting facade method invocation.
      */
-    void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws AccountCreationException;
+    void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
 
     /**
      * This method is used to reset current user account password. This method basically generates a token of type
@@ -119,13 +119,9 @@ public interface AccountServiceInterface {
      *
      * @param accountId ID of the account which the e-mail will be changed.
      * @param newEmail  New e-mail address.
-     * @throws AccountEmailChangeException Threw if any problem related to the e-mail occurs.
-     *                                     Contains a key to an internationalized message.
-     *                                     Additionally, if the problem was caused by an incorrect new mail,
-     *                                     the cause is set to <code>AccountValidationException</code> which contains more details about the incorrect fields.
-     * @throws AccountNotFoundException    Threw if account with specified Id can't be found.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
-    void changeEmail(UUID accountId, String newEmail) throws AccountEmailChangeException, AccountNotFoundException;
+    void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException;
 
     /**
      * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.
@@ -143,7 +139,7 @@ public interface AccountServiceInterface {
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
      * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
      */
-    boolean confirmEmail(String token) throws AccountNotFoundException, AccountEmailNullException, AccountEmailChangeException;
+    boolean confirmEmail(String token) throws ApplicationBaseException;
 
     /**
      * Retrieve Accounts that match the parameters, in a given order.

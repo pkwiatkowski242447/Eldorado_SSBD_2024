@@ -1,20 +1,26 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.integration.mop;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 
 import java.time.LocalDateTime;
@@ -29,6 +35,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
 public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
+    }
+
+    @AfterEach
+    void teardown() {
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAdmin")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAuth")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOP")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOK")).close();
+    }
 
     @Autowired
     ReservationFacade reservationFacade;
@@ -50,7 +72,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeCreateReservationTest() {
+    public void reservationFacadeCreateReservationTest() throws ApplicationBaseException {
         assertNotNull(reservation);
         reservationFacade.create(reservation);
 
@@ -59,7 +81,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeFindReservationTest(){
+    public void reservationFacadeFindReservationTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
         Optional<Reservation> retrievedReservationOptional = reservationFacade.find(reservation.getId());
         assertTrue(retrievedReservationOptional.isPresent());
@@ -70,7 +92,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeEditReservationTest() {
+    public void reservationFacadeEditReservationTest() throws ApplicationBaseException {
         reservation.setBeginTime(LocalDateTime.now());
         reservationFacade.create(reservation);
 
@@ -87,7 +109,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    void reservationFacadeFindAndRefreshTest() {
+    void reservationFacadeFindAndRefreshTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
 
         UUID reservationId = reservation.getId();
@@ -101,7 +123,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeCountTest() {
+    public void reservationFacadeCountTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
         int count = reservationFacade.count();
         assertEquals(4,count);
@@ -109,7 +131,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeRemoveReservationTest(){
+    public void reservationFacadeRemoveReservationTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
         Optional<Reservation> retrievedReservationOptional = reservationFacade.find(reservation.getId());
         assertTrue(retrievedReservationOptional.isPresent());
@@ -137,7 +159,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeFindAllReservationsWithPaginationTest() {
+    public void reservationFacadeFindAllReservationsWithPaginationTest() throws ApplicationBaseException {
         reservationFacade.create(reservation);
 
         List<Reservation> reservations = reservationFacade.findAllWithPagination(0,8);

@@ -19,6 +19,9 @@ public class I18n {
     // Account internationalization keys
     public static final String ACCOUNT_LOGIN_ALREADY_TAKEN = "account.login.already.taken.exception";
     public static final String ACCOUNT_EMAIL_ALREADY_TAKEN = "account.email.already.taken.exception";
+    public static final String ACCOUNT_BLOCKED = "account.blocked.exception";
+    public static final String ACCOUNT_BLOCKED_BY_ADMIN = "account.blocked.by.admin.exception";
+    public static final String ACCOUNT_BLOCKED_BY_FAILED_LOGIN_ATTEMPTS = "account.blocked.by.too.many.failed.attempts.exception";
     public static final String ACCOUNT_ALREADY_BLOCKED = "account.already.blocked.exception";
     public static final String ACCOUNT_ALREADY_UNBLOCKED = "account.already.unblocked.exception";
 
@@ -31,6 +34,9 @@ public class I18n {
 
     // Optimistic lock
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "optimistic.lock.exception";
+
+    // Application internal server error
+    public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
 
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";
@@ -50,6 +56,7 @@ public class I18n {
     public static final String AUTH_CONTROLLER_ACCOUNT_LOGOUT = "authentication.controller.account.logout";
 
     // Account service
+    public static final String INVALID_LOGIN_ATTEMPT_EXCEPTION = "account.service.invalid.login.attempt.exception";
     public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "account.service.account.not.found.exception";
     public static final String ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION = "account.service.account.constraint.validation.exception";
     public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";

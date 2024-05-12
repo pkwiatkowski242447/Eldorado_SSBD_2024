@@ -18,6 +18,10 @@ public class AccountNotFoundException extends AccountBaseException {
         super(message);
     }
 
+    public AccountNotFoundException(Throwable cause) {
+        super(I18n.ACCOUNT_NOT_FOUND_EXCEPTION, cause);
+    }
+
     public AccountNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }

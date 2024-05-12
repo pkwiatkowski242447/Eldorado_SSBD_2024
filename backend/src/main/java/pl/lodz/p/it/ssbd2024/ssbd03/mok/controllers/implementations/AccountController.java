@@ -25,17 +25,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -176,7 +179,7 @@ public class AccountController implements AccountControllerInterface {
      * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for registration
      *                        to the application or changed later to other e-mail address.
      * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
-     * (if there is no account with given e-mail address) or 412 PRECONDITION FAILED (when account is either blocked or
+     * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
      */
@@ -286,20 +289,11 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) {
-        try {
-            if (accountService.confirmEmail(token)) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.badRequest().body(I18n.TOKEN_INVALID_OR_EXPIRED);
-            }
-        } catch (AccountNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (AccountEmailChangeException e) {
-            tokenService.removeAccountsEmailConfirmationToken(token);
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (AccountEmailNullException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+    public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) throws ApplicationBaseException{
+        if (accountService.confirmEmail(token)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().body(I18n.TOKEN_INVALID_OR_EXPIRED);
         }
     }
 
@@ -366,7 +360,7 @@ public class AccountController implements AccountControllerInterface {
     /**
      * This method is used to modify personal data of currently logged-in user.
      *
-     * @param id Id of account to find.
+     * @param id Identifier of account to find.
      * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
      * returns 400. When uuid is invalid returns 400.
      */
@@ -399,15 +393,28 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) {
-        try {
-            accountService.changeEmail(id, accountEmailDTO.getEmail());
-            return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (AccountEmailChangeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
+        accountService.changeEmail(id, accountEmailDTO.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * This method allows user to change their e-mail address, which later could be used to send
+     * messages about user actions in the application (e.g. messages containing confirmation links).
+     *
+     * @param accountEmailDTO Data transfer object containing new e-mail address.
+     * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
+     * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
+     * explaining why the error occurred).
+     */
+    @Override
+    @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changeEmailSelf(@Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account user = accountService.getAccountByLogin(login);
+        accountService.changeEmail(user.getId(), accountEmailDTO.getEmail());
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -417,7 +424,7 @@ public class AccountController implements AccountControllerInterface {
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
     @Override
-    @PostMapping(value = "/resend-email-confirmation", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/resend-email-confirmation")
     public ResponseEntity<?> resendEmailConfirmation() {
         try {
             accountService.resendEmailConfirmation();

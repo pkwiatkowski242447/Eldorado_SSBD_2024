@@ -1,16 +1,22 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +30,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
 public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("jdbc.ssbd03.url", () -> String.format("jdbc:postgresql://localhost:%s/ssbd03", postgres.getFirstMappedPort()));
+    }
+
+    @AfterEach
+    void teardown() {
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAdmin")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceAuth")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOP")).close();
+        ((AtomikosDataSourceBean) webApplicationContext.getBean("dataSourceMOK")).close();
+    }
 
     //INITIAL DATA
     @Autowired
@@ -206,7 +228,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findByLoginAndRefreshReturnExistingAccountTestPositive() {
-        Optional<Account> account = accountMOKFacade.findByLoginAndRefresh(accountLoginNo2);
+        Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo2);
 
         assertTrue(account.isPresent());
 
@@ -222,14 +244,14 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     public void findByLoginAndRefreshReturnNullTestPositive() {
-        Optional<Account> account = accountMOKFacade.findByLoginAndRefresh(accountLoginNo1);
+        Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo1);
 
         assertTrue(account.isEmpty());
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createAndRemoveMethodPositiveTest() {
+    public void createAndRemoveMethodPositiveTest() throws ApplicationBaseException {
         //Create account with user level
         Account account = new Account(accountLoginNo1, accountPasswordNo1, accountFirstNameNo1, accountLastNameNo1,
                 accountEmailNo1, accountPhoneNumberNo1);
@@ -239,7 +261,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage(accountLanguageNo1);
         //Facade
         accountMOKFacade.create(account);
-        Optional<Account> newAccount = accountMOKFacade.findByLoginAndRefresh(accountLoginNo1);
+        Optional<Account> newAccount = accountMOKFacade.findByLogin(accountLoginNo1);
         assertTrue(newAccount.isPresent());
 
         assertEquals(accountLoginNo1, newAccount.get().getLogin());
@@ -252,13 +274,13 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
         accountMOKFacade.remove(newAccount.get());
 
-        Optional<Account> deletedAccount = accountMOKFacade.findByLoginAndRefresh(accountLoginNo1);
+        Optional<Account> deletedAccount = accountMOKFacade.findByLogin(accountLoginNo1);
         assertTrue(deletedAccount.isEmpty());
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllInactiveAccountsWithPaginationPositiveTest() {
+    public void findAllInactiveAccountsWithPaginationPositiveTest() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -286,8 +308,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         assertEquals(1, accounts2.size());
         assertEquals(1, accounts3.size());
 
-        Optional<Account> accountToDelete1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4);
-        Optional<Account> accountToDelete2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3);
+        Optional<Account> accountToDelete1 = accountMOKFacade.findByLogin(accountLoginNo4);
+        Optional<Account> accountToDelete2 = accountMOKFacade.findByLogin(accountLoginNo3);
 
         accountMOKFacade.remove(accountToDelete1.orElseThrow(NoSuchElementException::new));
         accountMOKFacade.remove(accountToDelete2.orElseThrow(NoSuchElementException::new));
@@ -306,12 +328,11 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         assertEquals(2, accounts2.size());
         assertEquals(1, accounts3.size());
         assertEquals(1, accounts4.size());
-
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsMatchingLoginWithPagination() {
+    public void findAllAccountsMatchingLoginWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -338,8 +359,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         assertEquals(1, accounts1.size());
         assertEquals(0, accounts2.size());
 
-        Optional<Account> accountToDelete1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4);
-        Optional<Account> accountToDelete2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3);
+        Optional<Account> accountToDelete1 = accountMOKFacade.findByLogin(accountLoginNo4);
+        Optional<Account> accountToDelete2 = accountMOKFacade.findByLogin(accountLoginNo3);
 
         accountMOKFacade.remove(accountToDelete1.orElseThrow(NoSuchElementException::new));
         accountMOKFacade.remove(accountToDelete2.orElseThrow(NoSuchElementException::new));
@@ -347,7 +368,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editPositiveTest() {
+    public void editPositiveTest() throws ApplicationBaseException {
 
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -358,13 +379,13 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         account.setAccountLanguage(accountLanguageNo1);
 
         accountMOKFacade.create(account);
-        Optional<Account> accountFind = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3);
+        Optional<Account> accountFind = accountMOKFacade.findByLogin(accountLoginNo3);
 
         assertEquals(accountEmailNo3, accountFind.orElseThrow(NoSuchElementException::new).getEmail());
         accountFind.get().setEmail(accountEmailNo4);
 
         accountMOKFacade.edit(accountFind.get());
-        Optional<Account> accountEdited = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3);
+        Optional<Account> accountEdited = accountMOKFacade.findByLogin(accountLoginNo3);
         assertEquals(accountEmailNo4, accountFind.get().getEmail());
 
         accountMOKFacade.remove(accountEdited.orElseThrow(NoSuchElementException::new));
@@ -373,7 +394,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsMarkedForDeletionTestPositive() throws NoSuchFieldException {
+    public void findAllAccountsMarkedForDeletionTestPositive() throws ApplicationBaseException, NoSuchFieldException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -390,8 +411,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
-        Optional<Account> accountToEdit1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4);
-        Optional<Account> accountToEdit2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3);
+        Optional<Account> accountToEdit1 = accountMOKFacade.findByLogin(accountLoginNo4);
+        Optional<Account> accountToEdit2 = accountMOKFacade.findByLogin(accountLoginNo3);
         assertFalse(accountToEdit1.isEmpty());
         assertFalse(accountToEdit2.isEmpty());
 
@@ -408,7 +429,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsByBlockedTestPositive() throws NoSuchFieldException, IllegalAccessException {
+    public void findAllAccountsByBlockedTestPositive() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -426,8 +447,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
 
-        Optional<Account> account1Find = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3);
-        Optional<Account> account2Find = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4);
+        Optional<Account> account1Find = accountMOKFacade.findByLogin(accountLoginNo3);
+        Optional<Account> account2Find = accountMOKFacade.findByLogin(accountLoginNo4);
 
         Field blockedField = Account.class.getDeclaredField("blocked");
         blockedField.setAccessible(true);
@@ -458,7 +479,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllBlockedAccountsThatWereBlockedByAdminWithPagination() throws IllegalAccessException, NoSuchFieldException {
+    public void findAllBlockedAccountsThatWereBlockedByAdminWithPagination() throws ApplicationBaseException, IllegalAccessException, NoSuchFieldException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -476,8 +497,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
 
-        Optional<Account> account1Find = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3);
-        Optional<Account> account2Find = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4);
+        Optional<Account> account1Find = accountMOKFacade.findByLogin(accountLoginNo3);
+        Optional<Account> account2Find = accountMOKFacade.findByLogin(accountLoginNo4);
 
         Field blockedTimeField = Account.class.getDeclaredField("blockedTime");
         Field blockedField = Account.class.getDeclaredField("blocked");
@@ -547,7 +568,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination() {
+    public void findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -583,7 +604,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllAccountsWithoutRecentActivityWithPagination() {
+    public void findAllAccountsWithoutRecentActivityWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -603,8 +624,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
 
-        Account accountFind1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3).orElseThrow(NoSuchElementException::new);
-        Account accountFind2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4).orElseThrow(NoSuchElementException::new);
+        Account accountFind1 = accountMOKFacade.findByLogin(accountLoginNo3).orElseThrow(NoSuchElementException::new);
+        Account accountFind2 = accountMOKFacade.findByLogin(accountLoginNo4).orElseThrow(NoSuchElementException::new);
 
         accountFind1.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2017, 5, 8, 15, 30));
         accountFind2.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2018, 5, 8, 15, 30));
@@ -612,8 +633,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.edit(accountFind1);
         accountMOKFacade.edit(accountFind2);
 
-        accountFind1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3).orElseThrow(NoSuchElementException::new);
-        accountFind2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4).orElseThrow(NoSuchElementException::new);
+        accountFind1 = accountMOKFacade.findByLogin(accountLoginNo3).orElseThrow(NoSuchElementException::new);
+        accountFind2 = accountMOKFacade.findByLogin(accountLoginNo4).orElseThrow(NoSuchElementException::new);
 
         List<Account> accounts0 = accountMOKFacade.findAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2017, 6, 8, 15, 30), true, 0, 10);
         List<Account> accounts1 = accountMOKFacade.findAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2018, 6, 8, 15, 30), true, 0, 10);
@@ -626,7 +647,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void countAllAccountsWithoutRecentActivityWithPagination() {
+    public void countAllAccountsWithoutRecentActivityWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -646,8 +667,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
 
-        Account accountFind1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3).orElseThrow(NoSuchElementException::new);
-        Account accountFind2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4).orElseThrow(NoSuchElementException::new);
+        Account accountFind1 = accountMOKFacade.findByLogin(accountLoginNo3).orElseThrow(NoSuchElementException::new);
+        Account accountFind2 = accountMOKFacade.findByLogin(accountLoginNo4).orElseThrow(NoSuchElementException::new);
 
         accountFind1.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2017, 5, 8, 15, 30));
         accountFind2.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2018, 5, 8, 15, 30));
@@ -655,8 +676,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.edit(accountFind1);
         accountMOKFacade.edit(accountFind2);
 
-        accountFind1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3).orElseThrow(NoSuchElementException::new);
-        accountFind2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4).orElseThrow(NoSuchElementException::new);
+        accountFind1 = accountMOKFacade.findByLogin(accountLoginNo3).orElseThrow(NoSuchElementException::new);
+        accountFind2 = accountMOKFacade.findByLogin(accountLoginNo4).orElseThrow(NoSuchElementException::new);
 
         Long count1 = accountMOKFacade.countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2017, 6, 8, 15, 30), true, 0, 10).orElseThrow(NoSuchElementException::new);
         Long count2 = accountMOKFacade.countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2018, 6, 8, 15, 30), true, 0, 10).orElseThrow(NoSuchElementException::new);
@@ -669,7 +690,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes() throws NoSuchFieldException, IllegalAccessException {
+    public void findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -687,8 +708,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
 
-        Account accountFind1 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo3).orElseThrow(NoSuchElementException::new);
-        Account accountFind2 = accountMOKFacade.findByLoginAndRefresh(accountLoginNo4).orElseThrow(NoSuchElementException::new);
+        Account accountFind1 = accountMOKFacade.findByLogin(accountLoginNo3).orElseThrow(NoSuchElementException::new);
+        Account accountFind2 = accountMOKFacade.findByLogin(accountLoginNo4).orElseThrow(NoSuchElementException::new);
 
         Field blockedTimeField = Account.class.getDeclaredField("blockedTime");
         Field blockedField = Account.class.getDeclaredField("blocked");
@@ -698,7 +719,6 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         blockedField.set(accountFind1, true);
         blockedTimeField.set(accountFind2, LocalDateTime.of(2018, 5, 8, 15, 30));
         blockedField.set(accountFind2, true);
-
 
         //accountFind1.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2017, 5, 8, 15, 30));
         //accountFind2.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2018, 5, 8, 15, 30));
