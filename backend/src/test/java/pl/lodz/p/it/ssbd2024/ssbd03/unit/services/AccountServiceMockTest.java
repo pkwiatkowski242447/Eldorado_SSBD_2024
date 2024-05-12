@@ -13,7 +13,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountCreationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailChangeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
@@ -70,7 +69,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void registerStaffTestSuccessful() throws AccountCreationException {
+    void registerStaffTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
         String testToken = "TestTokenValue";
 
@@ -85,7 +84,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void registerAdminTestSuccessful() throws AccountCreationException {
+    void registerAdminTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
         String testToken = "TestTokenValue";
 
@@ -143,7 +142,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeEmailTestSuccessful() throws AccountEmailChangeException, AccountNotFoundException {
+    void changeEmailTestSuccessful() throws ApplicationBaseException, AccountEmailChangeException, AccountNotFoundException {
 
         Account a = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         a.setAccountLanguage("pl");

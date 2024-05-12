@@ -405,7 +405,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) {
+    public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
         try {
             accountService.changeEmail(id, accountEmailDTO.getEmail());
             return ResponseEntity.noContent().build();

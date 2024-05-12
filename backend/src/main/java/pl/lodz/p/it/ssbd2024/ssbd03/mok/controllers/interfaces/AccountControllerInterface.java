@@ -131,8 +131,10 @@ public interface AccountControllerInterface {
      * @param id                    Identifier of the user account, whose e-mail will be changed by this method.
      * @param accountEmailDTO Data transfer object containing new e-mail address.
      * @return                      It returns an HTTP response with a code depending on the result.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade
+     * and service layers.
      */
-    ResponseEntity<?> changeEmail(UUID id, AccountEmailDTO accountEmailDTO);
+    ResponseEntity<?> changeEmail(UUID id, AccountEmailDTO accountEmailDTO) throws ApplicationBaseException;
 
     /**
      * This method is used to resend confirmation e-mail message.

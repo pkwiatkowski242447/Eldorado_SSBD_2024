@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingEventFacade;
 
 import java.time.LocalDateTime;
@@ -67,7 +68,7 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingEventFacadeCountParkingEventsTest() {
+    public void parkingEventFacadeCountParkingEventsTest() throws ApplicationBaseException {
         parkingEventFacade.create(parkingEvent);
         parkingEventFacade.create(parkingEvent);
 
@@ -77,7 +78,7 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeCreateParkingEventTest() {
+    public void parkingFacadeCreateParkingEventTest() throws ApplicationBaseException {
         assertNotNull(parkingEvent);
         parkingEventFacade.create(parkingEvent);
 
@@ -86,7 +87,7 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindParkingEventTest(){
+    public void parkingFacadeFindParkingEventTest() throws ApplicationBaseException {
         parkingEventFacade.create(parkingEvent);
         Optional<ParkingEvent> parkingEventOptional = parkingEventFacade.find(parkingEvent.getId());
         assertTrue(parkingEventOptional.isPresent());
@@ -97,7 +98,7 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeEditParkingEventTest() {
+    public void parkingFacadeEditParkingEventTest() throws ApplicationBaseException {
         parkingEvent.setDate(LocalDateTime.now());
         parkingEventFacade.create(parkingEvent);
 
@@ -114,7 +115,7 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindAndRefreshParkingEventTest() {
+    public void parkingFacadeFindAndRefreshParkingEventTest() throws ApplicationBaseException {
         parkingEventFacade.create(parkingEvent);
         UUID parkingEventId = parkingEvent.getId();
 
@@ -127,7 +128,7 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeRemoveReservationTest(){
+    public void parkingFacadeRemoveReservationTest() throws ApplicationBaseException {
         parkingEventFacade.create(parkingEvent);
         Optional<ParkingEvent> retrievedParkingEventOptional = parkingEventFacade.find(parkingEvent.getId());
         assertTrue(retrievedParkingEventOptional.isPresent());

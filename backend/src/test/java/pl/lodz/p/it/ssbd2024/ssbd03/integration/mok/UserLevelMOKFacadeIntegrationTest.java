@@ -20,6 +20,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
 
 import java.util.List;
@@ -98,7 +99,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createAndRemoveTestPositive() {
+    public void createAndRemoveTestPositive() throws ApplicationBaseException {
         UserLevel userLevel = userLevelFacade.find(uuidUserLevelNo1).orElseThrow(NoSuchElementException::new);
         Account account = userLevel.getAccount();
 
@@ -129,7 +130,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editTestPositive() {
+    public void editTestPositive() throws ApplicationBaseException {
         //pobieram user level staff dla klienta
         UserLevel staffUserLevel = userLevelFacade.find(UUID.fromString("2488831d-c7c4-4f61-b48a-3be87364271f")).orElseThrow(NoSuchElementException::new);
         //UserLevel userLevel = userLevelFacade.find(uuidUserLevelNo1).get();

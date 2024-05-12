@@ -31,6 +31,9 @@ public class I18n {
     // Optimistic lock
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "optimistic.lock.exception";
 
+    // Application internal server error
+    public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
+
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";
     public static final String AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION = "authentication.service.account.login.not.found.exception";

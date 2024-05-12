@@ -20,6 +20,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 
 import java.util.*;
@@ -66,7 +67,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeCreateParkingTest() {
+    public void parkingFacadeCreateParkingTest() throws ApplicationBaseException {
         assertNotNull(parking);
         parkingFacade.create(parking);
 
@@ -75,7 +76,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindParkingTest(){
+    public void parkingFacadeFindParkingTest() {
         UUID uuid = UUID.fromString("96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1");
         Optional<Parking> retrievedParkingOptional = parkingFacade.find(uuid);
         assertTrue(retrievedParkingOptional.isPresent());
@@ -86,7 +87,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeEditParkingTest() {
+    public void parkingFacadeEditParkingTest() throws ApplicationBaseException {
         Address addressNo1 = new Address("Tes", "Te", "Tes");
         Parking parkingNo1 = new Parking(addressNo1);
         parkingFacade.create(parkingNo1);
@@ -102,7 +103,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    void parkingFacadeFindAndRefreshParkingTest() {
+    void parkingFacadeFindAndRefreshParkingTest() throws ApplicationBaseException {
         parkingFacade.create(parking);
 
         UUID parkingId = parking.getId();
@@ -116,7 +117,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeCountParkingLotsTest() {
+    public void parkingFacadeCountParkingLotsTest() throws ApplicationBaseException {
         parkingFacade.create(parking);
         int parkingCount = parkingFacade.count();
         assertEquals(2,parkingCount);
@@ -124,7 +125,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeRemoveParkingTest(){
+    public void parkingFacadeRemoveParkingTest() throws ApplicationBaseException {
         parkingFacade.create(parking);
         Optional<Parking> retrivedParkingOptional = parkingFacade.find(parking.getId());
         assertTrue(retrivedParkingOptional.isPresent());
@@ -151,7 +152,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindAllParkingLotsWithPaginationTest(){
+    public void parkingFacadeFindAllParkingLotsWithPaginationTest() throws ApplicationBaseException {
         Address addressNo1 = new Address("avf","mjh","cdd");
         Address addressNo2 = new Address("ass","mfr","cpd");
         Address addressNo3 = new Address("ap","mja","cdl");
@@ -175,7 +176,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindParkingBySectorTypesTest() {
+    public void parkingFacadeFindParkingBySectorTypesTest() throws ApplicationBaseException {
         Parking parkingNo1 = new Parking(new Address("fa", "fb", "cf"));
         Parking parkingNo2 = new Parking(new Address("ab", "bbb", "cbf"));
         Parking parkingNo3 = new Parking(new Address("a1", "b11", "cb11f"));
@@ -196,7 +197,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindSectorsInParkingWithPaginationTest(){
+    public void parkingFacadeFindSectorsInParkingWithPaginationTest() throws ApplicationBaseException {
         Address addressNo1 = new Address("a","b","c");
         Parking parkingNo1 = new Parking(addressNo1);
         parkingNo1.addSector("name1", Sector.SectorType.COVERED,100,200);
@@ -212,7 +213,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindSectorInParkingWithAvailablePlacesTest(){
+    public void parkingFacadeFindSectorInParkingWithAvailablePlacesTest() throws ApplicationBaseException {
         Address addressNo1 = new Address("a","b","c");
         Parking parkingNo1 = new Parking(addressNo1);
 
@@ -233,7 +234,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindParkingWithAvailablePlacesTest(){
+    public void parkingFacadeFindParkingWithAvailablePlacesTest() throws ApplicationBaseException {
         Address addressNo1 = new Address("a","b","c");
         Address addressNo2 = new Address("ar","br","rc");
         Parking parkingNo1 = new Parking(addressNo1);
@@ -255,7 +256,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeEditSectorTest(){
+    public void parkingFacadeEditSectorTest() throws ApplicationBaseException {
         Address addressNo1 = new Address("Tes", "Te", "Tes");
         Parking parkingNo1 = new Parking(addressNo1);
 
@@ -272,7 +273,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeRemoveSectorTest(){
+    public void parkingFacadeRemoveSectorTest() {
         parkingFacade.removeSector(sector);
         List<Sector> listOfSectors = new ArrayList<>();
         assertEquals(listOfSectors, parking.getSectors());
@@ -280,7 +281,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindSectorInParkingBySectorTypesTest(){
+    public void parkingFacadeFindSectorInParkingBySectorTypesTest() {
         Address addressNo1 = new Address("tt", "Mi", "ttt");
         Address addressNo2 = new Address("dtt", "Mei", "ttet");
         Parking parkingNo1 = new Parking(addressNo1);
