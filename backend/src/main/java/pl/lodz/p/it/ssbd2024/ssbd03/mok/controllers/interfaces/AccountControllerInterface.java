@@ -44,6 +44,19 @@ public interface AccountControllerInterface {
     ResponseEntity<?> forgetAccountPassword(AccountEmailDTO accountEmailDTO) throws ApplicationBaseException;
 
     /**
+     * This endpoint is used to reset user account password by the administrator. It does generate RESET PASSWORD token, write
+     * it to the database, and send a message with reset password URL to user e-mail address.
+     *
+     * @param id Identifier of the account of which the password will be resetted.
+     *
+     * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
+     * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
+     * not activated yet).
+     * @throws ApplicationBaseException 
+     */
+    ResponseEntity<?> resetAccountPassword(String id) throws ApplicationBaseException;
+
+    /**
      * This endpoint is used to change password for an unauthenticated user. It does generate RESET PASSWORD token, write
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
