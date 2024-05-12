@@ -456,24 +456,25 @@ public class AccountService implements AccountServiceInterface {
      * Retrieves an Account by the login.
      *
      * @param login Login of the searched user account.
-     * @return If Account with the given login was found returns Account, otherwise returns null.
+     * @return If Account with the given login was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public Account getAccountByLogin(String login) {
-        Optional<Account> account = accountFacade.findByLogin(login);
-        return account.orElse(null);
+    public Account getAccountByLogin(String login) throws ApplicationBaseException {
+        return  accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 
     /**
      * Retrieves from the database account by id.
      *
      * @param id Account's id.
-     * @return Returns Optional containing the requested account if found, otherwise returns empty Optional.
+     * @return If Account with the given id was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
     @Override
-    public Optional<Account> getAccountById(UUID id) {
-        return accountFacade.findAndRefresh(id);
+    public Account getAccountById(UUID id) throws ApplicationBaseException {
+        return accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
     }
 
     /**

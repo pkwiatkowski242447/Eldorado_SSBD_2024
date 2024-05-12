@@ -11,7 +11,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -167,17 +166,19 @@ public interface AccountServiceInterface {
      * Retrieves an Account by the login.
      *
      * @param login Login of the searched user account.
-     * @return If an Account with the given login was found return Account, otherwise returns null.
+     * @return If Account with the given login was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
-    Account getAccountByLogin(String login);
+    Account getAccountByLogin(String login) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database account by id.
      *
      * @param id Account's id.
-     * @return Returns Optional containing the requested account if found, otherwise returns empty Optional.
+     * @return If Account with the given id was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
-    Optional<Account> getAccountById(UUID id);
+    Account getAccountById(UUID id) throws ApplicationBaseException;
 
     /**
      * Creates a new JWT related to changing of an account's e-mail,
