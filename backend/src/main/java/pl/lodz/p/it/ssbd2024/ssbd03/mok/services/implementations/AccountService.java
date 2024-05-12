@@ -372,12 +372,14 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
         Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
                 .orElseThrow(AccountIdNotFoundException::new);
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
+            log.info(account.toString());
             account.setActive(true);
             account.setVerified(true);
             accountFacade.edit(account);

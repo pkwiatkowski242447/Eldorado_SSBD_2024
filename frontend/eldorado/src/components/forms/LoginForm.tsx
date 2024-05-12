@@ -6,7 +6,6 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components/ui/form"
 import {FormLabel} from "react-bootstrap";
-import {useEffect} from "react";
 import {useAccount} from "@/hooks/useAccount.ts";
 
 const formSchema = z.object({
@@ -18,10 +17,7 @@ const formSchema = z.object({
 
 function LoginForm() {
 
-    const {isAuthenticated, logIn, getCurrentAccount} = useAccount();
-    useEffect(() => {
-        getCurrentAccount();
-    }, []);
+    const {logIn} = useAccount();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -46,7 +42,7 @@ function LoginForm() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Form {...form} onSubmit={form.handleSubmit(onSubmit)}>
+                <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             control={form.control}
@@ -54,7 +50,7 @@ function LoginForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <div className="grid gap-4">
-                                        <FormLabel>Login</FormLabel>
+                                        <FormLabel className="text-left">Login</FormLabel>
                                         <FormControl>
                                             <Input placeholder="" {...field} />
                                         </FormControl>
@@ -70,10 +66,11 @@ function LoginForm() {
                                 <FormItem>
                                     <div className="grid gap-4">
                                         <div className="grid gap-2">
-                                            <FormLabel>Password
-                                                {/*<a href="#" className="ml-auto inline-block text-fuchsia-300 underline">*/}
-                                                {/*    Forgot your password?*/}
-                                                {/*</a>*/}
+                                            <FormLabel className="text-left">Password
+                                                <a href="/forgot-password"
+                                                   className="ml-auto inline-block text-black underline text-right">
+                                                    Forgot your password?
+                                                </a>
                                             </FormLabel>
                                             <FormControl>
                                                 <Input type="password" {...field} />
