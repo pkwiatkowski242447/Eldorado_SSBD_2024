@@ -9,6 +9,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorExc
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 
 /**
  * General exception handling component in a form of @ControllerAdvice for exceptions that are shared
@@ -81,5 +83,25 @@ public class GenericExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(mapperBaseException.getMessage());
+    }
+
+    /**
+     *
+     */
+    @ExceptionHandler(value = { InvalidDataFormatException.class })
+    public ResponseEntity<?> handleInvalidDataFormatException(InvalidDataFormatException invalidDataFormatException) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(invalidDataFormatException.getMessage());
+    }
+
+    /**
+     *
+     */
+    @ExceptionHandler(value = { IllegalOperationException.class })
+    public ResponseEntity<?> handleIllegalOperationException(IllegalOperationException illegalOperationException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(illegalOperationException.getMessage());
     }
 }

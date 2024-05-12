@@ -287,11 +287,10 @@ public class AccountService implements AccountServiceInterface {
      * @param id Account identifier
      * @throws AccountNotFoundException       Threw when there is no account with given login.
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
-     * @throws IllegalOperationException      Threw when user try to block their own account.
      */
     @Override
-    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException {
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException();
         }
@@ -583,7 +582,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(AccountNotFoundException::new);
 
         String currentAccountLogin = SecurityContextHolder.getContext().getAuthentication().getName();
         Account currentAccount = accountFacade.findByLogin(currentAccountLogin)
