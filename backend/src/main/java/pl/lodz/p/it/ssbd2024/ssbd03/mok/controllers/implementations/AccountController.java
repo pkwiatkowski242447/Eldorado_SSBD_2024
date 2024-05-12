@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
@@ -37,7 +37,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
@@ -121,7 +120,7 @@ public class AccountController implements AccountControllerInterface {
 
             accountService.blockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException e) {
-            ///TODO w innych tez
+            //TODO check this error handling in other methods after big merging
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
 
@@ -444,6 +443,7 @@ public class AccountController implements AccountControllerInterface {
         } catch (AccountNotFoundException | AccountUserLevelException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+
     }
 
     /**
@@ -501,7 +501,11 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -520,7 +524,11 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -539,7 +547,11 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
