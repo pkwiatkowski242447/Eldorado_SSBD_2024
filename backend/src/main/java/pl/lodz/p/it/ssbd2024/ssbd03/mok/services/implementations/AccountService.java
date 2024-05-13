@@ -288,10 +288,9 @@ public class AccountService implements AccountServiceInterface {
      * @param id Account identifier
      * @throws AccountNotFoundException       Threw when there is no account with given login.
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
-     * @throws IllegalOperationException      Threw when user try to block their own account.
      */
     @Override
-    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
+    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException();
@@ -484,6 +483,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))

@@ -5,4 +5,7 @@ public class ApplicationDatabaseException extends ApplicationBaseException {
     public ApplicationDatabaseException(Throwable cause) {
         super(cause);
     }
+    public ApplicationDatabaseException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

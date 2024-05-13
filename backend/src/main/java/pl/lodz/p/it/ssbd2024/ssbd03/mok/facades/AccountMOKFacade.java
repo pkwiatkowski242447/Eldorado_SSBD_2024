@@ -76,7 +76,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
-    public Optional<Account> find(UUID id) {
+    public Optional<Account> find(UUID id) throws ApplicationBaseException{
         Optional<Account> optionalAccount = super.find(id);
         optionalAccount.ifPresent(entity -> entityManager.refresh(entity));
         return optionalAccount;
@@ -111,11 +111,8 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @return List of all user accounts from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
-<<<<<<< HEAD
-=======
      *
      * @note. Accounts are be default ordered (in the returned list) by the login.
->>>>>>> 317d64e1237e34ea3d45a47aecf9ceb516280e07
      */
     public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize) {
         try {

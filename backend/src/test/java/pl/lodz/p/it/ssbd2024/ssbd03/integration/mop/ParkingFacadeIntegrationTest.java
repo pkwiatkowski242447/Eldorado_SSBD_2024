@@ -76,7 +76,7 @@ public class ParkingFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindParkingTest() {
+    public void parkingFacadeFindParkingTest() throws ApplicationBaseException {
         UUID uuid = UUID.fromString("96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1");
         Optional<Parking> retrievedParkingOptional = parkingFacade.find(uuid);
         assertTrue(retrievedParkingOptional.isPresent());

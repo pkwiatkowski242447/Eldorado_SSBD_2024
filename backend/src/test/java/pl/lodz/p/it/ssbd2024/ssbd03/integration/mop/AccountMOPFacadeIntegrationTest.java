@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
 
 import java.time.LocalDateTime;
@@ -101,7 +102,7 @@ public class AccountMOPFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void accountMOPFacadeFindAccountByIdTest() {
+    public void accountMOPFacadeFindAccountByIdTest() throws ApplicationBaseException {
         UUID uuid = UUID.fromString("b3b8c2ac-21ff-434b-b490-aa6d717447c0");
         Optional<Account> accountOptional = accountMOPFacade.find(uuid);
         assertTrue(accountOptional.isPresent());

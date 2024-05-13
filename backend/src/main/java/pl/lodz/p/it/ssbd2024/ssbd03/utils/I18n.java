@@ -37,6 +37,7 @@ public class I18n {
 
     // Application internal server error
     public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
+    public static final String UNEXPECTED_DATABASE_EXCEPTION = "application.database.server.exception";
 
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";
