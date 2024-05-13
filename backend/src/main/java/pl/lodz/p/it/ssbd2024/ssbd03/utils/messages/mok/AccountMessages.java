@@ -13,6 +13,7 @@ public class AccountMessages {
     public static final String VERIFIED_NULL = "bean.validation.account.verified.flag.null";
     public static final String ACTIVE_NULL = "bean.validation.account.active.flag.null";
     public static final String BLOCKED_NULL = "bean.validation.account.blocked.flag.null";
+    public static final String TWO_FACTOR_AUTH_NULL = "bean.validation.account.two.factor.auth.flag.null";
 
     public static final String NAME_BLANK = "bean.validation.account.first.name.blank";
     public static final String NAME_REGEX_NOT_MET = "bean.validation.account.first.name.regex.not.met";

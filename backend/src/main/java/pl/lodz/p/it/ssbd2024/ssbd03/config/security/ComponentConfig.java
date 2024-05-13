@@ -36,7 +36,7 @@ public class ComponentConfig {
                         account.getActive(),
                         true,
                         true,
-                        true,
+                        !account.getBlocked(),
                         account.getUserLevels().stream().map(userLevel -> new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase())).toList());
             } catch (AccountNotFoundException exception) {
                 throw new RuntimeException(exception.getMessage(), exception);

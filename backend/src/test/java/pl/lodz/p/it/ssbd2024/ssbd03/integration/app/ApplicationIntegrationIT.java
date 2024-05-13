@@ -20,7 +20,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @Test
     public void loginEndpointTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!");
+        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
 
         RequestSpecification request = RestAssured.given();
         request.contentType(CONTENT_TYPE);
@@ -28,9 +28,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
         Response response = request.post("http://localhost:8181/api/v1/auth/login");
 
-        assertEquals(200, response.getStatusCode());
-        assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
-
+        assertEquals(204, response.getStatusCode());
+        // assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
     }
 
     private String decodeJwtTokenAndExtractValue(String payload, String key) {
@@ -49,10 +48,4 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
         return null;
     }
-
-//    @Test
-//    public void test() throws InterruptedException {
-//        System.out.println("Lorem ipsum");
-//        Thread.sleep(100000L);
-//    }
 }

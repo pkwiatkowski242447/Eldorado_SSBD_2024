@@ -131,7 +131,6 @@ public class TokenFacade extends AbstractFacade<Token> {
         } catch (PersistenceException e) {
             return Optional.empty();
         }
-
     }
 
     /**
@@ -197,5 +196,4 @@ public class TokenFacade extends AbstractFacade<Token> {
                 .setParameter("accountId", accountId)
                 .executeUpdate();
     }
-
 }

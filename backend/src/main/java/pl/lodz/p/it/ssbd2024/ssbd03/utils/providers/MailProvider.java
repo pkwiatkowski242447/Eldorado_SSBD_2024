@@ -238,6 +238,58 @@ public class MailProvider {
     }
 
     /**
+     * Sends e-mail message with authentication code for the second step in multifactor authentication to the e-mail
+     * address, attached to user account.
+     *
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param authCode Authentication code used for the second step of multifactor authentication.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language Language of the message.
+     */
+    public void sendTwoFactorAuthCode(String firstName, String lastName, String authCode, String emailReceiver, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("code-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_ACTION_DESCRIPTION, language))
+                    .replace("$code", authCode)
+                    .replace("$note_title", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    /**
+     * This method is used to send an email address
+     *
+     * @param emailContent E-mail content that will be sent to the user e-mail address (in HTML format).
+     * @param emailReceiver E-mail address of the user, which the mail is sent to.
+     * @param senderEmail E-mail address of the sender - that is the Eldorado application.
+     * @param emailSubject Topic of the e-mail message.
+     * @throws MessagingException Exception thrown while the e-mail message is being sent.
+     */
+    private void sendEmail(String emailContent, String emailReceiver, String senderEmail, String emailSubject) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+        messageHelper.setTo(emailReceiver);
+
+        messageHelper.setSubject(emailSubject);
+        messageHelper.setText(emailContent, true);
+        messageHelper.setFrom(senderEmail);
+
+        this.mailSender.send(mimeMessage);
+    }
+
+    /**
      * Loads e-mail template from the /resources/templates folder.
      * @param templateName Name of the template file.
      * @return Returns a String containing the loaded template.

@@ -22,7 +22,7 @@ public class AccountMapper {
      * @throws MapperBaseException Threw when Account contains invalid unhandled user level.
      */
     public static AccountOutputDTO toAccountOutputDto(Account account) throws MapperBaseException {
-        Set<UserLevelDTO> list= new HashSet<>();
+        Set<UserLevelDTO> list = new HashSet<>();
         for (UserLevel userLevel : account.getUserLevels()) {
             list.add(UserLevelMapper.toUserLevelDTO(userLevel));
         }
@@ -35,6 +35,7 @@ public class AccountMapper {
                 account.getVerified(),
                 account.getActive(),
                 account.getBlocked(),
+                account.getTwoFactorAuth(),
                 account.getBlockedTime(),
                 account.getCreationDate(),
                 account.getActivityLog().getLastSuccessfulLoginTime(),
@@ -73,7 +74,7 @@ public class AccountMapper {
 
         userLevels.forEach(account::addUserLevel);
 
-        account.setAccountLanguage(accountModifyDTO.getAccountLanguage());
+        account.setTwoFactorAuth(accountModifyDTO.isTwoFactorAuth());
 
         return account;
     }
