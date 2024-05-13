@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
@@ -11,7 +12,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -91,7 +91,7 @@ public interface AccountServiceInterface {
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
      * @throws IllegalOperationException      Threw when user try to block their own account.
      */
-    void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException;
+    void blockAccount(UUID id) throws ApplicationBaseException;
 
     /**
      * Method for unblocking an account by its UUID.
@@ -100,7 +100,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException         Threw when there is no account with given login.
      * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
      */
-    void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException;
+    void unblockAccount(UUID id) throws AccountBaseException;
 
     /**
      * This method is used to modify user personal data.
@@ -167,17 +167,19 @@ public interface AccountServiceInterface {
      * Retrieves an Account by the login.
      *
      * @param login Login of the searched user account.
-     * @return If an Account with the given login was found return Account, otherwise returns null.
+     * @return If Account with the given login was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
-    Account getAccountByLogin(String login);
+    Account getAccountByLogin(String login) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database account by id.
      *
      * @param id Account's id.
-     * @return Returns Optional containing the requested account if found, otherwise returns empty Optional.
+     * @return If Account with the given id was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
-    Optional<Account> getAccountById(UUID id);
+    Account getAccountById(UUID id) throws ApplicationBaseException;
 
     /**
      * Creates a new JWT related to changing of an account's e-mail,
