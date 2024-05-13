@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
@@ -35,12 +35,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -101,31 +100,21 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "400", description = "The account has not been blocked due to the correctness of the request or because the account is not available in the database"),
             @ApiResponse(responseCode = "409", description = "The account has not been blocked due to being blocked already or trying to block own account.")
     })
-    public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) {
+    public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
         try {
-            if (id.length() != 36) {
-                log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
-                return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
-            }
             if (SecurityContextHolder.getContext().getAuthentication() != null &&
                     SecurityContextHolder.getContext().getAuthentication().getName()
-                            .equals(accountService.getAccountById(UUID.fromString(id)).orElseThrow(
-                                    () -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER)
-                            ).getLogin())) {
-                log.error(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
+                            .equals(accountService.getAccountById(UUID.fromString(id))
+                                    .orElseThrow(AccountNotFoundException::new).getLogin())) {
                 throw new IllegalOperationException(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
             }
 
             accountService.blockAccount(UUID.fromString(id));
-        } catch (AccountNotFoundException anfe) {
-            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
-            return ResponseEntity.badRequest().body(anfe.getMessage());
-        } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
-            log.error(e instanceof AccountAlreadyBlockedException ?
-                    AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION :
-                    AccountLogMessages.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            //TODO check this error handling in other methods after big merging
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
+
         return ResponseEntity.noContent().build();
     }
 
@@ -186,12 +175,12 @@ public class AccountController implements AccountControllerInterface {
      * This endpoint is used to reset user account password by the administrator. It does generate RESET PASSWORD token, write
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
-     * @param id Identifier of the account of which the password will be resetted.
+     * @param id Identifier of the account of which the password will be reset.
      *
      * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
-     * @throws ApplicationBaseException 
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
      */
     @Override
     @PostMapping(value = "/reset-password/{id}")
@@ -542,18 +531,22 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to client user level to the user account with given identifier which
      * is passed as a String to this method.
      *
-     * @param id    Identifier of the user account, whose user level will be changed by this method.
-     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
-     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
-     *              (with a message explaining why the error occurred).
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     * (with a message explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
      *                                  methods in both facade and service component for Account.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -561,18 +554,22 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to staff user level to the user account with given identifier which
      * is passed as a String to this method.
      *
-     * @param id    Identifier of the user account, whose user level will be changed by this method.
-     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
-     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
-     *              (with a message explaining why the error occurred).
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     * (with a message explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
      *                                  methods in both facade and service component for Account.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -580,18 +577,22 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to admin user level to the user account with given identifier which
      * is passed as a String to this method.
      *
-     * @param id    Identifier of the user account, whose user level will be changed by this method.
-     * @return      If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     *              could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
-     *              If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
-     *              (with a message explaining why the error occurred).
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If adding user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
+     * (with a message explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
      *                                  methods in both facade and service component for Account.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
