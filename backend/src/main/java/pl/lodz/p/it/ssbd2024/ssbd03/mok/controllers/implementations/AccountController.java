@@ -136,19 +136,11 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "400", description = "The account has not been unblocked due to the correctness of the request or because the account is not available in the database"),
             @ApiResponse(responseCode = "409", description = "The account has not been unblocked due to being blocked already.")
     })
-    public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
+    public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
         try {
-            if (id.length() != 36) {
-                log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
-                return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
-            }
             accountService.unblockAccount(UUID.fromString(id));
-        } catch (AccountNotFoundException anfe) {
-            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
-            return ResponseEntity.badRequest().body(anfe.getMessage());
-        } catch (AccountAlreadyUnblockedException aaue) {
-            log.error(AccountLogMessages.ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
         return ResponseEntity.noContent().build();
     }

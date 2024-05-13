@@ -312,7 +312,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (!account.getBlocked()) {
             throw new AccountAlreadyUnblockedException();
         }
