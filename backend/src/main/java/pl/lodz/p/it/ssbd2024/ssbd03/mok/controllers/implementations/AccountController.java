@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
@@ -35,8 +34,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -44,7 +41,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.AccountLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.util.List;
@@ -103,10 +99,6 @@ public class AccountController implements AccountControllerInterface {
     })
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
         try {
-            if (id.length() != 36) {
-                log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
-                return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
-            }
             if (SecurityContextHolder.getContext().getAuthentication() != null &&
                     SecurityContextHolder.getContext().getAuthentication().getName()
                             .equals(accountService.getAccountById(UUID.fromString(id)).getLogin())) {
@@ -115,15 +107,11 @@ public class AccountController implements AccountControllerInterface {
             }
 
             accountService.blockAccount(UUID.fromString(id));
-        } catch (AccountNotFoundException anfe) {
-            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
-            return ResponseEntity.badRequest().body(anfe.getMessage());
-        } catch (AccountAlreadyBlockedException | IllegalOperationException e) {
-            log.error(e instanceof AccountAlreadyBlockedException ?
-                    AccountLogMessages.ACCOUNT_ALREADY_BLOCKED_EXCEPTION :
-                    AccountLogMessages.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            //TODO check this error handling in other methods after big merging
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
+
         return ResponseEntity.noContent().build();
     }
 
@@ -145,19 +133,11 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "400", description = "The account has not been unblocked due to the correctness of the request or because the account is not available in the database"),
             @ApiResponse(responseCode = "409", description = "The account has not been unblocked due to being blocked already.")
     })
-    public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) {
+    public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
         try {
-            if (id.length() != 36) {
-                log.error(AccountLogMessages.ACCOUNT_INVALID_UUID_EXCEPTION);
-                return ResponseEntity.badRequest().body(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
-            }
             accountService.unblockAccount(UUID.fromString(id));
-        } catch (AccountNotFoundException anfe) {
-            log.error(AccountLogMessages.ACCOUNT_NOT_FOUND_EXCEPTION);
-            return ResponseEntity.badRequest().body(anfe.getMessage());
-        } catch (AccountAlreadyUnblockedException aaue) {
-            log.error(AccountLogMessages.ACCOUNT_ALREADY_UNBLOCKED_EXCEPTION);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(aaue.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
         return ResponseEntity.noContent().build();
     }
@@ -184,7 +164,8 @@ public class AccountController implements AccountControllerInterface {
      * This endpoint is used to reset user account password by the administrator. It does generate RESET PASSWORD token, write
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
-     * @param id Identifier of the account of which the password will be resetted.
+     * @param id Identifier of the account of which the password will be reset.
+     *
      * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
@@ -542,7 +523,11 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -561,7 +546,11 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -580,7 +569,11 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 

@@ -28,7 +28,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedExce
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
@@ -288,11 +287,10 @@ public class AccountService implements AccountServiceInterface {
      * @param id Account identifier
      * @throws AccountNotFoundException       Threw when there is no account with given login.
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
-     * @throws IllegalOperationException      Threw when user try to block their own account.
      */
     @Override
-    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException {
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException();
         }
@@ -314,7 +312,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (!account.getBlocked()) {
             throw new AccountAlreadyUnblockedException();
         }

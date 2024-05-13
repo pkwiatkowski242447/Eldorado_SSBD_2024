@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
@@ -90,7 +91,7 @@ public interface AccountServiceInterface {
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
      * @throws IllegalOperationException      Threw when user try to block their own account.
      */
-    void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException;
+    void blockAccount(UUID id) throws ApplicationBaseException;
 
     /**
      * Method for unblocking an account by its UUID.
@@ -99,7 +100,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException         Threw when there is no account with given login.
      * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
      */
-    void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException;
+    void unblockAccount(UUID id) throws AccountBaseException;
 
     /**
      * This method is used to modify user personal data.
