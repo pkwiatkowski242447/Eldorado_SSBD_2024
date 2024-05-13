@@ -53,7 +53,13 @@ public class Token extends AbstractEntity {
     /**
      * Used to specify the type of the Account action related to the token.
      */
-    public enum TokenType {REGISTER, RESET_PASSWORD, CONFIRM_EMAIL, CHANGE_OVERWRITTEN_PASSWORD}
+    public enum TokenType {
+        MULTI_FACTOR_AUTHENTICATION_CODE,
+        REGISTER,
+        RESET_PASSWORD,
+        CONFIRM_EMAIL,
+        CHANGE_OVERWRITTEN_PASSWORD
+    }
 
     /**
      * The value of the token.

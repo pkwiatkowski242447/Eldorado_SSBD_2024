@@ -230,8 +230,16 @@ public class Account extends AbstractEntity {
      */
     @NotNull(message = AccountMessages.BLOCKED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_COLUMN, nullable = false)
-//    @Setter
+    @Setter
     private Boolean blocked = false;
+
+    /**
+     * Variable indicating whether user account has 2FA enabled.
+     */
+    @NotNull(message = AccountMessages.TWO_FACTOR_AUTH_NULL)
+    @Column(name = DatabaseConsts.TWO_FACTOR_AUTH_COLUMN, nullable = false)
+    @Setter
+    private Boolean twoFactorAuth = true;
 
     /**
      * Time when the account was blocked.

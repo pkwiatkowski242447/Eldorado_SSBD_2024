@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -20,6 +21,9 @@ import java.util.*;
  */
 @Component
 public class JWTProvider {
+
+    @Value("${authentication.code.validity.period.length.minutes}")
+    private int authenticationCodeValidityLength;
 
     private String secretKey;
 
@@ -166,6 +170,40 @@ public class JWTProvider {
     private String getSignInKey() {
         byte[] keyBytes = Base64.getDecoder().decode(this.secretKey);
         return new String(keyBytes);
+    }
+
+    // Multifactor Auth
+
+    /**
+     * Method used to generate JWT token, which is valid for next couple of minutes
+     * (default: 5 minutes), containing code used for second step in two factor
+     * authentication.
+     */
+    public String generateMultiFactorAuthToken(String codeValue) {
+        return JWT.create()
+                .withClaim(JWTConsts.CODE_VALUE, codeValue)
+                .withIssuedAt(Instant.now())
+                .withExpiresAt(Instant.now().plus(this.authenticationCodeValidityLength, ChronoUnit.MINUTES))
+                .withIssuer(JWTConsts.TOKEN_ISSUER)
+                .sign(Algorithm.HMAC256(this.getSignInKey()));
+    }
+
+    public String extractHashedCodeValueFromToken(String token) {
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        return decodedJWT.getClaim(JWTConsts.CODE_VALUE).asString();
+    }
+
+    public boolean isMultiFactorAuthTokenValid(String multiFactorAuthToken) {
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey()))
+                    .withIssuer(JWTConsts.TOKEN_ISSUER)
+                    .build();
+            DecodedJWT decodedJWT = jwtVerifier.verify(multiFactorAuthToken);
+            return decodedJWT.getExpiresAt().after(new Date());
+        } catch (JWTVerificationException exception) {
+            return false;
+        }
     }
 
     //=================================================JWS==========================================================\\

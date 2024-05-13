@@ -22,6 +22,7 @@ public class DatabaseConsts {
     public static final String ACCOUNT_VERIFIED_COLUMN = "verified";
     public static final String ACCOUNT_ACTIVE_COLUMN = "active";
     public static final String ACCOUNT_BLOCKED_COLUMN = "blocked";
+    public static final String TWO_FACTOR_AUTH_COLUMN = "two_factor_auth";
     public static final String ACCOUNT_BLOCKED_TIME_COLUMN = "blocked_timestamp";
     public static final String ACCOUNT_LANGUAGE_COLUMN = "language";
     public static final String ACCOUNT_PHONE_NUMBER_COLUMN = "phone_number";

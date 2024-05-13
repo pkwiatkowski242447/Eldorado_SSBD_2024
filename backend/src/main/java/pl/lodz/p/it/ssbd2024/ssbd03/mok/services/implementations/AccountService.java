@@ -347,7 +347,7 @@ public class AccountService implements AccountServiceInterface {
         foundAccount.setName(modifiedAccount.getName());
         foundAccount.setLastname(modifiedAccount.getLastname());
         foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
-        foundAccount.setAccountLanguage(modifiedAccount.getAccountLanguage());
+        foundAccount.setTwoFactorAuth(modifiedAccount.getTwoFactorAuth());
 
         for (UserLevel foundUserLevel : foundAccount.getUserLevels()) {
             UserLevel modifiedUserLevel = modifiedAccount.getUserLevels().stream()

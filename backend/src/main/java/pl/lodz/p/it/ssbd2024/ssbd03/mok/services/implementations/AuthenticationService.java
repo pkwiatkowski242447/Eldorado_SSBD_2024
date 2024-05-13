@@ -3,14 +3,11 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -19,22 +16,24 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptExcept
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationAccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.authentication.AuthenticationInvalidCredentialsException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenAuthFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
 
 /**
  * Service managing authentication.
  */
 @Slf4j
 @Service
+@Transactional(propagation = Propagation.REQUIRED)
 public class AuthenticationService implements AuthenticationServiceInterface {
 
     @Value("${account.maximum.failed.login.attempt.counter}")
@@ -46,14 +45,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     private final AuthenticationFacade authenticationFacade;
 
     /**
-     * Facade component used for operations conducted on activity log object inside account object instance.
+     * Token facade, used for token manipulation in the database.
      */
-    private final AccountMOKFacade accountMOKFacade;
+    private final TokenAuthFacade tokenFacade;
 
     /**
-     * AuthenticationManager used for authenticate user.
+     * Password encoder, used for generating hashes for tokens containing auth codes.
      */
-    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * MailProvider used for sending emails.
@@ -65,79 +64,157 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     private final JWTProvider jwtProvider;
 
+
     /**
      * Autowired constructor for the service.
      *
      * @param authenticationFacade  Facade used for reading users accounts information for authentication purposes.
-     * @param authenticationManager Spring Security component, responsible for performing authentication in the application.
+     * @param tokenFacade Facade used for inserting, deleting and reading token objects from the database.
+     * @param passwordEncoder Component, responsible for generating hashes for given authentication code, and verifying them.
+     * @param jwtProvider Component, responsible for generating JWT tokens with given content, and for given amount of time.
+     * @param mailProvider Component used for sending e-mail messages.
      */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
-                                 AccountMOKFacade accountMOKFacade,
-                                 AuthenticationManager authenticationManager,
+                                 TokenAuthFacade tokenFacade,
+                                 PasswordEncoder passwordEncoder,
                                  MailProvider mailProvider,
                                  JWTProvider jwtProvider) {
         this.authenticationFacade = authenticationFacade;
-        this.accountMOKFacade = accountMOKFacade;
-        this.authenticationManager = authenticationManager;
+        this.tokenFacade = tokenFacade;
+        this.passwordEncoder = passwordEncoder;
         this.mailProvider = mailProvider;
         this.jwtProvider = jwtProvider;
     }
 
     /**
-     * Authenticates a user in the system.
+     * This method is used to perform the second step in multifactor authentication, that is
+     * to verify the provided authentication code, used for authenticating user in the application.
      *
      * @param login    Login of the Account.
-     * @param password Password to the Account.
-     * @return Returns an Account with the given credentials.
-     * @throws AuthenticationAccountNotFoundException    Threw when there is no Account with given login.
-     * @throws AuthenticationInvalidCredentialsException Threw when credentials don't match any account.
+     * @param code     8 character long string value, which is the authentication code sent to the users e-mail address.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     * on facade components.
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
-    public String login(String login, String password, String ipAddr) throws ApplicationBaseException {
-        String token = "";
-        Account account = authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
-        try {
-            ActivityLog activityLog = account.getActivityLog();
-            if (!account.getActive() || account.getBlocked()) {
-                activityLog.setLastUnsuccessfulLoginIp(ipAddr);
-                activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
-                account.setActivityLog(activityLog);
-                authenticationFacade.edit(account);
-                if (!account.getActive()) {
-                    throw new AccountNotActivatedException();
-                } else if (account.getBlockedTime() != null) {
-                    throw new AccountBlockedByAdminException();
-                } else {
-                    throw new AccountBlockedByFailedLoginAttemptsException();
-                }
-            } else if (activityLog.getUnsuccessfulLoginCounter() > this.failedLoginAttemptMaxVal) {
-                throw new AccountBlockedByFailedLoginAttemptsException();
-            } else {
-                Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                activityLog.setLastSuccessfulLoginIp(ipAddr);
-                activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
-                activityLog.setUnsuccessfulLoginCounter(0);
-                account.setActivityLog(activityLog);
-                authenticationFacade.edit(account);
-                token = jwtProvider.generateJWTToken(account);
-            }
-        } catch (BadCredentialsException exception) {
-            Account refreshedAccount = authenticationFacade.findAndRefresh(account.getId()).orElseThrow(InvalidLoginAttemptException::new);
-            ActivityLog activityLog = refreshedAccount.getActivityLog();
-            activityLog.setLastUnsuccessfulLoginIp(ipAddr);
-            activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
-            activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
-            refreshedAccount.setActivityLog(activityLog);
-            authenticationFacade.edit(refreshedAccount);
-            mailProvider.sendBlockAccountInfoEmail(refreshedAccount.getName(), refreshedAccount.getLastname(),
-                    refreshedAccount.getEmail(), account.getAccountLanguage(), false);
-            throw new InvalidLoginAttemptException();
+    public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
+        Account account = this.authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
+        if (!account.getActive()) {
+            throw new AccountNotActivatedException();
+        } else if (account.getBlocked() && account.getBlockedTime() != null) {
+            throw new AccountBlockedByAdminException();
+        } else if (account.getBlocked()) {
+            throw new AccountBlockedByFailedLoginAttemptsException();
         }
-        return token;
+
+        Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId()).orElseThrow(TokenNotFoundException::new);
+        String hashedAuthenticationCode = this.jwtProvider.extractHashedCodeValueFromToken(token.getTokenValue());
+        if (!jwtProvider.isMultiFactorAuthTokenValid(token.getTokenValue()) ||
+                !passwordEncoder.matches(code, hashedAuthenticationCode))
+            throw new TokenNotValidException();
+        this.tokenFacade.remove(token);
+    }
+
+    /**
+     * This method is used to register successful login attempt made by the user - if first step of authentication is
+     * completed then e-mail message with authentication code is sent to the user. If second step of authentication is
+     * completed then JWT token is generated and sent to the user.
+     *
+     * @param userLogin Login of the user that is trying to authenticate in the application.
+     * @param confirmed Boolean flag indicating whether user identity is confirmed - used to send e-mail when first step of multifactor authentication is completed.
+     * @param ipAddress Logical IPv4 address, which the user is authenticating from.
+     * @param language  Language constant, read as a setting in the user's browser.
+     * @return String containing a JWT token is returned if user identity is confirmed, that is after the authentication code is entered and
+     * validated. Otherwise, it sends e-mail message containing the authentication code.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     * on facade components.
+     */
+    @Override
+    public String registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
+        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+        if (!confirmed && account.getTwoFactorAuth()) {
+            this.generateAndSendEmailMessageWithAuthenticationCode(account);
+            return null;
+        }
+        ActivityLog activityLog = account.getActivityLog();
+        activityLog.setLastSuccessfulLoginIp(ipAddress);
+        activityLog.setLastSuccessfulLoginTime(LocalDateTime.now());
+        activityLog.setUnsuccessfulLoginCounter(0);
+        account.setActivityLog(activityLog);
+        account.setAccountLanguage(language);
+        authenticationFacade.edit(account);
+        return jwtProvider.generateJWTToken(account);
+    }
+
+    /**
+     * This method is used to register unsuccessful login attempt made by the user - specifically when credentials
+     * entered by the user are invalid (that causes the unsuccessfulLoginCounter to increment, hence the name of the method).
+     *
+     * @param userLogin Login of the user that is trying to authenticate in the application.
+     * @param ipAddress Logical IPv4 address, which the user is authenticating from.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     * on facade components.
+     */
+    @Override
+    public void registerUnsuccessfulLoginAttemptWithIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
+        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
+        ActivityLog activityLog = account.getActivityLog();
+        activityLog.setLastUnsuccessfulLoginIp(ipAddress);
+        activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
+        activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
+        account.setActivityLog(activityLog);
+        authenticationFacade.edit(account);
+        if (activityLog.getUnsuccessfulLoginCounter() > this.failedLoginAttemptMaxVal) {
+            mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
+                    account.getEmail(), account.getAccountLanguage(), false);
+        }
+    }
+
+    /**
+     * This method is used to register unsuccessful login attempt made by the user - specifically when user account
+     * could not be authenticated to other reasons, such as the account being not active or blocked. That should not
+     * increase the unsuccessfulLoginCounter as authentication could not be performed.
+     *
+     * @param userLogin Login of the user that is trying to authenticate in the application.
+     * @param ipAddress Logical IPv4 address, which the user is authenticating from.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     * on facade components.
+     */
+    @Override
+    public void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
+        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
+        ActivityLog activityLog = account.getActivityLog();
+        activityLog.setLastUnsuccessfulLoginIp(ipAddress);
+        activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
+        account.setActivityLog(activityLog);
+        authenticationFacade.edit(account);
+    }
+
+    /**
+     * This method is used to generate authentication code for multifactor authentication, and sends it via
+     * e-mail message to the e-mail address connected to the account, which user try to authenticate to.
+     *
+     * @param account User account, which the authentication code is generated for.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     * on facade components.
+     */
+    private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
+        tokenFacade.findByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId()).ifPresent(tokenFacade::remove);
+
+        Random random = new Random();
+        String authCodeValue = String.valueOf(10000000 + random.nextInt(90000000));
+
+        String hashedAuthCode = passwordEncoder.encode(authCodeValue);
+        String tokenValue = this.jwtProvider.generateMultiFactorAuthToken(hashedAuthCode);
+
+        mailProvider.sendTwoFactorAuthCode(account.getName(),
+                account.getLastname(),
+                authCodeValue,
+                account.getEmail(),
+                account.getAccountLanguage());
+
+        Token multiFactorAuthToken = new Token(tokenValue, account, Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE);
+        this.tokenFacade.create(multiFactorAuthToken);
     }
 
     /**
@@ -145,15 +222,9 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      *
      * @param login Login of the Account to be retrieved.
      * @return Returns Account with the specified login.
-     * @throws AuthenticationAccountNotFoundException Threw when there is no Account with given login.
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
-    public Account findByLogin(String login) throws AuthenticationAccountNotFoundException {
-        try {
-            return this.authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException(I18n.AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION));
-        } catch (AccountNotFoundException exception) {
-            throw new AuthenticationAccountNotFoundException(exception.getMessage(), exception);
-        }
+    public Optional<Account> findByLogin(String login) {
+        return this.authenticationFacade.findByLogin(login);
     }
 }

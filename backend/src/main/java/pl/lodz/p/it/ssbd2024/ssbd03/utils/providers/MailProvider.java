@@ -190,6 +190,35 @@ public class MailProvider {
     }
 
     /**
+     * Sends e-mail message with authentication code for the second step in multifactor authentication to the e-mail
+     * address, attached to user account.
+     *
+     * @param firstName User's first name.
+     * @param lastName User's last name.
+     * @param authCode Authentication code used for the second step of multifactor authentication.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language Language of the message.
+     */
+    public void sendTwoFactorAuthCode(String firstName, String lastName, String authCode, String emailReceiver, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("code-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_ACTION_DESCRIPTION, language))
+                    .replace("$code", authCode)
+                    .replace("$note_title", I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException | NullPointerException exception) {
+            log.error(exception.getMessage(), exception.getCause());
+        }
+    }
+
+    /**
      * This method is used to send e-mail message when newly registered user account is being activated.
      *
      * @param firstName       User's first name.

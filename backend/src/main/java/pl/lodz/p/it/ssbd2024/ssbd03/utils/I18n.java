@@ -87,6 +87,12 @@ public class I18n {
     public static final String CONFIRM_REGISTER_ACTION_DESCRIPTION = "mail.confirm.register.action_description";
     public static final String CONFIRM_REGISTER_NOTE_TITLE = "mail.confirm.register.note_title";
 
+    public static final String LOGIN_AUTHENTICATION_CODE_GREETING_MESSAGE = "mail.login.auth.code.greeting.message";
+    public static final String LOGIN_AUTHENTICATION_CODE_MESSAGE_SUBJECT = "mail.login.auth.code.message.subject";
+    public static final String LOGIN_AUTHENTICATION_CODE_RESULT_MESSAGE = "mail.login.auth.code.result_message";
+    public static final String LOGIN_AUTHENTICATION_CODE_ACTION_DESCRIPTION = "mail.login.auth.code.action_description";
+    public static final String LOGIN_AUTHENTICATION_CODE_NOTE_TITLE = "mail.login.auth.code.note_title";
+
     public static final String CONFIRM_ACCOUNT_ACTIVATION_GREETING_MESSAGE = "mail.confirm.account.activation.greeting.message";
     public static final String CONFIRM_ACCOUNT_ACTIVATION_MESSAGE_SUBJECT = "mail.confirm.account.activation.message.subject";
     public static final String CONFIRM_ACCOUNT_ACTIVATION_RESULT_MESSAGE = "mail.confirm.account.activation.result_message";

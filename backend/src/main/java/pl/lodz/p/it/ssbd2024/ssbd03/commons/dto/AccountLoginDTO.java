@@ -22,4 +22,7 @@ public class AccountLoginDTO {
 
     @Schema(description = "Secret string of characters used to authenticate to the application", example = "P@ssw0rd!", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
+
+    @Schema(description = "String of characters that specify language setting in the user browser.", example = "pl", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String language;
 }
