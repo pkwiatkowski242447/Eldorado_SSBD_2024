@@ -278,7 +278,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void getAccountByLoginTest() {
+    void getAccountByLoginTest() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
 
@@ -311,14 +311,14 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void getAccountByIdTest() {
+    void getAccountByIdTest() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
 
         when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
 
-        assertEquals(account, accountService.getAccountById(id).orElse(null));
+        assertEquals(account, accountService.getAccountById(id));
 
         Mockito.verify(accountMOKFacade, Mockito.times(1)).findAndRefresh(id);
     }
