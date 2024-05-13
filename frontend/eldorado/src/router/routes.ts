@@ -54,14 +54,15 @@ export const PublicRoutes: RouteType[] = [
         Component: UserManagementPage
     },
     {
+        path: Pathnames.public.changeUserLevel,
+        Component: ChangeUserLevelPage
+    },
+    {
 
         path: Pathnames.public.accountSettings,
         Component: AccountSettings
     },
-    {
-        path: Pathnames.public.changeUserLevel,
-        Component: ChangeUserLevelPage
-    },
+
 ]
 
 // export const AdminRoutes: RouteType[] = [
