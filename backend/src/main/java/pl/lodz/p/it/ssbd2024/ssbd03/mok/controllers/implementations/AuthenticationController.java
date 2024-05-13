@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +17,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AuthenticationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 /**
  * Controller used for authentication in the system.
@@ -25,6 +25,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController implements AuthenticationControllerInterface {
+
+    @Value("${logout.exit.page.url}")
+    private String exitPageUrl;
 
     /**
      * AuthenticationServiceInterface used for authentication purposes.
@@ -35,7 +38,6 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * Autowired constructor for the controller.
      *
      * @param authenticationService Service used for authentication purposes.
-     * @param jwtProvider           Component used in order to generate JWT tokens with specified payload.
      */
     @Autowired
     public AuthenticationController(AuthenticationServiceInterface authenticationService) {
@@ -50,7 +52,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * @return In case of successful logging in returns HTTP 200 OK and JWT later used to keep track of a session.
      * If any problems occur returns HTTP 400 BAD REQUEST and JSON containing information about the problem.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     * layer of facade and service components in the application.
+     *                                  layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,26 +72,19 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * This method is used to log out from the application, in a situation
      * when user was previously authenticated.
      *
-     * @param request   HttpRequest object, associated with the current request.
-     * @param response  HttpResponse object, .
-     *
-     * @return 200 OK is returned when user is logged out successfully. Otherwise, when any exception is thrown, then
-     * 400 BAD REQUEST is returned.
+     * @param request  HttpRequest object, associated with the current request.
+     * @param response HttpResponse object, .
+     * @return 204 OK is returned when user is logged out successfully.
      */
     @Override
     @PostMapping(value = "/logout")
     @Operation(summary = "Log out", description = "This endpoint is used to log out a user from the application.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Logging out previously authenticated user was successful."),
-            @ApiResponse(responseCode = "400", description = "Unknown exception occurred while processing the request."),
+            @ApiResponse(responseCode = "204", description = "Logging out previously authenticated user was successful."),
     })
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-            logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-            return ResponseEntity.ok().build();
-        } catch (Exception exception) {
-            return ResponseEntity.badRequest().body(I18n.AUTH_CONTROLLER_ACCOUNT_LOGOUT);
-        }
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+        return ResponseEntity.noContent().build();
     }
 }

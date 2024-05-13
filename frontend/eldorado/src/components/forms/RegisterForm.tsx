@@ -7,10 +7,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {api} from "@/api/api.ts";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {useToast} from "@/components/ui/use-toast.ts";
-
-const phoneRegex = new RegExp(
-    /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?(-?\s?[0-9])+$/
-);
+import {isValidPhoneNumber} from "react-phone-number-input";
+import {PhoneInput} from "@/components/ui/phone-input.tsx";
 
 const formSchema = z.object({
     email: z.string().min(1, {message: "This field has to be filled."})
@@ -23,7 +21,7 @@ const formSchema = z.object({
         .max(32, {message: "First name has to be at most 32 characters long."}),
     lastName: z.string().min(2, {message: "Last name has to be at least 2 characters long."})
         .max(32, {message: "Last name has to be at most 32 characters long."}),
-    phoneNumber: z.string().regex(phoneRegex, {message: "This is not a valid phone number."}),
+    phoneNumber: z.string().refine(isValidPhoneNumber, {message: "Invalid phone number"}),
 })
 
 export function RegisterForm() {
@@ -42,7 +40,6 @@ export function RegisterForm() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-
         console.table(values)
         api.registerClient(values.login, values.password, values.firstName, values.lastName, values.email,
             values.phoneNumber, navigator.language.substring(0, 2))
@@ -70,7 +67,7 @@ export function RegisterForm() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Form {...form} onSubmit={form.handleSubmit(onSubmit)}>
+                <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <div className="grid gap-4">
                             <div className="grid grid-cols-2 gap-4">
@@ -111,10 +108,11 @@ export function RegisterForm() {
                                         control={form.control}
                                         name="phoneNumber"
                                         render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel className="text-black">Phone Number</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="" {...field}/>
+                                            <FormItem className="items-start">
+                                                <FormLabel className="text-black text-center">Phone Number</FormLabel>
+                                                <FormControl className="w-full">
+                                                    <PhoneInput //TODO fix this
+                                                        placeholder="" {...field}/>
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>

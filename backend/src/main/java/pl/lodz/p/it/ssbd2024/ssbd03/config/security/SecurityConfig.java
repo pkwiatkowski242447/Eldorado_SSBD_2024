@@ -55,7 +55,7 @@ public class SecurityConfig {
      * Whitelist containing all URLs related to paths available to unauthenticated users.
      */
     private static final String[] PATHS_WHITELIST = {
-            "/api/v1/auth/login/**",
+            "/api/v1/auth/**",
             "/api/v1/register/client",
             "/api/v1/accounts/change-password/**",
             "/api/v1/accounts/forgot-password",
@@ -65,6 +65,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .logout((logout) -> logout
+                        .logoutUrl("/api/v1/auth/logout")
+                        .logoutSuccessUrl("http://localhost:3000/login"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> corsConfigurationSource())
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

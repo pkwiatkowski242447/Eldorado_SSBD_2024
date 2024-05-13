@@ -3,11 +3,10 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.old.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 
@@ -107,12 +106,12 @@ public interface AccountServiceInterface {
      * This method is used to modify user personal data.
      *
      * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
-     * @param currentUserLogin Login associated with the modified account.
+     * @param userLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw if while editing the account, a parallel editing action occurred.
      */
-    Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException, ApplicationOptimisticLockException;
+    Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException;
 
     /**
      * Changes the e-mail of the specified Account.
@@ -187,7 +186,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException Thrown when an account from security context can't be found in the database.
      * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
      */
-    void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException;
+    void resendEmailConfirmation() throws ApplicationBaseException;
 
     /**
      * Removes the client user level from the account.
@@ -196,7 +195,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException  Threw when there is no account with given login.
      * @throws AccountUserLevelException Threw when the account has no client user level or this is the only user level of the account.
      */
-    void removeClientUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+    void removeClientUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * Removes the staff user level from the account.
@@ -205,7 +204,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException  Threw when there is no account with given login.
      * @throws AccountUserLevelException Threw when the account has no staff user level or this is the only user level of the account.
      */
-    void removeStaffUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+    void removeStaffUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * Removes the admin user level from the account.
@@ -214,7 +213,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException  Threw when there is no account with given login.
      * @throws AccountUserLevelException Threw when the account has no admin user level or this is the only user level of the account.
      */
-    void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException;
+    void removeAdminUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * Adds the Client user level to the account.

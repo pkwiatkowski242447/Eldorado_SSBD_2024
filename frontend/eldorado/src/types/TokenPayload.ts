@@ -3,14 +3,11 @@ export interface AccessToken{
 }
 
 export enum RolesEnum{
-    ADMIN = "ROLE_ADMIN",
-    STAFF = "ROLE_STAFF",
-    CLIENT = "ROLE_CLIENT"
+    ADMIN = "ADMIN",
+    STAFF = "STAFF",
+    CLIENT = "CLIENT"
 }
 
-export interface Authority{
-    authority: RolesEnum
-}
 export interface TokenPayload {
     sub: string;
     account_id: string;

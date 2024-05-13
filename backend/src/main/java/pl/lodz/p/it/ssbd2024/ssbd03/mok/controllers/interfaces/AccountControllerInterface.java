@@ -44,6 +44,19 @@ public interface AccountControllerInterface {
     ResponseEntity<?> forgetAccountPassword(AccountEmailDTO accountEmailDTO) throws ApplicationBaseException;
 
     /**
+     * This endpoint is used to reset user account password by the administrator. It does generate RESET PASSWORD token, write
+     * it to the database, and send a message with reset password URL to user e-mail address.
+     *
+     * @param id Identifier of the account of which the password will be resetted.
+     *
+     * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
+     * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
+     * not activated yet).
+     * @throws ApplicationBaseException 
+     */
+    ResponseEntity<?> resetAccountPassword(String id) throws ApplicationBaseException;
+
+    /**
      * This endpoint is used to change password for an unauthenticated user. It does generate RESET PASSWORD token, write
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
@@ -112,10 +125,19 @@ public interface AccountControllerInterface {
      * @param accountModifyDTO Account properties with potentially changed values.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> modifySelfAccount(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
+    ResponseEntity<?> modifyAccountSelf(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
 
     /**
-     * This method is used to find user account by Id.
+     * This method is used to modify personal data user by other user with administrative privileges.
+     *
+     * @param ifMatch Value of If-Match header
+     * @param accountModifyDTO Account properties with potentially changed values.
+     * @return It returns an HTTP response with a code depending on the result.
+     */
+    ResponseEntity<?> modifyUserAccount(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
+
+    /**
+     * This method is used to find user account by id.
      *
      * @param id Identifier of account to find.
      * @return It returns an HTTP response with a code depending on the result.
@@ -147,7 +169,7 @@ public interface AccountControllerInterface {
      *
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      */
-    ResponseEntity<?> resendEmailConfirmation();
+    ResponseEntity<?> resendEmailConfirmation() throws ApplicationBaseException;
 
     /**
      * This method is used to remove client user level from account.
@@ -158,7 +180,7 @@ public interface AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      */
-    ResponseEntity<?> removeClientUserLevel(String id);
+    ResponseEntity<?> removeClientUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * This method is used to remove staff user level from account.
@@ -169,7 +191,7 @@ public interface AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      */
-    ResponseEntity<?> removeStaffUserLevel(String id);
+    ResponseEntity<?> removeStaffUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * This method is used to remove admin user level from account.
@@ -180,7 +202,7 @@ public interface AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      */
-    ResponseEntity<?> removeAdminUserLevel(String id);
+    ResponseEntity<?> removeAdminUserLevel(String id) throws ApplicationBaseException;
 
     /**
      * This method is used to client user level to the user account with given identifier which

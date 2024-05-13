@@ -3,35 +3,24 @@ import {useAccountState} from "../context/AccountContext";
 import {useNavigate} from "react-router-dom";
 import {api} from "../api/api";
 import {Pathnames} from "../router/pathnames";
-import {jwtDecode} from "jwt-decode";
-import {RolesEnum, TokenPayload} from "../types/TokenPayload";
 import {usersApi} from "@/api/userApi.ts";
 import {useEffect, useState} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
+import {RolesEnum} from "@/types/TokenPayload.ts";
 
 export const useAccount = () => {
 
-    useEffect(() => {
-        const tokenRaw = localStorage.getItem("token");
-        if (tokenRaw && tokenRaw !== 'null') {
-            const decodedToken: TokenPayload = jwtDecode<TokenPayload>(tokenRaw);
-            const user: UserType = {
-                id: decodedToken.sub,
-                login: decodedToken.account_id,
-                token: tokenRaw,
-                activeRole: decodedToken.user_levels[0],
-                userTypes: decodedToken.user_levels.map((role: RolesEnum) => role),
-            };
-            setAccount(user);
-        }
-    }, []);
-
     const navigate = useNavigate()
-    const {account, setAccount} =
-        useAccountState()
+    const {account, setAccount} = useAccountState()
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const accountType: RolesEnum[] | null = account?.userTypes ? account.userTypes : null;
     const {toast} = useToast()
+
+    useEffect(() => {
+        const storedAccount = localStorage.getItem('account');
+        if (storedAccount) {
+            setAccount(JSON.parse(storedAccount));
+        }
+    }, [setAccount]);
 
     const navigateToMainPage = () => {
         navigate(Pathnames.public.home)
@@ -51,20 +40,10 @@ export const useAccount = () => {
     const logIn = async (login: string, password: string) => {
         try {
             const token = (await api.logIn(login, password)).data;
-            console.log(token);
             localStorage.setItem('token', token);
-            const decodedToken: TokenPayload = jwtDecode<TokenPayload>(token);
-            const user: UserType = {
-                id: decodedToken.sub,
-                login: decodedToken.account_id,
-                token: token,
-                activeRole: decodedToken.user_levels[0],
-                userTypes: decodedToken.user_levels.map((role: RolesEnum) => role),
-            };
-            setAccount(user);
+            await getCurrentAccount()
             setIsAuthenticated(true);
-            console.log(user)
-            navigate(Pathnames.public.test)
+            navigate(Pathnames.public.home)
         } catch (e) {
             toast({
                 variant: "destructive",
@@ -79,11 +58,45 @@ export const useAccount = () => {
         try {
             const tokenRaw = localStorage.getItem("token");
             if (tokenRaw && tokenRaw !== 'null') {
-                const {data} = await usersApi.getSelf();
-                setAccount(data)
-                console.table(data)
-            } else throw new Error("Token is null");
-        } catch {
+                const token = await usersApi.getSelf();
+                localStorage.setItem('token', token.data);
+                let activeUserLevel = token.data.userLevelsDto[0];
+                console.log(activeUserLevel)
+                for (const i in token.data.userLevelsDto.length) {
+                    if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
+                        if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
+                            activeUserLevel = token.data.userLevelsDto[i];
+                            break;
+                        }
+                    } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
+                        if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
+                            activeUserLevel = token.data.userLevelsDto[i];
+                            break;
+                        }
+                    }
+                }
+                console.log(activeUserLevel)
+                const user: UserType = {
+                    accountLanguage: token.data.accountLanguage,
+                    active: token.data.active,
+                    blocked: token.data.blocked,
+                    creationDate: token.data.creationDate,
+                    email: token.data.email,
+                    id: token.data.id,
+                    lastname: token.data.lastname,
+                    login: token.data.login,
+                    name: token.data.name,
+                    token: tokenRaw,
+                    phone: token.data.phone,
+                    userLevels: token.data.userLevelsDto,
+                    activeUserLevel: activeUserLevel,
+                    verified: token.data.verified,
+                };
+                console.log(activeUserLevel)
+                setAccount(user)
+                localStorage.setItem('account', JSON.stringify(user));
+            }
+        } catch (e) {
             if (account !== null) {
                 alert('Unable to get current account!');
                 await logOut();
@@ -94,7 +107,6 @@ export const useAccount = () => {
     return {
         account,
         isAuthenticated,
-        accountType,
         logIn,
         getCurrentAccount,
         logOut,

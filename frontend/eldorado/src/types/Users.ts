@@ -6,30 +6,25 @@ export enum AccountTypeEnum{
     STAFF = "Staff",
 }
 
+export interface UserLevelType {
+    id: string
+    roleName: RolesEnum
+    version: number
+}
+
 export interface UserType {
-    // archive:boolean,
-    id:string,
-    login:string
+    accountLanguage: string
+    active: boolean
+    blocked: boolean
+    creationDate: Date
+    email: string
+    id: string
+    lastname: string
+    login: string
+    name: string
     token: string
-    activeRole: RolesEnum;
-    userTypes: RolesEnum[]
+    phone: string
+    userLevels: UserLevelType[]
+    activeUserLevel: UserLevelType
+    verified: boolean
 }
-
-// export interface ClientType extends UserType{
-//     clientTypeName: "normal" | "coach" | "athlete",
-//     firstName: string,
-//     lastName: string,
-//     eTag?: string
-// }
-
-export interface NewUserType {
-    login:string,
-    password:string
-    userTypes: AccountTypeEnum[] | null
-}
-
-// export interface NewClientType extends NewUserType{
-//     clientTypeName: "normal" | "coach" | "athlete",
-//     firstName: string,
-//     lastName: string
-// }

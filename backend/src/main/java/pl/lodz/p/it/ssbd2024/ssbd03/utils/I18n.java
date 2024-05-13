@@ -47,7 +47,8 @@ public class I18n {
     public static final String STAFF_ACCOUNT_CREATION_EXCEPTION = "account.service.staff.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_CREATION_EXCEPTION = "account.service.admin.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
-    public static final String UNEXPECTED_USER_LEVEL = "user_level.type.unexpected.exception";
+    public static final String NO_SUCH_USER_LEVEL_EXCEPTION = "user_level.no.such.user.level.exception";
+    public static final String ONE_USER_LEVEL = "user_level.one.user.level";
     public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
     public static final String USER_LEVEL_DUPLICATED = "user_level.type.duplicated.exception";
 
@@ -74,6 +75,10 @@ public class I18n {
 
     // JWT
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
+
+    // Util
+    public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
+
 
     // Mail provider
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";

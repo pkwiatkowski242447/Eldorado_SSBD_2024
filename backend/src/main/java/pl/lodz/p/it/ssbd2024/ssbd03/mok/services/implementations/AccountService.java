@@ -12,10 +12,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
@@ -328,14 +329,14 @@ public class AccountService implements AccountServiceInterface {
      * This method is used to modify user personal data.
      *
      * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
-     * @param currentUserLogin Login associated with the modified account.
+     * @param userLogin Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException           Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
-    public Account modifyAccount(Account modifiedAccount, String currentUserLogin) throws AccountNotFoundException, ApplicationOptimisticLockException {
-        Account foundAccount = accountFacade.findByLogin(currentUserLogin).orElseThrow(AccountNotFoundException::new);
+    public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
+        Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
 
         if (!modifiedAccount.getVersion().equals(foundAccount.getVersion())) {
             throw new ApplicationOptimisticLockException();
@@ -344,6 +345,17 @@ public class AccountService implements AccountServiceInterface {
         foundAccount.setName(modifiedAccount.getName());
         foundAccount.setLastname(modifiedAccount.getLastname());
         foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
+        foundAccount.setAccountLanguage(modifiedAccount.getAccountLanguage());
+
+        for (UserLevel foundUserLevel : foundAccount.getUserLevels()) {
+            UserLevel modifiedUserLevel = modifiedAccount.getUserLevels().stream()
+                    .filter((level) -> level.getClass().getSimpleName().equalsIgnoreCase(foundUserLevel.getClass().getSimpleName()))
+                    .findFirst().orElseThrow(UserLevelMissingException::new);
+
+            if (!foundUserLevel.getVersion().equals(modifiedUserLevel.getVersion())) {
+                throw new ApplicationOptimisticLockException();
+            }
+        }
 
         accountFacade.edit(foundAccount);
 
@@ -358,12 +370,14 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
         Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
                 .orElseThrow(AccountIdNotFoundException::new);
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
+            log.info(account.toString());
             account.setActive(true);
             account.setVerified(true);
             accountFacade.edit(account);
@@ -490,7 +504,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
      */
     @Override
-    public void resendEmailConfirmation() throws AccountNotFoundException, TokenNotFoundException {
+    public void resendEmailConfirmation() throws ApplicationBaseException{
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account account = accountFacade.findByLogin(login)
                 .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -520,16 +534,14 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void removeClientUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+    public void removeClientUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Client)) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
-            //TODO maybe change to another exception
+            throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
         if (account.getUserLevels().size() == 1) {
-            throw new AccountUserLevelException("User must have at least one user level.");
-            //TODO maybe change to another exception
+            throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
         UserLevel clientUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Client).findFirst().orElse(null);
@@ -550,16 +562,14 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void removeStaffUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
+    public void removeStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Staff)) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
-            //TODO maybe change to another exception
+            throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
         if (account.getUserLevels().size() == 1) {
-            throw new AccountUserLevelException("User must have at least one user level.");
-            //TODO maybe change to another exception
+            throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
         UserLevel staffUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Staff).findFirst().orElse(null);
@@ -580,8 +590,8 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void removeAdminUserLevel(String id) throws AccountNotFoundException, AccountUserLevelException {
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(AccountNotFoundException::new);
+    public void removeAdminUserLevel(String id) throws ApplicationBaseException{
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         String currentAccountLogin = SecurityContextHolder.getContext().getAuthentication().getName();
         Account currentAccount = accountFacade.findByLogin(currentAccountLogin)
@@ -592,10 +602,10 @@ public class AccountService implements AccountServiceInterface {
         }
 
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Admin)) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
         if (account.getUserLevels().size() == 1) {
-            throw new AccountUserLevelException(I18n.UNEXPECTED_USER_LEVEL);
+            throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
         UserLevel adminUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Admin).findFirst().orElse(null);
