@@ -26,10 +26,10 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request.contentType(CONTENT_TYPE);
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
-        Response response = request.post("http://localhost:8181/api/v1/auth/login");
+        Response response = request.post("http://localhost:8181/api/v1/auth/login-credentials");
 
-        assertEquals(204, response.getStatusCode());
-        // assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
+        assertEquals(200, response.getStatusCode());
+        assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
     }
 
     private String decodeJwtTokenAndExtractValue(String payload, String key) {

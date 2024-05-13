@@ -185,7 +185,7 @@ public class AccountController implements AccountControllerInterface {
      * This endpoint is used to reset user account password by the administrator. It does generate RESET PASSWORD token, write
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
-     * @param id Identifier of the account of which the password will be resetted.
+     * @param id Identifier of the account of which the password will be reset.
      *
      * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
