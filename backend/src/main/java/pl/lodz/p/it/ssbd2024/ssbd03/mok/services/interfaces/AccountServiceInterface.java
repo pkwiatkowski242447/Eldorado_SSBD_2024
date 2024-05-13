@@ -92,7 +92,7 @@ public interface AccountServiceInterface {
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
      * @throws IllegalOperationException      Threw when user try to block their own account.
      */
-    void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException, IllegalOperationException;
+    void blockAccount(UUID id) throws ApplicationBaseException;
 
     /**
      * Method for unblocking an account by its UUID.

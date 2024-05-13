@@ -20,7 +20,7 @@ public interface AccountControllerInterface {
      * @param id Identifier of account that will be blocked.
      * @return HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> blockAccount(String id);
+    ResponseEntity<?> blockAccount(String id) throws ApplicationBaseException;
 
     /**
      * This method allows to unblock a user account by its UUID.

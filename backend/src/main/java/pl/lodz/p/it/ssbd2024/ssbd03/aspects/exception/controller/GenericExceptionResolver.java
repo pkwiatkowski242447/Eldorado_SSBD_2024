@@ -10,7 +10,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockExceptio
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
-
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 
 /**
  * General exception handling component in a form of @ControllerAdvice for exceptions that are shared
@@ -99,5 +99,22 @@ public class GenericExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(invalidDataFormatException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any IllegalOperationException or exception that extend it, which could be thrown when
+     * trying to perform a prohibited operation. After such exception is propagated from controller it will be caught
+     * and transformed into HTTP Response.
+     *
+     * @param illegalOperationException IllegalOperationException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST
+     */
+    @ExceptionHandler(value = { IllegalOperationException.class })
+    public ResponseEntity<?> handleIllegalOperationException(IllegalOperationException illegalOperationException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(illegalOperationException.getMessage());
     }
 }
