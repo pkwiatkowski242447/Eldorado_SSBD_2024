@@ -206,7 +206,7 @@ public class AccountController implements AccountControllerInterface {
 
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException anfe) {
-            return ResponseEntity.badRequest().body(anfe.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -438,7 +438,7 @@ public class AccountController implements AccountControllerInterface {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
         } catch (AccountNotFoundException anfe) {
-            return ResponseEntity.badRequest().body(anfe.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

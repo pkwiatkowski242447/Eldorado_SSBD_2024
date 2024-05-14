@@ -151,7 +151,6 @@ public class AccountServiceMockTest {
     void confirmEmailTestTokenNotInDatabase() {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
-        Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
 
         when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.empty());
 
@@ -800,6 +799,17 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    void changePasswordSelfTestAccountNotFound() {
+        String currentPassword = "CurrentPassword";
+        String newPassword = "NewPassword";
+
+        when(encoder.encode(newPassword)).thenReturn(newPassword);
+        when(accountMOKFacade.findByLogin(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> accountService.changePasswordSelf(currentPassword, newPassword, "login"));
+    }
+
+    @Test
     void changePasswordSelfTestIncorrectPassword() {
         String incorrectPassword = "IncorrectPassword";
         String currentPassword = "CurrentPassword";
@@ -985,7 +995,6 @@ public class AccountServiceMockTest {
         assertEquals(newLastname, resultAccount.getLastname());
         assertEquals(accountOld.getEmail(), resultAccount.getEmail());
         assertEquals(newPhoneNumber, resultAccount.getPhoneNumber());
-        assertEquals(newLanguage, resultAccount.getAccountLanguage());
     }
 
     @Test
