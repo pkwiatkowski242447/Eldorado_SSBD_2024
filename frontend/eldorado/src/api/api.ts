@@ -1,4 +1,5 @@
 import {apiWithConfig} from "./api.config";
+import {UserLevelType} from "@/types/Users.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -35,5 +36,24 @@ export const api = {
         return apiWithConfig.post(`/accounts/change-password/${token}`, {
             password
         })
-    }
+    },
+
+    modifyAccountSelf: (login: string, version: number, userLevelsDto: UserLevelType[], name: string,
+                        lastname: string, phoneNumber: string, accountLanguage: string, etag: string) => {
+        const cleanedEtag = etag.replace(/^"|"$/g, '');
+        //this is necessary because backend requires etag to be without quotes
+        return apiWithConfig.put('/accounts/self', {
+            login: login,
+            version: version,
+            userLevelsDto: userLevelsDto,
+            name: name,
+            lastname: lastname,
+            phoneNumber: phoneNumber,
+            accountLanguage: accountLanguage
+        }, {
+            headers: {
+                'If-Match': cleanedEtag
+            }
+        })
+    },
 }
