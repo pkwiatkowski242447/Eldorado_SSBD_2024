@@ -85,15 +85,16 @@ public class AccountController implements AccountControllerInterface {
     }
 
     /**
-     * This endpoint allows user with administrative user level to block a user account by its UUID. After
-     * the account has been blocked.
+     * This endpoint allows user with administrative user level to block a user account by its UUID. After that
+     * the user account is blocked and could not authenticate to the application.
      *
      * @param id UUID of an Account to block.
      * @return If account blocking is successful, then 204 NO CONTENT is returned as a response.
-     * In case of IllegalArgumentException being thrown, during parsing passed id from String to UUID class,
-     * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
-     * 404 NOT FOUND and when AccountAlreadyBlockedException or IllegalOperationException is thrown,
-     * the response is 409 CONFLICT.
+     * In case of IllegalArgumentException or AccountNotFoundException being thrown, during parsing passed id from String to UUID class,
+     * 400 BAD REQUEST is returned, with appropriate message. If AccountAlreadyBlockedException or IllegalOperationException is thrown,
+     * the response is 409 CONFLICT. 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{user_id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -103,7 +104,8 @@ public class AccountController implements AccountControllerInterface {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been blocked correctly."),
             @ApiResponse(responseCode = "400", description = "The account has not been blocked due to the correctness of the request or because the account is not available in the database"),
-            @ApiResponse(responseCode = "409", description = "The account has not been blocked due to being blocked already or trying to block own account.")
+            @ApiResponse(responseCode = "409", description = "The account has not been blocked due to being blocked already or trying to block own account."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
         try {
@@ -124,14 +126,15 @@ public class AccountController implements AccountControllerInterface {
     }
 
     /**
-     * This endpoint allows user with administrative user level to unblock a user account by its UUID. After
-     * the account has been unblocked.
+     * This endpoint allows user with administrative user level to unblock a user account by its UUID. After that
+     * the user account is unblocked, and it could authenticate in the application.
      *
      * @param id UUID of an Account to unblock.
      * @return If account unblocking is successful, then 204 NO CONTENT is returned as a response.
-     * In case of IllegalArgumentException being thrown, during parsing passed id from String to UUID class,
-     * 400 BAD REQUEST is returned, with appropriate message. If AccountNotFoundException is thrown, the response is
-     * 404 NOT FOUND and when AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
+     * In case of IllegalArgumentException or AccountNotFoundException being thrown, during parsing passed id from String to UUID class,
+     * 400 BAD REQUEST is returned, with appropriate message. If AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{user_id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -141,7 +144,8 @@ public class AccountController implements AccountControllerInterface {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The account has been unblocked correctly."),
             @ApiResponse(responseCode = "400", description = "The account has not been unblocked due to the correctness of the request or because the account is not available in the database"),
-            @ApiResponse(responseCode = "409", description = "The account has not been unblocked due to being blocked already.")
+            @ApiResponse(responseCode = "409", description = "The account has not been unblocked due to being blocked already."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
         try {
@@ -157,11 +161,12 @@ public class AccountController implements AccountControllerInterface {
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
      * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for registration
-     *                        to the application or changed later to other e-mail address.
+     * to the application or changed later to other e-mail address.
      * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/forgot-password")
@@ -186,7 +191,8 @@ public class AccountController implements AccountControllerInterface {
      * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/reset-password/{id}")
@@ -212,9 +218,11 @@ public class AccountController implements AccountControllerInterface {
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
      * @param token RESET PASSWORD token required to change password for user account, that was generated when
-     *              forgetAccountPassword() method was called.
+     * forgetAccountPassword() method was called.
      * @return 200 OK is returned when changing password goes flawlessly. Otherwise, 400 BAD REQUEST is returned (since
      * RESET PASSWORD token is no longer valid or not in the database).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/change-password/{token_id}")
@@ -233,7 +241,7 @@ public class AccountController implements AccountControllerInterface {
 
     /**
      * This method retrieves user accounts from the system. In order to avoid sending huge amounts of user data
-     * it used pagination, so that users from a particular page, of a particular size can be retrieved.
+     * it used pagination, so that user accounts from a particular page, of a particular size can be retrieved.
      *
      * @param pageNumber Number of the page, which user accounts will be retrieved from.
      * @param pageSize   Number of user accounts per page.
@@ -252,7 +260,7 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "204", description = "List of accounts returned from given page of given size is empty."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    public ResponseEntity<?> getAllUsers(@RequestParam(name = "pageNumber") int pageNumber, @RequestParam(name = "pageSize") int pageSize) {
+    public ResponseEntity<?> getAllUsers(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize) {
         List<AccountListDTO> accountList = accountService.getAllAccounts(pageNumber, pageSize)
                 .stream()
                 .map(AccountListMapper::toAccountListDTO)
@@ -304,11 +312,11 @@ public class AccountController implements AccountControllerInterface {
      * registered either by user itself or by user with administrative privileges.
      *
      * @param token Last part of the activation URL, sent to the e-mail address user specified during registration process. It is a JWT token
-     *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
+     * generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
-     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
-     *                                  methods in both facade and service component for Account.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping("/activate-account/{token}")
@@ -332,9 +340,11 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to confirm the change of an e-mail
      *
      * @param token Last part of the activation URL, sent to the new e-mail address. It is a JWT token
-     *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
+     * generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return This function returns 204 NO CONTENT if method finishes successfully.
      * It could also return 400 BAD REQUEST if the token is not valid, expired or account does not exist.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -358,7 +368,9 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to find user account of currently logged-in user.
      *
      * @return If user account is found for currently logged user then 200 OK with user account in the response
-     * body is returned, otherwise 500 INTERNAL SERVER ERROR is returned, since user account could not be found.
+     * body is returned, otherwise 400 BAD REQUEST is returned, since user account could not be found.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -390,6 +402,8 @@ public class AccountController implements AccountControllerInterface {
      * If request has empty IF_MATCH header or account currently logged user was not found or data are invalid
      * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
      * then 409 CONFLICT is returned.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
@@ -430,6 +444,8 @@ public class AccountController implements AccountControllerInterface {
      * If request has empty IF_MATCH header or account currently logged user was not found or data are invalid
      * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
      * then 409 CONFLICT is returned.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
@@ -464,6 +480,8 @@ public class AccountController implements AccountControllerInterface {
      * @param id Identifier of account to find.
      * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
      * returns 400. When uuid is invalid returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
@@ -498,9 +516,11 @@ public class AccountController implements AccountControllerInterface {
      * @param id              Identifier of the user account, whose e-mail will be changed by this method.
      * @param accountEmailDTO Data transfer object containing new e-mail address.
      * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
+     * could not be found (and therefore e-mail address could not be changed) then 400 BAD REQUEST is returned. If account
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
      * explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -523,9 +543,11 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param accountEmailDTO Data transfer object containing new e-mail address.
      * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore e-mail address could not be changed) then 404 NOT FOUND is returned. If account
+     * could not be found (and therefore e-mail address could not be changed) then 400 BAD REQUEST is returned. If account
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
      * explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -550,6 +572,8 @@ public class AccountController implements AccountControllerInterface {
      * It generates a new token used in a confirmation.
      *
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/resend-email-confirmation")
@@ -571,9 +595,11 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param id Identifier of the user account, whose user level will be changed by this method.
      * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -595,9 +621,11 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param id Identifier of the user account, whose user level will be changed by this method.
      * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -619,9 +647,11 @@ public class AccountController implements AccountControllerInterface {
      *
      * @param id Identifier of the user account, whose user level will be changed by this method.
      * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
+     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -647,8 +677,8 @@ public class AccountController implements AccountControllerInterface {
      * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
      * (with a message explaining why the error occurred).
-     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
-     *                                  methods in both facade and service component for Account.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -678,8 +708,8 @@ public class AccountController implements AccountControllerInterface {
      * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
      * (with a message explaining why the error occurred).
-     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
-     *                                  methods in both facade and service component for Account.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -709,8 +739,8 @@ public class AccountController implements AccountControllerInterface {
      * could not be found (and therefore user level could not be changed) then 404 NOT FOUND is returned.
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
      * (with a message explaining why the error occurred).
-     * @throws ApplicationBaseException General superclass for all application exceptions, thrown by the aspects intercepting
-     *                                  methods in both facade and service component for Account.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -737,7 +767,8 @@ public class AccountController implements AccountControllerInterface {
      * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
      * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
      * is the same as current password returns 400 BAD REQUEST HTTP response.
-     * @throws ApplicationBaseException Thrown when problems occur when password is changing.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
     @Override
     @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)

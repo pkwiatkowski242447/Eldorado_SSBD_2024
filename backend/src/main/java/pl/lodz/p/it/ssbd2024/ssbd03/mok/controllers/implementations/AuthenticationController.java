@@ -55,6 +55,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * Autowired constructor for the controller.
      *
      * @param authenticationService Service used for authentication purposes.
+     * @param authenticationManager Spring Security component used to create Authentication object while authenticating
+     * user in the application.
      */
     @Autowired
     public AuthenticationController(AuthenticationServiceInterface authenticationService,
@@ -70,10 +72,11 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      *
      * @param accountLoginDTO User's credentials.
      * @param request         HTTP Request in which the credentials.
-     * @return In case of successful logging in returns HTTP 204 NO CONTENT is returned.
-     * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
+     * @return In case of successful logging in it returns 200 OK (if the enabled authentication mode is only one factor)
+     * or returns HTTP 204 NO CONTENT (in multifactor authentication). When account is blocked or not active
+     * then 400 BAD REQUEST is returned. When user credentials are invalid or account is not found 401 UNAUTHORIZED is returned.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     *                                  layer of facade and service components in the application.
+     * layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -125,7 +128,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * @return In case of successful logging in returns HTTP 200 OK is returned.
      * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     *                                  layer of facade and service components in the application.
+     * layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)

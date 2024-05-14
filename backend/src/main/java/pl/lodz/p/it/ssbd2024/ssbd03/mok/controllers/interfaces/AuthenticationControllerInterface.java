@@ -19,10 +19,11 @@ public interface AuthenticationControllerInterface {
      *
      * @param accountLoginDTO User's credentials.
      * @param request         HTTP Request in which the credentials.
-     * @return In case of successful logging in returns HTTP 204 NO CONTENT is returned.
-     * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
+     * @return In case of successful logging in it returns 200 OK (if the enabled authentication mode is only one factor)
+     * or returns HTTP 204 NO CONTENT (in multifactor authentication). When account is blocked or not active
+     * then 400 BAD REQUEST is returned. When user credentials are invalid or account is not found 401 UNAUTHORIZED is returned.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     *                                  layer of facade and service components in the application.
+     * layer of facade and service components in the application.
      */
     ResponseEntity<?> loginUsingCredentials(AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException;
 
@@ -30,21 +31,22 @@ public interface AuthenticationControllerInterface {
      * Allows an unauthenticated user to perform the second step in multifactor authentication,
      * which is to provide authentication code, which was sent to the users e-mail address.
      *
-     * @param AuthenticationCodeDTO Data transfer object containing authentication code.
+     * @param authenticationCodeDTO Data transfer object containing authentication code.
      * @param request               HTTP Request in which the credentials.
      * @return In case of successful logging in returns HTTP 200 OK is returned.
      * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     *                                  layer of facade and service components in the application.
+     * layer of facade and service components in the application.
      */
-    ResponseEntity<?> loginUsingAuthenticationCode(AuthenticationCodeDTO AuthenticationCodeDTO, HttpServletRequest request) throws ApplicationBaseException;
+    ResponseEntity<?> loginUsingAuthenticationCode(AuthenticationCodeDTO authenticationCodeDTO, HttpServletRequest request) throws ApplicationBaseException;
 
     /**
-     * Allows authenticated user to log out from the system.
+     * This method is used to log out from the application, in a situation
+     * when user was previously authenticated.
      *
-     * @param request  HTTP Request in which the credentials
-     * @param response HTTP Response object, associated with the response.
-     * @return         It returns an HTTP response with 204 NO CONTENT if logout was successful.
+     * @param request  HttpRequest object, associated with the current request.
+     * @param response HttpResponse object, .
+     * @return 204 OK is returned when user is logged out successfully.
      */
     ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response);
 }

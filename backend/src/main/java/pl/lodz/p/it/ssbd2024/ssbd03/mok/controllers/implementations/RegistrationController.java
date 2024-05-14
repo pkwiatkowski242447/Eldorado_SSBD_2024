@@ -57,6 +57,8 @@ public class RegistrationController implements RegistrationControllerInterface {
      * @return If account registration is successful, then 204 NO CONTENT is returned as a response. In case of Persistence exception being thrown
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
+     * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
+     * layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,6 +88,8 @@ public class RegistrationController implements RegistrationControllerInterface {
      * @return If account registration is successful, then 204 NO CONTENT is returned as a response. In case of Persistence exception being thrown
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
+     * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
+     * layer of facade and service components in the application.
      */
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
@@ -116,6 +120,8 @@ public class RegistrationController implements RegistrationControllerInterface {
      * @return If account registration is successful, then 204 NO CONTENT is returned as a response. In case of Persistence exception being thrown
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
+     * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
+     * layer of facade and service components in the application.
      */
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
