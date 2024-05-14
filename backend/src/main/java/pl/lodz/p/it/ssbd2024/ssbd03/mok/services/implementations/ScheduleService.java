@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
+@TxTracked
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ScheduleService implements ScheduleServiceInterface {
 

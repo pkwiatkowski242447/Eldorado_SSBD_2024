@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class TxAspect {
      * Pointcut definition for every method or class with @Transactional annotation (from org.springframework.transaction.annotation)
      * effectively executing corresponding advice method for every transactional call of any method.
      */
-    @Pointcut(value = "@annotation(org.springframework.transaction.annotation.Transactional) || @within(org.springframework.transaction.annotation.Transactional)")
+    @Pointcut(value = "@annotation(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked) || @within(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked)")
     private void txPointcut() {}
 
     /**
@@ -61,6 +62,8 @@ public class TxAspect {
     private Object aroundTxPointcut(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         String transactionKey;
         StringBuilder message = new StringBuilder("Method call: ");
+        message.append(proceedingJoinPoint.getSignature().getName());
+        message.append(" | Class: ").append(proceedingJoinPoint.getTarget().getClass().getSimpleName());
         Object result = new Object();
         try {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -68,7 +71,8 @@ public class TxAspect {
 
             Method getTransactionKey = transactionSynchronizationRegistry.getMethod("getTransactionKey", (Class<?>[]) null);
             Transaction transaction = (Transaction) getTransactionKey.invoke(transactionSynchronizationRegistry.getDeclaredConstructor().newInstance());
-            transactionKey = transaction.toString();
+            if (transaction.toString() != null) transactionKey = transaction.toString();
+            else transactionKey = "NULL";
 
             if (!transactionIds.contains(transactionKey)) {
                 Method registerSynchronization = transactionSynchronizationRegistry.getMethod("registerInterposedSynchronization", Synchronization.class);
@@ -77,8 +81,6 @@ public class TxAspect {
             }
 
             try {
-                message.append(proceedingJoinPoint.getSignature().getName());
-                message.append(" | Class: ").append(proceedingJoinPoint.getTarget().getClass().getSimpleName());
                 message.append(" | Transaction key: ").append(transactionKey != null ? transactionKey : "NULL");
                 message.append(" | User: ").append(null != SecurityContextHolder.getContext().getAuthentication() ? SecurityContextHolder.getContext().getAuthentication().getName() : "--ANONYMOUS--");
             } catch (Exception e) {

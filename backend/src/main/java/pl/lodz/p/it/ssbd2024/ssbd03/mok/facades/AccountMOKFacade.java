@@ -1,13 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -29,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Repository
+@TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class AccountMOKFacade extends AbstractFacade<Account> {
 
@@ -219,6 +218,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAccountByLogin.setParameter("login", login);
             Account foundAccount = findAccountByLogin.getSingleResult();
             entityManager.refresh(foundAccount);
+            entityManager.lock(foundAccount, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             return Optional.of(foundAccount);
         } catch (PersistenceException exception) {
             return Optional.empty();

@@ -3,12 +3,16 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.persistence.RollbackException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,10 +21,13 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
@@ -50,6 +57,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * Autowired constructor for the controller.
      *
      * @param authenticationService Service used for authentication purposes.
+     * @param authenticationManager Spring Security component used to create Authentication object while authenticating
+     * user in the application.
      */
     @Autowired
     public AuthenticationController(AuthenticationServiceInterface authenticationService,
@@ -65,14 +74,19 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      *
      * @param accountLoginDTO User's credentials.
      * @param request         HTTP Request in which the credentials.
-     * @return In case of successful logging in returns HTTP 204 NO CONTENT is returned.
-     * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
+     * @return In case of successful logging in it returns 200 OK (if the enabled authentication mode is only one factor)
+     * or returns HTTP 204 NO CONTENT (in multifactor authentication). When account is blocked or not active
+     * then 400 BAD REQUEST is returned. When user credentials are invalid or account is not found 401 UNAUTHORIZED is returned.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     *                                  layer of facade and service components in the application.
+     * layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ANONYMOUS" })
+    @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Enter credentials", description = "This endpoint is used to perform first step in multifactor authentication in the application.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "First step of multifactor authentication was successful. Since user enabled only one factor authentication, then acces token is returned."),
@@ -118,11 +132,15 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * @return In case of successful logging in returns HTTP 200 OK is returned.
      * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     *                                  layer of facade and service components in the application.
+     * layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ANONYMOUS" })
+    @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Enter authentication code", description = "This endpoint is used to perform second step in multifactor authentication in the application.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Full authentication process was successful."),
@@ -152,6 +170,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/logout")
+    @RolesAllowed({ "ROLE_AUTHENTICATED" })
     @Operation(summary = "Log out", description = "This endpoint is used to log out a user from the application.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Logging out previously authenticated user was successful."),

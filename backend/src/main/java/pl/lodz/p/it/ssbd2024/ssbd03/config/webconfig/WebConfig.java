@@ -8,6 +8,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,8 +21,10 @@ import java.util.List;
         "classpath:application.properties",
         "classpath:properties/mail.properties",
         "classpath:properties/urls.properties",
-        "classpath:properties/consts.properties"
+        "classpath:properties/consts.properties",
+        "classpath:properties/retry.properties"
 })
+@EnableRetry
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class WebConfig implements WebMvcConfigurer {
 

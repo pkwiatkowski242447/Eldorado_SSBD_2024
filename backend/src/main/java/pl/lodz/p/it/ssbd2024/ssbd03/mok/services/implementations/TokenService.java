@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -22,6 +23,8 @@ import java.time.temporal.ChronoUnit;
  */
 @Slf4j
 @Service
+@TxTracked
+@Transactional(propagation = Propagation.MANDATORY)
 public class TokenService implements TokenServiceInterface {
 
     @Value("${account.password.reset.period.length.minutes}")
@@ -57,7 +60,6 @@ public class TokenService implements TokenServiceInterface {
      * @return Returns newly created registration token value.
      */
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
     public String createRegistrationToken(Account account) throws ApplicationBaseException {
         String tokenValue = this.jwtProvider.generateActionToken(account,24, ChronoUnit.HOURS);
 
@@ -77,7 +79,6 @@ public class TokenService implements TokenServiceInterface {
      * layer.
      */
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
     public String createEmailConfirmationToken(Account account, String email) throws ApplicationBaseException{
         tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
 
@@ -98,7 +99,6 @@ public class TokenService implements TokenServiceInterface {
      * layer.
      */
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
     public String createPasswordResetToken(Account account) throws ApplicationBaseException {
         tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).ifPresent(tokenFacade::remove);
 
