@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @ContextConfiguration(classes = SpringWebInitializer.class)
 public class AccountControllerMockTest {
-    static private final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
     @Mock
     private AccountService accountService;
     @Mock

@@ -112,7 +112,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         } catch (LockedException lockedException) {
             this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
             Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin()).orElseThrow(InvalidLoginAttemptException::new);
-            if (account.getBlockedTime() != null) {
+            if (account.getBlockedTime() == null) {
                 throw new AccountBlockedByAdminException();
             } else {
                 throw new AccountBlockedByFailedLoginAttemptsException();
