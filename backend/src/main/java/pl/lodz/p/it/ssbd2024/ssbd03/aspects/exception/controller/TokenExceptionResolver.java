@@ -25,7 +25,7 @@ public class TokenExceptionResolver {
      */
     @ExceptionHandler(value = { TokenNotFoundException.class })
     public ResponseEntity<?> handleTokenNotFoundException(TokenNotFoundException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(exception.getMessage());
     }

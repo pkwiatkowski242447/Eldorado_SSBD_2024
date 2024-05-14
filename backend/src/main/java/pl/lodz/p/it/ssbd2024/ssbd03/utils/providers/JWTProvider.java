@@ -220,5 +220,4 @@ public class JWTProvider {
                 .withPayload(signableDTO.getSigningFields())
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
-
 }

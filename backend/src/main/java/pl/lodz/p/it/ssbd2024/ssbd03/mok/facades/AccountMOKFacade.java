@@ -1,9 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -219,6 +216,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAccountByLogin.setParameter("login", login);
             Account foundAccount = findAccountByLogin.getSingleResult();
             entityManager.refresh(foundAccount);
+            entityManager.lock(foundAccount, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             return Optional.of(foundAccount);
         } catch (PersistenceException exception) {
             return Optional.empty();

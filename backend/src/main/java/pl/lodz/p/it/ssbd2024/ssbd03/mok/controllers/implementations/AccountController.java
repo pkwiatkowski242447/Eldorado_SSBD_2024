@@ -5,14 +5,19 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.RollbackException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +38,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -91,6 +97,8 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{user_id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Block user account", description = "The endpoint is used to block user account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been blocked correctly."),
@@ -127,6 +135,8 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{user_id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Unblock user account", description = "The endpoint is used to unblock user account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The account has been unblocked correctly."),
@@ -155,6 +165,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/forgot-password")
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Forget currently set password", description = "The endpoint is used to forget current password, that is to send e-mail message with password reset URL.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The password change URL has been sent to the user's e-mail address."),
+            @ApiResponse(responseCode = "400", description = "The account is blocked or not activated or account with given e-mail has not been found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> forgetAccountPassword(@RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
         this.accountService.forgetAccountPassword(accountEmailDTO.getEmail());
         return ResponseEntity.noContent().build();
@@ -165,7 +183,6 @@ public class AccountController implements AccountControllerInterface {
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
      * @param id Identifier of the account of which the password will be reset.
-     *
      * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
@@ -174,16 +191,20 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/reset-password/{id}")
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Reset account password by admin", description = "The endpoint is used by admin to send password change URL to e-mail address attached to the account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The password change URL has been sent to the user's e-mail address."),
+            @ApiResponse(responseCode = "400", description = "The account is blocked or not activated or account with given identifier has not been found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> resetAccountPassword(@PathVariable("id") String id) throws ApplicationBaseException {
-        try {
-            UUID uuid = UUID.fromString(id);
-            Account account = accountService.getAccountById(uuid);
-            this.accountService.forgetAccountPassword(account.getEmail());
-
-            return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException anfe) {
-            return ResponseEntity.badRequest().body(anfe.getMessage());
-        }
+        UUID uuid = UUID.fromString(id);
+        Account account = accountService.getAccountById(uuid);
+        this.accountService.forgetAccountPassword(account.getEmail());
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -197,6 +218,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/change-password/{token_id}")
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Change account password", description = "The endpoint is used by unauthenticated user to change their account password, by clicking the link sent to their e-mail address.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The password was changed successfully."),
+            @ApiResponse(responseCode = "400", description = "The account is blocked or not activated or account, which the password is changed for has not been found, or there is no password change token for given account."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> changeAccountPassword(@PathVariable("token_id") String token, @RequestBody AccountPasswordDTO accountPasswordDTO) throws ApplicationBaseException {
         this.accountService.changeAccountPassword(token, accountPasswordDTO.getPassword());
         return ResponseEntity.noContent().build();
@@ -215,6 +244,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+    @Operation(summary = "Get all users", description = "The endpoint is used retrieve list of accounts from given page of given size.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of accounts returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of accounts returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> getAllUsers(@RequestParam(name = "pageNumber") int pageNumber, @RequestParam(name = "pageSize") int pageSize) {
         List<AccountListDTO> accountList = accountService.getAllAccounts(pageNumber, pageSize)
                 .stream()
@@ -238,6 +275,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(value = "/match-login-firstname-and-lastname", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+    @Operation(summary = "Get all users matching criteria", description = "The endpoint is used retrieve list of accounts that match certain criteria, that is either contain certain phrase in login, firstName, lastName, with certain activity status and ordered by login alphabetically or not.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of accounts returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of accounts returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
                                                                             @RequestParam(name = "firstName", defaultValue = "") String firstName,
                                                                             @RequestParam(name = "lastName", defaultValue = "") String lastName,
@@ -267,6 +312,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping("/activate-account/{token}")
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Activate account", description = "The endpoint is used activate user account by itself after successful registration.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Account activation was successful."),
+            @ApiResponse(responseCode = "400", description = "Activation URL expired, is invalid or account, which is being activated is not found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> activateAccount(@PathVariable("token") String token) throws ApplicationBaseException {
         if (accountService.activateAccount(token)) {
             return ResponseEntity.noContent().build();
@@ -285,6 +338,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Confirm e-mail", description = "The endpoint is used confirm e-mail attached to user's account after it was changed by the user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "E-mail confirmation process was successful."),
+            @ApiResponse(responseCode = "400", description = "E-mail confirmation URL expired, is invalid or account, which is e-mail is activated for, is not found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> confirmEmail(@PathVariable(value = "token") String token) throws ApplicationBaseException {
         if (accountService.confirmEmail(token)) {
             return ResponseEntity.noContent().build();
@@ -301,6 +362,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+    @Operation(summary = "Get your account details", description = "The endpoint is used to get user's own account details, and sign them using JWS, where the signature is placed in ETag header.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User's accounts details were found successfully."),
+            @ApiResponse(responseCode = "400", description = "Account of the currently logged in user could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> getSelf() throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account account = accountService.getAccountByLogin(login);
@@ -324,6 +393,8 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Modify self account", description = "The endpoint is used to modify self account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
@@ -362,7 +433,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    @Operation(summary = "Modify self account", description = "The endpoint is used to modify user account.")
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Modify other user account account", description = "The endpoint is used to modify user account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccountOutputDTO.class))),
@@ -395,6 +468,14 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+    @Operation(summary = "Find user account by id", description = "The endpoint is used retrieve user account details by its identifier.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User's account details were found successfully."),
+            @ApiResponse(responseCode = "400", description = "User account could not be found in the database."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> getUserById(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             UUID uuid = UUID.fromString(id);
@@ -423,6 +504,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Change other user's e-mail address", description = "The endpoint is used change e-mail address, attached to certain user's account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
+            @ApiResponse(responseCode = "400", description = "Given e-mail address is already set, is already taken by other user or user account could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id, @Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
         accountService.changeEmail(id, accountEmailDTO.getEmail());
         return ResponseEntity.noContent().build();
@@ -440,6 +529,15 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Change own e-mail address", description = "The endpoint is used change e-mail address, attached to own user's account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
+            @ApiResponse(responseCode = "400", description = "Given e-mail address is already set, is already taken by other user or user account could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> changeEmailSelf(@Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account user = accountService.getAccountByLogin(login);
@@ -455,6 +553,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/resend-email-confirmation")
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Resend e-mail confirmation message", description = "The endpoint is used resend e-mail confirmation message, that would be used to change e-mail address attached to user's account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message is sent successfully."),
+            @ApiResponse(responseCode = "400", description = "There is no token for account's e-mail change or the account, which the e-mail is change for, could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> resendEmailConfirmation() throws ApplicationBaseException {
         accountService.resendEmailConfirmation();
         return ResponseEntity.noContent().build();
@@ -471,6 +577,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Remove client user level", description = "The endpoint is used to remove client user level from account with given identifier, if the account contains such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Client user level was removed successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does not have client user level, or it is the only user level that account has."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
         return ResponseEntity.noContent().build();
@@ -487,6 +601,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Remove staff user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Staff user level was removed successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does not have staff user level, or it is the only user level that account has."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
         return ResponseEntity.noContent().build();
@@ -503,6 +625,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Remove admin user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Admin user level was removed successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does not have admin user level, or it is the only user level that account has, or it is the user level of the currently logged in user."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
         return ResponseEntity.noContent().build();
@@ -522,6 +652,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Add client user level", description = "The endpoint is used to add client user level to the account with given identifier, if the account does not have such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Client user level was added to the account successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does already have client user level, or all user levels are assigned to the account."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
@@ -545,6 +683,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Add staff user level", description = "The endpoint is used to add staff user level to the account with given identifier, if the account does not have such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Staff user level was added to the account successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does already have staff user level, or all user levels are assigned to the account."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
@@ -568,6 +714,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Add admin user level", description = "The endpoint is used to add admin user level to the account with given identifier, if the account does not have such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Admin user level was added to the account successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does already have admin user level, or all user levels are assigned to the account."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
@@ -587,6 +741,14 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+    @Operation(summary = "Change own password", description = "The endpoint is used to change password, used to authenticate to the currently logged in account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 ", description = "Account's password was changed successfully."),
+            @ApiResponse(responseCode = "400", description = "Given past password is not the same as the old one, new password is the same as the old one or account, which the password is change for could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
         String oldPassword = accountChangePasswordDTO.getOldPassword();
         String newPassword = accountChangePasswordDTO.getNewPassword();
