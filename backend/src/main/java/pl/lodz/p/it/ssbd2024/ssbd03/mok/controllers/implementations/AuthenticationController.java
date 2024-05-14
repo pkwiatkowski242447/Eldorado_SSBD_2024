@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -80,6 +82,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
@@ -132,6 +136,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
@@ -164,6 +170,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/logout")
+    @RolesAllowed({ "ROLE_AUTHENTICATED" })
     @Operation(summary = "Log out", description = "This endpoint is used to log out a user from the application.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Logging out previously authenticated user was successful."),

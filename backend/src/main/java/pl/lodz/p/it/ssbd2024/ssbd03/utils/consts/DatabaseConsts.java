@@ -67,6 +67,7 @@ public class DatabaseConsts {
     public static final String CLIENT_DISCRIMINATOR = "CLIENT";
     public static final String STAFF_DISCRIMINATOR = "STAFF";
     public static final String ADMIN_DISCRIMINATOR = "ADMIN";
+    public static final String AUTHENTICATED_DISCRIMINATOR = "AUTHENTICATED";
 
     // MOP
 

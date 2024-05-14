@@ -17,11 +17,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.utils.JWTMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,6 +65,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith(SecurityConstants.BEARER_PREFIX)) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.getWriter().write(JWTMessages.INCORRECT_TOKEN);
+            response.getWriter().flush();
             SecurityContextHolder.clearContext();
             return;
         }
@@ -83,7 +86,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 return;
             } else {
                 log.debug("Adding authentication object back to the SecurityContext...");
-                List<SimpleGrantedAuthority> listOfRoles = account.getUserLevels().stream().map(userLevel -> new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase())).toList();
+                List<SimpleGrantedAuthority> listOfRoles = new ArrayList<>();
+                for (UserLevel userLevel : account.getUserLevels()) {
+                    listOfRoles.add(new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase()));
+                }
+                listOfRoles.add(new SimpleGrantedAuthority("ROLE_AUTHENTICATED"));
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account.getLogin(), account.getPassword(), listOfRoles);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

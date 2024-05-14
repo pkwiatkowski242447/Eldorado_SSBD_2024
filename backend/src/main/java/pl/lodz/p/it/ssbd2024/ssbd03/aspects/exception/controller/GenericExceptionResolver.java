@@ -11,6 +11,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+
+import java.nio.file.AccessDeniedException;
 
 /**
  * General exception handling component in a form of @ControllerAdvice for exceptions that are shared
@@ -116,5 +119,12 @@ public class GenericExceptionResolver {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(illegalOperationException.getMessage());
+    }
+
+    @ExceptionHandler(value = { AccessDeniedException.class })
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException accessDeniedException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+               .contentType(MediaType.TEXT_PLAIN)
+               .body(I18n.ACCESS_DENIED_EXCEPTION);
     }
 }

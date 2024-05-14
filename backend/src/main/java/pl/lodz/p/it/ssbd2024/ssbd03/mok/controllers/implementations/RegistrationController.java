@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class RegistrationController implements RegistrationControllerInterface {
      */
     @Override
     @PostMapping(value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ANONYMOUS", "ROLE_ADMIN" })
     @Operation(summary = "Register client", description = "Register new user account with client user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with client user level was created successfully and account activation message was sent."),
@@ -92,8 +94,8 @@ public class RegistrationController implements RegistrationControllerInterface {
      * layer of facade and service components in the application.
      */
     @Override
-    @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Operation(summary = "Register staff", description = "Register new user account with staff user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with staff user level was created successfully and account activation message was sent."),
@@ -124,8 +126,8 @@ public class RegistrationController implements RegistrationControllerInterface {
      * layer of facade and service components in the application.
      */
     @Override
-    @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @PostMapping(value = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Operation(summary = "Register admin", description = "Register new user account with admin user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with admin user level was created successfully and account activation message was sent."),

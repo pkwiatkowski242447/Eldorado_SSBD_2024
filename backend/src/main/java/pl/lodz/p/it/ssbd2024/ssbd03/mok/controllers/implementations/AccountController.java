@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
@@ -98,11 +100,12 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{user_id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Block user account", description = "The endpoint is used to block user account.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "The account has been blocked correctly."),
+            @ApiResponse(responseCode = "204", description = "The account has been blocked correctly."),
             @ApiResponse(responseCode = "400", description = "The account has not been blocked due to the correctness of the request or because the account is not available in the database"),
             @ApiResponse(responseCode = "409", description = "The account has not been blocked due to being blocked already or trying to block own account."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
@@ -138,6 +141,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{user_id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Unblock user account", description = "The endpoint is used to unblock user account.")
@@ -170,6 +174,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/forgot-password")
+    @RolesAllowed({ "ROLE_ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Forget currently set password", description = "The endpoint is used to forget current password, that is to send e-mail message with password reset URL.")
@@ -197,6 +202,8 @@ public class AccountController implements AccountControllerInterface {
     @Override
     @PostMapping(value = "/reset-password/{id}")
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
+    @RolesAllowed({ "ROLE_ADMIN" })
+    @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
@@ -226,6 +233,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/change-password/{token_id}")
+    @RolesAllowed({ "ROLE_ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Change account password", description = "The endpoint is used by unauthenticated user to change their account password, by clicking the link sent to their e-mail address.")
@@ -252,6 +260,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN", "ROLE_STAFF" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class })
     @Operation(summary = "Get all users", description = "The endpoint is used retrieve list of accounts from given page of given size.")
@@ -283,6 +292,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(value = "/match-login-firstname-and-lastname", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN", "ROLE_STAFF" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class })
     @Operation(summary = "Get all users matching criteria", description = "The endpoint is used retrieve list of accounts that match certain criteria, that is either contain certain phrase in login, firstName, lastName, with certain activity status and ordered by login alphabetically or not.")
@@ -320,6 +330,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping("/activate-account/{token}")
+    @RolesAllowed({ "ROLE_ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Activate account", description = "The endpoint is used activate user account by itself after successful registration.")
@@ -348,6 +359,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Confirm e-mail", description = "The endpoint is used confirm e-mail attached to user's account after it was changed by the user.")
@@ -374,6 +386,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_AUTHENTICATED" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class })
     @Operation(summary = "Get your account details", description = "The endpoint is used to get user's own account details, and sign them using JWS, where the signature is placed in ETag header.")
@@ -407,6 +420,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @RolesAllowed({ "ROLE_AUTHENTICATED" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Modify self account", description = "The endpoint is used to modify self account.")
@@ -449,6 +463,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Modify other user account account", description = "The endpoint is used to modify user account.")
@@ -484,8 +499,8 @@ public class AccountController implements AccountControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @Override
-    @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_STAFF", "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class })
     @Operation(summary = "Find user account by id", description = "The endpoint is used retrieve user account details by its identifier.")
@@ -524,6 +539,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Change other user's e-mail address", description = "The endpoint is used change e-mail address, attached to certain user's account.")
@@ -551,6 +567,8 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_AUTHENTICATED" })
+    @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
@@ -577,6 +595,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/resend-email-confirmation")
+    @RolesAllowed({ "ROLE_CLIENT", "ROLE_STAFF", "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Resend e-mail confirmation message", description = "The endpoint is used resend e-mail confirmation message, that would be used to change e-mail address attached to user's account.")
@@ -603,6 +622,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Remove client user level", description = "The endpoint is used to remove client user level from account with given identifier, if the account contains such a user level.")
@@ -629,6 +649,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Remove staff user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
@@ -655,6 +676,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Remove admin user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
@@ -682,6 +704,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Add client user level", description = "The endpoint is used to add client user level to the account with given identifier, if the account does not have such a user level.")
@@ -713,6 +736,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Add staff user level", description = "The endpoint is used to add staff user level to the account with given identifier, if the account does not have such a user level.")
@@ -744,6 +768,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_ADMIN" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Add admin user level", description = "The endpoint is used to add admin user level to the account with given identifier, if the account does not have such a user level.")
@@ -772,6 +797,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({ "ROLE_AUTHENTICATED" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Change own password", description = "The endpoint is used to change password, used to authenticate to the currently logged in account.")

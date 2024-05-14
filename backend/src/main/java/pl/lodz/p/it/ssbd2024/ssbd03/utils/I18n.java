@@ -32,11 +32,10 @@ public class I18n {
     // Token internationalization keys
     public static final String TOKEN_VALUE_ALREADY_TAKEN = "token.value.already.taken.exception";
 
-    // Optimistic lock
-    public static final String OPTIMISTIC_LOCK_EXCEPTION = "optimistic.lock.exception";
-
-    // Application internal server error
+    // General exception messages
+    public static final String OPTIMISTIC_LOCK_EXCEPTION = "application.optimistic.lock.exception";
     public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
+    public static final String ACCESS_DENIED_EXCEPTION = "application.access.denied.exception";
 
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";

@@ -8,6 +8,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
@@ -20,6 +22,7 @@ import java.util.*;
  * Component used for all operations connected with JSON Web Tokens.
  */
 @Component
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class JWTProvider {
 
     @Value("${authentication.code.validity.period.length.minutes}")
