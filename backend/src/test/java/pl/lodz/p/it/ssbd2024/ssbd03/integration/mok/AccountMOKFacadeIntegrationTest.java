@@ -97,7 +97,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findMethodReturnExistingAccountTestPositive() {
+    public void findMethodReturnExistingAccountTestPositive() throws ApplicationBaseException {
         Optional<Account> account = accountMOKFacade.find(accountIdNo1);
         //Check if method find existing user
         assertTrue(account.isPresent());
@@ -113,7 +113,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findMethodReturnNullAccountTestPositive() {
+    public void findMethodReturnNullAccountTestPositive() throws ApplicationBaseException {
         UUID uuid = UUID.fromString("b3b8c2ac-22ff-434b-b490-aa6d717447c0");
         Optional<Account> account = accountMOKFacade.find(uuid);
 
@@ -162,7 +162,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAndRefreshReturnNullAccountTestPositive() {
+    public void findAndRefreshReturnNullAccountTestPositive() throws ApplicationBaseException {
         UUID uuid = UUID.fromString("b3b8c2ac-22ff-434b-b490-aa6d717447c0");
         Optional<Account> account = accountMOKFacade.find(uuid);
 

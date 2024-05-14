@@ -12,6 +12,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -57,7 +58,7 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      */
     @Transactional
     @Override
-    public Optional<Account> find(UUID id) {
+    public Optional<Account> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
 

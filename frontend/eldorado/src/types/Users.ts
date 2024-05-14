@@ -27,4 +27,5 @@ export interface UserType {
     userLevels: UserLevelType[]
     activeUserLevel: UserLevelType
     verified: boolean
+    version: number
 }

@@ -43,6 +43,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
@@ -519,8 +520,10 @@ public class AccountController implements AccountControllerInterface {
             headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountOutputDTO)));
 
             return ResponseEntity.ok().headers(headers).body(accountOutputDTO);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
+        } catch (AccountNotFoundException anfe) {
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -36,6 +36,7 @@ public class I18n {
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "application.optimistic.lock.exception";
     public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
     public static final String ACCESS_DENIED_EXCEPTION = "application.access.denied.exception";
+    public static final String UNEXPECTED_DATABASE_EXCEPTION = "application.database.server.exception";
 
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";

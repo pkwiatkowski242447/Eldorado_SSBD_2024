@@ -71,7 +71,7 @@ public abstract class AbstractFacade<T> {
      * @param id ID of the entity to be retrieved.
      * @return If an entity with the given ID was found returns an Optional containing the entity, otherwise returns an empty Optional.
      */
-    protected Optional<T> find(UUID id) {
+    protected Optional<T> find(UUID id) throws ApplicationBaseException {
         return Optional.ofNullable(getEntityManager().find(entityClass, id));
     }
 

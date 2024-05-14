@@ -88,7 +88,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    public Optional<Parking> find(UUID id) {
+    public Optional<Parking> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
 

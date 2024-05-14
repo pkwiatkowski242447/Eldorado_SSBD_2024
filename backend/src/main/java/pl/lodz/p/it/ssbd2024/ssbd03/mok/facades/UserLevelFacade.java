@@ -88,7 +88,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
      */
     @Override
-    public Optional<UserLevel> find(UUID id) {
+    public Optional<UserLevel> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
 

@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorExc
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountLoginAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -65,7 +66,7 @@ public class AccountFacadeAspect {
                 }
                 exceptionCopy = exceptionCopy.getCause();
             } while (exceptionCopy != null);
-            throw new ApplicationDatabaseException(exception);
+            throw new ApplicationDatabaseException(I18n.UNEXPECTED_DATABASE_EXCEPTION, exception);
         } catch (ConstraintViolationException constraintViolationException) {
             Set<String> violations = new HashSet<>();
             for (ConstraintViolation<?> constraintViolation : constraintViolationException.getConstraintViolations()) {

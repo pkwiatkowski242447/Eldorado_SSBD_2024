@@ -75,7 +75,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
-    public Optional<Account> find(UUID id) {
+    public Optional<Account> find(UUID id) throws ApplicationBaseException{
         Optional<Account> optionalAccount = super.find(id);
         optionalAccount.ifPresent(entity -> entityManager.refresh(entity));
         return optionalAccount;

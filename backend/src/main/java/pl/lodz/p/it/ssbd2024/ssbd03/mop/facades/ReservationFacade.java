@@ -85,7 +85,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public Optional<Reservation> find(UUID id) {
+    public Optional<Reservation> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
 
