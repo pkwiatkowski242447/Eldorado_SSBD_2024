@@ -116,7 +116,7 @@ public class TokenService implements TokenServiceInterface {
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void removeAccountsEmailConfirmationToken(String token) {
+    public void removeAccountsEmailConfirmationToken(String token) throws ApplicationBaseException {
         tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL,
                 jwtProvider.extractAccountId(token)).ifPresent(tokenFacade::remove);
     }

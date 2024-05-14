@@ -70,7 +70,7 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void removeAccountEmailConfirmationTokenTestSuccessful() {
+    void removeAccountEmailConfirmationTokenTestSuccessful() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         String tokenValue = "TOKEN VALUE";
         Token token = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
@@ -83,7 +83,7 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void removeAccountEmailConfirmationTokenTestNoSuchToken() {
+    void removeAccountEmailConfirmationTokenTestNoSuchToken() throws ApplicationBaseException {
         String tokenValue = "TOKEN VALUE";
         Mockito.when(tokenFacade.findByTypeAndAccount(eq(Token.TokenType.CONFIRM_EMAIL), any())).thenReturn(Optional.empty());
         Mockito.when(jwtProvider.extractAccountId(tokenValue)).thenReturn(UUID.randomUUID());
