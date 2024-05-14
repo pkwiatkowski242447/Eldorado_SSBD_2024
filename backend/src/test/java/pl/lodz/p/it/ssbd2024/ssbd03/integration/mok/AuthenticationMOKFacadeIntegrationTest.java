@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
@@ -61,6 +63,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void findAndRefreshTestPositive() {
         Optional<Account> account = authenticationFacade.findAndRefresh(accountIdNo1);
 
@@ -77,6 +80,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void findTestPositive() {
         Optional<Account> account = authenticationFacade.find(accountIdNo1);
 
@@ -109,6 +113,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void editTestPositive() {
         Account account = authenticationFacade.find(accountIdNo1).orElseThrow(NoSuchElementException::new);
 

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
@@ -82,7 +83,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ANONYMOUS" })
+    @RolesAllowed({ Roles.ANONYMOUS })
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -136,7 +137,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ANONYMOUS" })
+    @RolesAllowed({ Roles.ANONYMOUS })
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -170,7 +171,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/logout")
-    @RolesAllowed({ "ROLE_AUTHENTICATED" })
+    @RolesAllowed({ Roles.AUTHENTICATED })
     @Operation(summary = "Log out", description = "This endpoint is used to log out a user from the application.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Logging out previously authenticated user was successful."),

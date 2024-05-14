@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfigFull;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
@@ -30,6 +31,28 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
         assertEquals(200, response.getStatusCode());
         assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
+    }
+
+    @Test
+    public void getSelfTest() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
+
+        RequestSpecification request = RestAssured.given();
+        request.contentType(CONTENT_TYPE);
+        request.body(mapper.writeValueAsString(accountLoginDTO));
+
+        Response response = request.post("http://localhost:8181/api/v1/auth/login-credentials");
+
+        assertEquals(200, response.getStatusCode());
+        assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
+
+        request = RestAssured.given();
+        request.contentType(CONTENT_TYPE);
+
+        response = request.header("Authorization", "Bearer " + response.asString()).get("http://localhost:8181/api/v1/accounts/self");
+
+        assertEquals(200, response.getStatusCode());
     }
 
     private String decodeJwtTokenAndExtractValue(String payload, String key) {
