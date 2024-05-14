@@ -89,7 +89,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @return If Token with the given ID was found returns an Optional containing the Token, otherwise returns an empty Optional.
      */
     @Override
-    public Optional<Token> find(UUID id) {
+    public Optional<Token> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
 

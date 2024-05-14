@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -182,7 +184,7 @@ public class AccountController implements AccountControllerInterface {
 
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException anfe) {
-            return ResponseEntity.badRequest().body(anfe.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -405,8 +407,10 @@ public class AccountController implements AccountControllerInterface {
             headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountOutputDTO)));
 
             return ResponseEntity.ok().headers(headers).body(accountOutputDTO);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
+        } catch (AccountNotFoundException anfe) {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -440,6 +444,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public ResponseEntity<?> changeEmailSelf(@Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account user = accountService.getAccountByLogin(login);

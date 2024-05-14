@@ -60,7 +60,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findTestPositive() {
+    public void findTestPositive() throws ApplicationBaseException {
         Optional<UserLevel> userLevel =  userLevelFacade.find(uuidClientLevelUuid);
 
         Assertions.assertFalse(userLevel.isEmpty());

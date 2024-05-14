@@ -101,7 +101,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findReturnsExistingTokenPositiveTest() {
+    public void findReturnsExistingTokenPositiveTest() throws ApplicationBaseException {
         Optional<Token> token = tokenFacade.find(uuidNo1);
 
         assertFalse(token.isEmpty());

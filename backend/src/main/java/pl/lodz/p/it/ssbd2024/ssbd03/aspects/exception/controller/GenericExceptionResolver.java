@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
@@ -83,6 +84,23 @@ public class GenericExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(mapperBaseException.getMessage());
+    }
+
+    /**
+     * This method is used to transform any ApplicationDatabaseException or exception that extend it,
+     * which wraps unexpected database exceptions. After such exception is propagated from controller
+     * it will be caught and transformed into HTTP Response.
+     *
+     * @param applicationDatabaseException ApplicationDatabaseException that was caught in order to be transformed to HTTP Response.
+     *
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 500 INTERNAL SERVER ERROR
+     */
+    @ExceptionHandler(value = { ApplicationDatabaseException.class })
+    public ResponseEntity<?> handleApplicationDatabaseException(ApplicationDatabaseException applicationDatabaseException) {
+        return ResponseEntity.internalServerError()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(applicationDatabaseException.getMessage());
     }
 
     /**

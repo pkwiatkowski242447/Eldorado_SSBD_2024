@@ -489,6 +489,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))

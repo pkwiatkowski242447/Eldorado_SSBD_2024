@@ -176,7 +176,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeFindHistoricalReservationsWithPagination(){
+    public void reservationFacadeFindHistoricalReservationsWithPagination() throws ApplicationBaseException {
         UUID reservationId = UUID.fromString("1ec7d685-71ac-4418-834a-ed7b6fc68fc8");
         UUID clientId = UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c");
 
@@ -191,7 +191,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeFindActiveReservationsWithPagination(){
+    public void reservationFacadeFindActiveReservationsWithPagination() throws ApplicationBaseException {
         UUID reservationIdNo1 = UUID.fromString("1ec7d685-71ac-4418-834a-ed7b6fc68fc8");
         UUID clientIdNo1 = UUID.fromString("9428fadf-191c-4dd7-8626-01c3e0ff603c");
 

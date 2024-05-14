@@ -78,7 +78,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return If an ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
      */
     @Override
-    public Optional<ParkingEvent> find(UUID id) {
+    public Optional<ParkingEvent> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
 
