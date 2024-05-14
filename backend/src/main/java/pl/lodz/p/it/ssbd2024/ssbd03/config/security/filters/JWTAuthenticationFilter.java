@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenDataExtractionException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.utils.JWTMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
@@ -34,20 +35,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private final JWTProvider jwtProvider;
     private final AuthenticationFacade authenticationFacade;
 
-    /**
-     * Whitelist containing all URLs related to paths available to unauthenticated users.
-     */
-    private static final String[] PATHS_WHITELIST = {
-            "/api/v1/auth",
-            "/api/v1/register/client",
-            "/api/v1/accounts/change-password",
-            "/v3/api-docs",
-            "/swagger-ui",
-            "/api/v1/accounts/forgot-password",
-            "/api/v1/accounts/change-password",
-            "/api/v1/accounts/activate-account"
-    };
-
     @Autowired
     public JWTAuthenticationFilter(JWTProvider jwtProvider,
                                    AuthenticationFacade authenticationFacade) {
@@ -62,52 +49,38 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         log.debug("Started JWT Authentication Filter execution...");
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith(SecurityConstants.BEARER_PREFIX)) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.getWriter().write(JWTMessages.INCORRECT_TOKEN);
-            response.getWriter().flush();
-            SecurityContextHolder.clearContext();
-            return;
-        }
+        if (authHeader != null && ! authHeader.isBlank() && authHeader.startsWith(SecurityConstants.BEARER_PREFIX)) {
+            String jwtToken = authHeader.replaceAll("\\s+", "").substring(6);
 
-        final String jwtToken = authHeader.replaceAll("\\s+", "").substring(6);
-        final String userName = jwtProvider.extractUsername(jwtToken);
-
-        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            log.debug("Security context object was empty...");
-            final UUID accountId = jwtProvider.extractAccountId(jwtToken);
-            Account account = authenticationFacade.find(accountId).orElseThrow();
-
-            if (!jwtProvider.isTokenValid(jwtToken, account)) {
-                log.debug("Token was invalid...");
+            UUID accountId;
+            try {
+                accountId = jwtProvider.extractAccountId(jwtToken);
+            } catch (TokenDataExtractionException exception) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.getWriter().write(JWTMessages.INVALID_TOKEN);
                 SecurityContextHolder.clearContext();
                 return;
-            } else {
-                log.debug("Adding authentication object back to the SecurityContext...");
-                List<SimpleGrantedAuthority> listOfRoles = new ArrayList<>();
-                for (UserLevel userLevel : account.getUserLevels()) {
-                    listOfRoles.add(new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase()));
+            }
+
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                Account account = authenticationFacade.find(accountId).orElse(null);
+                if (account == null || !jwtProvider.isTokenValid(jwtToken, account)) {
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    response.getWriter().write(JWTMessages.INVALID_TOKEN);
+                    SecurityContextHolder.clearContext();
+                    return;
+                } else {
+                    List<SimpleGrantedAuthority> listOfRoles = new ArrayList<>();
+                    for (UserLevel userLevel : account.getUserLevels()) {
+                        listOfRoles.add(new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase()));
+                    }
+                    listOfRoles.add(new SimpleGrantedAuthority("ROLE_AUTHENTICATED"));
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account.getLogin(), account.getPassword(), listOfRoles);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-                listOfRoles.add(new SimpleGrantedAuthority("ROLE_AUTHENTICATED"));
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account.getLogin(), account.getPassword(), listOfRoles);
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        String path = request.getServletPath();
-
-        for (String pathVar : PATHS_WHITELIST) {
-            if (path.startsWith(pathVar)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
