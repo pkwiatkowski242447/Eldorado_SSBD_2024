@@ -174,7 +174,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/forgot-password")
-    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @RolesAllowed({ "ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Forget currently set password", description = "The endpoint is used to forget current password, that is to send e-mail message with password reset URL.")
@@ -233,7 +233,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/change-password/{token_id}")
-    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @RolesAllowed({ "ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Change account password", description = "The endpoint is used by unauthenticated user to change their account password, by clicking the link sent to their e-mail address.")
@@ -330,7 +330,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping("/activate-account/{token}")
-    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @RolesAllowed({ "ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Activate account", description = "The endpoint is used activate user account by itself after successful registration.")
@@ -359,7 +359,7 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @RolesAllowed({ "ANONYMOUS" })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
     @Operation(summary = "Confirm e-mail", description = "The endpoint is used confirm e-mail attached to user's account after it was changed by the user.")

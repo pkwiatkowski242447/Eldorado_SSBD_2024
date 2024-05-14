@@ -63,7 +63,7 @@ public class RegistrationController implements RegistrationControllerInterface {
      */
     @Override
     @PostMapping(value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ANONYMOUS", "ROLE_ADMIN" })
+    @RolesAllowed({ "ANONYMOUS", "ROLE_ADMIN" })
     @Operation(summary = "Register client", description = "Register new user account with client user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with client user level was created successfully and account activation message was sent."),

@@ -82,7 +82,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @RolesAllowed({ "ANONYMOUS" })
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -136,7 +136,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      */
     @Override
     @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ANONYMOUS" })
+    @RolesAllowed({ "ANONYMOUS" })
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
