@@ -6,13 +6,14 @@ pipeline{
     }
 
       environment {
-            MAIL_PROPERTIES_TARGET_LOCATION = 'backend/src/main/resources/properties/'
+			PROPERTIES_LOCATION = 'backend/src/main/resources/properties/'
         }
 
     stages{
         stage('build'){
             steps{
-                sh 'cp ${JENKINS_HOME}/mail.properties ${MAIL_PROPERTIES_TARGET_LOCATION}'
+                sh 'cp ${JENKINS_HOME}/mail.properties ${PROPERTIES_LOCATION}'
+				sh 'cp ${JENKINS_HOME}/key.properties ${PROPERTIES_LOCATION}'
                 sh 'cd backend && mvn -B -Ptest clean test'
             }
         }
