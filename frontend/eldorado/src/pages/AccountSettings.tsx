@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import SiteHeader from "@/components/SiteHeader.tsx";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import {useAccountState} from "@/context/AccountContext.tsx";
 import {parsePhoneNumber} from "react-phone-number-input";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
+import {useAccount} from "@/hooks/useAccount.ts";
 
 const emailSchema = z.object({
     email: z.string().email({message: "New email is required."}),
@@ -34,12 +35,12 @@ function AccountSettings() {
     const phoneNumber = parsePhoneNumber(account?.phone || '')
     const e164Number = phoneNumber?.format('E.164')
 
-    // const {getCurrentAccount} = useAccount();
+    const {getCurrentAccount} = useAccount();
 
-    // useEffect(() => {
-    //     getCurrentAccount();
-    // }, []);
-    //TODO implement maybe
+    useEffect(() => {
+        getCurrentAccount();
+    }, []);
+
 
     const formEmail = useForm({
         resolver: zodResolver(emailSchema),
@@ -58,20 +59,34 @@ function AccountSettings() {
     });
 
     const onSubmitEmail = (values: z.infer<typeof emailSchema>) => {
-        // Call API to change email
-        console.log(values);
+        api.changeEmailSelf(values.email).then(() => {
+            getCurrentAccount();
+
+            toast({
+                title: "Success!",
+                description: "Your email has been successfully changed.",
+            });
+            setTimeout(() => {
+                window.location.reload()
+            }, 3000);
+
+        }).catch((error) => {
+            toast({
+                variant: "destructive",
+                description: "Something went wrong. Please try again later.",
+            })
+            console.log(error.response.data)
+        });
     };
 
     const onSubmitUserData = (values: z.infer<typeof userDataSchema>) => {
         const etag = window.localStorage.getItem('etag');
-        if (account && account.accountLanguage) {
+        if (account && account.accountLanguage && etag !== null) {
             api.modifyAccountSelf(account.login, account.version, account.userLevels,
-                values.name, values.lastName, values.phoneNumber, account.accountLanguage, etag)
+                values.name, values.lastName, values.phoneNumber, false, etag)
                 .then(() => {
-                    account.name = values.name;
-                    account.lastname = values.lastName;
-                    account.phone = values.phoneNumber;
-
+                    getCurrentAccount();
+                    window.location.reload()
                     toast({
                         title: "Success!",
                         description: "Your account info has been successfully changed.",

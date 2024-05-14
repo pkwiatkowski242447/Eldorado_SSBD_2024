@@ -1,4 +1,3 @@
-import {useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {api} from '@/api/api.ts';
 import {useToast} from '@/components/ui/use-toast.ts';
@@ -12,35 +11,62 @@ function ActivateAccountPage() {
     const {toast} = useToast();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    // useEffect(() => {
+    //     console.log(decodedToken)
+    //     // Add a delay before making the API call
+    //     setTimeout(() => {
+    //         api.activateAccount(decodedToken!)
+    //             .then(() => {
+    //                 toast({
+    //                     title: "Account activated",
+    //                     description: "Your account has been successfully activated. You can now log in.",
+    //                     action: (
+    //                         <div>
+    //                             <Button onClick={() => {
+    //                                 navigate('/login', {replace: true});
+    //                             }}>
+    //                                 Log in
+    //                             </Button>
+    //                         </div>
+    //                     ),
+    //                 });
+    //             })
+    //             .catch((error) => {
+    //                 toast({
+    //                     title: "Error",
+    //                     description: "There was an error activating your account. Please try again later.",
+    //                 });
+    //                 console.log(error.response.data);
+    //             });
+    //     }, 5000); // Delay of 1 second
+    // }, [token, toast, navigate, decodedToken]);
+
+    function onClickButton() {
         console.log(decodedToken)
-        // Add a delay before making the API call
-        setTimeout(() => {
-            api.activateAccount(decodedToken!)
-                .then(() => {
-                    toast({
-                        title: "Account activated",
-                        description: "Your account has been successfully activated. You can now log in.",
-                        action: (
-                            <div>
-                                <Button onClick={() => {
-                                    navigate('/login', {replace: true});
-                                }}>
-                                    Log in
-                                </Button>
-                            </div>
-                        ),
-                    });
-                })
-                .catch((error) => {
-                    toast({
-                        title: "Error",
-                        description: "There was an error activating your account. Please try again later.",
-                    });
-                    console.log(error.response.data);
+        api.activateAccount(decodedToken!)
+            .then(() => {
+                toast({
+                    title: "Account activated",
+                    description: "Your account has been successfully activated. You can now log in.",
+                    action: (
+                        <div>
+                            <Button onClick={() => {
+                                navigate('/login', {replace: true});
+                            }}>
+                                Log in
+                            </Button>
+                        </div>
+                    ),
                 });
-        }, 1000); // Delay of 1 second
-    }, [token, toast, navigate, decodedToken]);
+            })
+            .catch((error) => {
+                toast({
+                    title: "Error",
+                    description: "There was an error activating your account. Please try again later.",
+                });
+                console.log(error.response.data);
+            });
+    }
 
     return (
         <div>
@@ -48,7 +74,8 @@ function ActivateAccountPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Almost there...</CardTitle>
-                    <CardDescription>Your account is being activated. Please wait.</CardDescription>
+                    <CardDescription>Activate your Eldorado account by pressing the button below:</CardDescription>
+                    <Button onClick={onClickButton}>Activate!</Button>
                 </CardHeader>
             </Card>
         </div>

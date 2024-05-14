@@ -15,6 +15,7 @@ import LandingPage from "@/pages/LandingPage.tsx";
 import UserManagementPage from "@/pages/UserManagementPage.tsx";
 import AccountSettings from "@/pages/AccountSettings.tsx";
 import ChangeUserLevelPage from "@/pages/ChangeUserLevelPage.tsx";
+import ConfirmEmailChangePage from "@/pages/ConfirmEmailChangePage.tsx";
 // import RegisterPage from "../pages/RegisterPage";
 // import ChangePasswordFormForm from "../components/forms/ChangePasswordForm";
 // import ChangePasswordPage from "../pages/ChangePasswordPage";
@@ -61,6 +62,10 @@ export const PublicRoutes: RouteType[] = [
 
         path: Pathnames.public.accountSettings,
         Component: AccountSettings
+    },
+    {
+        path: Pathnames.public.confirmEmailChange,
+        Component: ConfirmEmailChangePage
     },
 
 ]

@@ -1,9 +1,12 @@
-import {apiWithConfig} from "./api.config";
+import {API_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
+import axios from "axios";
 
 export const api = {
     logIn: (login: string, password: string) => {
-        return apiWithConfig.post('/auth/login', {login, password})
+        let language = window.navigator.language;
+        language = language.substring(0, 2)
+        return apiWithConfig.post('/auth/login-credentials', {login, password, language})
     },
 
     logOut: () => {
@@ -39,7 +42,7 @@ export const api = {
     },
 
     modifyAccountSelf: (login: string, version: number, userLevelsDto: UserLevelType[], name: string,
-                        lastname: string, phoneNumber: string, accountLanguage: string, etag: string) => {
+                        lastname: string, phoneNumber: string, twoFactorAuth: boolean, etag: string) => {
         const cleanedEtag = etag.replace(/^"|"$/g, '');
         //this is necessary because backend requires etag to be without quotes
         return apiWithConfig.put('/accounts/self', {
@@ -49,11 +52,25 @@ export const api = {
             name: name,
             lastname: lastname,
             phoneNumber: phoneNumber,
-            accountLanguage: accountLanguage
+            twoFactorAuth: twoFactorAuth
         }, {
             headers: {
                 'If-Match': cleanedEtag
             }
         })
+    },
+
+    changeEmailSelf: (email: string) => {
+        return apiWithConfig.patch('/accounts/change-email-self', {
+            email: email
+        })
+    },
+
+    confirmEmail: (token: string) => {
+        return axios.create({
+            baseURL: API_URL,
+            timeout: TIMEOUT_IN_MS,
+            headers: DEFAULT_HEADERS,
+        }).post(`/accounts/confirm-email/${token}`)
     },
 }

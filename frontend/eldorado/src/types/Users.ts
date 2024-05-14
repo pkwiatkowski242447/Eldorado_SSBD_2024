@@ -28,4 +28,5 @@ export interface UserType {
     activeUserLevel: UserLevelType
     verified: boolean
     version: number
+    twoFactorAuth: boolean
 }
