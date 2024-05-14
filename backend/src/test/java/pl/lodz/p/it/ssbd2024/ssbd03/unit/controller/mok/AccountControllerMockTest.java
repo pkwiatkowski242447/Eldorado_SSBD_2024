@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.controller.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations.AccountController;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AccountService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
@@ -25,7 +25,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -60,7 +59,7 @@ public class AccountControllerMockTest {
 
     @Test
     public void getUserByIdTestSuccessful() throws Exception {
-        when(accountService.getAccountById(any())).thenReturn(Optional.of(testAccount));
+        when(accountService.getAccountById(any())).thenReturn(testAccount);
         when(jwtProvider.generateObjectSignature(any())).thenReturn("SIGNATURE");
         mockMvc.perform(
                         get("/api/v1/accounts/{id}", testId)
@@ -70,7 +69,7 @@ public class AccountControllerMockTest {
 
     @Test
     public void getUserByIdTestAccountNotFound() throws Exception {
-        when(accountService.getAccountById(any())).thenReturn(Optional.empty());
+        when(accountService.getAccountById(any())).thenThrow(AccountNotFoundException.class);
 
         mockMvc.perform(
                         get("/api/v1/accounts/{id}", testId)
@@ -139,7 +138,7 @@ public class AccountControllerMockTest {
 
     @Test
     public void resetAccountPasswordTestSuccessful() throws Exception {
-        when(accountService.getAccountById(UUID.fromString(testId))).thenReturn(Optional.ofNullable(testAccount));
+        when(accountService.getAccountById(UUID.fromString(testId))).thenReturn(testAccount);
         doNothing().when(accountService).forgetAccountPassword(testAccount.getEmail());
 
         mockMvc.perform(
@@ -150,7 +149,7 @@ public class AccountControllerMockTest {
 
     @Test
     public void resetAccountPasswordTestAccountNotFound() throws Exception {
-        when(accountService.getAccountById(UUID.fromString(testId))).thenReturn(Optional.empty());
+        when(accountService.getAccountById(UUID.fromString(testId))).thenThrow(AccountNotFoundException.class);
 
         mockMvc.perform(
                         post("/api/v1/accounts/reset-password/{id}", testId)
