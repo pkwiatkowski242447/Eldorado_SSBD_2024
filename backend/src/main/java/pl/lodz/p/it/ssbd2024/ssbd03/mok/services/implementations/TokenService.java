@@ -31,16 +31,17 @@ public class TokenService implements TokenServiceInterface {
      * TokenFacade used for operations on token entities.
      */
     private final TokenFacade tokenFacade;
+
     /**
-     * JWTProvider used for managing JWT TOKENS.
+     * JWTProvider used for managing JWT tokens.
      */
     private final JWTProvider jwtProvider;
 
     /**
      * Autowired constructor for the service.
      *
-     * @param tokenFacade   Facade containing method for token manipulation.
-     * @param jwtProvider   Component used to provide JWT token generation mechanism for a certain payload.
+     * @param tokenFacade     Facade containing method for token manipulation.
+     * @param jwtProvider     Component used to provide JWT token generation mechanism for a certain payload.
      */
     @Autowired
     public TokenService(TokenFacade tokenFacade,

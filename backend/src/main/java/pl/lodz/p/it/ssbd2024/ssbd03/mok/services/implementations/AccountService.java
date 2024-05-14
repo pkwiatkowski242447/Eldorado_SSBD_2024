@@ -28,7 +28,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedExce
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
@@ -142,7 +141,7 @@ public class AccountService implements AccountServiceInterface {
 
         this.accountFacade.create(newClientAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newClientAccount, (this.accountCreationConfirmationPeriodLengthHours / 2) * 60, ChronoUnit.MINUTES);
+        String tokenValue = jwtProvider.generateActionToken(newClientAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
         tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
@@ -170,6 +169,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newStaffAccount.setAccountLanguage(language);
@@ -179,7 +179,7 @@ public class AccountService implements AccountServiceInterface {
 
         accountFacade.create(newStaffAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newStaffAccount, 12, ChronoUnit.HOURS);
+        String tokenValue = jwtProvider.generateActionToken(newStaffAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
         tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
@@ -207,6 +207,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newAdminAccount.setAccountLanguage(language);
@@ -216,7 +217,7 @@ public class AccountService implements AccountServiceInterface {
 
         accountFacade.create(newAdminAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newAdminAccount, 12, ChronoUnit.HOURS);
+        String tokenValue = jwtProvider.generateActionToken(newAdminAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
         tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
@@ -291,7 +292,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException();
         }
@@ -313,7 +314,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
-        Account account = accountFacade.findAndRefresh(id).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (!account.getBlocked()) {
             throw new AccountAlreadyUnblockedException();
         }
@@ -346,7 +347,7 @@ public class AccountService implements AccountServiceInterface {
         foundAccount.setName(modifiedAccount.getName());
         foundAccount.setLastname(modifiedAccount.getLastname());
         foundAccount.setPhoneNumber(modifiedAccount.getPhoneNumber());
-        foundAccount.setAccountLanguage(modifiedAccount.getAccountLanguage());
+        foundAccount.setTwoFactorAuth(modifiedAccount.getTwoFactorAuth());
 
         for (UserLevel foundUserLevel : foundAccount.getUserLevels()) {
             UserLevel modifiedUserLevel = modifiedAccount.getUserLevels().stream()
@@ -383,6 +384,10 @@ public class AccountService implements AccountServiceInterface {
             account.setVerified(true);
             accountFacade.edit(account);
             tokenFacade.remove(tokenFromDB);
+            mailProvider.sendActivationConfirmationEmail(account.getName(),
+                    account.getLastname(),
+                    account.getEmail(),
+                    account.getAccountLanguage());
             return true;
         }
         return false;
@@ -455,24 +460,25 @@ public class AccountService implements AccountServiceInterface {
      * Retrieves an Account by the login.
      *
      * @param login Login of the searched user account.
-     * @return If Account with the given login was found returns Account, otherwise returns null.
+     * @return If Account with the given login was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public Account getAccountByLogin(String login) {
-        Optional<Account> account = accountFacade.findByLogin(login);
-        return account.orElse(null);
+    public Account getAccountByLogin(String login) throws ApplicationBaseException {
+        return  accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 
     /**
      * Retrieves from the database account by id.
      *
      * @param id Account's id.
-     * @return Returns Optional containing the requested account if found, otherwise returns empty Optional.
+     * @return If Account with the given id was found returns Account, otherwise throws AccountNotFoundException.
+     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
     @Override
-    public Optional<Account> getAccountById(UUID id) {
-        return accountFacade.findAndRefresh(id);
+    public Account getAccountById(UUID id) throws ApplicationBaseException {
+        return accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
     }
 
     /**

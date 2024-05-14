@@ -20,7 +20,7 @@ public interface AccountControllerInterface {
      * @param id Identifier of account that will be blocked.
      * @return HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> blockAccount(String id);
+    ResponseEntity<?> blockAccount(String id) throws ApplicationBaseException;
 
     /**
      * This method allows to unblock a user account by its UUID.
@@ -28,7 +28,7 @@ public interface AccountControllerInterface {
      * @param id Identifier of account that will be unblocked.
      * @return It returns an HTTP response with a code depending on the result.
      */
-    ResponseEntity<?> unblockAccount(String id);
+    ResponseEntity<?> unblockAccount(String id) throws ApplicationBaseException;
 
     /**
      * This endpoint is used to "forget" password for an unauthenticated user. It does generate RESET PASSWORD token, write
@@ -52,7 +52,7 @@ public interface AccountControllerInterface {
      * @return 204 NO CONTENT if entire process of resetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
-     * @throws ApplicationBaseException 
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method.
      */
     ResponseEntity<?> resetAccountPassword(String id) throws ApplicationBaseException;
 

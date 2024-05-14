@@ -20,7 +20,10 @@ export const useAccount = () => {
         if (storedAccount) {
             setAccount(JSON.parse(storedAccount));
         }
-    }, [setAccount]);
+        if (account?.token) {
+            window.localStorage.setItem('token', account.token);
+        }
+    }, [account?.token, setAccount]);
 
     const navigateToMainPage = () => {
         navigate(Pathnames.public.home)
@@ -59,23 +62,26 @@ export const useAccount = () => {
             const tokenRaw = localStorage.getItem("token");
             if (tokenRaw && tokenRaw !== 'null') {
                 const token = await usersApi.getSelf();
-                localStorage.setItem('token', token.data);
+                window.localStorage.setItem('etag', token.headers['etag']);
                 let activeUserLevel = token.data.userLevelsDto[0];
-                console.log(activeUserLevel)
-                for (const i in token.data.userLevelsDto.length) {
-                    if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
-                        if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
-                            activeUserLevel = token.data.userLevelsDto[i];
-                            break;
-                        }
-                    } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
-                        if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
-                            activeUserLevel = token.data.userLevelsDto[i];
-                            break;
+                if (account?.activeUserLevel == null) {
+                    for (const i in token.data.userLevelsDto.length) {
+                        if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
+                            if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
+                                activeUserLevel = token.data.userLevelsDto[i];
+                                break;
+                            }
+                        } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
+                            if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
+                                activeUserLevel = token.data.userLevelsDto[i];
+                                break;
+                            }
                         }
                     }
+                } else {
+                    activeUserLevel = account.activeUserLevel;
                 }
-                console.log(activeUserLevel)
+                console.table(token.data)
                 const user: UserType = {
                     accountLanguage: token.data.accountLanguage,
                     active: token.data.active,
@@ -91,8 +97,8 @@ export const useAccount = () => {
                     userLevels: token.data.userLevelsDto,
                     activeUserLevel: activeUserLevel,
                     verified: token.data.verified,
+                    version: token.data.version,
                 };
-                console.log(activeUserLevel)
                 setAccount(user)
                 localStorage.setItem('account', JSON.stringify(user));
             }

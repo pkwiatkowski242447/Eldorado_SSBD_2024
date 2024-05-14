@@ -23,8 +23,8 @@ public class AccountModifyDTO extends AccountSignableDTO {
     private String lastname;
     @Schema(description = "Phone number of the user", example = "111222333", requiredMode = Schema.RequiredMode.REQUIRED)
     private String phoneNumber;
-    @Schema(description = "Language used natively in user browser", example = "pl", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String accountLanguage;
+    @Schema(description = "Boolean flag indicating whether 2FA is enabled.", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
+    private boolean twoFactorAuth;
 
     /**
      * All arguments constructor
@@ -34,14 +34,14 @@ public class AccountModifyDTO extends AccountSignableDTO {
      * @param name First name of the user.
      * @param lastname Last name of the user.
      * @param phoneNumber Phone number of the user.
-     * @param accountLanguage Language used natively in user browser.
+     * @param twoFactorAuth Boolean flag indicating whether 2FA is enabled.
      */
     public AccountModifyDTO(String login, Long version, Set<UserLevelDTO> userLevelsDto,
-                            String name, String lastname, String phoneNumber, String accountLanguage) {
+                            String name, String lastname, String phoneNumber, boolean twoFactorAuth) {
         super(login, version, userLevelsDto);
         this.name = name;
         this.lastname = lastname;
         this.phoneNumber = phoneNumber;
-        this.accountLanguage = accountLanguage;
+        this.twoFactorAuth = twoFactorAuth;
     }
 }

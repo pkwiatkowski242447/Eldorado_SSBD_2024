@@ -26,6 +26,8 @@ public class AccountOutputDTO extends AccountSignableDTO {
     private final boolean active;
     @Schema(description = "Flag indicating if account is blocked", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
     private final boolean blocked;
+    @Schema(description = "Flag indicating if account has 2FA enabled", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
+    private final boolean twoFactorAuth;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     @Schema(description = "Data and time when account has been blocked", example = "YYYY-MM-dd HH:mm", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -61,7 +63,7 @@ public class AccountOutputDTO extends AccountSignableDTO {
      * All arguments constructor for AccountOutputDTO - with calling constructor of superclass.
      */
     public AccountOutputDTO(String login, Long version, Set<UserLevelDTO> userLevelsDto, UUID id, boolean verified,
-                            boolean active, boolean blocked, LocalDateTime blockedTime, LocalDateTime creationDate,
+                            boolean active, boolean blocked, boolean twoFactorAuth, LocalDateTime blockedTime, LocalDateTime creationDate,
                             LocalDateTime lastSuccessfulLoginTime, LocalDateTime lastUnsuccessfulLoginTime,
                             String accountLanguage, String lastSuccessfulLoginIp, String lastUnsuccessfulLoginIp,
                             String phoneNumber, String lastname, String name, String email) {
@@ -70,6 +72,7 @@ public class AccountOutputDTO extends AccountSignableDTO {
         this.verified = verified;
         this.active = active;
         this.blocked = blocked;
+        this.twoFactorAuth = twoFactorAuth;
         this.blockedTime = blockedTime;
         this.creationDate = creationDate;
         this.lastSuccessfulLoginTime = lastSuccessfulLoginTime;

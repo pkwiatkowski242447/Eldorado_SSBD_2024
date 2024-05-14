@@ -7,14 +7,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AuthenticationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
 
@@ -26,13 +36,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServic
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController implements AuthenticationControllerInterface {
 
-    @Value("${logout.exit.page.url}")
-    private String exitPageUrl;
-
     /**
      * AuthenticationServiceInterface used for authentication purposes.
      */
     private final AuthenticationServiceInterface authenticationService;
+
+    /**
+     * AuthenticationManager used for authenticate user.
+     */
+    private final AuthenticationManager authenticationManager;
 
     /**
      * Autowired constructor for the controller.
@@ -40,32 +52,94 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * @param authenticationService Service used for authentication purposes.
      */
     @Autowired
-    public AuthenticationController(AuthenticationServiceInterface authenticationService) {
+    public AuthenticationController(AuthenticationServiceInterface authenticationService,
+                                    AuthenticationManager authenticationManager) {
         this.authenticationService = authenticationService;
+        this.authenticationManager = authenticationManager;
     }
 
     /**
-     * Allows an unauthenticated user to log in to the system.
+     * Allows an unauthenticated user to perform the first step in multifactor authentication,
+     * which is to provide credentials to check users identity and for generating the code, which is sent
+     * to the users e-mail address.
      *
      * @param accountLoginDTO User's credentials.
      * @param request         HTTP Request in which the credentials.
-     * @return In case of successful logging in returns HTTP 200 OK and JWT later used to keep track of a session.
-     * If any problems occur returns HTTP 400 BAD REQUEST and JSON containing information about the problem.
+     * @return In case of successful logging in returns HTTP 204 NO CONTENT is returned.
+     * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
      *                                  layer of facade and service components in the application.
      */
     @Override
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Log in", description = "This endpoint is used to authenticate in the application.")
+    @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Operation(summary = "Enter credentials", description = "This endpoint is used to perform first step in multifactor authentication in the application.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Authentication with given credentials was successful."),
+            @ApiResponse(responseCode = "200", description = "First step of multifactor authentication was successful. Since user enabled only one factor authentication, then acces token is returned."),
+            @ApiResponse(responseCode = "204", description = "First step of multifactor authentication was successful. Now enter authentication code for the second step."),
             @ApiResponse(responseCode = "400", description = "User account is blocked, and therefore could not be used authenticated."),
             @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
-    public ResponseEntity<?> login(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
-        String token = this.authenticationService.login(accountLoginDTO.getLogin(), accountLoginDTO.getPassword(), request.getRemoteAddr());
-        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(token);
+    public ResponseEntity<?> loginUsingCredentials(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
+        try {
+            Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
+                    accountLoginDTO.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(accountLoginDTO.getLogin(), false,
+                    request.getRemoteAddr(), accountLoginDTO.getLanguage());
+            if (accessToken != null) return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
+        } catch (BadCredentialsException badCredentialsException) {
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
+            throw new InvalidLoginAttemptException();
+        } catch (DisabledException disabledException) {
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
+            throw new AccountNotActivatedException();
+        } catch (LockedException lockedException) {
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
+            Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin()).orElseThrow(InvalidLoginAttemptException::new);
+            if (account.getBlockedTime() != null) {
+                throw new AccountBlockedByAdminException();
+            } else {
+                throw new AccountBlockedByFailedLoginAttemptsException();
+            }
+        } catch (AuthenticationException authenticationException) {
+            throw new InvalidLoginAttemptException();
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Allows an unauthenticated user to perform the second step in multifactor authentication,
+     * which is to provide authentication code, which was sent to the users e-mail address.
+     *
+     * @param authenticationCodeDTO Data transfer object containing authentication code.
+     * @param request               HTTP Request in which the credentials.
+     * @return In case of successful logging in returns HTTP 200 OK is returned.
+     * If any problems occur returns HTTP 400 BAD REQUEST with the problem description.
+     * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
+     *                                  layer of facade and service components in the application.
+     */
+    @Override
+    @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Operation(summary = "Enter authentication code", description = "This endpoint is used to perform second step in multifactor authentication in the application.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Full authentication process was successful."),
+            @ApiResponse(responseCode = "400", description = "User account is blocked, and therefore could not be used authenticated."),
+            @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
+            @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
+    })
+    public ResponseEntity<?> loginUsingAuthenticationCode(@RequestBody AuthenticationCodeDTO authenticationCodeDTO, HttpServletRequest request) throws ApplicationBaseException {
+        try {
+            this.authenticationService.loginUsingAuthenticationCode(authenticationCodeDTO.getUserLogin(), authenticationCodeDTO.getAuthCodeValue());
+        } catch (ApplicationBaseException applicationBaseException) {
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(authenticationCodeDTO.getUserLogin(), request.getRemoteAddr());
+            throw applicationBaseException;
+        }
+        String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(authenticationCodeDTO.getUserLogin(), true,
+                request.getRemoteAddr(), authenticationCodeDTO.getLanguage());
+        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
     }
 
     /**
