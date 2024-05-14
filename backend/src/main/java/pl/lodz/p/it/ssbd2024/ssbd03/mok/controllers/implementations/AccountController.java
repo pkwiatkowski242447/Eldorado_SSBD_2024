@@ -215,10 +215,15 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> resetAccountPassword(@PathVariable("id") String id) throws ApplicationBaseException {
-        UUID uuid = UUID.fromString(id);
-        Account account = accountService.getAccountById(uuid);
-        this.accountService.forgetAccountPassword(account.getEmail());
-        return ResponseEntity.noContent().build();
+        try {
+            UUID uuid = UUID.fromString(id);
+            Account account = accountService.getAccountById(uuid);
+            this.accountService.forgetAccountPassword(account.getEmail());
+
+            return ResponseEntity.noContent().build();
+        } catch (AccountNotFoundException anfe) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
