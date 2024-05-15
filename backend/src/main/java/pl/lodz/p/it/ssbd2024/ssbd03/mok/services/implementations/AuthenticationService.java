@@ -171,11 +171,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
         activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
         account.setActivityLog(activityLog);
-        authenticationFacade.edit(account);
-        if (activityLog.getUnsuccessfulLoginCounter() > this.failedLoginAttemptMaxVal) {
+
+        if (!account.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= this.failedLoginAttemptMaxVal) {
+            account.blockAccount(false);
             mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
                     account.getEmail(), account.getAccountLanguage(), false);
         }
+
+        authenticationFacade.edit(account);
     }
 
     /**
