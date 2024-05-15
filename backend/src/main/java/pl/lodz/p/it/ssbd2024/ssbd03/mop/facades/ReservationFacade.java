@@ -64,7 +64,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public void edit(Reservation entity) {
+    public void edit(Reservation entity) throws ApplicationBaseException{
         super.edit(entity);
     }
 

@@ -64,7 +64,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    public void edit(Parking entity) {
+    public void edit(Parking entity) throws ApplicationBaseException{
         super.edit(entity);
     }
 

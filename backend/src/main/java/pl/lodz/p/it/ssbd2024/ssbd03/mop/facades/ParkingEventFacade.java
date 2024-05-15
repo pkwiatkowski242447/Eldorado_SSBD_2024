@@ -64,7 +64,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @param entity ParkingEvent to be modified.
      */
     @Override
-    public void edit(ParkingEvent entity) {
+    public void edit(ParkingEvent entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 

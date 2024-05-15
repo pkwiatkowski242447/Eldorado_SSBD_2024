@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
@@ -11,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -53,6 +57,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      */
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
+    @PermitAll
     public Optional<Account> find(UUID id) {
         return super.findAndRefresh(id);
     }
@@ -63,7 +68,8 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @param entity Account to be modified.
      */
     @Override
-    public void edit(Account entity) {
+    @PermitAll
+    public void edit(Account entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 
@@ -74,6 +80,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public Optional<Account> findAndRefresh(UUID id) {
         return super.findAndRefresh(id);
     }
@@ -82,10 +89,10 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * This method is used to find user account by username. As username needs to be unique, it returns a single result.
      *
      * @param login Login of the searched user account.
-     *
      * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
+    @PermitAll
     public Optional<Account> findByLogin(String login) {
         try {
             TypedQuery<Account> tq = getEntityManager().createNamedQuery("Account.findByLogin", Account.class);

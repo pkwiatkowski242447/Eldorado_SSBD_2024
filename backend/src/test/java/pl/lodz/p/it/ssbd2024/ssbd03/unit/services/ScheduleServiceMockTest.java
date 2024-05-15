@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -130,7 +131,7 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void unblockAccountTestSuccessful() throws NoSuchFieldException, IllegalAccessException, ScheduleBadPropertiesException {
+    void unblockAccountTestSuccessful() throws NoSuchFieldException, IllegalAccessException, ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         account.setAccountLanguage("pl");

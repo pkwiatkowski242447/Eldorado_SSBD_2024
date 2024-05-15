@@ -44,6 +44,7 @@ export const useAccount = () => {
         try {
             const token = (await api.logIn(login, password)).data;
             localStorage.setItem('token', token);
+            console.log(token)
             await getCurrentAccount()
             setIsAuthenticated(true);
             navigate(Pathnames.public.home)
@@ -94,10 +95,11 @@ export const useAccount = () => {
                     name: token.data.name,
                     token: tokenRaw,
                     phone: token.data.phone,
-                    userLevels: token.data.userLevelsDto,
+                    userLevelsDto: token.data.userLevelsDto,
                     activeUserLevel: activeUserLevel,
                     verified: token.data.verified,
                     version: token.data.version,
+                    twoFactorAuth: token.data.twoFactorAuth,
                 };
                 setAccount(user)
                 localStorage.setItem('account', JSON.stringify(user));

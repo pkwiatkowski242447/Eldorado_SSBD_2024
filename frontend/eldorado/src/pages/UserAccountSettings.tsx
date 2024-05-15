@@ -9,11 +9,21 @@ import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
-import {useAccountState} from "@/context/AccountContext.tsx";
 import {parsePhoneNumber} from "react-phone-number-input";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
+import {useParams} from "react-router-dom";
+import {UserType} from "@/types/Users.ts";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
+import {RolesEnum} from "@/types/TokenPayload.ts";
 
 const emailSchema = z.object({
     email: z.string().email({message: "New email is required."}),
@@ -27,49 +37,170 @@ const userDataSchema = z.object({
     phoneNumber: z.string().refine(isValidPhoneNumber, {message: "Invalid phone number"}),
 });
 
-function AccountSettings() {
-    const [activeForm, setActiveForm] = useState('Authentication');
+const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
-    const {account} = useAccountState();
+function UserAccountSettings() {
+    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'UserLevel');
+    const [managedUser, setManagedUser] = useState<UserType | null>(null);
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
 
-    const phoneNumber = parsePhoneNumber(account?.phone || '')
+    const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
+    const {id} = useParams<{ id: string }>();
+    const phoneNumber = parsePhoneNumber(managedUser?.phone || '')
     const e164Number = phoneNumber?.format('E.164')
+
+    useEffect(() => {
+        if (id) {
+            localStorage.setItem('activeForm', activeForm);
+            api.getAccountById(id).then(response => {
+                setManagedUser(response.data);
+                console.log(response.data)
+            });
+        }
+    }, [activeForm, id]);
 
     const {getCurrentAccount} = useAccount();
 
-    //It has to be that way afaik so ignore the warning and enjoy your day :)
-    useEffect(() => {
-        getCurrentAccount();
-    }, []);
+    const handleRemoveClick = (level: RolesEnum) => {
+        setLevelToChange(level);
+        setAlertDialogOpen(true);
+    };
 
+    const handleAddClick = (level: RolesEnum) => {
+        setLevelToChange(level);
+        setAlertDialogOpen(true);
+    };
+
+    //TODO you have to manually refresh the page to see the changes
+    //TODO gray out the admin button for the admin that is editing his own account
+    const confirmChangeUserLevel = () => {
+        if (levelToChange && managedUser) {
+            if (managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange)) {
+                switch (levelToChange) {
+                    case RolesEnum.ADMIN:
+                        api.removeLevelAdmin(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been removed successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                    case RolesEnum.STAFF:
+                        api.removeLevelStaff(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been removed successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                    case RolesEnum.CLIENT:
+                        api.removeLevelClient(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been removed successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                }
+            } else {
+                switch (levelToChange) {
+                    case RolesEnum.ADMIN:
+                        api.addLevelAdmin(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been added successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                    case RolesEnum.STAFF:
+                        api.addLevelStaff(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been added successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                    case RolesEnum.CLIENT:
+                        api.addLevelClient(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been added successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                }
+                setAlertDialogOpen(false);
+                location.reload()
+                setLevelToChange(null);
+            }
+        }
+    }
 
     const formEmail = useForm({
         resolver: zodResolver(emailSchema),
-        // defaultValues: {
-        //     email: account?.email || '',
-        // },
     });
 
     const formUserData = useForm({
         resolver: zodResolver(userDataSchema),
-        // defaultValues: {
-        //     name: account?.name || '',
-        //     lastName: account?.lastname || '',
-        //     phoneNumber: account?.phone || '',
-        // },
     });
 
     const onSubmitEmail = (values: z.infer<typeof emailSchema>) => {
         api.changeEmailSelf(values.email).then(() => {
-            getCurrentAccount();
-
             toast({
                 title: "Success!",
                 description: "Your email has been successfully changed.",
             });
-            setTimeout(() => {
-                window.location.reload()
-            }, 3000);
+            if (managedUser?.id) {
+                api.getAccountById(managedUser?.id).then(response => {
+                    setManagedUser(response.data);
+                    console.log(response.data)
+                });
+            }
+            // setTimeout(() => {
+            //     window.location.reload()
+            // }, 3000);
 
         }).catch((error) => {
             toast({
@@ -82,8 +213,8 @@ function AccountSettings() {
 
     const onSubmitUserData = (values: z.infer<typeof userDataSchema>) => {
         const etag = window.localStorage.getItem('etag');
-        if (account && account.accountLanguage && etag !== null) {
-            api.modifyAccountSelf(account.login, account.version, account.userLevelsDto,
+        if (managedUser && managedUser.accountLanguage && etag !== null) {
+            api.modifyAccountSelf(managedUser.login, managedUser.version, managedUser.userLevelsDto,
                 values.name, values.lastName, values.phoneNumber, false, etag)
                 .then(() => {
                     getCurrentAccount();
@@ -111,21 +242,62 @@ function AccountSettings() {
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">
-                    <h1 className="text-3xl font-semibold">Modify Your Account</h1>
+                    <h1 className="text-3xl font-semibold">Modify Account - {managedUser?.login}</h1>
                 </div>
                 <div
                     className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <a href="#" className="font-semibold text-primary"
+                        <a className="font-semibold text-primary"
+                           onClick={() => setActiveForm('UserLevels')}>User Levels</a>
+                        <a className="font-semibold text-primary"
                            onClick={() => setActiveForm('Authentication')}>
                             Authentication
                         </a>
-                        <a href="#" onClick={() => setActiveForm('Personal Info')}>Personal Info</a>
+                        <a className="font-semibold text-primary"
+                           onClick={() => setActiveForm('Personal Info')}>Personal Info</a>
 
                     </nav>
                     <div className="grid gap-6">
+                        {activeForm === 'UserLevels' && managedUser?.userLevelsDto && (
+                            <div>
+                                {activeForm === 'UserLevels' && (
+                                    <div>
+                                        {allUserLevels.map((level: RolesEnum) => (
+                                            <div key={level}>
+                                                <span>{level}</span>
+                                                {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === level) ? (
+                                                    <Button className="text-white bg-red-500 hover:bg-red-700 m-5"
+                                                            onClick={() => handleRemoveClick(level)}>
+                                                        Remove
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        className="text-white bg-green-500 hover:bg-green-700 m-5"
+                                                        onClick={() => handleAddClick(level)}>
+                                                        Add
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                                            <AlertDialogContent>
+                                                <AlertDialogTitle>Confirm</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Are you sure you want
+                                                    to {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange) ? 'remove' : 'add'} the {levelToChange} level
+                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange) ? ' from' : ' to'} this user?
+                                                </AlertDialogDescription>
+                                                <AlertDialogAction
+                                                    onClick={confirmChangeUserLevel}>OK</AlertDialogAction>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         {activeForm === 'Authentication' && (
                             <div>
                                 <Card className="mx-10 w-auto">
@@ -145,7 +317,7 @@ function AccountSettings() {
                                                                             E-Mail</FormLabel>
                                                                         <FormControl>
                                                                             <Input
-                                                                                placeholder={account?.email} {...field} />
+                                                                                placeholder={managedUser?.email} {...field} />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
@@ -160,33 +332,6 @@ function AccountSettings() {
                                         </Form>
                                     </CardContent>
                                 </Card>
-                                {/*<Card className="mx-10 w-auto">*/}
-                                {/*    <CardContent>*/}
-                                {/*        <Form {...form}>*/}
-                                {/*            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">*/}
-                                {/*                <div className="grid gap-4 p-5">*/}
-                                {/*                    <div className="grid gap-2">*/}
-                                {/*                        <FormField*/}
-                                {/*                            control={form.control}*/}
-                                {/*                            name="newPassword"*/}
-                                {/*                            render={({field}) => (*/}
-                                {/*                                <FormItem>*/}
-                                {/*                                    <FormLabel className="text-black">New Password</FormLabel>*/}
-                                {/*                                    <FormControl>*/}
-                                {/*                                        <Input placeholder="" {...field} />*/}
-                                {/*                                    </FormControl>*/}
-                                {/*                                    <FormMessage/>*/}
-                                {/*                                </FormItem>*/}
-                                {/*                            )}/>*/}
-                                {/*                    </div>*/}
-                                {/*                    <Button type="submit" className="w-full pb-2">*/}
-                                {/*                        Change your password*/}
-                                {/*                    </Button>*/}
-                                {/*                </div>*/}
-                                {/*            </form>*/}
-                                {/*        </Form>*/}
-                                {/*    </CardContent>*/}
-                                {/*</Card>*/}
                             </div>
                         )}
                         {activeForm === 'Personal Info' && (
@@ -206,7 +351,8 @@ function AccountSettings() {
                                                                     <FormLabel className="text-black">First
                                                                         Name</FormLabel>
                                                                     <FormControl>
-                                                                        <Input placeholder={account?.name} {...field}/>
+                                                                        <Input
+                                                                            placeholder={managedUser?.name} {...field}/>
                                                                     </FormControl>
                                                                     <FormMessage/>
                                                                 </FormItem>
@@ -223,7 +369,7 @@ function AccountSettings() {
                                                                         Name</FormLabel>
                                                                     <FormControl>
                                                                         <Input
-                                                                            placeholder={account?.lastname} {...field}/>
+                                                                            placeholder={managedUser?.lastname} {...field}/>
                                                                     </FormControl>
                                                                     <FormMessage/>
                                                                 </FormItem>
@@ -264,4 +410,4 @@ function AccountSettings() {
     );
 }
 
-export default AccountSettings;
+export default UserAccountSettings;

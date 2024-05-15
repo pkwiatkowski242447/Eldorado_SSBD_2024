@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
@@ -40,6 +42,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
 
     @Value("${account.maximum.failed.login.attempt.counter}")
     private int failedLoginAttemptMaxVal;
+
 
     /**
      * Facade component used for operations on accounts.
@@ -99,6 +102,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * on facade components.
      */
     @Override
+    @RolesAllowed({ Roles.ANONYMOUS })
     public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
         if (!account.getActive()) {
@@ -132,6 +136,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * on facade components.
      */
     @Override
+    @RolesAllowed({ Roles.CLIENT, Roles.STAFF, Roles.ADMIN})
     public String registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         if (!confirmed && account.getTwoFactorAuth()) {
@@ -158,6 +163,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * on facade components.
      */
     @Override
+    @RolesAllowed({ Roles.ANONYMOUS })
     public void registerUnsuccessfulLoginAttemptWithIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -183,6 +189,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * on facade components.
      */
     @Override
+    @RolesAllowed({ Roles.ANONYMOUS })
     public void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -200,6 +207,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
      * on facade components.
      */
+    @RolesAllowed({ Roles.ANONYMOUS })
     private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
         tokenFacade.findByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId()).ifPresent(tokenFacade::remove);
 
@@ -226,6 +234,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @return Returns Account with the specified login.
      */
     @Override
+    @RolesAllowed({ Roles.ANONYMOUS })
     public Optional<Account> findByLogin(String login) {
         return this.authenticationFacade.findByLogin(login);
     }

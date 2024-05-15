@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
+import jakarta.annotation.security.RunAs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -169,7 +172,11 @@ public class ScheduleService implements ScheduleServiceInterface {
         // Unblock accounts
         blockedAccounts.forEach((a -> {
             a.unblockAccount();
-            accountMOKFacade.edit(a);
+            try {
+                accountMOKFacade.edit(a);
+            } catch (ApplicationBaseException e) {
+                throw new RuntimeException(e);
+            }
 
             // Send notification mail
             mailProvider.sendUnblockAccountInfoEmail(a.getName(), a.getLastname(), a.getEmail(), a.getAccountLanguage());
