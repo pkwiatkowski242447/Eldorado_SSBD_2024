@@ -563,12 +563,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-<<<<<<< HEAD
-    public void findAllInactiveAccountsWithUnverifiedEmailWithPagination() throws ApplicationBaseException {
-=======
     @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
-    public void findAllInactiveAccountsWithUnverifiedEmailWithPagination() {
->>>>>>> a025ba59a4080413997dd76a24bda8978725e5cb
+    public void findAllInactiveAccountsWithUnverifiedEmailWithPagination() throws ApplicationBaseException {
         Account account0 = accountMOKFacade.findByLogin("tonyhalik").orElseThrow(NoSuchElementException::new);
         Account account1 = accountMOKFacade.findByLogin("adamn").orElseThrow(NoSuchElementException::new);
 
