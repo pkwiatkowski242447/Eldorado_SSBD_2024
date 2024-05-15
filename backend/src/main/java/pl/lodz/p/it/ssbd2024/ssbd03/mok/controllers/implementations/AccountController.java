@@ -89,7 +89,7 @@ public class AccountController implements AccountControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @Override
-    @PostMapping(value = "/{user_id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(value = "/{id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
     @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
@@ -100,7 +100,7 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "409", description = "The account has not been blocked due to being blocked already or trying to block own account."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    public ResponseEntity<?> blockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
+    public ResponseEntity<?> blockAccount(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             if (SecurityContextHolder.getContext().getAuthentication() != null &&
                     SecurityContextHolder.getContext().getAuthentication().getName()
@@ -129,7 +129,7 @@ public class AccountController implements AccountControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @Override
-    @PostMapping(value = "/{user_id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(value = "/{id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
     @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
@@ -140,7 +140,7 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "409", description = "The account has not been unblocked due to being blocked already."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    public ResponseEntity<?> unblockAccount(@PathVariable("user_id") String id) throws ApplicationBaseException {
+    public ResponseEntity<?> unblockAccount(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.unblockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException e) {
