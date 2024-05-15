@@ -65,19 +65,18 @@ function LoginForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <div className="grid gap-4">
-                                        <div className="grid gap-2">
-                                            <FormLabel className="text-left">Password
-                                                <a href="/forgot-password"
-                                                   className="ml-auto inline-block text-black underline text-right">
-                                                    Forgot your password?
-                                                </a>
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input type="password" {...field} />
-                                            </FormControl>
+                                        <div className="flex justify-between items-center">
+                                            <FormLabel className="text-left">Password</FormLabel>
+                                            <a href="/forgot-password"
+                                               className="inline-block text-black underline">
+                                                Forgot your password?
+                                            </a>
                                         </div>
+                                        <FormControl>
+                                            <Input type="password" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
                                     </div>
-                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
