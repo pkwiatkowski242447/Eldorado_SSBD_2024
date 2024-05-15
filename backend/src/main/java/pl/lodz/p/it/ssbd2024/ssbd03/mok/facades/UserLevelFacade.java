@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -57,6 +59,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @param userLevel UserLevel to be persisted.
      */
     @Override
+    @RolesAllowed(Roles.ADMIN)
     public void create(UserLevel userLevel) throws ApplicationBaseException {
         super.create(userLevel);
     }
@@ -67,6 +70,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @param userLevel UserLevel to be modified.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public void edit(UserLevel userLevel) {
         super.edit(userLevel);
     }
@@ -77,6 +81,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @param userLevel UserLevel to be removed from the database.
      */
     @Override
+    @RolesAllowed(Roles.ADMIN)
     public void remove(UserLevel userLevel) {
         super.remove(userLevel);
     }
@@ -88,6 +93,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public Optional<UserLevel> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
@@ -99,6 +105,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public Optional<UserLevel> findAndRefresh(UUID id) {
         return super.findAndRefresh(id);
     }
@@ -109,6 +116,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return List containing all UserLevels.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public List<UserLevel> findAll() {
         return super.findAll();
     }
@@ -119,6 +127,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return Number of UserLevels in the database.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public int count() {
         return super.count();
     }

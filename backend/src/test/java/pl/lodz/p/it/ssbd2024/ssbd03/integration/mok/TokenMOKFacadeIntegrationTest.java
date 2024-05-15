@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -80,6 +82,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ANONYMOUS})
     public void createAndRemovePositiveTest() throws ApplicationBaseException {
         String tokenValue = "testValueToken";
         Account account = accountMOKFacade.findByLogin("jerzybem").orElseThrow(NoSuchElementException::new);
@@ -113,6 +116,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void findAllPositiveTest() {
         List<Token> tokenList = tokenFacade.findAll();
 
@@ -121,6 +125,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void countPositiveTest() {
         int count = tokenFacade.count();
 
@@ -149,6 +154,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED})
     public void removeByAccountTest() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
@@ -178,6 +184,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void removeByTypeAndAccount() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");
@@ -209,6 +216,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ANONYMOUS})
     public void editTestPositive() throws ApplicationBaseException {
         Account account = new Account("wiktorptak", "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa", "wiktor", "ptak",
                 "wiktorptak@gmail.com", "123567123");

@@ -145,4 +145,5 @@ public class GenericExceptionResolver {
                .contentType(MediaType.TEXT_PLAIN)
                .body(I18n.ACCESS_DENIED_EXCEPTION);
     }
+
 }
