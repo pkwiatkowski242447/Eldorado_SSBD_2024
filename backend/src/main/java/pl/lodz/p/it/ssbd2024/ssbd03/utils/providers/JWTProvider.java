@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenDataExtractionException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
 import java.time.Instant;
@@ -115,10 +117,14 @@ public class JWTProvider {
      * @param jwtToken Token from which the AccountID will be extracted.
      * @return Returns AccountID from the Token.
      */
-    public UUID extractAccountId(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
-        DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
-        return UUID.fromString(decodedJWT.getClaim(JWTConsts.ACCOUNT_ID).asString());
+    public UUID extractAccountId(String jwtToken) throws TokenDataExtractionException {
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
+            DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
+            return UUID.fromString(decodedJWT.getClaim(JWTConsts.ACCOUNT_ID).asString());
+        } catch (SignatureVerificationException exception) {
+            throw new TokenDataExtractionException();
+        }
     }
 
     /**
@@ -127,10 +133,14 @@ public class JWTProvider {
      * @param jwtToken Token from which the username will be extracted.
      * @return Returns username from the Token.
      */
-    public String extractUsername(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
-        DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
-        return decodedJWT.getSubject();
+    public String extractUsername(String jwtToken) throws TokenDataExtractionException {
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
+            DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
+            return decodedJWT.getSubject();
+        } catch (SignatureVerificationException exception) {
+            throw new TokenDataExtractionException();
+        }
     }
 
     /**
@@ -139,10 +149,14 @@ public class JWTProvider {
      * @param jwtToken Token from which the email will be extracted.
      * @return String containing new email.
      */
-    public String extractEmail(String jwtToken) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
-        DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
-        return decodedJWT.getClaim(JWTConsts.EMAIL).asString();
+    public String extractEmail(String jwtToken) throws TokenDataExtractionException {
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
+            DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
+            return decodedJWT.getClaim(JWTConsts.EMAIL).asString();
+        } catch (SignatureVerificationException exception) {
+            throw new TokenDataExtractionException();
+        }
     }
 
     /**
@@ -192,10 +206,14 @@ public class JWTProvider {
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
-    public String extractHashedCodeValueFromToken(String token) {
-        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        return decodedJWT.getClaim(JWTConsts.CODE_VALUE).asString();
+    public String extractHashedCodeValueFromToken(String token) throws TokenDataExtractionException {
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
+            DecodedJWT decodedJWT = jwtVerifier.verify(token);
+            return decodedJWT.getClaim(JWTConsts.CODE_VALUE).asString();
+        } catch (SignatureVerificationException exception) {
+            throw new TokenDataExtractionException();
+        }
     }
 
     public boolean isMultiFactorAuthTokenValid(String multiFactorAuthToken) {
