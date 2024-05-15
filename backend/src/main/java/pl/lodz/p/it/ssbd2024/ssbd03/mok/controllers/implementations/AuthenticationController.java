@@ -129,7 +129,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         } catch (LockedException lockedException) {
             this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
             Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin()).orElseThrow(InvalidLoginAttemptException::new);
-            if (account.getBlockedTime() != null) {
+            if (account.getBlockedTime() == null) {
                 log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: User account has been blocked by the admin."
                         .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(), request.getRemoteAddr()));
                 throw new AccountBlockedByAdminException();

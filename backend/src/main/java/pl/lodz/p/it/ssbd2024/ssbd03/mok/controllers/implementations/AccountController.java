@@ -105,7 +105,6 @@ public class AccountController implements AccountControllerInterface {
             if (SecurityContextHolder.getContext().getAuthentication() != null &&
                     SecurityContextHolder.getContext().getAuthentication().getName()
                             .equals(accountService.getAccountById(UUID.fromString(id)).getLogin())) {
-                log.error(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
                 throw new IllegalOperationException(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION);
             }
 
