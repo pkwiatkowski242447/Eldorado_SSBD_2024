@@ -24,9 +24,22 @@ export interface UserType {
     name: string
     token: string
     phone: string
-    userLevels: UserLevelType[]
+    userLevelsDto: UserLevelType[]
     activeUserLevel: UserLevelType
     verified: boolean
     version: number
     twoFactorAuth: boolean
+}
+
+export interface ManagedUserType {
+    id: string
+    login: string
+    name: string
+    lastName: string
+    active: boolean
+    blocked: boolean
+    verified: boolean
+    // lastSuccessfulLoginTime: Date
+    // lastUnsuccessfulLoginTime: Date
+    userLevels: AccountTypeEnum[]
 }

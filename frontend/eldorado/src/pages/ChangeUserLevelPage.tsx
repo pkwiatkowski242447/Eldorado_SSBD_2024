@@ -71,11 +71,11 @@ function ChangeUserLevelPage() {
                                                 defaultValue={account?.activeUserLevel.roleName}
                                                 className="flex flex-col space-y-1"
                                             >
-                                                {account?.userLevels.map((userLevel, index) => (
+                                                {account?.userLevelsDto.map((userLevel, index) => (
                                                     <FormItem key={index}
                                                               className="flex items-center space-x-3 space-y-0">
                                                         <FormControl>
-                                                            <RadioGroupItem value={userLevel}/>
+                                                            <RadioGroupItem value={userLevel.roleName}/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
                                                             {userLevel.roleName}

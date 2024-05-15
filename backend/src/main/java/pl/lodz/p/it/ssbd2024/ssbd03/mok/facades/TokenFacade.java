@@ -70,7 +70,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param entity Token to be modified.
      */
     @Override
-    public void edit(Token entity) {
+    public void edit(Token entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 

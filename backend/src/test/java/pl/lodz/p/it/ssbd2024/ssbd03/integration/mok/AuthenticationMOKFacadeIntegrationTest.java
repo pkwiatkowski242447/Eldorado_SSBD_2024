@@ -16,6 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 
 import java.util.NoSuchElementException;
@@ -109,7 +110,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void editTestPositive() {
+    public void editTestPositive() throws ApplicationBaseException {
         Account account = authenticationFacade.find(accountIdNo1).orElseThrow(NoSuchElementException::new);
 
         assertTrue(account.getActive());

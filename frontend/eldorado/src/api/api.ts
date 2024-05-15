@@ -73,4 +73,37 @@ export const api = {
             headers: DEFAULT_HEADERS,
         }).post(`/accounts/confirm-email/${token}`)
     },
+
+    getAccounts: (details: string) => {
+        return apiWithConfig.get('/accounts' + details)
+    },
+
+    removeLevelClient: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/remove-level-client`)
+    },
+
+    removeLevelStaff: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/remove-level-staff`)
+    },
+
+    removeLevelAdmin: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/remove-level-admin`)
+    },
+
+    addLevelClient: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/add-level-client`)
+    },
+
+    addLevelStaff: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/add-level-staff`)
+    },
+
+    addLevelAdmin: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/add-level-admin`)
+    },
+
+    getAccountById: (id: string) => {
+        return apiWithConfig.get(`/accounts/${id}`)
+    },
+
 }

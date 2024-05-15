@@ -50,7 +50,7 @@ public abstract class AbstractFacade<T> {
      *
      * @param entity Entity to be modified.
      */
-    protected void edit(T entity) {
+    protected void edit(T entity) throws ApplicationBaseException {
         getEntityManager().merge(entity);
         getEntityManager().flush();
     }

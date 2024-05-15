@@ -67,7 +67,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @param userLevel UserLevel to be modified.
      */
     @Override
-    public void edit(UserLevel userLevel) {
+    public void edit(UserLevel userLevel) throws ApplicationBaseException {
         super.edit(userLevel);
     }
 

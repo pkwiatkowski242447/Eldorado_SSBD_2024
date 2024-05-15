@@ -521,7 +521,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param account Account to be modified.
      */
     @Override
-    public void edit(Account account) {
+    public void edit(Account account) throws ApplicationBaseException {
         super.edit(account);
     }
 

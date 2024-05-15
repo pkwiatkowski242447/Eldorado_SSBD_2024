@@ -374,6 +374,7 @@ public class Account extends AbstractEntity {
      */
     public void addUserLevel(UserLevel userLevel) {
         userLevels.add(userLevel);
+        userLevel.setAccount(this);
     }
 
     /**

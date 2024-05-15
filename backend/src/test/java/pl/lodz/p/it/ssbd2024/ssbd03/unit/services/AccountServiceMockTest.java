@@ -291,7 +291,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestSuccessful() throws AccountAlreadyBlockedException, IllegalOperationException, AccountNotFoundException {
+    void blockAccountTestSuccessful() throws AccountAlreadyBlockedException, IllegalOperationException, AccountNotFoundException, ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
@@ -306,7 +306,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestBlockedBySystem() throws AccountAlreadyBlockedException, AccountNotFoundException {
+    void blockAccountTestBlockedBySystem() throws AccountAlreadyBlockedException, AccountNotFoundException, ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
@@ -348,7 +348,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void unblockAccountTestSuccessful() throws AccountNotFoundException, AccountAlreadyUnblockedException {
+    void unblockAccountTestSuccessful() throws AccountNotFoundException, AccountAlreadyUnblockedException, ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.blockAccount(true);
