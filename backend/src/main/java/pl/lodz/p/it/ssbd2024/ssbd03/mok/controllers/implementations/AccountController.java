@@ -19,31 +19,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangePasswordDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
@@ -97,13 +86,13 @@ public class AccountController implements AccountControllerInterface {
      * 400 BAD REQUEST is returned, with appropriate message. If AccountAlreadyBlockedException or IllegalOperationException is thrown,
      * the response is 409 CONFLICT. 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{user_id}/block", produces = MediaType.TEXT_PLAIN_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Block user account", description = "The endpoint is used to block user account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The account has been blocked correctly."),
@@ -137,13 +126,13 @@ public class AccountController implements AccountControllerInterface {
      * In case of IllegalArgumentException or AccountNotFoundException being thrown, during parsing passed id from String to UUID class,
      * 400 BAD REQUEST is returned, with appropriate message. If AccountAlreadyUnblockedException is thrown, the response is 409 CONFLICT.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{user_id}/unblock", produces = MediaType.TEXT_PLAIN_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Unblock user account", description = "The endpoint is used to unblock user account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The account has been unblocked correctly."),
@@ -165,18 +154,18 @@ public class AccountController implements AccountControllerInterface {
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
      * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for registration
-     * to the application or changed later to other e-mail address.
+     *                        to the application or changed later to other e-mail address.
      * @return 204 NO CONTENT if entire process of forgetting password is successful. Otherwise, 404 NOT FOUND could be returned
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/forgot-password")
-    @RolesAllowed({ "ANONYMOUS" })
+    @RolesAllowed({Roles.ANONYMOUS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Forget currently set password", description = "The endpoint is used to forget current password, that is to send e-mail message with password reset URL.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The password change URL has been sent to the user's e-mail address."),
@@ -184,7 +173,11 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> forgetAccountPassword(@RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
-        this.accountService.forgetAccountPassword(accountEmailDTO.getEmail());
+        try {
+            accountService.forgetAccountPassword(accountEmailDTO.getEmail());
+        } catch (AccountNotFoundException | AccountNotActivatedException e) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -197,16 +190,16 @@ public class AccountController implements AccountControllerInterface {
      * (if there is no account with given e-mail address) or 400 BAD REQUEST (when account is either blocked or
      * not activated yet).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/reset-password/{id}")
     @PreAuthorize(value = "hasRole(T(pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts).ADMIN_DISCRIMINATOR)")
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Reset account password by admin", description = "The endpoint is used by admin to send password change URL to e-mail address attached to the account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The password change URL has been sent to the user's e-mail address."),
@@ -230,17 +223,17 @@ public class AccountController implements AccountControllerInterface {
      * it to the database, and send a message with reset password URL to user e-mail address.
      *
      * @param token RESET PASSWORD token required to change password for user account, that was generated when
-     * forgetAccountPassword() method was called.
+     *              forgetAccountPassword() method was called.
      * @return 200 OK is returned when changing password goes flawlessly. Otherwise, 400 BAD REQUEST is returned (since
      * RESET PASSWORD token is no longer valid or not in the database).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/change-password/{token_id}")
-    @RolesAllowed({ "ANONYMOUS" })
+    @RolesAllowed({Roles.ANONYMOUS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Change account password", description = "The endpoint is used by unauthenticated user to change their account password, by clicking the link sent to their e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The password was changed successfully."),
@@ -265,9 +258,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN", "ROLE_STAFF" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     @Operation(summary = "Get all users", description = "The endpoint is used retrieve list of accounts from given page of given size.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of accounts returned from given page of given size is not empty."),
@@ -297,9 +290,9 @@ public class AccountController implements AccountControllerInterface {
      */
     @Override
     @GetMapping(value = "/match-login-firstname-and-lastname", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN", "ROLE_STAFF" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     @Operation(summary = "Get all users matching criteria", description = "The endpoint is used retrieve list of accounts that match certain criteria, that is either contain certain phrase in login, firstName, lastName, with certain activity status and ordered by login alphabetically or not.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of accounts returned from given page of given size is not empty."),
@@ -327,17 +320,17 @@ public class AccountController implements AccountControllerInterface {
      * registered either by user itself or by user with administrative privileges.
      *
      * @param token Last part of the activation URL, sent to the e-mail address user specified during registration process. It is a JWT token
-     * generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
+     *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return This function returns 204 NO CONTENT if method finishes successfully (all performed action finish without any errors).
      * It could also return 204 NO CONTENT if the token is not valid.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping("/activate-account/{token}")
-    @RolesAllowed({ "ANONYMOUS" })
+    @RolesAllowed({Roles.ANONYMOUS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Activate account", description = "The endpoint is used activate user account by itself after successful registration.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Account activation was successful."),
@@ -356,17 +349,17 @@ public class AccountController implements AccountControllerInterface {
      * This method is used to confirm the change of an e-mail
      *
      * @param token Last part of the activation URL, sent to the new e-mail address. It is a JWT token
-     * generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
+     *              generated with payload taken from the user account (id and login) and is valid for a certain amount of time.
      * @return This function returns 204 NO CONTENT if method finishes successfully.
      * It could also return 400 BAD REQUEST if the token is not valid, expired or account does not exist.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/confirm-email/{token}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ANONYMOUS" })
+    @RolesAllowed({Roles.ANONYMOUS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Confirm e-mail", description = "The endpoint is used confirm e-mail attached to user's account after it was changed by the user.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "E-mail confirmation process was successful."),
@@ -387,13 +380,13 @@ public class AccountController implements AccountControllerInterface {
      * @return If user account is found for currently logged user then 200 OK with user account in the response
      * body is returned, otherwise 400 BAD REQUEST is returned, since user account could not be found.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_AUTHENTICATED" })
+    @RolesAllowed({Roles.AUTHENTICATED})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     @Operation(summary = "Get your account details", description = "The endpoint is used to get user's own account details, and sign them using JWS, where the signature is placed in ETag header.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User's accounts details were found successfully."),
@@ -421,13 +414,13 @@ public class AccountController implements AccountControllerInterface {
      * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
      * then 409 CONFLICT is returned.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    @RolesAllowed({ "ROLE_AUTHENTICATED" })
+    @RolesAllowed({Roles.AUTHENTICATED})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Modify self account", description = "The endpoint is used to modify self account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
@@ -464,13 +457,13 @@ public class AccountController implements AccountControllerInterface {
      * 400 BAD REQUEST is returned. If accountModifyDTO signature is different from IF_MATCH header value
      * then 409 CONFLICT is returned.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Modify other user account account", description = "The endpoint is used to modify user account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
@@ -501,13 +494,13 @@ public class AccountController implements AccountControllerInterface {
      * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
      * returns 400. When uuid is invalid returns 400.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_STAFF", "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     @Operation(summary = "Find user account by id", description = "The endpoint is used retrieve user account details by its identifier.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User's account details were found successfully."),
@@ -542,13 +535,13 @@ public class AccountController implements AccountControllerInterface {
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
      * explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Change other user's e-mail address", description = "The endpoint is used change e-mail address, attached to certain user's account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
@@ -570,15 +563,15 @@ public class AccountController implements AccountControllerInterface {
      * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
      * explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_AUTHENTICATED" })
+    @RolesAllowed({Roles.AUTHENTICATED})
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Change own e-mail address", description = "The endpoint is used change e-mail address, attached to own user's account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
@@ -598,13 +591,13 @@ public class AccountController implements AccountControllerInterface {
      *
      * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/resend-email-confirmation")
-    @RolesAllowed({ "ROLE_CLIENT", "ROLE_STAFF", "ROLE_ADMIN" })
+    @RolesAllowed({Roles.AUTHENTICATED})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Resend e-mail confirmation message", description = "The endpoint is used resend e-mail confirmation message, that would be used to change e-mail address attached to user's account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message is sent successfully."),
@@ -625,13 +618,13 @@ public class AccountController implements AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Remove client user level", description = "The endpoint is used to remove client user level from account with given identifier, if the account contains such a user level.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "Client user level was removed successfully."),
@@ -652,13 +645,13 @@ public class AccountController implements AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Remove staff user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "Staff user level was removed successfully."),
@@ -679,13 +672,13 @@ public class AccountController implements AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
      * explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Remove admin user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "Admin user level was removed successfully."),
@@ -707,13 +700,13 @@ public class AccountController implements AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
      * (with a message explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Add client user level", description = "The endpoint is used to add client user level to the account with given identifier, if the account does not have such a user level.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "Client user level was added to the account successfully."),
@@ -739,13 +732,13 @@ public class AccountController implements AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
      * (with a message explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Add staff user level", description = "The endpoint is used to add staff user level to the account with given identifier, if the account does not have such a user level.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "Staff user level was added to the account successfully."),
@@ -771,13 +764,13 @@ public class AccountController implements AccountControllerInterface {
      * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned
      * (with a message explaining why the error occurred).
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PostMapping(value = "/{id}/add-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Add admin user level", description = "The endpoint is used to add admin user level to the account with given identifier, if the account does not have such a user level.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204 ", description = "Admin user level was added to the account successfully."),
@@ -800,13 +793,13 @@ public class AccountController implements AccountControllerInterface {
      * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
      * is the same as current password returns 400 BAD REQUEST HTTP response.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ROLE_AUTHENTICATED" })
+    @RolesAllowed({Roles.AUTHENTICATED})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = { ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class })
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Change own password", description = "The endpoint is used to change password, used to authenticate to the currently logged in account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200 ", description = "Account's password was changed successfully."),

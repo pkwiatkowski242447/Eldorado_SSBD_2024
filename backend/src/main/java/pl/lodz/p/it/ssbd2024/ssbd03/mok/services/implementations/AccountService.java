@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -63,6 +65,8 @@ public class AccountService implements AccountServiceInterface {
 
     @Value("${account.creation.confirmation.period.length.hours}")
     private int accountCreationConfirmationPeriodLengthHours;
+    @Value("${account.password.reset.period.length.minutes}")
+    private int passwordResetPeriodLengthMinutes;
 
     /**
      * AccountFacade used for operations on account entities.
@@ -87,7 +91,6 @@ public class AccountService implements AccountServiceInterface {
     /**
      * TokenServiceInterface used for operations on tokens.
      */
-    private final TokenServiceInterface tokenService;
 
     private final UserLevelFacade userLevelFacade;
 
@@ -99,7 +102,6 @@ public class AccountService implements AccountServiceInterface {
      * @param tokenFacade     This facade is responsible for manipulating tokens, used for various, user account related operations.
      * @param mailProvider    This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
      * @param jwtProvider     This component is used to generate token values for token facade.
-     * @param tokenService    Service used for more complicated token operations.
      * @param userLevelFacade It is used to create new tokens, remove them, etc.
      */
     @Autowired
@@ -108,14 +110,12 @@ public class AccountService implements AccountServiceInterface {
                           TokenFacade tokenFacade,
                           MailProvider mailProvider,
                           JWTProvider jwtProvider,
-                          TokenServiceInterface tokenService,
                           UserLevelFacade userLevelFacade) {
         this.accountFacade = accountFacade;
         this.passwordEncoder = passwordEncoder;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
         this.jwtProvider = jwtProvider;
-        this.tokenService = tokenService;
         this.userLevelFacade = userLevelFacade;
     }
 
@@ -132,6 +132,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
      */
     @Override
+    @RolesAllowed({ Roles.ANONYMOUS, Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
             throws ApplicationBaseException {
@@ -171,6 +172,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -209,6 +211,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -240,6 +243,7 @@ public class AccountService implements AccountServiceInterface {
      * @param userEmail Email address that will be used to search for the existing account, and then used for sending
      *                  e-mail message with password change URL.
      */
+    @RolesAllowed({ Roles.ANONYMOUS })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPassword(String userEmail) throws ApplicationBaseException {
         Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
@@ -247,7 +251,12 @@ public class AccountService implements AccountServiceInterface {
         if (account.getBlocked()) throw new AccountBlockedException();
         else if (!account.getActive()) throw new AccountNotActivatedException();
 
-        String tokenValue = this.tokenService.createPasswordResetToken(account);
+        tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).ifPresent(tokenFacade::remove);
+
+        String tokenValue = this.jwtProvider.generateActionToken(account, this.passwordResetPeriodLengthMinutes, ChronoUnit.MINUTES);
+        Token passwordToken = new Token(tokenValue, account, Token.TokenType.RESET_PASSWORD);
+        this.tokenFacade.create(passwordToken);
+
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
         String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
 
@@ -267,6 +276,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
      *                                  method.
      */
+    @RolesAllowed({ Roles.ANONYMOUS })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
@@ -293,6 +303,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
@@ -315,6 +326,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (!account.getBlocked()) {
@@ -339,6 +351,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
+    @RolesAllowed({ Roles.AUTHENTICATED })
     public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
         Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
 
@@ -374,6 +387,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
+    @RolesAllowed({ Roles.ANONYMOUS })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
@@ -405,6 +419,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountEmailNullException Threw if the email extracted from the token was for some strange reason null.
      */
     @Override
+    @RolesAllowed({ Roles.ANONYMOUS })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean confirmEmail(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
@@ -436,6 +451,7 @@ public class AccountService implements AccountServiceInterface {
      * @return List of user accounts that match the given parameters.
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
                                                                         String lastName,
@@ -454,6 +470,7 @@ public class AccountService implements AccountServiceInterface {
      * @return A list of all accounts in the system, ordered by account login, with pagination applied.
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     public List<Account> getAllAccounts(int pageNumber, int pageSize) {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
@@ -466,6 +483,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
     @Override
+    @RolesAllowed({ Roles.AUTHENTICATED })
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getAccountByLogin(String login) throws ApplicationBaseException {
         return  accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
@@ -491,6 +509,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
     @Override
+    @RolesAllowed({ Roles.AUTHENTICATED })
     @Transactional(propagation = Propagation.REQUIRED)
     public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
@@ -499,8 +518,13 @@ public class AccountService implements AccountServiceInterface {
         if (accountFacade.findByEmail(newEmail).isPresent())
             throw new AccountEmailAlreadyTakenException();
 
-        String token = tokenService.createEmailConfirmationToken(account, newEmail);
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(token.getBytes()));
+        tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
+
+        String tokenValue = this.jwtProvider.generateEmailToken(account, newEmail, 24);
+        Token emailToken = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
+        this.tokenFacade.create(emailToken);
+
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
         String confirmationURL = accountConfirmEmail + encodedTokenValue;
 
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
@@ -514,6 +538,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
      */
     @Override
+    @RolesAllowed({ Roles.AUTHENTICATED })
     public void resendEmailConfirmation() throws ApplicationBaseException{
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account account = accountFacade.findByLogin(login)
@@ -543,6 +568,7 @@ public class AccountService implements AccountServiceInterface {
      */
 
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeClientUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -571,6 +597,7 @@ public class AccountService implements AccountServiceInterface {
      */
 
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -599,6 +626,7 @@ public class AccountService implements AccountServiceInterface {
      */
 
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeAdminUserLevel(String id) throws ApplicationBaseException{
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -635,6 +663,7 @@ public class AccountService implements AccountServiceInterface {
      * AccountUserLevelException - when account already has this user level
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addClientUserLevel(String id) throws ApplicationBaseException {
 
@@ -659,6 +688,7 @@ public class AccountService implements AccountServiceInterface {
      * AccountUserLevelException - when account already has this user level
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addStaffUserLevel(String id) throws ApplicationBaseException{
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -682,6 +712,7 @@ public class AccountService implements AccountServiceInterface {
      * AccountUserLevelException - when account already has this user level
      */
     @Override
+    @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addAdminUserLevel(String id) throws ApplicationBaseException{
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -707,6 +738,7 @@ public class AccountService implements AccountServiceInterface {
      * are not equal). AccountNotFoundException (when account not found).
      */
     @Override
+    @RolesAllowed({ Roles.AUTHENTICATED })
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationBaseException.class)
     public void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException {
 
