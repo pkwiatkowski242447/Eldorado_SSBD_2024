@@ -17,11 +17,4 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(I18n.ACCESS_DENIED_EXCEPTION);
     }
-
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(I18n.INTERNAL_SERVER_ERROR);
-    }
 }
