@@ -9,9 +9,15 @@ export const api = {
         return apiWithConfig.post('/auth/login-credentials', {login, password, language})
     },
 
+    logIn2fa: (userLogin: string, authCodeValue: string) => {
+        let language = window.navigator.language;
+        language = language.substring(0, 2)
+        const a = apiWithConfig.post('/auth/login-auth-code', {userLogin, authCodeValue, language})
+        return a
+    },
+
     logOut: () => {
         const url = '/auth/logout';
-        console.log(`Making POST request to: ${url}`);
         return apiWithConfig.post(url);
     },
 
