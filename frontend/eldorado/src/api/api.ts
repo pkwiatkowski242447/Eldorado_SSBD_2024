@@ -60,6 +60,27 @@ export const api = {
         })
     },
 
+    modifyAccountUser: (login: string, version: number, userLevelsDto: UserLevelType[], name: string,
+                        lastname: string, phoneNumber: string, twoFactorAuth: boolean, etag: string) => {
+        const cleanedEtag = etag.replace(/^"|"$/g, '');
+        //this is necessary because backend requires etag to be without quotes
+        const test = apiWithConfig.put('/accounts', {
+            login: login,
+            version: version,
+            userLevelsDto: userLevelsDto,
+            name: name,
+            lastname: lastname,
+            phoneNumber: phoneNumber,
+            twoFactorAuth: twoFactorAuth
+        }, {
+            headers: {
+                'If-Match': cleanedEtag
+            }
+        })
+        console.log(test)
+        return test
+    },
+
     changeEmailSelf: (email: string) => {
         return apiWithConfig.patch('/accounts/change-email-self', {
             email: email

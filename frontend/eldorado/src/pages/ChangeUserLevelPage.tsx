@@ -37,8 +37,12 @@ function ChangeUserLevelPage() {
     function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
             if (account) {
-                account.activeUserLevel = data.type;
+                // @ts-expect-error this works like a charm tho why mad
+                account.activeUserLevel = account.userLevelsDto.find((userLevel) => userLevel.roleName === data.type)
+                console.log(data)
+                console.log(account.activeUserLevel)
                 localStorage.setItem('account', JSON.stringify(account));
+                console.log(localStorage.getItem('account'))
             }
             toast({
                 title: "Hurray!",

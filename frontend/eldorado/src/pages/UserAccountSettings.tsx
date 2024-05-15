@@ -55,6 +55,8 @@ function UserAccountSettings() {
             api.getAccountById(id).then(response => {
                 setManagedUser(response.data);
                 console.log(response.data)
+                console.log(response.headers['etag'])
+                window.localStorage.setItem('etag', response.headers['etag']);
             });
         }
     }, [activeForm, id]);
@@ -190,7 +192,7 @@ function UserAccountSettings() {
         api.changeEmailSelf(values.email).then(() => {
             toast({
                 title: "Success!",
-                description: "Your email has been successfully changed.",
+                description: "The confirmation email has been sent to the provided address.",
             });
             if (managedUser?.id) {
                 api.getAccountById(managedUser?.id).then(response => {
@@ -213,15 +215,16 @@ function UserAccountSettings() {
 
     const onSubmitUserData = (values: z.infer<typeof userDataSchema>) => {
         const etag = window.localStorage.getItem('etag');
+        console.log(managedUser?.version)
         if (managedUser && managedUser.accountLanguage && etag !== null) {
-            api.modifyAccountSelf(managedUser.login, managedUser.version, managedUser.userLevelsDto,
+            api.modifyAccountUser(managedUser.login, managedUser.version, managedUser.userLevelsDto,
                 values.name, values.lastName, values.phoneNumber, false, etag)
                 .then(() => {
                     getCurrentAccount();
                     window.location.reload()
                     toast({
                         title: "Success!",
-                        description: "Your account info has been successfully changed.",
+                        description: "The account info has been successfully changed.",
                     });
                 }).catch((error) => {
                     toast({
@@ -303,7 +306,7 @@ function UserAccountSettings() {
                                 <Card className="mx-10 w-auto">
                                     <CardContent>
                                         <Form {...formEmail}>
-                                            {// @ts-expect-error - fix this
+                                            {// @ts-expect-error - fix this maybe
                                                 <form onSubmit={formEmail.handleSubmit(onSubmitEmail)}
                                                       className="space-y-4">
                                                     <div className="grid gap-4 p-5">
@@ -338,7 +341,7 @@ function UserAccountSettings() {
                             <Card className="mx-auto">
                                 <CardContent>
                                     <Form {...formUserData}>
-                                        {// @ts-expect-error - fix this
+                                        {// @ts-expect-error - fix this maybe
                                             <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
                                                   className="space-y-4">
                                                 <div className="grid gap-4 p-10">

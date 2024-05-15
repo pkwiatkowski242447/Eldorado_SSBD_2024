@@ -26,7 +26,7 @@ export const useAccount = () => {
     }, [account?.token, setAccount]);
 
     const navigateToMainPage = () => {
-        navigate(Pathnames.public.home)
+        navigate(Pathnames.public.login)
     }
 
     const logOut = async () => {
@@ -36,6 +36,8 @@ export const useAccount = () => {
             console.log(e)
         } finally {
             localStorage.removeItem('token')
+            localStorage.removeItem('account')
+            localStorage.removeItem('etag')
             setAccount(null)
             navigateToMainPage()
         }
@@ -70,11 +72,13 @@ export const useAccount = () => {
                         if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
                             if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
                                 activeUserLevel = token.data.userLevelsDto[i];
+                                console.log(activeUserLevel)
                                 break;
                             }
                         } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
                             if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
                                 activeUserLevel = token.data.userLevelsDto[i];
+                                console.log(activeUserLevel)
                                 break;
                             }
                         }
@@ -82,7 +86,6 @@ export const useAccount = () => {
                 } else {
                     activeUserLevel = account.activeUserLevel;
                 }
-                console.table(token.data)
                 const user: UserType = {
                     accountLanguage: token.data.accountLanguage,
                     active: token.data.active,
