@@ -40,13 +40,24 @@ const userDataSchema = z.object({
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
 function UserAccountSettings() {
-    const [activeForm, setActiveForm] = useState('Authentication');
-    const {id} = useParams<{ id: string }>();
+    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'UserLevel');
     const [managedUser, setManagedUser] = useState<UserType | null>(null);
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+
+    const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
+    const {id} = useParams<{ id: string }>();
     const phoneNumber = parsePhoneNumber(managedUser?.phone || '')
     const e164Number = phoneNumber?.format('E.164')
-    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
+
+    useEffect(() => {
+        if (id) {
+            localStorage.setItem('activeForm', activeForm);
+            api.getAccountById(id).then(response => {
+                setManagedUser(response.data);
+                console.log(response.data)
+            });
+        }
+    }, [activeForm, id]);
 
     const {getCurrentAccount} = useAccount();
 
@@ -60,37 +71,112 @@ function UserAccountSettings() {
         setAlertDialogOpen(true);
     };
 
+    //TODO you have to manually refresh the page to see the changes
+    //TODO gray out the admin button for the admin that is editing his own account
     const confirmChangeUserLevel = () => {
         if (levelToChange && managedUser) {
             if (managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange)) {
-                console.log('remove will be here')
+                switch (levelToChange) {
+                    case RolesEnum.ADMIN:
+                        api.removeLevelAdmin(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been removed successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                    case RolesEnum.STAFF:
+                        api.removeLevelStaff(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been removed successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                    case RolesEnum.CLIENT:
+                        api.removeLevelClient(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been removed successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
+                        break;
+                }
             } else {
                 switch (levelToChange) {
                     case RolesEnum.ADMIN:
-                        api.addLevelAdmin(managedUser.id);
+                        api.addLevelAdmin(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been added successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
                         break;
                     case RolesEnum.STAFF:
-                        api.addLevelStaff(managedUser.id);
+                        api.addLevelStaff(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been added successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
                         break;
                     case RolesEnum.CLIENT:
-                        api.addLevelClient(managedUser.id);
+                        api.addLevelClient(managedUser.id).then(() => {
+                            setAlertDialogOpen(false);
+                            toast({
+                                title: "Success!",
+                                description: "User level has been added successfully."
+                            })
+                        }).catch((error) => {
+                            toast({
+                                title: "Oh no!",
+                                description: "Something went wrong."
+                            })
+                            console.log(error.response.data)
+                        });
                         break;
                 }
                 setAlertDialogOpen(false);
+                location.reload()
                 setLevelToChange(null);
             }
         }
     }
-
-
-    useEffect(() => {
-        if (id) {
-            api.getAccountById(id).then(response => {
-                setManagedUser(response.data);
-                console.log(response.data)
-            });
-        }
-    }, [id]);
 
     const formEmail = useForm({
         resolver: zodResolver(emailSchema),
@@ -201,7 +287,7 @@ function UserAccountSettings() {
                                                 <AlertDialogDescription>
                                                     Are you sure you want
                                                     to {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange) ? 'remove' : 'add'} the {levelToChange} level
-                                                    from this user?
+                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange) ? ' from' : ' to'} this user?
                                                 </AlertDialogDescription>
                                                 <AlertDialogAction
                                                     onClick={confirmChangeUserLevel}>OK</AlertDialogAction>
@@ -217,30 +303,32 @@ function UserAccountSettings() {
                                 <Card className="mx-10 w-auto">
                                     <CardContent>
                                         <Form {...formEmail}>
-                                            <form onSubmit={formEmail.handleSubmit(onSubmitEmail)}
-                                                  className="space-y-4">
-                                                <div className="grid gap-4 p-5">
-                                                    <div className="grid gap-2">
-                                                        <FormField
-                                                            control={formEmail.control}
-                                                            name="email"
-                                                            render={({field}) => (
-                                                                <FormItem>
-                                                                    <FormLabel className="text-black">New
-                                                                        E-Mail</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input
-                                                                            placeholder={managedUser?.email} {...field} />
-                                                                    </FormControl>
-                                                                    <FormMessage/>
-                                                                </FormItem>
-                                                            )}/>
+                                            {// @ts-expect-error - fix this
+                                                <form onSubmit={formEmail.handleSubmit(onSubmitEmail)}
+                                                      className="space-y-4">
+                                                    <div className="grid gap-4 p-5">
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formEmail.control}
+                                                                name="email"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="text-black">New
+                                                                            E-Mail</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input
+                                                                                placeholder={managedUser?.email} {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}/>
+                                                        </div>
+                                                        <Button type="submit" className="w-full pb-2">
+                                                            Change your email
+                                                        </Button>
                                                     </div>
-                                                    <Button type="submit" className="w-full pb-2">
-                                                        Change your email
-                                                    </Button>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            }
                                         </Form>
                                     </CardContent>
                                 </Card>
@@ -250,65 +338,67 @@ function UserAccountSettings() {
                             <Card className="mx-auto">
                                 <CardContent>
                                     <Form {...formUserData}>
-                                        <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
-                                              className="space-y-4">
-                                            <div className="grid gap-4 p-10">
-                                                <div className="grid gap-2">
-                                                    <FormField
-                                                        control={formUserData.control}
-                                                        name="name"
-                                                        render={({field}) => (
-                                                            <FormItem>
-                                                                <FormLabel className="text-black">First
-                                                                    Name</FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        placeholder={managedUser?.name} {...field}/>
-                                                                </FormControl>
-                                                                <FormMessage/>
-                                                            </FormItem>
-                                                        )}
-                                                    />
+                                        {// @ts-expect-error - fix this
+                                            <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
+                                                  className="space-y-4">
+                                                <div className="grid gap-4 p-10">
+                                                    <div className="grid gap-2">
+                                                        <FormField
+                                                            control={formUserData.control}
+                                                            name="name"
+                                                            render={({field}) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="text-black">First
+                                                                        Name</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            placeholder={managedUser?.name} {...field}/>
+                                                                    </FormControl>
+                                                                    <FormMessage/>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <FormField
+                                                            control={formUserData.control}
+                                                            name="lastName"
+                                                            render={({field}) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="text-black">Last
+                                                                        Name</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            placeholder={managedUser?.lastname} {...field}/>
+                                                                    </FormControl>
+                                                                    <FormMessage/>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <FormField
+                                                            control={formUserData.control}
+                                                            name="phoneNumber"
+                                                            render={({field}) => (
+                                                                <FormItem className="items-start">
+                                                                    <FormLabel className="text-black text-center">Phone
+                                                                        Number</FormLabel>
+                                                                    <FormControl className="w-full">
+                                                                        <PhoneInput //TODO fix this
+                                                                            placeholder={e164Number} {...field}/>
+                                                                    </FormControl>
+                                                                    <FormMessage/>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                    <Button type="submit" className="w-full pb-2">
+                                                        Save changes
+                                                    </Button>
                                                 </div>
-                                                <div className="grid gap-2">
-                                                    <FormField
-                                                        control={formUserData.control}
-                                                        name="lastName"
-                                                        render={({field}) => (
-                                                            <FormItem>
-                                                                <FormLabel className="text-black">Last
-                                                                    Name</FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        placeholder={managedUser?.lastname} {...field}/>
-                                                                </FormControl>
-                                                                <FormMessage/>
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                </div>
-                                                <div className="grid gap-2">
-                                                    <FormField
-                                                        control={formUserData.control}
-                                                        name="phoneNumber"
-                                                        render={({field}) => (
-                                                            <FormItem className="items-start">
-                                                                <FormLabel className="text-black text-center">Phone
-                                                                    Number</FormLabel>
-                                                                <FormControl className="w-full">
-                                                                    <PhoneInput //TODO fix this
-                                                                        placeholder={e164Number} {...field}/>
-                                                                </FormControl>
-                                                                <FormMessage/>
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                </div>
-                                                <Button type="submit" className="w-full pb-2">
-                                                    Save changes
-                                                </Button>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        }
                                     </Form>
                                 </CardContent>
                             </Card>

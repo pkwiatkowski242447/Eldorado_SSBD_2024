@@ -95,7 +95,7 @@ export const useAccount = () => {
                     name: token.data.name,
                     token: tokenRaw,
                     phone: token.data.phone,
-                    userLevels: token.data.userLevelsDto,
+                    userLevelsDto: token.data.userLevelsDto,
                     activeUserLevel: activeUserLevel,
                     verified: token.data.verified,
                     version: token.data.version,
