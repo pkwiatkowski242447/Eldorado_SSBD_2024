@@ -247,7 +247,6 @@ public class Account extends AbstractEntity {
      */
     @Column(name = DatabaseConsts.ACCOUNT_BLOCKED_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
-//    @Setter
     private LocalDateTime blockedTime;
 
     /**
