@@ -133,4 +133,19 @@ export const api = {
         return apiWithConfig.get(`/accounts/${id}`)
     },
 
+    blockAccount: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/block`, {}, {
+            headers: {
+                'accept': 'text/plain'
+            }
+        });
+    },
+
+    unblockAccount: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/unblock`, {}, {
+            headers: {
+                'accept': 'text/plain'
+            }
+        });
+    },
 }
