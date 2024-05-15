@@ -52,7 +52,22 @@ function UserManagementPage() {
     const handleConfirmBlockUnblock = () => {
         if (selectedUser) {
             if (selectedUser.blocked) {
-                console.log('unblock')
+                api.unblockAccount(selectedUser.id).then(() => {
+                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
+                        if (response.status === 204) {
+                            setUsers([]);
+                        } else {
+                            setUsers(response.data);
+                        }
+                    });
+                    setAlertDialogOpen(false)
+                }).catch(error => {
+                    toast({
+                        variant: "destructive",
+                        description: "Something went wrong. Please try again later.",
+                    })
+                    console.table(error);
+                });
             } else {
                 api.blockAccount(selectedUser.id).then(() => {
                     api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
