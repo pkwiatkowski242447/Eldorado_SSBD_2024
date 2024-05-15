@@ -306,10 +306,11 @@ public class AccountControllerMockTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    @WithMockUser("login")
+   @Test
+    @WithMockUser("loginAdm")
     public void blockAccountTestSuccessful() throws Exception {
         doNothing().when(accountService).blockAccount(UUID.fromString(testId));
+        when(accountService.getAccountById(UUID.fromString(testId))).thenReturn(testAccount);
 
         mockMvc.perform(
                         post("/api/v1/accounts/{id}/block", testId))
