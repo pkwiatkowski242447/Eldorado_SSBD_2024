@@ -138,7 +138,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     @Override
     @RolesAllowed({ Roles.CLIENT, Roles.STAFF, Roles.ADMIN})
     public String registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
-        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         if (!confirmed && account.getTwoFactorAuth()) {
             this.generateAndSendEmailMessageWithAuthenticationCode(account);
             return null;

@@ -632,7 +632,11 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.removeClientUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException();
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -659,7 +663,11 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.removeStaffUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException();
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -686,7 +694,11 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     public ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
-        accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        try {
+            accountService.removeAdminUserLevel(String.valueOf(UUID.fromString(id)));
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException();
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -716,8 +728,8 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.addClientUserLevel(String.valueOf(UUID.fromString(id)));
-        } catch (IllegalArgumentException e) {
-            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException();
         }
         return ResponseEntity.noContent().build();
     }
@@ -748,8 +760,8 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.addStaffUserLevel(String.valueOf(UUID.fromString(id)));
-        } catch (IllegalArgumentException e) {
-            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException();
         }
         return ResponseEntity.noContent().build();
     }
@@ -780,8 +792,8 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.addAdminUserLevel(String.valueOf(UUID.fromString(id)));
-        } catch (IllegalArgumentException e) {
-            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException();
         }
         return ResponseEntity.noContent().build();
     }
@@ -796,7 +808,7 @@ public class AccountController implements AccountControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @Override
-    @PatchMapping(value = "/self/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/change-password/self", consumes = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({Roles.AUTHENTICATED})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})

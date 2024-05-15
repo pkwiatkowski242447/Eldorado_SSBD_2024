@@ -19,16 +19,26 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.AccountExceptionResolver;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.GenericExceptionResolver;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.TokenExceptionResolver;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.CurrentPasswordAndNewPasswordAreTheSameException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations.AccountController;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AccountService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -43,6 +53,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -75,7 +87,7 @@ public class AccountControllerMockTest {
     @BeforeEach
     public void setup() throws NoSuchFieldException, IllegalAccessException {
         this.mockMvc = MockMvcBuilders.standaloneSetup(accountController)
-                .setControllerAdvice(new GenericExceptionResolver(), new AccountExceptionResolver())
+                .setControllerAdvice(new GenericExceptionResolver(), new AccountExceptionResolver(), new TokenExceptionResolver())
                 .build();
         testAccount = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         testAccount.setAccountLanguage("pl");
@@ -166,6 +178,36 @@ public class AccountControllerMockTest {
     }
 
     @Test
+    public void forgetAccountPasswordTestUnsuccessfulAccountNotFound() throws Exception {
+        String email = "test@email.com";
+        AccountEmailDTO emailDTO = new AccountEmailDTO(email);
+
+        doThrow(AccountNotFoundException.class).when(accountService).forgetAccountPassword(email);
+
+        mockMvc.perform(
+                        post("/api/v1/accounts/forgot-password")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(mapper.writeValueAsString(emailDTO)))
+                .andExpect(status().isNoContent());
+        verify(accountService, times(1)).forgetAccountPassword(email);
+    }
+
+    @Test
+    public void forgetAccountPasswordTestUnsuccessfulAccountNotActivated() throws Exception {
+        String email = "test@email.com";
+        AccountEmailDTO emailDTO = new AccountEmailDTO(email);
+
+        doThrow(AccountNotActivatedException.class).when(accountService).forgetAccountPassword(email);
+
+        mockMvc.perform(
+                        post("/api/v1/accounts/forgot-password")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(mapper.writeValueAsString(emailDTO)))
+                .andExpect(status().isNoContent());
+        verify(accountService, times(1)).forgetAccountPassword(email);
+    }
+
+    @Test
     public void resetAccountPasswordTestSuccessful() throws Exception {
         when(accountService.getAccountById(UUID.fromString(testId))).thenReturn(testAccount);
         doNothing().when(accountService).forgetAccountPassword(testAccount.getEmail());
@@ -198,6 +240,15 @@ public class AccountControllerMockTest {
     }
 
     @Test
+    public void addClientUserLevelTestUnsuccessful() throws Exception {
+        String exampleId = "ExampleId";
+
+        mockMvc.perform(post("/api/v1/accounts/{id}/add-level-client", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void addStaffUserLevelTestSuccessful() throws Exception {
 
         doNothing().when(accountService).addStaffUserLevel(testId);
@@ -206,6 +257,15 @@ public class AccountControllerMockTest {
                         post("/api/v1/accounts/{id}/add-level-staff", testId)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void addStaffUserLevelTestUnsuccessful() throws Exception {
+        String exampleId = "ExampleId";
+
+        mockMvc.perform(post("/api/v1/accounts/{id}/add-level-staff", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -220,6 +280,15 @@ public class AccountControllerMockTest {
     }
 
     @Test
+    public void addAdminUserLevelTestUnsuccessful() throws Exception {
+        String exampleId = "ExampleId";
+
+        mockMvc.perform(post("/api/v1/accounts/{id}/add-level-admin", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void removeClientUserLevelTestSuccessful() throws Exception {
 
         doNothing().when(accountService).removeClientUserLevel(testId);
@@ -228,6 +297,15 @@ public class AccountControllerMockTest {
                         post("/api/v1/accounts/{id}/remove-level-client", testId)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void removeClientUserLevelTestUnsuccessful() throws Exception {
+        String exampleId = "ExampleId";
+
+        mockMvc.perform(post("/api/v1/accounts/{id}/remove-level-client", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -242,6 +320,15 @@ public class AccountControllerMockTest {
     }
 
     @Test
+    public void removeStaffUserLevelTestUnsuccessful() throws Exception {
+        String exampleId = "ExampleId";
+
+        mockMvc.perform(post("/api/v1/accounts/{id}/remove-level-staff", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void removeAdminUserLevelTestSuccessful() throws Exception {
 
         doNothing().when(accountService).removeAdminUserLevel(testId);
@@ -250,6 +337,15 @@ public class AccountControllerMockTest {
                         post("/api/v1/accounts/{id}/remove-level-admin", testId)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void removeAdminUserLevelTestUnsuccessful() throws Exception {
+        String exampleId = "ExampleId";
+
+        mockMvc.perform(post("/api/v1/accounts/{id}/remove-level-admin", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -306,7 +402,234 @@ public class AccountControllerMockTest {
                 .andExpect(status().isBadRequest());
     }
 
-   @Test
+    @Test
+    public void activateAccountTestPositive() throws Exception {
+        String exampleId = "ExampleId";
+
+        when(accountService.activateAccount(exampleId)).thenReturn(true);
+
+        mockMvc.perform(post("/api/v1/accounts/activate-account/{exampleId}", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void activateAccountTestNegative() throws Exception {
+        String exampleId = "ExampleId";
+
+        when(accountService.activateAccount(exampleId)).thenReturn(false);
+
+        mockMvc.perform(post("/api/v1/accounts/activate-account/{exampleId}", exampleId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void changeAccountPasswordTestNegativeTokenNotFound() throws Exception {
+        String exampleToken = "ExampleToken";
+        String examplePassword = "ExamplePassword";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountPasswordDTO accountPasswordDTO = new AccountPasswordDTO(examplePassword);
+
+        doThrow(TokenNotFoundException.class).when(accountService).changeAccountPassword(exampleToken, accountPasswordDTO.getPassword());
+
+        mockMvc.perform(post("/api/v1/accounts/change-password/{token_id}", exampleToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountPasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void changeAccountPasswordTestNegativeTokenNotValid() throws Exception {
+        String exampleToken = "ExampleToken";
+        String examplePassword = "ExamplePassword";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountPasswordDTO accountPasswordDTO = new AccountPasswordDTO(examplePassword);
+
+        doThrow(TokenNotValidException.class).when(accountService).changeAccountPassword(exampleToken, accountPasswordDTO.getPassword());
+
+        mockMvc.perform(post("/api/v1/accounts/change-password/{token_id}", exampleToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountPasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void changeAccountPasswordTestNegativeAccountIdNotFoundException() throws Exception {
+        String exampleToken = "ExampleToken";
+        String examplePassword = "ExamplePassword";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountPasswordDTO accountPasswordDTO = new AccountPasswordDTO(examplePassword);
+
+        doThrow(AccountIdNotFoundException.class).when(accountService).changeAccountPassword(exampleToken, accountPasswordDTO.getPassword());
+
+        mockMvc.perform(post("/api/v1/accounts/change-password/{token_id}", exampleToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountPasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void changeAccountPasswordTestNegativeAccountBlockedException() throws Exception {
+        String exampleToken = "ExampleToken";
+        String examplePassword = "ExamplePassword";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountPasswordDTO accountPasswordDTO = new AccountPasswordDTO(examplePassword);
+
+        doThrow(AccountBlockedException.class).when(accountService).changeAccountPassword(exampleToken, accountPasswordDTO.getPassword());
+
+        mockMvc.perform(post("/api/v1/accounts/change-password/{token_id}", exampleToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountPasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void changeAccountPasswordTestNegativeAccountNotActivatedException() throws Exception {
+        String exampleToken = "ExampleToken";
+        String examplePassword = "ExamplePassword";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountPasswordDTO accountPasswordDTO = new AccountPasswordDTO(examplePassword);
+
+        doThrow(AccountNotActivatedException.class).when(accountService).changeAccountPassword(exampleToken, accountPasswordDTO.getPassword());
+
+        mockMvc.perform(post("/api/v1/accounts/change-password/{token_id}", exampleToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountPasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void changeAccountPasswordTestPositive() throws Exception {
+        String exampleToken = "ExampleToken";
+        String examplePassword = "ExamplePassword";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountPasswordDTO accountPasswordDTO = new AccountPasswordDTO(examplePassword);
+
+        doNothing().when(accountService).changeAccountPassword(exampleToken, accountPasswordDTO.getPassword());
+
+        mockMvc.perform(post("/api/v1/accounts/change-password/{token_id}", exampleToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountPasswordDTO)))
+                .andExpect(status().isNoContent());
+    }
+
+    @WithMockUser(username = "ExampleAdminLogin1", roles = {"ADMIN"})
+    @Test
+    public void changePasswordSelfTestNegativeAccountNotFound() throws Exception {
+        String oldPassword = "ExampleOldPassword1";
+        String newPassword = "ExampleNewPassword1";
+        String userName = "ExampleAdminLogin1";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountChangePasswordDTO accountChangePasswordDTO = new AccountChangePasswordDTO(oldPassword, newPassword);
+
+        doThrow(AccountNotFoundException.class).when(accountService).changePasswordSelf(accountChangePasswordDTO.getOldPassword(),
+                accountChangePasswordDTO.getNewPassword(),
+                userName);
+
+        mockMvc.perform(patch("/api/v1/accounts/change-password/self")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountChangePasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @WithMockUser(username = "ExampleAdminLogin2", roles = {"ADMIN"})
+    @Test
+    public void changePasswordSelfTestNegativeOldPasswordIsNotCorrect() throws Exception {
+        String oldPassword = "ExampleOldPassword2";
+        String newPassword = "ExampleNewPassword2";
+        String userName = "ExampleAdminLogin2";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountChangePasswordDTO accountChangePasswordDTO = new AccountChangePasswordDTO(oldPassword, newPassword);
+
+        doThrow(IncorrectPasswordException.class).when(accountService).changePasswordSelf(accountChangePasswordDTO.getOldPassword(),
+                accountChangePasswordDTO.getNewPassword(),
+                userName);
+
+        mockMvc.perform(patch("/api/v1/accounts/change-password/self")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountChangePasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @WithMockUser(username = "ExampleAdminLogin3", roles = {"ADMIN"})
+    @Test
+    public void changePasswordSelfTestNegativeNewPasswordTheSameAsTheOldOne() throws Exception {
+        String oldPassword = "ExampleOldPassword3";
+        String newPassword = "ExampleNewPassword3";
+        String userName = "ExampleAdminLogin3";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountChangePasswordDTO accountChangePasswordDTO = new AccountChangePasswordDTO(oldPassword, newPassword);
+
+        doThrow(CurrentPasswordAndNewPasswordAreTheSameException.class).when(accountService).changePasswordSelf(accountChangePasswordDTO.getOldPassword(),
+                accountChangePasswordDTO.getNewPassword(),
+                userName);
+
+        mockMvc.perform(patch("/api/v1/accounts/change-password/self")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountChangePasswordDTO)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @WithMockUser(username = "ExampleAdminLogin4", roles = {"ADMIN"})
+    @Test
+    public void changePasswordSelfTestPositive() throws Exception {
+        String oldPassword = "ExampleOldPassword4";
+        String newPassword = "ExampleNewPassword4";
+        String userName = "ExampleAdminLogin4";
+        ObjectMapper objectMapper = new ObjectMapper();
+        AccountChangePasswordDTO accountChangePasswordDTO = new AccountChangePasswordDTO(oldPassword, newPassword);
+
+        doNothing().when(accountService).changePasswordSelf(accountChangePasswordDTO.getOldPassword(),
+                accountChangePasswordDTO.getNewPassword(),
+                userName);
+
+        mockMvc.perform(patch("/api/v1/accounts/change-password/self")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accountChangePasswordDTO)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getAccountsByMatchingLoginFirstNameAndLastNameTestPositiveWithNoEmptyListOfAccounts() throws Exception {
+        Account accountNo1 = new Account("exampleLogin1", "examplePassword1", "exampleFirstName1", "exampleLastName1", "exampleEmail1", "examplePhoneNumber1");
+        Account accountNo2 = new Account("exampleLogin2", "examplePassword2", "exampleFirstName2", "exampleLastName2", "exampleEmail2", "examplePhoneNumber2");
+        Account accountNo3 = new Account("exampleLogin3", "examplePassword3", "exampleFirstName3", "exampleLastName3", "exampleEmail3", "examplePhoneNumber3");
+        List<Account> listOfAccounts = List.of(accountNo1, accountNo2, accountNo3);
+
+        when(accountService.getAccountsByMatchingLoginFirstNameAndLastName(anyString(), anyString(), anyString(),
+                anyBoolean(), anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
+
+        mockMvc.perform(get("/api/v1/accounts//match-login-firstname-and-lastname")
+                        .queryParam("login", "ExampleLogin")
+                        .queryParam("firstName", "ExampleFirstName")
+                        .queryParam("lastName", "ExampleLastName")
+                        .queryParam("active", "true")
+                        .queryParam("order", "false")
+                        .queryParam("pageNumber", "0")
+                        .queryParam("pageSize", "5"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getAccountsByMatchingLoginFirstNameAndLastNameTestPositiveWhenThereAreNoAccounts() throws Exception {
+        List<Account> listOfAccounts = new ArrayList<>();
+
+        when(accountService.getAccountsByMatchingLoginFirstNameAndLastName(anyString(), anyString(), anyString(),
+                anyBoolean(), anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
+
+        mockMvc.perform(get("/api/v1/accounts//match-login-firstname-and-lastname")
+                        .queryParam("login", "ExampleLogin")
+                        .queryParam("firstName", "ExampleFirstName")
+                        .queryParam("lastName", "ExampleLastName")
+                        .queryParam("active", "true")
+                        .queryParam("order", "false")
+                        .queryParam("pageNumber", "0")
+                        .queryParam("pageSize", "5"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     @WithMockUser("loginAdm")
     public void blockAccountTestSuccessful() throws Exception {
         doNothing().when(accountService).blockAccount(UUID.fromString(testId));

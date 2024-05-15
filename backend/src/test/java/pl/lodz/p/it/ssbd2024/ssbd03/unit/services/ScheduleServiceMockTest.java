@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -22,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ScheduleServiceMockTest {
@@ -55,25 +55,32 @@ public class ScheduleServiceMockTest {
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         List<Account> accountList = List.of(account, account1);
 
-        Mockito.when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenReturn(accountList);
-        Mockito.doNothing().when(tokenFacade).removeByAccount(null);
-        Mockito.doNothing().when(accountMOKFacade).remove(any(Account.class));
+        when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenReturn(accountList);
+        doNothing().when(tokenFacade).removeByAccount(null);
+        doNothing().when(accountMOKFacade).remove(any(Account.class));
 
         scheduleService.deleteNotVerifiedAccount();
 
-        Mockito.verify(accountMOKFacade, Mockito.times(1)).remove(account);
-        Mockito.verify(accountMOKFacade, Mockito.times(1)).remove(account1);
+        verify(accountMOKFacade, times(1)).remove(account);
+        verify(accountMOKFacade, times(1)).remove(account1);
+    }
+
+    @Test
+    void deleteNotVerifiedTestUnsuccessful() {
+        when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenThrow(NumberFormatException.class);
+
+        assertThrows(ScheduleBadPropertiesException.class, () -> scheduleService.deleteNotVerifiedAccount());
     }
 
     @Test
     void deleteNotVerifiedTestEmpty() throws ScheduleBadPropertiesException {
         List<Account> accountList = new ArrayList<>();
 
-        Mockito.when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenReturn(accountList);
+        when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenReturn(accountList);
 
         scheduleService.deleteNotVerifiedAccount();
 
-        Mockito.verify(accountMOKFacade, Mockito.times(1)).findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS);
+        verify(accountMOKFacade, times(1)).findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS);
     }
 
     @Test
@@ -92,13 +99,13 @@ public class ScheduleServiceMockTest {
         creationDateField.set(account1, LocalDateTime.now().minusHours(13));
         creationDateField.setAccessible(false);
 
-        Mockito.when(tokenFacade.findByTokenType(Token.TokenType.REGISTER)).thenReturn(tokenList);
-        Mockito.doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
-        Mockito.doNothing().when(tokenFacade).removeByTypeAndAccount(Token.TokenType.REGISTER, null);
+        when(tokenFacade.findByTokenType(Token.TokenType.REGISTER)).thenReturn(tokenList);
+        doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
+        doNothing().when(tokenFacade).removeByTypeAndAccount(Token.TokenType.REGISTER, null);
 
         scheduleService.resendConfirmationEmail();
 
-        Mockito.verify(mailProvider, Mockito.times(2)).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
+        verify(mailProvider, times(2)).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
     }
 
     @Test
@@ -117,10 +124,10 @@ public class ScheduleServiceMockTest {
         creationDateField.set(account1, LocalDateTime.now());
         creationDateField.setAccessible(false);
 
-        Mockito.when(tokenFacade.findByTokenType(Token.TokenType.REGISTER)).thenReturn(tokenList);
+        when(tokenFacade.findByTokenType(Token.TokenType.REGISTER)).thenReturn(tokenList);
         scheduleService.resendConfirmationEmail();
-        Mockito.verify(tokenFacade, Mockito.times(1)).findByTokenType(Token.TokenType.REGISTER);
-        Mockito.verify(mailProvider, Mockito.never()).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
+        verify(tokenFacade, times(1)).findByTokenType(Token.TokenType.REGISTER);
+        verify(mailProvider, never()).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
     }
 
     @Test
@@ -138,25 +145,33 @@ public class ScheduleServiceMockTest {
         blockedTimeField.setAccessible(false);
         List<Account> accountList = List.of(account, account1);
 
-        Mockito.when(accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(2L, TimeUnit.HOURS))
+        when(accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(2L, TimeUnit.HOURS))
                 .thenReturn(accountList);
-        Mockito.doNothing().when(accountMOKFacade).edit(any());
-        Mockito.doNothing().when(mailProvider).sendUnblockAccountInfoEmail(any(), any(), any(), any());
+        doNothing().when(accountMOKFacade).edit(any());
+        doNothing().when(mailProvider).sendUnblockAccountInfoEmail(any(), any(), any(), any());
 
         scheduleService.unblockAccount();
 
-        Mockito.verify(mailProvider, Mockito.times(2)).sendUnblockAccountInfoEmail(any(), any(), any(), any());
+        verify(mailProvider, times(2)).sendUnblockAccountInfoEmail(any(), any(), any(), any());
+    }
+
+    @Test
+    void unblockAccountTestUnsuccessful() {
+        when(accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(2L, TimeUnit.HOURS))
+                .thenThrow(NumberFormatException.class);
+
+        assertThrows(ScheduleBadPropertiesException.class, () -> scheduleService.unblockAccount());
     }
 
     @Test
     void unblockAccountTestEmpty() throws ScheduleBadPropertiesException {
         List<Account> accountList = new ArrayList<>();
 
-        Mockito.when(accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(2L, TimeUnit.HOURS))
+        when(accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(2L, TimeUnit.HOURS))
                 .thenReturn(accountList);
 
         scheduleService.unblockAccount();
 
-        Mockito.verify(mailProvider, Mockito.never()).sendUnblockAccountInfoEmail(any(), any(), any(), any());
+        verify(mailProvider, never()).sendUnblockAccountInfoEmail(any(), any(), any(), any());
     }
 }
