@@ -87,6 +87,12 @@ export const api = {
         })
     },
 
+    changeEmailUser: (id: string, email: string) => {
+        return apiWithConfig.patch(`/accounts/${id}/change-email`, {
+            email: email
+        })
+    },
+
     confirmEmail: (token: string) => {
         return axios.create({
             baseURL: API_URL,

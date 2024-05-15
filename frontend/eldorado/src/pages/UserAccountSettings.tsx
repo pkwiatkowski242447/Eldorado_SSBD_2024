@@ -189,28 +189,30 @@ function UserAccountSettings() {
     });
 
     const onSubmitEmail = (values: z.infer<typeof emailSchema>) => {
-        api.changeEmailSelf(values.email).then(() => {
-            toast({
-                title: "Success!",
-                description: "The confirmation email has been sent to the provided address.",
-            });
-            if (managedUser?.id) {
-                api.getAccountById(managedUser?.id).then(response => {
-                    setManagedUser(response.data);
-                    console.log(response.data)
+        if (managedUser) {
+            api.changeEmailUser(managedUser.id, values.email).then(() => {
+                toast({
+                    title: "Success!",
+                    description: "The confirmation email has been sent to the provided address.",
                 });
-            }
-            // setTimeout(() => {
-            //     window.location.reload()
-            // }, 3000);
+                if (managedUser?.id) {
+                    api.getAccountById(managedUser?.id).then(response => {
+                        setManagedUser(response.data);
+                        console.log(response.data)
+                    });
+                }
+                // setTimeout(() => {
+                //     window.location.reload()
+                // }, 3000);
 
-        }).catch((error) => {
-            toast({
-                variant: "destructive",
-                description: "Something went wrong. Please try again later.",
-            })
-            console.log(error.response.data)
-        });
+            }).catch((error) => {
+                toast({
+                    variant: "destructive",
+                    description: "Something went wrong. Please try again later.",
+                })
+                console.log(error.response.data)
+            });
+        }
     };
 
     const onSubmitUserData = (values: z.infer<typeof userDataSchema>) => {
@@ -290,7 +292,8 @@ function UserAccountSettings() {
                                                 <AlertDialogDescription>
                                                     Are you sure you want
                                                     to {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange) ? 'remove' : 'add'} the {levelToChange} level
-                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange) ? ' from' : ' to'} this user?
+                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange) ? ' from' : ' to'} this
+                                                    user?
                                                 </AlertDialogDescription>
                                                 <AlertDialogAction
                                                     onClick={confirmChangeUserLevel}>OK</AlertDialogAction>
