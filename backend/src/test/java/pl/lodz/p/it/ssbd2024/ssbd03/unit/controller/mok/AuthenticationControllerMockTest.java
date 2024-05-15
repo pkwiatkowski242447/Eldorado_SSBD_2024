@@ -16,6 +16,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -230,6 +231,7 @@ public class AuthenticationControllerMockTest {
         assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
     }
 
+    @WithMockUser(username = "johann13", roles = { "CLIENT" })
     @Test
     public void loginUsingAuthenticationCodeSuccessful() throws Exception {
         Mockito.doNothing().when(authenticationService).loginUsingAuthenticationCode(
@@ -274,6 +276,7 @@ public class AuthenticationControllerMockTest {
         Mockito.verify(authenticationService, Mockito.times(1)).loginUsingAuthenticationCode(Mockito.eq("johann13"), Mockito.eq("TEST_VALUE"));
     }
 
+    @WithMockUser(username = "ExampleAdminNo1", roles = { "ADMIN" })
     @Test
     public void logoutSuccessful() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/logout"))
