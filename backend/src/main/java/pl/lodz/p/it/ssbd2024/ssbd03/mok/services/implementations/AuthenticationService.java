@@ -103,7 +103,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         Account account = this.authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
         if (!account.getActive()) {
             throw new AccountNotActivatedException();
-        } else if (account.getBlocked() && account.getBlockedTime() != null) {
+        } else if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountBlockedByAdminException();
         } else if (account.getBlocked()) {
             throw new AccountBlockedByFailedLoginAttemptsException();
@@ -133,7 +133,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     @Override
     public String registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
-        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         if (!confirmed && account.getTwoFactorAuth()) {
             this.generateAndSendEmailMessageWithAuthenticationCode(account);
             return null;

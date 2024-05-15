@@ -21,6 +21,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TokenServiceMockTest {
@@ -35,12 +36,12 @@ public class TokenServiceMockTest {
     private TokenService tokenService;
 
     @Test
-    void createRegistrationTokenTest() throws ApplicationBaseException {
+    public void createRegistrationTokenTest() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         String tokenValue = "TOKEN VALUE";
         ArgumentCaptor<Token> tokenArgumentCaptor = ArgumentCaptor.captor();
         Token compareToken = new Token(tokenValue, account, Token.TokenType.REGISTER);
-        Mockito.when(jwtProvider.generateActionToken(account, 24, ChronoUnit.HOURS)).thenReturn(tokenValue);
+        when(jwtProvider.generateActionToken(account, 24, ChronoUnit.HOURS)).thenReturn(tokenValue);
         Mockito.doNothing().when(tokenFacade).create(any());
 
         assertEquals(tokenValue, tokenService.createRegistrationToken(account));
@@ -52,13 +53,13 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void createEmailConfirmationTokenTest() throws ApplicationBaseException {
+    public void createEmailConfirmationTokenTest() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         String newEmail = "new@email.com";
         String tokenValue = "TOKEN VALUE";
         ArgumentCaptor<Token> tokenArgumentCaptor = ArgumentCaptor.captor();
         Token compareToken = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
-        Mockito.when(jwtProvider.generateEmailToken(account, newEmail,24)).thenReturn(tokenValue);
+        when(jwtProvider.generateEmailToken(account, newEmail,24)).thenReturn(tokenValue);
         Mockito.doNothing().when(tokenFacade).create(any());
 
         assertEquals(tokenValue, tokenService.createEmailConfirmationToken(account, newEmail));
@@ -70,12 +71,12 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void removeAccountEmailConfirmationTokenTestSuccessful() throws ApplicationBaseException {
+    public void removeAccountEmailConfirmationTokenTestSuccessful() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         String tokenValue = "TOKEN VALUE";
         Token token = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
-        Mockito.when(tokenFacade.findByTypeAndAccount(eq(Token.TokenType.CONFIRM_EMAIL), any())).thenReturn(Optional.of(token));
-        Mockito.when(jwtProvider.extractAccountId(tokenValue)).thenReturn(UUID.randomUUID());
+        when(tokenFacade.findByTypeAndAccount(eq(Token.TokenType.CONFIRM_EMAIL), any())).thenReturn(Optional.of(token));
+        when(jwtProvider.extractAccountId(tokenValue)).thenReturn(UUID.randomUUID());
         Mockito.doNothing().when(tokenFacade).remove(token);
 
         tokenService.removeAccountsEmailConfirmationToken(tokenValue);
@@ -83,12 +84,46 @@ public class TokenServiceMockTest {
     }
 
     @Test
-    void removeAccountEmailConfirmationTokenTestNoSuchToken() throws ApplicationBaseException {
+    public void removeAccountEmailConfirmationTokenTestNoSuchToken() throws ApplicationBaseException {
         String tokenValue = "TOKEN VALUE";
-        Mockito.when(tokenFacade.findByTypeAndAccount(eq(Token.TokenType.CONFIRM_EMAIL), any())).thenReturn(Optional.empty());
-        Mockito.when(jwtProvider.extractAccountId(tokenValue)).thenReturn(UUID.randomUUID());
+        when(tokenFacade.findByTypeAndAccount(eq(Token.TokenType.CONFIRM_EMAIL), any())).thenReturn(Optional.empty());
+        when(jwtProvider.extractAccountId(tokenValue)).thenReturn(UUID.randomUUID());
 
         tokenService.removeAccountsEmailConfirmationToken(tokenValue);
         Mockito.verify(tokenFacade, Mockito.never()).remove(any());
+    }
+
+    @Test
+    public void createPasswordResetTokenTestPositiveWhenPreviousTokenNotFound() throws ApplicationBaseException {
+        Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        String exampleTokenValue = "ExampleTokenValue1";
+        Token token = new Token(exampleTokenValue, account, Token.TokenType.RESET_PASSWORD);
+
+        when(tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId())).thenReturn(Optional.empty());
+        when(jwtProvider.generateActionToken(account, 0, ChronoUnit.MINUTES)).thenReturn(exampleTokenValue);
+        doNothing().when(tokenFacade).create(any());
+
+        String tokenValue = tokenService.createPasswordResetToken(account);
+
+        assertEquals(tokenValue, exampleTokenValue);
+    }
+
+    @Test
+    public void createPasswordResetTokenTestPositiveWhenPreviousTokenFound() throws ApplicationBaseException {
+        Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        Token existingToken = new Token("SomeOtherTokenValue", account, Token.TokenType.RESET_PASSWORD);
+        String exampleTokenValue = "ExampleTokenValue2";
+        Token token = new Token(exampleTokenValue, account, Token.TokenType.RESET_PASSWORD);
+
+        when(tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId())).thenReturn(Optional.of(existingToken));
+        doNothing().when(tokenFacade).remove(existingToken);
+        when(jwtProvider.generateActionToken(account, 0, ChronoUnit.MINUTES)).thenReturn(exampleTokenValue);
+        doNothing().when(tokenFacade).create(any());
+
+        String tokenValue = tokenService.createPasswordResetToken(account);
+
+        assertEquals(tokenValue, exampleTokenValue);
+
+        verify(tokenFacade, times(1)).remove(existingToken);
     }
 }
