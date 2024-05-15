@@ -22,7 +22,8 @@ import java.util.List;
         "classpath:properties/mail.properties",
         "classpath:properties/urls.properties",
         "classpath:properties/consts.properties",
-        "classpath:properties/retry.properties"
+        "classpath:properties/retry.properties",
+        "classpath:properties/key.properties"
 })
 @EnableRetry
 @EnableAspectJAutoProxy(proxyTargetClass = true)

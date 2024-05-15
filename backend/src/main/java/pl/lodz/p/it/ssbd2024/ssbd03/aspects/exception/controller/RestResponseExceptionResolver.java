@@ -1,8 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,5 +18,10 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
                 .body(I18n.ACCESS_DENIED_EXCEPTION);
     }
 
-
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(I18n.INTERNAL_SERVER_ERROR);
+    }
 }

@@ -33,7 +33,7 @@ public interface TokenServiceInterface {
      *
      * @param token Confirmation token to be removed
      */
-    void removeAccountsEmailConfirmationToken(String token);
+    void removeAccountsEmailConfirmationToken(String token) throws ApplicationBaseException;
 
     /**
      * Creates and persists password reset token for the Account.

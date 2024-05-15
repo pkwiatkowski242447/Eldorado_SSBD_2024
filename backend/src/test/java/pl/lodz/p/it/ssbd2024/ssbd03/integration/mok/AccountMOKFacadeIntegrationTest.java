@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -122,6 +124,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void findByLoginReturnExistingAccountPositiveTest() {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo2);
 
@@ -138,6 +141,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void findByLoginReturnNullAccountTestPositive() {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo1);
 
@@ -171,6 +175,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.ADMIN)
     public void findAllTestPositive() {
         List<Account> accounts = accountMOKFacade.findAll();
 
@@ -179,6 +184,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.ADMIN)
     public void findAllWithPaginationTestPositive() {
         List<Account> accountsNo1 = accountMOKFacade.findAllAccountsWithPagination(0, 4);
         List<Account> accountsNo2 = accountMOKFacade.findAllAccountsWithPagination(1, 3);
@@ -191,6 +197,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.ADMIN)
     public void findAllActiveAccountsWithPaginationTestPositive() {
         List<Account> accountsNo1 = accountMOKFacade.findAllActiveAccountsWithPagination(0, 4);
         List<Account> accountsNo2 = accountMOKFacade.findAllActiveAccountsWithPagination(1, 3);
@@ -227,6 +234,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void findByLoginAndRefreshReturnExistingAccountTestPositive() {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo2);
 
@@ -243,6 +251,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void findByLoginAndRefreshReturnNullTestPositive() {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo1);
 
@@ -251,6 +260,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void createAndRemoveMethodPositiveTest() throws ApplicationBaseException {
         //Create account with user level
         Account account = new Account(accountLoginNo1, accountPasswordNo1, accountFirstNameNo1, accountLastNameNo1,
@@ -280,6 +290,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllInactiveAccountsWithPaginationPositiveTest() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -317,6 +328,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.ADMIN)
     public void findAllActiveAccountsWithGivenUserLevelWithPaginationPositiveTest() {
         List<Account> accounts0 = accountMOKFacade.findAll();
         assertEquals(7, accounts0.size());
@@ -332,6 +344,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllAccountsMatchingLoginWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -368,6 +381,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void editPositiveTest() throws ApplicationBaseException {
 
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
@@ -394,6 +408,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void findAllAccountsMarkedForDeletionTestPositive() throws ApplicationBaseException, NoSuchFieldException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -429,6 +444,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllAccountsByBlockedTestPositive() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -479,6 +495,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllBlockedAccountsThatWereBlockedByAdminWithPagination() throws ApplicationBaseException, IllegalAccessException, NoSuchFieldException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -531,6 +548,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllActiveAccountsWithUnverifiedEmailWithPaginationTestPositive() {
         List<Account> accounts0 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 10);
         List<Account> accounts1 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 2);
@@ -545,7 +563,12 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+<<<<<<< HEAD
     public void findAllInactiveAccountsWithUnverifiedEmailWithPagination() throws ApplicationBaseException {
+=======
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
+    public void findAllInactiveAccountsWithUnverifiedEmailWithPagination() {
+>>>>>>> a025ba59a4080413997dd76a24bda8978725e5cb
         Account account0 = accountMOKFacade.findByLogin("tonyhalik").orElseThrow(NoSuchElementException::new);
         Account account1 = accountMOKFacade.findByLogin("adamn").orElseThrow(NoSuchElementException::new);
 
@@ -568,6 +591,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -604,6 +628,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllAccountsWithoutRecentActivityWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -647,6 +672,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void countAllAccountsWithoutRecentActivityWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
@@ -690,6 +716,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = Roles.AUTHENTICATED)
     public void findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);

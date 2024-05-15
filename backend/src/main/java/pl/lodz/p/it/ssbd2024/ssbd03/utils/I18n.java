@@ -28,6 +28,7 @@ public class I18n {
     // Token exceptions
     public static final String TOKEN_VALUE_NOT_FOUND_EXCEPTION = "token.token.value.not.found.exception";
     public static final String TOKEN_NOT_VALID_EXCEPTION = "token.token.value.not.valid.exception";
+    public static final String TOKEN_DATA_EXTRACTION_EXCEPTION = "token.data.extraction.taken.exception";
 
     // Token internationalization keys
     public static final String TOKEN_VALUE_ALREADY_TAKEN = "token.value.already.taken.exception";
@@ -37,6 +38,7 @@ public class I18n {
     public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
     public static final String ACCESS_DENIED_EXCEPTION = "application.access.denied.exception";
     public static final String UNEXPECTED_DATABASE_EXCEPTION = "application.database.server.exception";
+    public static final String PATH_NOT_FOUND_EXCEPTION = "application.path.not.found.exception";
 
     // Authentication service
     public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";

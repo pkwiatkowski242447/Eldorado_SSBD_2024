@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -38,49 +37,17 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    /**
-     * Whitelist containing all URLs related to OpenAPI configuration.
-     */
-    private static final String[] AUTH_WHITELIST = {
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/webjars/**",
-            "/v3/api-docs/**",
-            "/api/public/**",
-            "/api/public/authenticate",
-            "/actuator/*",
-            "/swagger-ui/**"
-    };
-
-    /**
-     * Whitelist containing all URLs related to paths available to unauthenticated users.
-     */
-    private static final String[] PATHS_WHITELIST = {
-            "/api/v1/auth/**",
-            "/api/v1/register/client",
-            "/api/v1/accounts/change-password/**",
-            "/api/v1/accounts/forgot-password",
-            "/api/v1/accounts/activate-account/**"
-    };
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .logout((logout) -> logout
-                        .logoutUrl("/api/v1/auth/logout")
-                        .logoutSuccessUrl("http://localhost:3000/login"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> corsConfigurationSource())
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(PATHS_WHITELIST).permitAll()
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .requestMatchers("/**").authenticated());
+                          .requestMatchers("/**").permitAll()
+                );
 
         return httpSecurity.build();
     }
