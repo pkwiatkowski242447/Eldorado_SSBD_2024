@@ -35,7 +35,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.TokenServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
@@ -304,7 +303,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     @RolesAllowed({ Roles.ADMIN })
-    public void blockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyBlockedException {
+    public void blockAccount(UUID id) throws ApplicationBaseException, AccountNotFoundException, AccountAlreadyBlockedException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException();
@@ -327,7 +326,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     @RolesAllowed({ Roles.ADMIN })
-    public void unblockAccount(UUID id) throws AccountNotFoundException, AccountAlreadyUnblockedException {
+    public void unblockAccount(UUID id) throws ApplicationBaseException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (!account.getBlocked()) {
             throw new AccountAlreadyUnblockedException();
@@ -344,8 +343,8 @@ public class AccountService implements AccountServiceInterface {
     /**
      * This method is used to modify user personal data.
      *
-     * @param modifiedAccount  Account with potentially modified properties: name, lastname, phoneNumber.
-     * @param userLogin Login associated with the modified account.
+     * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
+     * @param userLogin       Login associated with the modified account.
      * @return Account object with applied modifications
      * @throws AccountNotFoundException           Threw if the account with passed login property does not exist.
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
@@ -414,8 +413,8 @@ public class AccountService implements AccountServiceInterface {
      *
      * @param token Last part of the confirmation URL sent in a message to user's e-mail address.
      * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
-     * @throws AccountNotFoundException Threw if the account connected to the token does not exist.
-     * @throws TokenNotFoundException Threw if the token does not exist in the database.
+     * @throws AccountNotFoundException  Threw if the account connected to the token does not exist.
+     * @throws TokenNotFoundException    Threw if the token does not exist in the database.
      * @throws AccountEmailNullException Threw if the email extracted from the token was for some strange reason null.
      */
     @Override
@@ -486,7 +485,7 @@ public class AccountService implements AccountServiceInterface {
     @RolesAllowed({ Roles.AUTHENTICATED })
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getAccountByLogin(String login) throws ApplicationBaseException {
-        return  accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        return accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 
     /**
@@ -628,7 +627,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void removeAdminUserLevel(String id) throws ApplicationBaseException{
+    public void removeAdminUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         String currentAccountLogin = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -658,9 +657,8 @@ public class AccountService implements AccountServiceInterface {
      * Adds the Client user level to the account.
      *
      * @param id Identifier of the account to which the Client user level will be added.
-     * @throws ApplicationBaseException
-     * AccountNotFoundException - when account is not found
-     * AccountUserLevelException - when account already has this user level
+     * @throws ApplicationBaseException AccountNotFoundException - when account is not found
+     *                                  AccountUserLevelException - when account already has this user level
      */
     @Override
     @RolesAllowed({ Roles.ADMIN })
@@ -669,62 +667,57 @@ public class AccountService implements AccountServiceInterface {
 
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
-        if(account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
         }
         UserLevel clientUserLevel = new Client();
         account.addUserLevel(clientUserLevel);
-        accountFacade.edit(account);
-
         userLevelFacade.create(clientUserLevel);
+        accountFacade.edit(account);
     }
 
     /**
      * Adds the Staff user level to the account.
      *
      * @param id Identifier of the account to which the Staff user level will be added.
-     * @throws ApplicationBaseException
-     * AccountNotFoundException - when account is not found
-     * AccountUserLevelException - when account already has this user level
+     * @throws ApplicationBaseException AccountNotFoundException - when account is not found
+     *                                  AccountUserLevelException - when account already has this user level
      */
     @Override
     @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void addStaffUserLevel(String id) throws ApplicationBaseException{
+    public void addStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
-        if(account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
         }
         UserLevel staffUserLevel = new Staff();
         account.addUserLevel(staffUserLevel);
-        accountFacade.edit(account);
-
         userLevelFacade.create(staffUserLevel);
+        accountFacade.edit(account);
     }
 
     /**
      * Adds the Admin user level to the account.
      *
      * @param id Identifier of the account to which the Admin user level will be added.
-     * @throws ApplicationBaseException
-     * AccountNotFoundException - when account is not found
-     * AccountUserLevelException - when account already has this user level
+     * @throws ApplicationBaseException AccountNotFoundException - when account is not found
+     *                                  AccountUserLevelException - when account already has this user level
      */
     @Override
     @RolesAllowed({ Roles.ADMIN })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void addAdminUserLevel(String id) throws ApplicationBaseException{
+    public void addAdminUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
-        if(account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Admin)) {
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Admin)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
         }
         UserLevel adminUserLevel = new Admin();
         account.addUserLevel(adminUserLevel);
-        accountFacade.edit(account);
-
         userLevelFacade.create(adminUserLevel);
+        accountFacade.edit(account);
     }
 
     /***

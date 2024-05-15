@@ -12,6 +12,8 @@ import SiteHeader from "@/components/SiteHeader.tsx";
 import {Card, CardHeader} from "@/components/ui/card.tsx";
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {useNavigate} from "react-router-dom";
+import {useEffect} from "react";
+import {useAccount} from "@/hooks/useAccount.ts";
 
 const FormSchema = z.object({
     type: z.any()
@@ -21,10 +23,16 @@ function ChangeUserLevelPage() {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
     })
-
     const navigator = useNavigate()
-
     const {account} = useAccountState()
+
+    const {getCurrentAccount} = useAccount();
+
+    //It has to be that way afaik so ignore the warning and enjoy your day :)
+    useEffect(() => {
+        getCurrentAccount();
+    }, []);
+
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
@@ -71,11 +79,11 @@ function ChangeUserLevelPage() {
                                                 defaultValue={account?.activeUserLevel.roleName}
                                                 className="flex flex-col space-y-1"
                                             >
-                                                {account?.userLevels.map((userLevel, index) => (
+                                                {account?.userLevelsDto.map((userLevel, index) => (
                                                     <FormItem key={index}
                                                               className="flex items-center space-x-3 space-y-0">
                                                         <FormControl>
-                                                            <RadioGroupItem value={userLevel}/>
+                                                            <RadioGroupItem value={userLevel.roleName}/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
                                                             {userLevel.roleName}

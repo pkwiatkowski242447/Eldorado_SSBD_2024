@@ -100,7 +100,7 @@ public interface AccountServiceInterface {
      * @throws AccountNotFoundException         Threw when there is no account with given login.
      * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
      */
-    void unblockAccount(UUID id) throws AccountBaseException;
+    void unblockAccount(UUID id) throws ApplicationBaseException;
 
     /**
      * This method is used to modify user personal data.

@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -68,7 +69,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      */
     @Override
     @PermitAll
-    public void edit(Account entity) {
+    public void edit(Account entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 
@@ -88,7 +89,6 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * This method is used to find user account by username. As username needs to be unique, it returns a single result.
      *
      * @param login Login of the searched user account.
-     *
      * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */

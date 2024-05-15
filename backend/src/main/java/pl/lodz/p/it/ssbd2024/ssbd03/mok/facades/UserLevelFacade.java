@@ -71,7 +71,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public void edit(UserLevel userLevel) {
+    public void edit(UserLevel userLevel) throws ApplicationBaseException {
         super.edit(userLevel);
     }
 

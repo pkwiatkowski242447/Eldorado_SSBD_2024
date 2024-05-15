@@ -75,7 +75,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @Override
     @RolesAllowed(Roles.AUTHENTICATED)
-    public void edit(Token entity) {
+    public void edit(Token entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 
