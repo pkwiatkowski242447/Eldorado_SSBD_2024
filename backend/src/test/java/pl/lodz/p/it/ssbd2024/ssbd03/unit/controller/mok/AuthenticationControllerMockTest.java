@@ -27,6 +27,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.AccountExceptio
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.GenericExceptionResolver;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
@@ -85,8 +86,8 @@ public class AuthenticationControllerMockTest {
         // Verify
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
     @Test
@@ -110,8 +111,8 @@ public class AuthenticationControllerMockTest {
         // Verify
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
     @Test
@@ -132,8 +133,8 @@ public class AuthenticationControllerMockTest {
         // Verify
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
     @Test
@@ -148,15 +149,20 @@ public class AuthenticationControllerMockTest {
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
                 .andExpect(MockMvcResultMatchers.status().is(401))
-                .andExpect(result -> assertEquals(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION, result.getResponse().getContentAsString()));
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         // Verify
         Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithIncrement(Mockito.eq("johann13"), Mockito.anyString());
 
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
     @Test
@@ -171,15 +177,20 @@ public class AuthenticationControllerMockTest {
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
                 .andExpect(MockMvcResultMatchers.status().is(400))
-                .andExpect(result -> assertEquals(I18n.ACCOUNT_INACTIVE_EXCEPTION, result.getResponse().getContentAsString()));
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_INACTIVE_EXCEPTION)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         // Verify
         Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(Mockito.eq("johann13"), Mockito.anyString());
 
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
     @Test
@@ -199,15 +210,20 @@ public class AuthenticationControllerMockTest {
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
                 .andExpect(MockMvcResultMatchers.status().is(400))
-                .andExpect(result -> assertEquals(I18n.ACCOUNT_BLOCKED_BY_ADMIN, result.getResponse().getContentAsString()));
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_BLOCKED_BY_ADMIN)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         // Verify
         Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(Mockito.eq("johann13"), Mockito.anyString());
 
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
     @Test
@@ -227,15 +243,20 @@ public class AuthenticationControllerMockTest {
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
                 .andExpect(MockMvcResultMatchers.status().is(400))
-                .andExpect(result -> assertEquals(I18n.ACCOUNT_BLOCKED_BY_FAILED_LOGIN_ATTEMPTS, result.getResponse().getContentAsString()));
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_BLOCKED_BY_FAILED_LOGIN_ATTEMPTS)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         // Verify
         Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(Mockito.eq("johann13"), Mockito.anyString());
 
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
     @Test
@@ -248,15 +269,20 @@ public class AuthenticationControllerMockTest {
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
                 .andExpect(MockMvcResultMatchers.status().is(401))
-                .andExpect(result -> assertEquals(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION, result.getResponse().getContentAsString()));
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
-        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
-        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
     }
 
-    @WithMockUser(username = "johann13", roles = { "CLIENT" })
+    @WithMockUser(username = "johann13", roles = {"CLIENT"})
     @Test
     public void loginUsingAuthenticationCodeSuccessful() throws Exception {
         Mockito.doNothing().when(authenticationService).loginUsingAuthenticationCode(
@@ -294,14 +320,19 @@ public class AuthenticationControllerMockTest {
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(authenticationCodeDTO)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.ACCOUNT_INACTIVE_EXCEPTION, result.getResponse().getContentAsString()));
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_INACTIVE_EXCEPTION)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         // Verify
         Mockito.verify(authenticationService, Mockito.times(1)).loginUsingAuthenticationCode(Mockito.eq("johann13"), Mockito.eq("TEST_VALUE"));
     }
 
-    @WithMockUser(username = "ExampleAdminNo1", roles = { "ADMIN" })
+    @WithMockUser(username = "ExampleAdminNo1", roles = {"ADMIN"})
     @Test
     public void logoutSuccessful() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/logout"))
