@@ -471,7 +471,7 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccountOutputDTO.class))),
             @ApiResponse(responseCode = "400", description = "The account has not been modified due to the correctness of the request or because the account is not available in the database", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)),
-            @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
+            @ApiResponse(responseCode = "409", description = "The account has not been modified due to parallel modification.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
     })
     public ResponseEntity<?> modifyUserAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                                @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {

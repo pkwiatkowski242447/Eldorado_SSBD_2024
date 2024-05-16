@@ -81,7 +81,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     private final String accountEmailNo1 = "emailtest@it.com";
     private final String accountEmailNo3 = "emailtest2@it.com";
     private final String accountEmailNo4 = "emailtest3@it.com";
-    private final String accountEmailNo2 = "jbem@example.com";
+    private final String accountEmailNo2 = "jerzybem@spoko.pl";
 
     //phone number
     private final String accountPhoneNumberNo1 = "123123123";

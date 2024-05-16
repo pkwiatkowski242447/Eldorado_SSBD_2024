@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminDTO;
@@ -22,7 +23,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Getter
+@Getter @Setter
 public abstract class AccountSignableDTO implements SignableDTO {
     @Schema(description = "String identifier linked with Account", example = "boleslawchrobry", requiredMode = Schema.RequiredMode.REQUIRED)
     private String login;

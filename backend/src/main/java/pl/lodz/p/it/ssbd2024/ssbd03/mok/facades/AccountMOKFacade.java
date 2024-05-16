@@ -230,7 +230,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAccountByLogin.setParameter("login", login);
             Account foundAccount = findAccountByLogin.getSingleResult();
             entityManager.refresh(foundAccount);
-            entityManager.lock(foundAccount, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             return Optional.of(foundAccount);
         } catch (PersistenceException exception) {
             return Optional.empty();
