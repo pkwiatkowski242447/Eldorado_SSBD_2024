@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
+import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
@@ -25,12 +27,21 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenAuthFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Optional;
-import java.util.Random;
 
 /**
  * Service managing authentication.
@@ -70,6 +81,8 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     private final JWTProvider jwtProvider;
 
+    final TimeBasedOneTimePasswordGenerator totp = new TimeBasedOneTimePasswordGenerator(Duration.of(30, ChronoUnit.SECONDS), 8);
+    private Key key;
 
     /**
      * Autowired constructor for the service.
@@ -93,6 +106,18 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         this.jwtProvider = jwtProvider;
     }
 
+    @PostConstruct
+    public void generateKey() throws NoSuchAlgorithmException {
+        final KeyGenerator keyGenerator = KeyGenerator.getInstance(totp.getAlgorithm());
+
+        // Key length should match the length of the HMAC output (160 bits for SHA-1, 256 bits
+        // for SHA-256, and 512 bits for SHA-512). Note that while Mac#getMacLength() returns a
+        // length in _bytes,_ KeyGenerator#init(int) takes a key length in _bits._
+        final int macLengthInBytes = Mac.getInstance(totp.getAlgorithm()).getMacLength();
+        keyGenerator.init(macLengthInBytes * 8);
+
+        key = keyGenerator.generateKey();
+    }
     /**
      * This method is used to perform the second step in multifactor authentication, that is
      * to verify the provided authentication code, used for authenticating user in the application.
@@ -115,7 +140,13 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         }
 
         Token token = this.tokenFacade.findByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId()).orElseThrow(TokenNotFoundException::new);
-        String hashedAuthenticationCode = this.jwtProvider.extractHashedCodeValueFromToken(token.getTokenValue());
+        String hashedAuthenticationCode;
+        try{
+            hashedAuthenticationCode = this.jwtProvider.extractHashedCodeValueFromToken(token.getTokenValue());
+        } catch (TokenNotValidException exception){
+            tokenFacade.remove(token);
+            throw exception;
+        }
         if (!jwtProvider.isMultiFactorAuthTokenValid(token.getTokenValue()) ||
                 !passwordEncoder.matches(code, hashedAuthenticationCode))
             throw new TokenNotValidException();
@@ -215,8 +246,12 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
         tokenFacade.findByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId()).ifPresent(tokenFacade::remove);
 
-        Random random = new Random();
-        String authCodeValue = String.valueOf(10000000 + random.nextInt(90000000));
+        String authCodeValue;
+        try {
+            authCodeValue = totp.generateOneTimePasswordString(key, Instant.now());
+        }catch (InvalidKeyException e) {
+            throw new ApplicationInternalServerErrorException();
+        }
 
         String hashedAuthCode = passwordEncoder.encode(authCodeValue);
         String tokenValue = this.jwtProvider.generateMultiFactorAuthToken(hashedAuthCode);
