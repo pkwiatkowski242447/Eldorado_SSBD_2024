@@ -6,7 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
@@ -35,7 +35,7 @@ public class AccountExceptionResolver {
     public ResponseEntity<?> handleAccountConstraintViolationException(AccountConstraintViolationException accountConstraintViolationException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new AccountConstraintViolationExceptionDTO(accountConstraintViolationException));
+                .body(new ExceptionDTO(accountConstraintViolationException));
     }
 
     /**
@@ -50,8 +50,8 @@ public class AccountExceptionResolver {
     @ExceptionHandler(value = {AccountConflictException.class})
     public ResponseEntity<?> handleAccountConflictException(AccountConflictException accountConflictException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(accountConflictException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(accountConflictException));
     }
 
     /**
@@ -66,8 +66,8 @@ public class AccountExceptionResolver {
     @ExceptionHandler(value = {AccountNotFoundException.class})
     public ResponseEntity<?> handleAccountNotFoundException(AccountNotFoundException accountNotFoundException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(accountNotFoundException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(accountNotFoundException));
     }
 
     /**
@@ -83,8 +83,8 @@ public class AccountExceptionResolver {
     @ExceptionHandler(value = {AccountStatusException.class})
     public ResponseEntity<?> handleAccountStatusException(AccountStatusException accountStatusException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(accountStatusException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(accountStatusException));
     }
 
     /**
@@ -99,8 +99,8 @@ public class AccountExceptionResolver {
     @ExceptionHandler(value = {AccountDataIntegrityCompromisedException.class})
     public ResponseEntity<?> handleAccountDataIntegrityCompromisedException(AccountDataIntegrityCompromisedException accountDataIntegrityCompromisedException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(accountDataIntegrityCompromisedException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(accountDataIntegrityCompromisedException));
     }
 
     /**
@@ -114,8 +114,8 @@ public class AccountExceptionResolver {
     @ExceptionHandler(value = {ResetOwnPasswordException.class})
     public ResponseEntity<?> handleResetOwnPasswordException(ResetOwnPasswordException resetOwnPasswordException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(resetOwnPasswordException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(resetOwnPasswordException));
     }
 
     /**
@@ -129,8 +129,8 @@ public class AccountExceptionResolver {
     @ExceptionHandler(value = {InvalidLoginAttemptException.class})
     public ResponseEntity<?> handleInvalidLoginAttemptException(InvalidLoginAttemptException invalidLoginAttemptException) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(invalidLoginAttemptException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(invalidLoginAttemptException));
     }
 
     /**
@@ -144,7 +144,7 @@ public class AccountExceptionResolver {
     @ExceptionHandler(value = {AccountUserLevelException.class})
     public ResponseEntity<?> handleAccountUserLevelException(AccountUserLevelException accountUserLevelException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(accountUserLevelException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(accountUserLevelException));
     }
 }

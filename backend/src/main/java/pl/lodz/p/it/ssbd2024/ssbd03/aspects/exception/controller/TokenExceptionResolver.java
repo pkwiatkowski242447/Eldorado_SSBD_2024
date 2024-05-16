@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 
@@ -28,8 +29,8 @@ public class TokenExceptionResolver {
     @ExceptionHandler(value = { TokenNotFoundException.class })
     public ResponseEntity<?> handleTokenNotFoundException(TokenNotFoundException exception) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(exception.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(exception));
     }
 
     /**
@@ -44,7 +45,7 @@ public class TokenExceptionResolver {
     @ExceptionHandler(value = { TokenNotValidException.class })
     public ResponseEntity<?> handleTokenNotValidException(TokenNotValidException exception) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(exception.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(exception));
     }
 }

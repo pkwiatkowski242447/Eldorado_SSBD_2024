@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 @ControllerAdvice
@@ -17,8 +18,8 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(I18n.INTERNAL_SERVER_ERROR);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(I18n.INTERNAL_SERVER_ERROR));
     }
 
     @Override
@@ -26,13 +27,13 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.TEXT_PLAIN)
-                .body(I18n.PATH_NOT_FOUND_EXCEPTION);
+                .body(new ExceptionDTO(I18n.PATH_NOT_FOUND_EXCEPTION));
     }
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<?> handleUnknownException(Exception ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.TEXT_PLAIN)
-                .body(I18n.INTERNAL_SERVER_ERROR);
+                .body(new ExceptionDTO(I18n.INTERNAL_SERVER_ERROR));
     }
 }
