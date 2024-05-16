@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -103,40 +104,41 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
-    public ResponseEntity<?> loginUsingCredentials(@RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
+    public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain, @RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
+        String sourceAddress = getSourceAddress(proxyChain, request);
         try {
             Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
                     accountLoginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(accountLoginDTO.getLogin(), false,
-                    request.getRemoteAddr(), accountLoginDTO.getLanguage());
+                   sourceAddress, accountLoginDTO.getLanguage());
             if (accessToken != null) {
                 log.info("User: %s successfully authenticated during one factor authentication in the application, starting session at %s from IPv4: %s"
-                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(), request.getRemoteAddr()));
+                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
                 return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
             }
             log.debug("User: %s successfully authenticated in the first step of multifactor authentication at %s from IPv4: %s"
-                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(), request.getRemoteAddr()));
+                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
         } catch (BadCredentialsException badCredentialsException) {
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithIncrement(accountLoginDTO.getLogin(),sourceAddress);
             log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: invalid login credentials."
-                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(), request.getRemoteAddr()));
+                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
             throw new InvalidLoginAttemptException();
         } catch (DisabledException disabledException) {
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(),sourceAddress);
             log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: User account has not been activated."
-                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(), request.getRemoteAddr()));
+                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
             throw new AccountNotActivatedException();
         } catch (LockedException lockedException) {
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), request.getRemoteAddr());
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(),sourceAddress);
             Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin()).orElseThrow(InvalidLoginAttemptException::new);
             if (account.getBlockedTime() == null) {
                 log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: User account has been blocked by the admin."
-                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(), request.getRemoteAddr()));
+                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
                 throw new AccountBlockedByAdminException();
             } else {
                 log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: User account has been blocked by logging unsuccessfully %d amount of time."
-                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(), request.getRemoteAddr(), this.loginFailedAttemptMaxCount));
+                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress, this.loginFailedAttemptMaxCount));
                 throw new AccountBlockedByFailedLoginAttemptsException();
             }
         } catch (AuthenticationException authenticationException) {
@@ -170,19 +172,20 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
-    public ResponseEntity<?> loginUsingAuthenticationCode(@RequestBody AuthenticationCodeDTO authenticationCodeDTO, HttpServletRequest request) throws ApplicationBaseException {
+    public ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain, @RequestBody AuthenticationCodeDTO authenticationCodeDTO, HttpServletRequest request) throws ApplicationBaseException {
+        String sourceAddress = getSourceAddress(proxyChain, request);
         try {
             this.authenticationService.loginUsingAuthenticationCode(authenticationCodeDTO.getUserLogin(), authenticationCodeDTO.getAuthCodeValue());
         } catch (ApplicationBaseException applicationBaseException) {
             log.error("Authentication to user account with login: %s at %s from IPv4: %s in the second step of multifactor authentication was not successful."
-                    .formatted(authenticationCodeDTO.getUserLogin(), LocalDateTime.now(), request.getRemoteAddr()));
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(authenticationCodeDTO.getUserLogin(), request.getRemoteAddr());
+                    .formatted(authenticationCodeDTO.getUserLogin(), LocalDateTime.now(),sourceAddress));
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(authenticationCodeDTO.getUserLogin(),sourceAddress);
             throw applicationBaseException;
         }
         String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(authenticationCodeDTO.getUserLogin(), true,
-                request.getRemoteAddr(), authenticationCodeDTO.getLanguage());
+               sourceAddress, authenticationCodeDTO.getLanguage());
         log.info("User: %s successfully authenticated during two factor authentication in the application, starting session at %s from IPv4: %s"
-                .formatted(SecurityContextHolder.getContext().getAuthentication().getName(), LocalDateTime.now().toString(), request.getRemoteAddr()));
+                .formatted(SecurityContextHolder.getContext().getAuthentication().getName(), LocalDateTime.now().toString(),sourceAddress));
         return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
     }
 
@@ -201,12 +204,21 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Logging out previously authenticated user was successful."),
     })
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain, HttpServletRequest request, HttpServletResponse response) {
+        String sourceAddress = getSourceAddress(proxyChain, request);
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
         log.info("User: %s successfully logged out from the application at %s from IPv4: %s, ending their session in the application."
-                .formatted(userName, LocalDateTime.now().toString(), request.getRemoteAddr()));
+                .formatted(userName, LocalDateTime.now().toString(),sourceAddress));
         return ResponseEntity.noContent().build();
+    }
+
+    private String getSourceAddress(String proxyChain, HttpServletRequest request){
+        if(proxyChain != null) {
+            return proxyChain.indexOf(',') == -1 ? proxyChain : proxyChain.split(",")[0];
+        } else {
+            return request.getRemoteAddr();
+        }
     }
 }

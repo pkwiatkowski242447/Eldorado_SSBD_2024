@@ -34,9 +34,6 @@ import java.util.concurrent.TimeUnit;
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ScheduleService implements ScheduleServiceInterface {
 
-    @Value("${mail.account.creation.confirmation.url}")
-    private String accountCreationConfirmationUrl;
-
     /**
      * AccountMOKFacade used for operations on account entities.
      */
@@ -65,6 +62,10 @@ public class ScheduleService implements ScheduleServiceInterface {
      */
     @Value("${scheduler.blocked_account_unblock_time}")
     private String unblockTime;
+    @Value("${mail.account.creation.confirmation.url}")
+    private String accountCreationConfirmationUrl;
+    @Value("${account.resend.creation.confirmation.after.hours}")
+    private int resendRegistrationConfirmationEmailAfterHours;
 
     /**
      * Autowired constructor for the service.
@@ -128,7 +129,7 @@ public class ScheduleService implements ScheduleServiceInterface {
 
         registerTokens.forEach(token -> {
             Account account = token.getAccount();
-            if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(12))) {
+            if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(resendRegistrationConfirmationEmailAfterHours))) {
                 String confirmationURL = accountCreationConfirmationUrl + token.getTokenValue();
 
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),

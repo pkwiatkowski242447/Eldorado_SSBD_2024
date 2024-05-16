@@ -47,6 +47,10 @@ public class ScheduleServiceMockTest {
         Field unblockTimeField = scheduleService.getClass().getDeclaredField("unblockTime");
         unblockTimeField.setAccessible(true);
         unblockTimeField.set(scheduleService, "2");
+        Field resendRegistrationConfirmationEmailAfterHoursField = scheduleService.getClass().getDeclaredField("resendRegistrationConfirmationEmailAfterHours");
+        resendRegistrationConfirmationEmailAfterHoursField.setAccessible(true);
+        resendRegistrationConfirmationEmailAfterHoursField.set(scheduleService, 12);
+
     }
 
     @Test

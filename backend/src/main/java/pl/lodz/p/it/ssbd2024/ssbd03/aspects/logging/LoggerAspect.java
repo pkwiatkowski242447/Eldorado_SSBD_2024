@@ -93,7 +93,7 @@ public class LoggerAspect {
                 stringBuilder.append("List of parameters: ")
                         .append("[ ");
                 for (Object parameter : point.getArgs()) {
-                    stringBuilder.append(parameter).append(": ").append(parameter.getClass().getSimpleName());
+                    stringBuilder.append(parameter).append(": ").append(parameter != null ? parameter.getClass().getSimpleName() : "null");
                     if (Arrays.stream(point.getArgs()).toList().getLast() != parameter) stringBuilder.append(", ");
                 }
                 stringBuilder.append(" ]")
