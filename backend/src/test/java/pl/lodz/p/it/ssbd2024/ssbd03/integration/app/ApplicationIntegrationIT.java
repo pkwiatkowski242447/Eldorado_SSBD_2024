@@ -66,7 +66,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("login", Matchers.equalTo("jerzybem"))
                 .body("name", Matchers.equalTo("Jerzy"))
                 .body("lastname", Matchers.equalTo("Bem"))
-                .body("email", Matchers.equalTo("testst@facais.com"))
+                .body("email", Matchers.equalTo("jbem@example.com"))
                 .body("phoneNumber", Matchers.equalTo("111111111"))
                 .body("verified", Matchers.equalTo(true))
                 .body("active", Matchers.equalTo(true))
