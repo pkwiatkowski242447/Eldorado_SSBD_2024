@@ -14,7 +14,7 @@ pipeline{
             steps{
                 sh 'cp ${JENKINS_HOME}/mail.properties ${PROPERTIES_LOCATION}'
 				sh 'cp ${JENKINS_HOME}/key.properties ${PROPERTIES_LOCATION}'
-                sh 'cd backend && mvn -B -Ptest clean test'
+                sh 'cd backend && mvn -B -Ptest clean verify'
             }
         }
     }

@@ -35,12 +35,4 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(I18n.PATH_NOT_FOUND_EXCEPTION);
     }
-
-    @ExceptionHandler(value = {Exception.class})
-    public ResponseEntity<?> handleUnknownException() {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(I18n.INTERNAL_SERVER_ERROR);
-    }
 }
