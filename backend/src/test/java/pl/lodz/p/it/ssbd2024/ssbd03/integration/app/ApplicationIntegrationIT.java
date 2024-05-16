@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDT
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -83,15 +85,18 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         assertEquals(200, response.getStatusCode());
     }
 
+    // Block and unblock
+
     @Test
     public void blockAndUnblockAccountByAdminTestSuccessful() throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        RequestSpecification request = RestAssured.given();
-        request.header("Authorization", "Bearer " + loginToken);
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
 
         // Check before blocking
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .get(BASE_URL + String.format("/accounts/%s", userId))
                 .then()
@@ -103,14 +108,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
 
         // Block account
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         // Check after blocking
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .get(BASE_URL + String.format("/accounts/%s", userId))
                 .then()
@@ -122,14 +129,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
 
         // Unblock account
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         // Check after unblocking
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .get(BASE_URL + String.format("/accounts/%s", userId))
                 .then()
@@ -163,7 +172,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @ParameterizedTest
     @MethodSource("provideNoAdminLevelAccountsParameters")
     public void blockAccountByAdminTestFailedNoAdminRole(String login) throws IOException {
-        String loginToken = login(login, "P@ssw0rd!", "pl");
+        String loginToken = this.login(login, "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
@@ -182,7 +191,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void blockAccountByAdminTestFailedAccountNotFound() throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
         String userId = UUID.randomUUID().toString();
@@ -201,7 +210,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void blockAccountByAdminTestFailedTryToBlockOwnAccount() throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
         String userId = "b3b8c2ac-21ff-434b-b490-aa6d717447c0";
@@ -220,20 +229,22 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void blockAccountByAdminTestFailedTryToBlockBlockedAccount() throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        RequestSpecification request = RestAssured.given();
-        request.header("Authorization", "Bearer " + loginToken);
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
 
         // Block account
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         // Try to block account second time
-        String response = request
+        String response = RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
@@ -246,14 +257,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         //------------------------------------------------------------------------------------//
 
         // Unblock account
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         // Check after unblocking
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .get(BASE_URL + String.format("/accounts/%s", userId))
                 .then()
@@ -268,7 +281,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @ParameterizedTest
     @MethodSource("provideInvalidUUIDParameters")
     public void blockAccountByAdminTestFailedInvalidUUID(String userId) throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
 
@@ -306,7 +319,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @ParameterizedTest
     @MethodSource("provideNoAdminLevelAccountsParameters")
     public void unblockAccountByAdminTestFailedNoAdminRole(String login) throws IOException {
-        String loginToken = login(login, "P@ssw0rd!", "pl");
+        String loginToken = this.login(login, "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
@@ -325,7 +338,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void unblockAccountByAdminTestFailedAccountNotFound() throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
         String userId = UUID.randomUUID().toString();
@@ -344,7 +357,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void unblockAccountByAdminTestFailedTryToUnblockUnblockedAccount() throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
@@ -364,7 +377,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @ParameterizedTest
     @MethodSource("provideInvalidUUIDParameters")
     public void unblockAccountByAdminTestFailedInvalidUUID(String userId) throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
         request.header("Authorization", "Bearer " + loginToken);
 
@@ -380,20 +393,18 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         assertEquals(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, response);
     }
 
-    /*----------------------------------------------------------------------------------------------------------------*/
-    /*----------------------------------------------------------------------------------------------------------------*/
-    /*----------------------------------------------------------------------------------------------------------------*/
-    /*----------------------------------------------------------------------------------------------------------------*/
+    // Modify self account
 
     @ParameterizedTest
     @MethodSource("provideAllLevelAccountsParameters")
     public void modifyAccountSelfTestSuccessful(String login) throws IOException {
-        String loginToken = login(login, "P@ssw0rd!", "pl");
-        RequestSpecification request = RestAssured.given();
-        request.header("Authorization", "Bearer " + loginToken);
+        String loginToken = this.login(login, "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
 
         // Check before modifying
-        Response responseBefore = request
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .get(BASE_URL + "/accounts/self")
                 .then()
@@ -413,7 +424,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         accountModifyDTO.setPhoneNumber("133111222");
 
         // Modify account
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
                 .contentType(CONTENT_TYPE_JSON)
@@ -428,7 +440,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
 
         // Check after modifying
-        request
+        RestAssured.given()
+                .spec(requestSpec)
                 .when()
                 .get(BASE_URL + "/accounts/self")
                 .then()
@@ -438,15 +451,15 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                         "name", Matchers.equalTo("Ebenezer"),
                         "phoneNumber", Matchers.equalTo("133111222")
                 );
-
-        ///TODO czy te zmiany imion niczego nie psuje?
     }
+
+    // Negative modify self account
 
     @Test
     public void modifyAccountSelfTestFailedNoLogin() throws IOException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
 
-        // Check before modifying as Admin
+        // Check before modifying
         Response responseBefore = RestAssured.given()
                 .when()
                 .header("Authorization", "Bearer " + loginToken)
@@ -455,6 +468,352 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.OK.value())
                 .body(
                         "login", Matchers.equalTo("jerzybem")
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+        accountModifyDTO.setName("Adam");
+
+        // Try to modify account
+        String responseModify = RestAssured.given()
+                .when()
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, responseModify);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideAllLevelAccountsParameters")
+    public void modifyAccountSelfTestFailedDataIntegrityCompromised(String login) throws IOException {
+        String loginToken = this.login(login, "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+
+        // Check before modifying
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "name", Matchers.not("Alalalala")
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+
+        accountModifyDTO.setLogin("newLogin");
+        accountModifyDTO.setName("Alalalala");
+
+        // Modify account
+        String responseModify = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.DATA_INTEGRITY_COMPROMISED, responseModify);
+
+        // Check after modifying
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "name", Matchers.not("Alalalala")
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideAllLevelAccountsParametersAndNotValidIfMatch")
+    public void modifyAccountSelfTestFailedInvalidIfMatch(String login, String ifMatch) throws IOException {
+        String loginToken = this.login(login, "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+
+        // Check before modifying
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "name", Matchers.not("Alalalala")
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+        accountModifyDTO.setName("Alalalala");
+
+        // Modify account
+        String responseModify = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", ifMatch)
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.MISSING_HEADER_IF_MATCH, responseModify);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideAllLevelAccountsParameters")
+    public void modifyAccountSelfTestFailedOptimisticLock(String login) throws IOException {
+        String loginToken = this.login(login, "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+
+        // Get before modifying v1
+        Response responseBefore_V1 = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(CONTENT_TYPE_JSON)
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "lastname", Matchers.not(Matchers.equalTo("Bbbbbb"))
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO_V1 = responseBefore_V1.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO_V1 = toAccountModifyDTO(accountOutputDTO_V1);
+        accountModifyDTO_V1.setLastname("Bbbbbb");
+
+        // Get before modifying v2
+        Response responseBefore_V2 = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "lastname", Matchers.not(Matchers.equalTo("Bbbbbb"))
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO_V2 = responseBefore_V2.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO_2 = toAccountModifyDTO(accountOutputDTO_V2);
+        accountModifyDTO_2.setLastname("Ccccc");
+
+        // Modify account v1
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO_V1)
+                .put(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "lastname", Matchers.equalTo("Bbbbbb")
+                );
+
+        // Modify account v2
+        String responseModify_V2 = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO_V1)
+                .put(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.OPTIMISTIC_LOCK_EXCEPTION, responseModify_V2);
+
+        // Check after modifying
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "lastname", (Matchers.equalTo("Bbbbbb")
+                        ));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideAllLevelAccountsParameters")
+    public void modifyAccountSelfTestFailedConstraintViolation(String login) throws IOException {
+        String loginToken = this.login(login, "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+
+        // Check before modifying
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "name", Matchers.any(String.class)
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+        String currentName = accountOutputDTO.getName();
+
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+        accountModifyDTO.setName("A".repeat(100));
+
+        // Modify account
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo("account.constraint.violation.exception"),
+                        "violations", Matchers.hasSize(2),
+                        "violations", Matchers.containsInAnyOrder(
+                                Matchers.equalTo("bean.validation.account.first.name.too.long"),
+                                Matchers.equalTo("bean.validation.account.first.name.regex.not.met")
+
+                        )
+                );
+
+        // Check after modifying
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo(login),
+                        "name", Matchers.equalTo(currentName)
+                );
+    }
+
+    // Modify other user
+
+    @Test
+    public void modifyUserAccountTestSuccessful() throws IOException {
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String userId = "02b0d9d7-a472-48d0-95e0-13a3e6a11d00";
+
+        // Check before modifying
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.not("Ebenezer"),
+                        "phoneNumber", Matchers.not("133111222")
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+        accountModifyDTO.setName("Ebenezer");
+        accountModifyDTO.setPhoneNumber("133111222");
+
+        // Modify account
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.equalTo("Ebenezer"),
+                        "phoneNumber", Matchers.equalTo("133111222")
+                );
+
+        // Check after modifying
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.equalTo("Ebenezer"),
+                        "phoneNumber", Matchers.equalTo("133111222")
+                );
+    }
+
+    // Negative modify other user
+
+    @Test
+    public void modifyUserAccountTestFailedNoLogin() throws IOException {
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        String userId = "02b0d9d7-a472-48d0-95e0-13a3e6a11d00";
+
+        // Check before modifying as Admin
+        Response responseBefore = RestAssured.given()
+                .when()
+                .header("Authorization", "Bearer " + loginToken)
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak")
                 )
                 .extract()
                 .response();
@@ -478,67 +837,294 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         assertEquals(I18n.ACCESS_DENIED_EXCEPTION, responseModify);
     }
 
-    //TODO integrity
-//    @ParameterizedTest
-//    @MethodSource("provideAllLevelAccountsParameters")
-//    public void modifyAccountSelfTestSuccessful(String login) throws IOException {
-//        String loginToken = login(login, "P@ssw0rd!", "pl");
-//        RequestSpecification request = RestAssured.given();
-//        request.header("Authorization", "Bearer " + loginToken);
-//
-//        // Check before modifying
-//        Response responseBefore = request
-//                .when()
-//                .get(BASE_URL + "/accounts/self")
-//                .then()
-//                .statusCode(HttpStatus.OK.value())
-//                .body(
-//                        "login", Matchers.equalTo(login),
-//                        "name", Matchers.not("Johnny"),
-//                        "phoneNumber", Matchers.not("111111222")
-//                )
-//                .extract()
-//                .response();
-//
-//        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
-//
-//        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
-//        accountModifyDTO.setName("Johnny");
-//        accountModifyDTO.setPhoneNumber("111111222");
-//
-//        // Modify account
-//        request
-//                .when()
-//                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-//                .contentType(CONTENT_TYPE_JSON)
-//                .body(accountModifyDTO)
-//                .put(BASE_URL + "/accounts/self")
-//                .then()
-//                .statusCode(HttpStatus.OK.value())
-//                .body(
-//                        "login", Matchers.equalTo(login),
-//                        "name", Matchers.equalTo("Johnny"),
-//                        "phoneNumber", Matchers.equalTo("111111222")
-//                );
-//
-//        // Check after modifying
-//        request
-//                .when()
-//                .get(BASE_URL + "/accounts/self")
-//                .then()
-//                .statusCode(HttpStatus.OK.value())
-//                .body(
-//                        "login", Matchers.equalTo(login),
-//                        "name", Matchers.equalTo("Johnny"),
-//                        "phoneNumber", Matchers.equalTo("111111222")
-//                );
-//
-//    ///TODO czy te zmiany imion niczego nie psuje?
-//    }
+    @ParameterizedTest
+    @MethodSource("provideNoAdminLevelAccountsParameters")
+    public void modifyUserAccountTestFailedNoAdminRole(String login) throws IOException {
+        String loginTokenAdmin = this.login("jerzybem", "P@ssw0rd!", "pl");
+        String userId = "02b0d9d7-a472-48d0-95e0-13a3e6a11d00";
 
-    //TODO invalid if-match
+        // Check before modifying as Admin
+        Response responseBefore = RestAssured.given()
+                .when()
+                .header("Authorization", "Bearer " + loginTokenAdmin)
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak")
+                )
+                .extract()
+                .response();
 
-    //TODO optimistic lock
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+        accountModifyDTO.setName("Adam");
+
+
+        String loginTokenNoAdmin = this.login(login, "P@ssw0rd!", "pl");
+        // Try to modify account
+        String responseModify = RestAssured.given()
+                .when()
+                .header("Authorization", "Bearer " + loginTokenNoAdmin)
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts")
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, responseModify);
+    }
+
+    @Test
+    public void modifyUserAccountTestFailedDataIntegrityCompromised() throws IOException {
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String userId = "02b0d9d7-a472-48d0-95e0-13a3e6a11d00";
+
+        // Check before modifying
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.not("Alalalala")
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+
+        accountModifyDTO.setLogin("newLogin");
+        accountModifyDTO.setName("Alalalala");
+
+        // Modify account
+        String responseModify = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.DATA_INTEGRITY_COMPROMISED, responseModify);
+
+        // Check after modifying
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.not("Alalalala")
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  "})
+    public void modifyUserAccountTestFailedInvalidIfMatch(String ifMatch) throws IOException {
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String userId = "02b0d9d7-a472-48d0-95e0-13a3e6a11d00";
+
+        // Check before modifying
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.not("Alalalala")
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+        accountModifyDTO.setName("Alalalala");
+
+        // Modify account
+        String responseModify = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", ifMatch)
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.MISSING_HEADER_IF_MATCH, responseModify);
+    }
+
+    @Test
+    public void modifyUserAccountTestFailedOptimisticLock() throws IOException {
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String userId = "02b0d9d7-a472-48d0-95e0-13a3e6a11d00";
+
+        // Get before modifying v1
+        Response responseBefore_V1 = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(CONTENT_TYPE_JSON)
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "lastname", Matchers.not(Matchers.equalTo("Bbbbbb"))
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO_V1 = responseBefore_V1.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO_V1 = toAccountModifyDTO(accountOutputDTO_V1);
+        accountModifyDTO_V1.setLastname("Bbbbbb");
+
+        // Get before modifying v2
+        Response responseBefore_V2 = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "lastname", Matchers.not(Matchers.equalTo("Bbbbbb"))
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO_V2 = responseBefore_V2.as(AccountOutputDTO.class);
+
+        AccountModifyDTO accountModifyDTO_2 = toAccountModifyDTO(accountOutputDTO_V2);
+        accountModifyDTO_2.setLastname("Ccccc");
+
+        // Modify account v1
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO_V1)
+                .put(BASE_URL + "/accounts")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "lastname", Matchers.equalTo("Bbbbbb")
+                );
+
+        // Modify account v2
+        String responseModify_V2 = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO_V1)
+                .put(BASE_URL + "/accounts")
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .extract()
+                .asString();
+
+        assertEquals(I18n.OPTIMISTIC_LOCK_EXCEPTION, responseModify_V2);
+
+        // Check after modifying
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "lastname", (Matchers.equalTo("Bbbbbb")
+                        ));
+    }
+
+    @Test
+    public void modifyUserAccountTestFailedConstraintViolation() throws IOException {
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String userId = "02b0d9d7-a472-48d0-95e0-13a3e6a11d00";
+
+        // Check before modifying
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.any(String.class)
+                )
+                .extract()
+                .response();
+
+        AccountOutputDTO accountOutputDTO = responseBefore.as(AccountOutputDTO.class);
+        String currentName = accountOutputDTO.getName();
+
+        AccountModifyDTO accountModifyDTO = toAccountModifyDTO(accountOutputDTO);
+        accountModifyDTO.setName("A".repeat(100));
+
+        // Modify account
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE_JSON)
+                .body(accountModifyDTO)
+                .put(BASE_URL + "/accounts")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo("account.constraint.violation.exception"),
+                        "violations", Matchers.hasSize(2),
+                        "violations", Matchers.containsInAnyOrder(
+                                Matchers.equalTo("bean.validation.account.first.name.too.long"),
+                                Matchers.equalTo("bean.validation.account.first.name.regex.not.met")
+
+                        )
+                );
+
+        // Check after modifying
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/accounts/%s", userId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "login", Matchers.equalTo("piotrnowak"),
+                        "name", Matchers.equalTo(currentName)
+                );
+    }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -555,16 +1141,27 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     private static Stream<Arguments> provideNoAdminLevelAccountsParameters() {
         return Stream.of(
-                Arguments.of("tonyhalik"),  // tonyhalik staff
-                Arguments.of("adamn")       // adamn client
+                Arguments.of("tonyhalik"),          // tonyhalik staff
+                Arguments.of("adamn")               // adamn client
         );
     }
 
     private static Stream<Arguments> provideAllLevelAccountsParameters() {
         return Stream.of(
-                Arguments.of("tonyhalik"),  // tonyhalik staff
-                Arguments.of("adamn"),       // adamn client
-                Arguments.of("jerzybem")       // jerzybem admin
+                Arguments.of("tonyhalik"),          // tonyhalik staff
+                Arguments.of("adamn"),              // adamn client
+                Arguments.of("jerzybem")            // jerzybem admin
+        );
+    }
+
+    private static Stream<Arguments> provideAllLevelAccountsParametersAndNotValidIfMatch() {
+        return Stream.of(
+                Arguments.of("tonyhalik", ""),      // tonyhalik staff
+                Arguments.of("tonyhalik", "  "),    // tonyhalik staff
+                Arguments.of("adamn", ""),          // adamn client
+                Arguments.of("adamn", "  "),        // adamn client
+                Arguments.of("jerzybem", ""),       // jerzybem admin
+                Arguments.of("jerzybem", "  ")      // jerzybem admin
         );
     }
 

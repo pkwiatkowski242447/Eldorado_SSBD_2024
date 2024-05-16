@@ -31,7 +31,7 @@ GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.token          TO ssbd03mok
 -- Admin
 INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'jerzybem', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '111111111', current_timestamp, 0, false);
 
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'Jerzy', 'Bem', 'testst@facais.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'Jerzy', 'Bem', 'jerzybem@spoko.pl');
 
 -- Admin - admin role
 INSERT INTO public.user_level (id, level, account_id, version) VALUES ('bdb52e59-0054-4ec5-a2af-3e0d2b187ce0', 'ADMIN', 'b3b8c2ac-21ff-434b-b490-aa6d717447c0', 0);
@@ -44,15 +44,15 @@ INSERT INTO public.staff_data (id) VALUES ('9ba0d086-edec-475d-8569-69156e79be9d
 -- Staff
 INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('e0bf979b-6b42-432d-8462-544d88b1ab5f', 'kamilslimak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '222222222', current_timestamp, 0, false);
 
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('e0bf979b-6b42-432d-8462-544d88b1ab5f', 'Kamil', 'Slimak', 'canel49300@facais.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('e0bf979b-6b42-432d-8462-544d88b1ab5f', 'Kamil', 'Slimak', 'kamilslimak1@spoko.pl');
 
 INSERT INTO public.user_level (id, level, account_id, version) VALUES ('2488831d-c7c4-4f61-b48a-3be87364271f', 'STAFF', 'e0bf979b-6b42-432d-8462-544d88b1ab5f', 0);
 INSERT INTO public.staff_data (id) VALUES ('2488831d-c7c4-4f61-b48a-3be87364271f');
 
 -- First Client
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'michalkowal', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000000', current_timestamp, 0, false);
+INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'michalkowal@spoko.pl', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000000', current_timestamp, 0, false);
 
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'Michal', 'Kowalski', 'mkowal@example.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'Michal', 'Kowalski', 'michalkowal@spoko.pl');
 
 INSERT INTO public.user_level (id, level, account_id, version) VALUES ('69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'CLIENT', '0ca02f7e-d8e9-45d3-a332-a56015acb822', 0);
 INSERT INTO public.client_data (id, type) VALUES ('69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'BASIC');
@@ -60,7 +60,7 @@ INSERT INTO public.client_data (id, type) VALUES ('69507c7f-4c03-4087-85e6-3ae3b
 -- Second Client
 INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'jakubkoza', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000001', current_timestamp, 0, false);
 
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'Jakub', 'Koza', 'jkoza@example.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'Jakub', 'Koza', 'jakubkoza@adresik.net');
 
 INSERT INTO public.user_level (id, level, account_id, version) VALUES ('9428fadf-191c-4dd7-8626-01c3e0ff603c', 'CLIENT', '902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 0);
 INSERT INTO public.client_data (id, type) VALUES ('9428fadf-191c-4dd7-8626-01c3e0ff603c', 'BASIC');
@@ -68,7 +68,7 @@ INSERT INTO public.client_data (id, type) VALUES ('9428fadf-191c-4dd7-8626-01c3e
 -- Third Client
 INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'piotrnowak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000003', current_timestamp, 0, false);
 
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'Piotr', 'Nowak', 'pnowak@example.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'Piotr', 'Nowak', 'piotrnowak@porn.hub.pl');
 
 INSERT INTO public.user_level (id, level, account_id, version) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', 'CLIENT', '02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 0);
 INSERT INTO public.client_data (id, type) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', 'BASIC');

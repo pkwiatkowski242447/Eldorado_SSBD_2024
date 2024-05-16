@@ -56,7 +56,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
     private final String accountLoginNo2 = "jerzybem";
     private final String accountFirstNameNo2 = "Jerzy";
     private final String accountLastNameNo2 = "Bem";
-    private final String accountEmailNo2 = "jbem@example.com";
+    private final String accountEmailNo2 = "jerzybem@spoko.pl";
     private final String accountLanguageNo1 = "PL";
     private final String accountPhoneNumberNo2 = "111111111";
 
