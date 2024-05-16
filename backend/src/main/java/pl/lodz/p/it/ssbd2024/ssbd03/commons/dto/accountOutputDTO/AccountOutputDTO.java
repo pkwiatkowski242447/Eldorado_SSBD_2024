@@ -1,10 +1,14 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
 
@@ -16,48 +20,49 @@ import java.util.UUID;
  * Data transfer object used in returning account.
  */
 @ToString(callSuper = true)
-@Getter
+@Getter @Setter
+@NoArgsConstructor
 public class AccountOutputDTO extends AccountSignableDTO {
     @Schema(description = "UUID identifier linked with account", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final UUID id;
+    private UUID id;
     @Schema(description = "Flag indicating if account is verified", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final boolean verified;
+    private boolean verified;
     @Schema(description = "Flag indicating if account is active", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final boolean active;
+    private boolean active;
     @Schema(description = "Flag indicating if account is blocked", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final boolean blocked;
+    private boolean blocked;
     @Schema(description = "Flag indicating if account has 2FA enabled", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final boolean twoFactorAuth;
+    private boolean twoFactorAuth;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Schema(description = "Data and time when account has been blocked", example = "YYYY-MM-dd HH:mm", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final LocalDateTime blockedTime;
+    private LocalDateTime blockedTime;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Schema(description = "Data and time when account has been created", example = "YYYY-MM-dd HH:mm", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final LocalDateTime creationDate;
+    private LocalDateTime creationDate;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Schema(description = "Data and time of last successful login in account", example = "YYYY-MM-dd HH:mm", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final LocalDateTime lastSuccessfulLoginTime;
+    private LocalDateTime lastSuccessfulLoginTime;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Schema(description = "Data and time of last unsuccessful login in account", example = "YYYY-MM-dd HH:mm", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final LocalDateTime lastUnsuccessfulLoginTime;
+    private LocalDateTime lastUnsuccessfulLoginTime;
     @Schema(description = "Language used natively in user browser", example = "pl", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final String accountLanguage;
+    private String accountLanguage;
     @Schema(description = "IPv4 address of last successful login in account", example = "XXX.XXX.XXX.XXX", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final String lastSuccessfulLoginIp;
+    private String lastSuccessfulLoginIp;
     @Schema(description = "IPv4 address of last unsuccessful login in account", example = "XXX.XXX.XXX.XXX", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final String lastUnsuccessfulLoginIp;
+    private String lastUnsuccessfulLoginIp;
     @Schema(description = "Phone number of the user", example = "111222333", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final String phoneNumber;
+    private String phoneNumber;
     @Schema(description = "Last name of the user", example = "Chrobry", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final String lastname;
+    private String lastname;
     @Schema(description = "First name of the user", example = "Boleslaw", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final String name;
+    private String name;
     @Schema(description = "E-mail used by the user", example = "boleslawchrobry@gmail.com", requiredMode = Schema.RequiredMode.REQUIRED)
-    private final String email;
+    private String email;
 
     /***
      * All arguments constructor for AccountOutputDTO - with calling constructor of superclass.
