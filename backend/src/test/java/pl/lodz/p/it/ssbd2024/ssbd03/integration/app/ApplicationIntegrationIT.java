@@ -7,11 +7,10 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
@@ -26,10 +25,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
 import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationIntegrationIT extends TestcontainersConfigFull {
@@ -39,7 +38,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     private static final String BASE_URL = "http://localhost:8181/api/v1";
 
     @BeforeAll
-    public static void setup(){
+    public static void setup() {
         RestAssured.config = RestAssured.config()
                 .logConfig(LogConfig.logConfig()
                         .enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
@@ -67,7 +66,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     public void invalidPathUnauthorized() {
         RestAssured.given()
                 .when()
-                .post(BASE_URL+"/not/a/real/path")
+                .post(BASE_URL + "/not/a/real/path")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NOT_FOUND.value());
@@ -79,7 +78,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/not/a/real/path")
+                .post(BASE_URL + "/not/a/real/path")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NOT_FOUND.value());
@@ -94,7 +93,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request.contentType(CONTENT_TYPE);
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
-        Response response = request.post(BASE_URL +"/auth/login-credentials");
+        Response response = request.post(BASE_URL + "/auth/login-credentials");
 
         assertEquals(200, response.getStatusCode());
         assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
@@ -102,7 +101,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request = RestAssured.given();
         request.contentType(CONTENT_TYPE);
 
-        response = request.header("Authorization", "Bearer " + response.asString()).get(BASE_URL+"/accounts/self");
+        response = request.header("Authorization", "Bearer " + response.asString()).get(BASE_URL + "/accounts/self");
 
         assertEquals(200, response.getStatusCode());
     }
@@ -110,11 +109,11 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @ParameterizedTest
     @MethodSource("provideNewUserLevelForAccountParameters")
     public void addAndRemoveUserLevelTestSuccessful(String id, String newUserLevel) throws JsonProcessingException {
-       String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/{id}/add-level-{level}", id, newUserLevel)
+                .post(BASE_URL + "/accounts/{id}/add-level-{level}", id, newUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -122,7 +121,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         List<String> userLevels = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .get(BASE_URL+"/accounts/{id}", id)
+                .get(BASE_URL + "/accounts/{id}", id)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.OK.value())
@@ -135,7 +134,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/{id}/remove-level-{level}", id, newUserLevel)
+                .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, newUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -143,13 +142,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         userLevels = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .get(BASE_URL+"/accounts/{id}", id)
+                .get(BASE_URL + "/accounts/{id}", id)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
                 .jsonPath()
-                .getList("userLevelsDto.roleName");;
+                .getList("userLevelsDto.roleName");
+        ;
 
         assertFalse(userLevels.contains(newUserLevel.toUpperCase()));
     }
@@ -161,7 +161,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/{id}/add-level-{level}", id, oldUserLevel)
+                .post(BASE_URL + "/accounts/{id}/add-level-{level}", id, oldUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -177,7 +177,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/invalid-id/add-level-{level}", userLevel)
+                .post(BASE_URL + "/accounts/invalid-id/add-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -191,7 +191,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     public void addUserLevelTestUnauthorized(String id, String newUserLevel) {
         String response = RestAssured.given()
                 .when()
-                .post(BASE_URL+"/accounts/{id}/add-level-{level}", id, newUserLevel)
+                .post(BASE_URL + "/accounts/{id}/add-level-{level}", id, newUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
@@ -207,7 +207,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/159cf8d2-4c75-4f7f-868d-adfaa6a842c0/add-level-{level}", userLevel)
+                .post(BASE_URL + "/accounts/159cf8d2-4c75-4f7f-868d-adfaa6a842c0/add-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -223,7 +223,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/f512c0b6-40b2-4bcb-8541-46077ac02101/add-level-{level}", userLevel)
+                .post(BASE_URL + "/accounts/f512c0b6-40b2-4bcb-8541-46077ac02101/add-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
@@ -239,7 +239,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/{id}/remove-level-{level}", id, oldUserLevel)
+                .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, oldUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -255,7 +255,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/{id}/remove-level-{level}", id, newUserLevel)
+                .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, newUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -270,7 +270,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/b3b8c2ac-21ff-434b-b490-aa6d717447c0/remove-level-admin")
+                .post(BASE_URL + "/accounts/b3b8c2ac-21ff-434b-b490-aa6d717447c0/remove-level-admin")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -284,7 +284,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     public void removeUserLevelTestUnauthorized(String id, String oldUserLevel) {
         String response = RestAssured.given()
                 .when()
-                .post(BASE_URL+"/accounts/{id}/remove-level-{level}", id, oldUserLevel)
+                .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, oldUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
@@ -292,6 +292,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .asString();
         assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
     }
+
     @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void removeUserLevelTestInvalidId(String userLevel) throws JsonProcessingException {
@@ -299,7 +300,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/invalid-id/remove-level-{level}", userLevel)
+                .post(BASE_URL + "/accounts/invalid-id/remove-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -315,7 +316,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/159cf8d2-4c75-4f7f-868d-adfaa6a842c0/remove-level-{level}", userLevel)
+                .post(BASE_URL + "/accounts/159cf8d2-4c75-4f7f-868d-adfaa6a842c0/remove-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -331,7 +332,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String response = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
-                .post(BASE_URL+"/accounts/f512c0b6-40b2-4bcb-8541-46077ac02101/remove-level-{level}", userLevel)
+                .post(BASE_URL + "/accounts/f512c0b6-40b2-4bcb-8541-46077ac02101/remove-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
@@ -344,10 +345,10 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @ValueSource(strings = {"client", "staff", "admin"})
     public void registerByAdminTestSuccessful(String userLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String username = "login" + userLevel;
-        String name = userLevel + "name";
-        String lastname = userLevel+"lastname";
-        String email = userLevel+"@email.com";
+        String username = "loginsucc" + userLevel;
+        String name = userLevel + "namesucc";
+        String lastname = userLevel + "lastnamesucc";
+        String email = userLevel + "succ@email.com";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
         RestAssured.given()
@@ -355,7 +356,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .contentType(CONTENT_TYPE)
                 .body(registerDTO)
-                .post(BASE_URL+"/register/{user_level}", userLevel)
+                .post(BASE_URL + "/register/{user_level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -369,7 +370,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .param("firstName", name)
                 .param("lastName", lastname)
                 .param("active", false)
-                .get(BASE_URL+"/accounts/match-login-firstname-and-lastname")
+                .get(BASE_URL + "/accounts/match-login-firstname-and-lastname")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.OK.value())
@@ -388,8 +389,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
         String username = "login" + userLevel;
         String name = userLevel + "name";
-        String lastname = userLevel+"lastname";
-        String email = userLevel+".nobueno";
+        String lastname = userLevel + "lastname";
+        String email = userLevel + ".nobueno";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
         RestAssured.given()
@@ -397,7 +398,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .contentType(CONTENT_TYPE)
                 .body(registerDTO)
-                .post(BASE_URL+"/register/{user_level}", userLevel)
+                .post(BASE_URL + "/register/{user_level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -411,8 +412,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
         String username = "jerzybem";
         String name = userLevel + "name";
-        String lastname = userLevel+"lastname";
-        String email = userLevel+"@email.com";
+        String lastname = userLevel + "lastname";
+        String email = userLevel + "@email.com";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
         String response = RestAssured.given()
@@ -420,7 +421,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .contentType(CONTENT_TYPE)
                 .body(registerDTO)
-                .post(BASE_URL+"/register/{user_level}", userLevel)
+                .post(BASE_URL + "/register/{user_level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
@@ -435,7 +436,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
         String username = "login" + userLevel;
         String name = userLevel + "name";
-        String lastname = userLevel+"lastname";
+        String lastname = userLevel + "lastname";
         String email = "pnowak@example.com";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
@@ -444,7 +445,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .contentType(CONTENT_TYPE)
                 .body(registerDTO)
-                .post(BASE_URL+"/register/{user_level}", userLevel)
+                .post(BASE_URL + "/register/{user_level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
@@ -459,8 +460,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
         String username = "login" + userLevel;
         String name = userLevel + "name";
-        String lastname = userLevel+"lastname";
-        String email = userLevel+"@email.com";
+        String lastname = userLevel + "lastname";
+        String email = userLevel + "@email.com";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
         String response = RestAssured.given()
@@ -468,13 +469,117 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .contentType(CONTENT_TYPE)
                 .body(registerDTO)
-                .post(BASE_URL+"/register/{user_level}", userLevel)
+                .post(BASE_URL + "/register/{user_level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
                 .extract()
                 .asString();
         assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+
+    }
+
+    @Test
+    public void registerClientByAnonymousTestSuccessful() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        String username = "veryUniqueLogin";
+        String name = "VeryQoolName";
+        String lastname = "VeryQoolLastname";
+        String email = "veryunique@email.com";
+        AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
+                email, "111111111", "pl");
+        RestAssured.given()
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(registerDTO)
+                .post(BASE_URL + "/register/client")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .param("pageNumber", 0)
+                .param("pageSize", 1)
+                .param("login", username)
+                .param("firstName", name)
+                .param("lastName", lastname)
+                .param("active", false)
+                .get(BASE_URL + "/accounts/match-login-firstname-and-lastname")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("[0].id", anything())
+                .body("[0].login", equalTo(username))
+                .body("[0].name", equalTo(name))
+                .body("[0].active", equalTo(false))
+                .body("[0].blocked", equalTo(false))
+                .body("[0].verified", equalTo(false))
+                .body("[0].userLevels[0]", equalTo("Client"));
+    }
+
+    @Test
+    public void registerByAnonymousTestConstraintViolation() {
+        String username = "veryUniqueLogin";
+        String name = "VeryQoolName";
+        String lastname = "VeryQoolLastname";
+        String email = "veryuniqueemail.com";
+        AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
+                email, "111111111", "pl");
+        RestAssured.given()
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(registerDTO)
+                .post(BASE_URL + "/register/client")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("violations[0]", equalTo(AccountMessages.EMAIL_CONSTRAINT_NOT_MET));
+    }
+
+    @Test
+    public void registerByAnonymousTestLoginConflict() {
+        String username = "jerzybem";
+        String name = "VeryQoolName";
+        String lastname = "VeryQoolLastname";
+        String email = "veryunique@email.com";
+        AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
+                email, "111111111", "pl");
+        String response = RestAssured.given()
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(registerDTO)
+                .post(BASE_URL + "/register/client")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .extract()
+                .asString();
+        assertEquals(I18n.ACCOUNT_LOGIN_ALREADY_TAKEN, response);
+    }
+
+    @Test
+    public void registerByAnonymousTestEmailConflict() {
+        String username = "veryUniqueLogin";
+        String name = "VeryQoolName";
+        String lastname = "VeryQoolLastname";
+        String email = "pnowak@example.com";
+        AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
+                email, "111111111", "pl");
+        String response = RestAssured.given()
+                .header("Authorization", "Bearer ")
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(registerDTO)
+                .post(BASE_URL + "/register/client")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .extract()
+                .asString();
+        assertEquals(I18n.ACCOUNT_EMAIL_ALREADY_TAKEN, response);
     }
 
     private String login(String login, String password, String language) throws JsonProcessingException {
@@ -485,7 +590,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request.contentType(CONTENT_TYPE);
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
-        Response response = request.post(BASE_URL+"/auth/login-credentials");
+        Response response = request.post(BASE_URL + "/auth/login-credentials");
         return response.asString();
     }
 
