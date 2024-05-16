@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -10,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
 
 import java.time.LocalDateTime;
@@ -21,6 +21,7 @@ import java.util.UUID;
  */
 @ToString(callSuper = true)
 @Getter @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class AccountOutputDTO extends AccountSignableDTO {
     @Schema(description = "UUID identifier linked with account", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)

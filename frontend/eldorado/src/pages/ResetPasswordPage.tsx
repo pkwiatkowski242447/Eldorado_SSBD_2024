@@ -57,7 +57,7 @@ function ResetPasswordPage() {
 
     return (
         <div>
-            <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2"/>
+            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
             <Card className="mx-auto max-w-2xl">
                 <CardHeader>
                     <CardTitle>Reset password</CardTitle>

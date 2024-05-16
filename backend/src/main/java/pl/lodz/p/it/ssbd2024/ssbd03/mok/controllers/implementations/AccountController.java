@@ -215,6 +215,8 @@ public class AccountController implements AccountControllerInterface {
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
     }
 
@@ -302,7 +304,7 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
                                                                             @RequestParam(name = "firstName", defaultValue = "") String firstName,
                                                                             @RequestParam(name = "lastName", defaultValue = "") String lastName,
-                                                                            @RequestParam(name = "active", defaultValue = "") boolean active,
+                                                                            @RequestParam(name = "active", defaultValue = "true") boolean active,
                                                                             @RequestParam(name = "order", defaultValue = "true") boolean order,
                                                                             @RequestParam(name = "pageNumber") int pageNumber,
                                                                             @RequestParam(name = "pageSize") int pageSize) {

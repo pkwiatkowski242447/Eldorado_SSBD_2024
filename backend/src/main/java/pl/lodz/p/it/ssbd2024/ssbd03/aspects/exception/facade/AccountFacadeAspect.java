@@ -61,7 +61,7 @@ public class AccountFacadeAspect {
             do {
                 if (exceptionCopy.getMessage().contains("account_login_key")) {
                     throw new AccountLoginAlreadyTakenException();
-                } else if (exceptionCopy.getMessage().contains("account_email_key")) {
+                } else if (exceptionCopy.getMessage().contains("personal_data_email_key")) {
                     throw new AccountEmailAlreadyTakenException();
                 }
                 exceptionCopy = exceptionCopy.getCause();
