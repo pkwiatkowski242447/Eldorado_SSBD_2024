@@ -19,6 +19,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptExcept
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
@@ -37,7 +38,7 @@ import java.util.Random;
 @Slf4j
 @Service
 @TxTracked
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = AccountConstraintViolationException.class)
 public class AuthenticationService implements AuthenticationServiceInterface {
 
     @Value("${account.maximum.failed.login.attempt.counter}")
