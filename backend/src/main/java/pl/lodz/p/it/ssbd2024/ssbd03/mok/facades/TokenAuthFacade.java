@@ -60,7 +60,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @param entity Token to be persisted.
      */
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
+    @PermitAll
     public void create(Token entity) throws ApplicationBaseException {
         super.create(entity);
     }

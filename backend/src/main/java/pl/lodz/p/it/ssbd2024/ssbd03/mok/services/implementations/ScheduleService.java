@@ -69,8 +69,8 @@ public class ScheduleService implements ScheduleServiceInterface {
     /**
      * Autowired constructor for the service.
      *
-     * @param accountMOKFacade  Facade used for managing user accounts.
-     * @param tokenFacade       Facade used for managing tokens used for many account related activities.
+     * @param accountMOKFacade Facade used for managing user accounts.
+     * @param tokenFacade      Facade used for managing tokens used for many account related activities.
      */
     @Autowired
     public ScheduleService(AccountMOKFacade accountMOKFacade, TokenFacade tokenFacade, MailProvider mailProvider) {
@@ -132,10 +132,10 @@ public class ScheduleService implements ScheduleServiceInterface {
                 String confirmationURL = accountCreationConfirmationUrl + token.getTokenValue();
 
                 mailProvider.sendRegistrationConfirmEmail(account.getName(),
-                                                          account.getLastname(),
-                                                          account.getEmail(),
-                                                          confirmationURL,
-                                                          account.getAccountLanguage());
+                        account.getLastname(),
+                        account.getEmail(),
+                        confirmationURL,
+                        account.getAccountLanguage());
                 tokenFacade.removeByTypeAndAccount(Token.TokenType.REGISTER, account.getId());
             }
         });

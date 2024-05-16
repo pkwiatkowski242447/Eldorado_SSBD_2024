@@ -19,6 +19,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptExcept
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
@@ -37,7 +38,7 @@ import java.util.Random;
 @Slf4j
 @Service
 @TxTracked
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = AccountConstraintViolationException.class)
 public class AuthenticationService implements AuthenticationServiceInterface {
 
     @Value("${account.maximum.failed.login.attempt.counter}")
@@ -73,11 +74,11 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     /**
      * Autowired constructor for the service.
      *
-     * @param authenticationFacade  Facade used for reading users accounts information for authentication purposes.
-     * @param tokenFacade Facade used for inserting, deleting and reading token objects from the database.
-     * @param passwordEncoder Component, responsible for generating hashes for given authentication code, and verifying them.
-     * @param jwtProvider Component, responsible for generating JWT tokens with given content, and for given amount of time.
-     * @param mailProvider Component used for sending e-mail messages.
+     * @param authenticationFacade Facade used for reading users accounts information for authentication purposes.
+     * @param tokenFacade          Facade used for inserting, deleting and reading token objects from the database.
+     * @param passwordEncoder      Component, responsible for generating hashes for given authentication code, and verifying them.
+     * @param jwtProvider          Component, responsible for generating JWT tokens with given content, and for given amount of time.
+     * @param mailProvider         Component used for sending e-mail messages.
      */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
@@ -96,13 +97,13 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * This method is used to perform the second step in multifactor authentication, that is
      * to verify the provided authentication code, used for authenticating user in the application.
      *
-     * @param login    Login of the Account.
-     * @param code     8 character long string value, which is the authentication code sent to the users e-mail address.
+     * @param login Login of the Account.
+     * @param code  8 character long string value, which is the authentication code sent to the users e-mail address.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
     @Override
-    @RolesAllowed({ Roles.ANONYMOUS })
+    @RolesAllowed({Roles.ANONYMOUS})
     public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
         if (!account.getActive()) {
@@ -133,12 +134,12 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @return String containing a JWT token is returned if user identity is confirmed, that is after the authentication code is entered and
      * validated. Otherwise, it sends e-mail message containing the authentication code.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
     @Override
-    @RolesAllowed({ Roles.CLIENT, Roles.STAFF, Roles.ADMIN})
+    @RolesAllowed({Roles.CLIENT, Roles.STAFF, Roles.ADMIN, Roles.ANONYMOUS})
     public String registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
-        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+        Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         if (!confirmed && account.getTwoFactorAuth()) {
             this.generateAndSendEmailMessageWithAuthenticationCode(account);
             return null;
@@ -160,10 +161,10 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @param userLogin Login of the user that is trying to authenticate in the application.
      * @param ipAddress Logical IPv4 address, which the user is authenticating from.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
     @Override
-    @RolesAllowed({ Roles.ANONYMOUS })
+    @RolesAllowed({Roles.ANONYMOUS})
     public void registerUnsuccessfulLoginAttemptWithIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -171,11 +172,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
         activityLog.setUnsuccessfulLoginCounter(activityLog.getUnsuccessfulLoginCounter() + 1);
         account.setActivityLog(activityLog);
-        authenticationFacade.edit(account);
-        if (activityLog.getUnsuccessfulLoginCounter() > this.failedLoginAttemptMaxVal) {
+
+        if (!account.getBlocked() && activityLog.getUnsuccessfulLoginCounter() >= this.failedLoginAttemptMaxVal) {
+            account.blockAccount(false);
             mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
                     account.getEmail(), account.getAccountLanguage(), false);
         }
+
+        authenticationFacade.edit(account);
     }
 
     /**
@@ -186,10 +190,10 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @param userLogin Login of the user that is trying to authenticate in the application.
      * @param ipAddress Logical IPv4 address, which the user is authenticating from.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
     @Override
-    @RolesAllowed({ Roles.ANONYMOUS })
+    @RolesAllowed({Roles.ANONYMOUS})
     public void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -205,9 +209,9 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      *
      * @param account User account, which the authentication code is generated for.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
-    @RolesAllowed({ Roles.ANONYMOUS })
+    @RolesAllowed({Roles.ANONYMOUS})
     private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
         tokenFacade.findByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId()).ifPresent(tokenFacade::remove);
 
@@ -234,7 +238,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @return Returns Account with the specified login.
      */
     @Override
-    @RolesAllowed({ Roles.ANONYMOUS })
+    @RolesAllowed({Roles.ANONYMOUS})
     public Optional<Account> findByLogin(String login) {
         return this.authenticationFacade.findByLogin(login);
     }

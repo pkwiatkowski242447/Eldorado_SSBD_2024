@@ -9,9 +9,15 @@ export const api = {
         return apiWithConfig.post('/auth/login-credentials', {login, password, language})
     },
 
+    logIn2fa: (userLogin: string, authCodeValue: string) => {
+        let language = window.navigator.language;
+        language = language.substring(0, 2)
+        const a = apiWithConfig.post('/auth/login-auth-code', {userLogin, authCodeValue, language})
+        return a
+    },
+
     logOut: () => {
         const url = '/auth/logout';
-        console.log(`Making POST request to: ${url}`);
         return apiWithConfig.post(url);
     },
 
@@ -60,8 +66,35 @@ export const api = {
         })
     },
 
+    modifyAccountUser: (login: string, version: number, userLevelsDto: UserLevelType[], name: string,
+                        lastname: string, phoneNumber: string, twoFactorAuth: boolean, etag: string) => {
+        const cleanedEtag = etag.replace(/^"|"$/g, '');
+        //this is necessary because backend requires etag to be without quotes
+        const test = apiWithConfig.put('/accounts', {
+            login: login,
+            version: version,
+            userLevelsDto: userLevelsDto,
+            name: name,
+            lastname: lastname,
+            phoneNumber: phoneNumber,
+            twoFactorAuth: twoFactorAuth
+        }, {
+            headers: {
+                'If-Match': cleanedEtag
+            }
+        })
+        console.log(test)
+        return test
+    },
+
     changeEmailSelf: (email: string) => {
         return apiWithConfig.patch('/accounts/change-email-self', {
+            email: email
+        })
+    },
+
+    changeEmailUser: (id: string, email: string) => {
+        return apiWithConfig.patch(`/accounts/${id}/change-email`, {
             email: email
         })
     },
@@ -106,4 +139,19 @@ export const api = {
         return apiWithConfig.get(`/accounts/${id}`)
     },
 
+    blockAccount: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/block`, {}, {
+            headers: {
+                'accept': 'text/plain'
+            }
+        });
+    },
+
+    unblockAccount: (id: string) => {
+        return apiWithConfig.post(`/accounts/${id}/unblock`, {}, {
+            headers: {
+                'accept': 'text/plain'
+            }
+        });
+    },
 }

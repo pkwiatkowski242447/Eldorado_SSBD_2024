@@ -111,8 +111,9 @@ export function RegisterForm() {
                                             <FormItem className="items-start">
                                                 <FormLabel className="text-black text-center">Phone Number</FormLabel>
                                                 <FormControl className="w-full">
-                                                    <PhoneInput //TODO fix this
-                                                        placeholder="" {...field}/>
+                                                    {// @ts-expect-error - fix this maybe
+                                                        <PhoneInput //TODO fix this
+                                                            placeholder="" {...field}/>}
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>

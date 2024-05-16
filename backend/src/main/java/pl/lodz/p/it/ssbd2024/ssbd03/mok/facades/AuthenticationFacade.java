@@ -93,6 +93,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * Otherwise, empty optional is returned.
      */
     @PermitAll
+    @Transactional(propagation = Propagation.REQUIRED)
     public Optional<Account> findByLogin(String login) {
         try {
             TypedQuery<Account> tq = getEntityManager().createNamedQuery("Account.findByLogin", Account.class);

@@ -13,16 +13,17 @@ import {useAccountState} from "@/context/AccountContext.tsx";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {useNavigate} from "react-router-dom";
+import {useAccount} from "@/hooks/useAccount.ts";
 
 
 const SiteHeader = () => {
     const {account} = useAccountState();
     const navigator = useNavigate();
 
+    const {logOut} = useAccount();
+
     function onClickLogout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('account');
-        navigator(Pathnames.public.login);
+        logOut()
     }
 
     function onClickSettings() {
@@ -35,7 +36,7 @@ const SiteHeader = () => {
 
     let headerColor = 'bg-gray-200 border-gray-200';
     if (account) {
-        switch (account?.activeUserLevel.roleName) {
+        switch (account.activeUserLevel.roleName) {
             case RolesEnum.ADMIN:
                 headerColor = 'bg-red-200 border-red-200';
                 break;
@@ -46,6 +47,7 @@ const SiteHeader = () => {
                 headerColor = 'bg-green-200 border-green-200';
                 break;
             default:
+                headerColor = 'bg-black';
                 break;
         }
     }
