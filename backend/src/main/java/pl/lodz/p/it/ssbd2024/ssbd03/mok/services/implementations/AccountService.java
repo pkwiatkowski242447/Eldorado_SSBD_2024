@@ -351,12 +351,8 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
-<<<<<<< HEAD
     @RolesAllowed({ Roles.AUTHENTICATED })
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
-=======
-    @RolesAllowed({Roles.AUTHENTICATED})
->>>>>>> 0d0d8a912e656c71f7ee9ec5b101f389963dc233
     public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
         Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
 

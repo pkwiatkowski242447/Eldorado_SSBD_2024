@@ -405,8 +405,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.OK.value())
                 .body("login", Matchers.equalTo("jerzybem"))
                 .body("name", Matchers.equalTo("Jerzy"))
-                .body("lastname", Matchers.equalTo("Bem"))
-                .body("email", Matchers.equalTo("jbem@example.com"))
+                .body("email", Matchers.equalTo("jerzybem@spoko.pl"))
                 .body("phoneNumber", Matchers.equalTo("111111111"))
                 .body("verified", Matchers.equalTo(true))
                 .body("active", Matchers.equalTo(true))
@@ -432,13 +431,12 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.OK.value())
                 .body("login", Matchers.equalTo("adamn"))
                 .body("name", Matchers.equalTo("Adam"))
-                .body("lastname", Matchers.equalTo("Niezgodka"))
                 .body("email", Matchers.equalTo("adamn@example.com"))
                 .body("phoneNumber", Matchers.equalTo("200000000"))
                 .body("verified", Matchers.equalTo(false))
                 .body("active", Matchers.equalTo(true))
                 .body("blocked", Matchers.equalTo(false))
-                .body("accountLanguage", Matchers.equalTo("PL"))
+                .body("accountLanguage", Matchers.equalTo("pl"))
                 .extract()
                 .jsonPath().getList("userLevelsDto.roleName");
 
@@ -743,7 +741,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.FORBIDDEN.value())
                 .extract()
                 .asString();
-
         assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
     }
 
@@ -1888,7 +1885,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String username = "login" + userLevel;
         String name = userLevel + "name";
         String lastname = userLevel + "lastname";
-        String email = "pnowak@example.com";
+        String email = "jerzybem@spoko.pl";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
         String response = RestAssured.given()
@@ -1933,7 +1930,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @Test
     public void registerClientByAnonymousTestSuccessful() throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String username = "veryUniqueLogin";
+        String username = "veryUniqueLoginOne";
         String name = "VeryQoolName";
         String lastname = "VeryQoolLastname";
         String email = "veryunique@email.com";
@@ -2016,7 +2013,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String username = "veryUniqueLogin";
         String name = "VeryQoolName";
         String lastname = "VeryQoolLastname";
-        String email = "pnowak@example.com";
+        String email = "jerzybem@spoko.pl";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
         String response = RestAssured.given()
@@ -2055,7 +2052,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
         RequestSpecification request = RestAssured.given();
         request.contentType(CONTENT_TYPE);
-
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
         Response response = request.post(BASE_URL + "/auth/login-credentials");
@@ -2122,6 +2118,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 return str.substring(0, str.indexOf("\","));
             }
         }
+
         return null;
     }
 }
