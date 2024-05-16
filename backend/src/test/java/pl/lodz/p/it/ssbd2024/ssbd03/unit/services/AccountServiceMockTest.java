@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.annotation.SecurityTestExecutionListeners;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
@@ -37,11 +36,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AccountService;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.TokenService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.lang.reflect.Field;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -54,8 +53,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @SecurityTestExecutionListeners
 public class AccountServiceMockTest {
-    @Mock
-    private TokenService tokenService;
     @Mock
     private MailProvider mailProvider;
     @Mock
@@ -192,7 +189,9 @@ public class AccountServiceMockTest {
         String newEmail = "new@email.com";
 
         when(accountMOKFacade.find(any())).thenReturn(Optional.of(a));
-        when(tokenService.createEmailConfirmationToken(a, newEmail)).thenReturn("TOKEN");
+        when(tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, a.getId())).thenReturn(Optional.empty());
+        when(jwtProvider.generateEmailToken(a, newEmail, 24)).thenReturn("TOKEN VALUE");
+        doNothing().when(tokenFacade).create(any(Token.class));
         doNothing().when(mailProvider).sendEmailConfirmEmail(eq(a.getName()), eq(a.getLastname()), eq(newEmail), any(), eq(a.getAccountLanguage()));
 
         accountService.changeEmail(UUID.randomUUID(), newEmail);
@@ -291,7 +290,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestSuccessful() throws AccountAlreadyBlockedException, IllegalOperationException, AccountNotFoundException {
+    void blockAccountTestSuccessful() throws AccountAlreadyBlockedException, IllegalOperationException, AccountNotFoundException, ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
@@ -306,7 +305,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestBlockedBySystem() throws AccountAlreadyBlockedException, AccountNotFoundException {
+    void blockAccountTestBlockedBySystem() throws AccountAlreadyBlockedException, AccountNotFoundException, ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
@@ -348,7 +347,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void unblockAccountTestSuccessful() throws AccountNotFoundException, AccountAlreadyUnblockedException {
+    void unblockAccountTestSuccessful() throws AccountNotFoundException, AccountAlreadyUnblockedException, ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.blockAccount(true);
@@ -931,7 +930,9 @@ public class AccountServiceMockTest {
         account.setActive(true);
 
         when(accountMOKFacade.findByEmail(account.getEmail())).thenReturn(Optional.of(account));
-        when(tokenService.createPasswordResetToken(account)).thenReturn("TOKEN");
+        when(tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId())).thenReturn(Optional.empty());
+        when(jwtProvider.generateActionToken(eq(account), anyInt(), eq(ChronoUnit.MINUTES))).thenReturn("TOKEN VALUE");
+        doNothing().when(tokenFacade).create(any(Token.class));
         doNothing().when(mailProvider).sendPasswordResetEmail(eq(account.getName()), eq(account.getLastname()), eq(account.getEmail()), any(), any());
 
         accountService.forgetAccountPassword(account.getEmail());

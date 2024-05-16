@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import SiteHeader from "@/components/SiteHeader.tsx";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import {useAccountState} from "@/context/AccountContext.tsx";
 import {parsePhoneNumber} from "react-phone-number-input";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
+import {useAccount} from "@/hooks/useAccount.ts";
 
 const emailSchema = z.object({
     email: z.string().email({message: "New email is required."}),
@@ -34,12 +35,13 @@ function AccountSettings() {
     const phoneNumber = parsePhoneNumber(account?.phone || '')
     const e164Number = phoneNumber?.format('E.164')
 
-    // const {getCurrentAccount} = useAccount();
+    const {getCurrentAccount} = useAccount();
 
-    // useEffect(() => {
-    //     getCurrentAccount();
-    // }, []);
-    //TODO implement maybe
+    //It has to be that way afaik so ignore the warning and enjoy your day :)
+    useEffect(() => {
+        getCurrentAccount();
+    }, []);
+
 
     const formEmail = useForm({
         resolver: zodResolver(emailSchema),
@@ -58,20 +60,34 @@ function AccountSettings() {
     });
 
     const onSubmitEmail = (values: z.infer<typeof emailSchema>) => {
-        // Call API to change email
-        console.log(values);
+        api.changeEmailSelf(values.email).then(() => {
+            getCurrentAccount();
+
+            toast({
+                title: "Success!",
+                description: "Your email has been successfully changed.",
+            });
+            setTimeout(() => {
+                window.location.reload()
+            }, 3000);
+
+        }).catch((error) => {
+            toast({
+                variant: "destructive",
+                description: "Something went wrong. Please try again later.",
+            })
+            console.log(error.response.data)
+        });
     };
 
     const onSubmitUserData = (values: z.infer<typeof userDataSchema>) => {
         const etag = window.localStorage.getItem('etag');
-        if (account && account.accountLanguage) {
-            api.modifyAccountSelf(account.login, account.version, account.userLevels,
-                values.name, values.lastName, values.phoneNumber, account.accountLanguage, etag)
+        if (account && account.accountLanguage && etag !== null) {
+            api.modifyAccountSelf(account.login, account.version, account.userLevelsDto,
+                values.name, values.lastName, values.phoneNumber, false, etag)
                 .then(() => {
-                    account.name = values.name;
-                    account.lastname = values.lastName;
-                    account.phone = values.phoneNumber;
-
+                    getCurrentAccount();
+                    window.location.reload()
                     toast({
                         title: "Success!",
                         description: "Your account info has been successfully changed.",
@@ -115,30 +131,32 @@ function AccountSettings() {
                                 <Card className="mx-10 w-auto">
                                     <CardContent>
                                         <Form {...formEmail}>
-                                            <form onSubmit={formEmail.handleSubmit(onSubmitEmail)}
-                                                  className="space-y-4">
-                                                <div className="grid gap-4 p-5">
-                                                    <div className="grid gap-2">
-                                                        <FormField
-                                                            control={formEmail.control}
-                                                            name="email"
-                                                            render={({field}) => (
-                                                                <FormItem>
-                                                                    <FormLabel className="text-black">New
-                                                                        E-Mail</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input
-                                                                            placeholder={account?.email} {...field} />
-                                                                    </FormControl>
-                                                                    <FormMessage/>
-                                                                </FormItem>
-                                                            )}/>
+                                            {// @ts-expect-error - fix this
+                                                <form onSubmit={formEmail.handleSubmit(onSubmitEmail)}
+                                                      className="space-y-4">
+                                                    <div className="grid gap-4 p-5">
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formEmail.control}
+                                                                name="email"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="text-black">New
+                                                                            E-Mail</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input
+                                                                                placeholder={account?.email} {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}/>
+                                                        </div>
+                                                        <Button type="submit" className="w-full pb-2">
+                                                            Change your email
+                                                        </Button>
                                                     </div>
-                                                    <Button type="submit" className="w-full pb-2">
-                                                        Change your email
-                                                    </Button>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            }
                                         </Form>
                                     </CardContent>
                                 </Card>
@@ -175,61 +193,66 @@ function AccountSettings() {
                             <Card className="mx-auto">
                                 <CardContent>
                                     <Form {...formUserData}>
-                                        <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
-                                              className="space-y-4">
-                                            <div className="grid gap-4 p-10">
-                                                <div className="grid gap-2">
-                                                    <FormField
-                                                        control={formUserData.control}
-                                                        name="name"
-                                                        render={({field}) => (
-                                                            <FormItem>
-                                                                <FormLabel className="text-black">First Name</FormLabel>
-                                                                <FormControl>
-                                                                    <Input placeholder={account?.name} {...field}/>
-                                                                </FormControl>
-                                                                <FormMessage/>
-                                                            </FormItem>
-                                                        )}
-                                                    />
+                                        {// @ts-expect-error - fix this
+                                            <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
+                                                  className="space-y-4">
+                                                <div className="grid gap-4 p-10">
+                                                    <div className="grid gap-2">
+                                                        <FormField
+                                                            control={formUserData.control}
+                                                            name="name"
+                                                            render={({field}) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="text-black">First
+                                                                        Name</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input placeholder={account?.name} {...field}/>
+                                                                    </FormControl>
+                                                                    <FormMessage/>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <FormField
+                                                            control={formUserData.control}
+                                                            name="lastName"
+                                                            render={({field}) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="text-black">Last
+                                                                        Name</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            placeholder={account?.lastname} {...field}/>
+                                                                    </FormControl>
+                                                                    <FormMessage/>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <FormField
+                                                            control={formUserData.control}
+                                                            name="phoneNumber"
+                                                            render={({field}) => (
+                                                                <FormItem className="items-start">
+                                                                    <FormLabel className="text-black text-center">Phone
+                                                                        Number</FormLabel>
+                                                                    <FormControl className="w-full">
+                                                                        <PhoneInput //TODO fix this
+                                                                            placeholder={e164Number} {...field}/>
+                                                                    </FormControl>
+                                                                    <FormMessage/>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                    <Button type="submit" className="w-full pb-2">
+                                                        Save changes
+                                                    </Button>
                                                 </div>
-                                                <div className="grid gap-2">
-                                                    <FormField
-                                                        control={formUserData.control}
-                                                        name="lastName"
-                                                        render={({field}) => (
-                                                            <FormItem>
-                                                                <FormLabel className="text-black">Last Name</FormLabel>
-                                                                <FormControl>
-                                                                    <Input placeholder={account?.lastname} {...field}/>
-                                                                </FormControl>
-                                                                <FormMessage/>
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                </div>
-                                                <div className="grid gap-2">
-                                                    <FormField
-                                                        control={formUserData.control}
-                                                        name="phoneNumber"
-                                                        render={({field}) => (
-                                                            <FormItem className="items-start">
-                                                                <FormLabel className="text-black text-center">Phone
-                                                                    Number</FormLabel>
-                                                                <FormControl className="w-full">
-                                                                    <PhoneInput //TODO fix this
-                                                                        placeholder={e164Number} {...field}/>
-                                                                </FormControl>
-                                                                <FormMessage/>
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                </div>
-                                                <Button type="submit" className="w-full pb-2">
-                                                    Save changes
-                                                </Button>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        }
                                     </Form>
                                 </CardContent>
                             </Card>

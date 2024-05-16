@@ -26,7 +26,7 @@ export const useAccount = () => {
     }, [account?.token, setAccount]);
 
     const navigateToMainPage = () => {
-        navigate(Pathnames.public.home)
+        navigate(Pathnames.public.login)
     }
 
     const logOut = async () => {
@@ -36,17 +36,25 @@ export const useAccount = () => {
             console.log(e)
         } finally {
             localStorage.removeItem('token')
+            localStorage.removeItem('account')
+            localStorage.removeItem('etag')
             setAccount(null)
             navigateToMainPage()
         }
     }
     const logIn = async (login: string, password: string) => {
         try {
-            const token = (await api.logIn(login, password)).data;
-            localStorage.setItem('token', token);
-            await getCurrentAccount()
-            setIsAuthenticated(true);
-            navigate(Pathnames.public.home)
+            const response = await api.logIn(login, password);
+            if (response.status === 200) {
+                const token = response.data;
+                localStorage.setItem('token', token);
+                await getCurrentAccount()
+                setIsAuthenticated(true);
+                navigate(Pathnames.public.home)
+            } else if (response.status === 204) {
+                console.log(login)
+                navigate(`/login/2fa/${login}`);
+            }
         } catch (e) {
             toast({
                 variant: "destructive",
@@ -57,6 +65,28 @@ export const useAccount = () => {
         } finally { /* empty */
         }
     }
+
+    const logIn2fa = async (userLogin: string, authCodeValue: string) => {
+        try {
+            const response = await api.logIn2fa(userLogin, authCodeValue);
+            if (response.status === 200) {
+                const token = response.data;
+                localStorage.setItem('token', token);
+                await getCurrentAccount()
+                setIsAuthenticated(true);
+                navigate(Pathnames.public.home)
+            }
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                description: "Something went wrong. Please try again later.",
+            })
+            console.log(e);
+            if (isAuthenticated) await logOut();
+        } finally { /* empty */
+        }
+    }
+
     const getCurrentAccount = async () => {
         try {
             const tokenRaw = localStorage.getItem("token");
@@ -69,11 +99,13 @@ export const useAccount = () => {
                         if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
                             if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
                                 activeUserLevel = token.data.userLevelsDto[i];
+                                console.log(activeUserLevel)
                                 break;
                             }
                         } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
                             if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
                                 activeUserLevel = token.data.userLevelsDto[i];
+                                console.log(activeUserLevel)
                                 break;
                             }
                         }
@@ -81,7 +113,6 @@ export const useAccount = () => {
                 } else {
                     activeUserLevel = account.activeUserLevel;
                 }
-                console.table(token.data)
                 const user: UserType = {
                     accountLanguage: token.data.accountLanguage,
                     active: token.data.active,
@@ -94,10 +125,11 @@ export const useAccount = () => {
                     name: token.data.name,
                     token: tokenRaw,
                     phone: token.data.phone,
-                    userLevels: token.data.userLevelsDto,
+                    userLevelsDto: token.data.userLevelsDto,
                     activeUserLevel: activeUserLevel,
                     verified: token.data.verified,
                     version: token.data.version,
+                    twoFactorAuth: token.data.twoFactorAuth,
                 };
                 setAccount(user)
                 localStorage.setItem('account', JSON.stringify(user));
@@ -116,5 +148,6 @@ export const useAccount = () => {
         logIn,
         getCurrentAccount,
         logOut,
+        logIn2fa
     }
 }

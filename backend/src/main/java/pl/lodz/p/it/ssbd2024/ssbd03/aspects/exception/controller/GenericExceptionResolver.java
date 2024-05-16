@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.nio.file.AccessDeniedException;
  * between all components.
  */
 @ControllerAdvice
+@Order(2)
 public class GenericExceptionResolver {
 
     /**
@@ -29,11 +31,10 @@ public class GenericExceptionResolver {
      *
      * @param optimisticLockException Exception that is either ApplicationOptimisticLockException or its subclass, that is
      *                                being caught while propagating from controller.
-     *
      * @return 400 BAD REQUEST is returned when instance of ApplicationOptimisticLockException or its subclasses are
      * propagated from controller component.
      */
-    @ExceptionHandler(value = { ApplicationOptimisticLockException.class })
+    @ExceptionHandler(value = {ApplicationOptimisticLockException.class})
     public ResponseEntity<?> handleOptimisticLockException(ApplicationOptimisticLockException optimisticLockException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .contentType(MediaType.TEXT_PLAIN)
@@ -45,11 +46,10 @@ public class GenericExceptionResolver {
      * After such exception is propagated from controller it will be caught and transformed into HTTP Response.
      *
      * @param invalidRequestHeaderException InvalidRequestHeaderException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { InvalidRequestHeaderException.class })
+    @ExceptionHandler(value = {InvalidRequestHeaderException.class})
     public ResponseEntity<?> handleInvalidRequestHeaderException(InvalidRequestHeaderException invalidRequestHeaderException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -61,11 +61,10 @@ public class GenericExceptionResolver {
      * it will be caught and transformed into HTTP Response.
      *
      * @param applicationInternalServerErrorException Any unexpected exception that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 500 BAD REQUEST
      */
-    @ExceptionHandler(value = { ApplicationInternalServerErrorException.class })
+    @ExceptionHandler(value = {ApplicationInternalServerErrorException.class})
     public ResponseEntity<?> handleUnexpectedException(ApplicationInternalServerErrorException applicationInternalServerErrorException) {
         return ResponseEntity.internalServerError()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -78,11 +77,10 @@ public class GenericExceptionResolver {
      * it will be caught and transformed into HTTP Response.
      *
      * @param mapperBaseException MapperBaseException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { MapperBaseException.class })
+    @ExceptionHandler(value = {MapperBaseException.class})
     public ResponseEntity<?> handleMapperBaseException(MapperBaseException mapperBaseException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -95,11 +93,10 @@ public class GenericExceptionResolver {
      * it will be caught and transformed into HTTP Response.
      *
      * @param applicationDatabaseException ApplicationDatabaseException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 500 INTERNAL SERVER ERROR
      */
-    @ExceptionHandler(value = { ApplicationDatabaseException.class })
+    @ExceptionHandler(value = {ApplicationDatabaseException.class})
     public ResponseEntity<?> handleApplicationDatabaseException(ApplicationDatabaseException applicationDatabaseException) {
         return ResponseEntity.internalServerError()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -111,11 +108,10 @@ public class GenericExceptionResolver {
      * passed invalid data. After such exception is propagated from controller it will be caught and transformed into HTTP Response.
      *
      * @param invalidDataFormatException InvalidDataFormatException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { InvalidDataFormatException.class })
+    @ExceptionHandler(value = {InvalidDataFormatException.class})
     public ResponseEntity<?> handleInvalidDataFormatException(InvalidDataFormatException invalidDataFormatException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -128,21 +124,21 @@ public class GenericExceptionResolver {
      * and transformed into HTTP Response.
      *
      * @param illegalOperationException IllegalOperationException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { IllegalOperationException.class })
+    @ExceptionHandler(value = {IllegalOperationException.class})
     public ResponseEntity<?> handleIllegalOperationException(IllegalOperationException illegalOperationException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(illegalOperationException.getMessage());
     }
 
-    @ExceptionHandler(value = { AccessDeniedException.class })
+    @ExceptionHandler(value = {AccessDeniedException.class})
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException accessDeniedException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-               .contentType(MediaType.TEXT_PLAIN)
-               .body(I18n.ACCESS_DENIED_EXCEPTION);
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(I18n.ACCESS_DENIED_EXCEPTION);
     }
+
 }

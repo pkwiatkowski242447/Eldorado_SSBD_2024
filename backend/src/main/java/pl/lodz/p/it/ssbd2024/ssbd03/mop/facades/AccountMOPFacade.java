@@ -102,7 +102,7 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      */
     @Transactional
     @Override
-    public void edit(Account account) {
+    public void edit(Account account) throws ApplicationBaseException{
         super.edit(account);
     }
 }

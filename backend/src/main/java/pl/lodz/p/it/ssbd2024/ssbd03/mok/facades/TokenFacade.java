@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -60,6 +63,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param entity Token to be persisted.
      */
     @Override
+    @PermitAll
     public void create(Token entity) throws ApplicationBaseException {
         super.create(entity);
     }
@@ -70,7 +74,8 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param entity Token to be modified.
      */
     @Override
-    public void edit(Token entity) {
+    @RolesAllowed(Roles.AUTHENTICATED)
+    public void edit(Token entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 
@@ -80,6 +85,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param entity Token to be removed from the database.
      */
     @Override
+    @RolesAllowed(Roles.ANONYMOUS)
     public void remove(Token entity) {
         super.remove(entity);
     }
@@ -91,6 +97,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @return If Token with the given ID was found returns an Optional containing the Token, otherwise returns an empty Optional.
      */
     @Override
+    @PermitAll
     public Optional<Token> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
@@ -101,6 +108,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @return List containing all Tokens.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public List<Token> findAll() {
         return super.findAll();
     }
@@ -111,6 +119,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @return Number of Tokens in the database.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public int count() {
         return super.count();
     }
@@ -122,6 +131,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param accountId ID of the associated Account.
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
+    @PermitAll
     public Optional<Token> findByTypeAndAccount(Token.TokenType tokenType, UUID accountId) {
         try {
             TypedQuery<Token> query = getEntityManager()
@@ -141,6 +151,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param tokenValue Value of the token to be found.
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
+    @PermitAll
     public Optional<Token> findByTokenValue(String tokenValue) {
         try {
             TypedQuery<Token> query = getEntityManager()
@@ -161,6 +172,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      *
      * @return List of tokens of the specified token type.
      */
+    @PermitAll
     public List<Token> findByTokenType(Token.TokenType tokenType) {
         try {
             TypedQuery<Token> query = getEntityManager()
@@ -180,6 +192,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      *
      * @param accountId ID of the Account which Token are to be removed.
      */
+    @PermitAll
     public void removeByAccount(UUID accountId) {
         getEntityManager().createNamedQuery("Token.removeByAccount")
                 .setParameter("accountId", accountId)
@@ -192,6 +205,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param tokenType Type of Tokens to be removed.
      * @param accountId ID of the Account which Tokens are to be removed.
      */
+    @PermitAll
     public void removeByTypeAndAccount(Token.TokenType tokenType, UUID accountId) {
         getEntityManager().createNamedQuery("Token.removeByTypeAndAccount")
                 .setParameter("tokenType", tokenType)

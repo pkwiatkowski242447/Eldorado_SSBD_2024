@@ -30,20 +30,21 @@ public class JWTProvider {
     @Value("${authentication.code.validity.period.length.minutes}")
     private int authenticationCodeValidityLength;
 
+    @Value("${secret.key}")
     private String secretKey;
 
-    /**
-     * Generates random secret key used for signing tokens.
-     * New key is after each system boot.
-     */
-    @PostConstruct
-    private void generateSignInKey() {
-        byte[] keyBytes = new byte[JWTConsts.SECRET_KEY_LENGTH];
-        for (int i = 0; i < keyBytes.length; i++) {
-            keyBytes[i] = (byte) Math.floor(Math.random() * 128);
-        }
-        this.secretKey = Base64.getEncoder().encodeToString(keyBytes);
-    }
+//    /**
+//     * Generates random secret key used for signing tokens.
+//     * New key is after each system boot.
+//     */
+//    @PostConstruct
+//    private void generateSignInKey() {
+//        byte[] keyBytes = new byte[JWTConsts.SECRET_KEY_LENGTH];
+//        for (int i = 0; i < keyBytes.length; i++) {
+//            keyBytes[i] = (byte) Math.floor(Math.random() * 128);
+//        }
+//        this.secretKey = Base64.getEncoder().encodeToString(keyBytes);
+//    }
 
     /**
      * Generates new JSON Web Token used to keep track of user session.

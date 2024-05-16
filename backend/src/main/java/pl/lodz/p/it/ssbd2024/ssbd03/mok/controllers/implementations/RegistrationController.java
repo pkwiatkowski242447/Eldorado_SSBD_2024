@@ -11,12 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
@@ -32,7 +32,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterf
 @RestController
 @RequestMapping(value = "/api/v1/register")
 @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-        retryFor = { ApplicationDatabaseException.class, RollbackException.class })
+        retryFor = {ApplicationDatabaseException.class, RollbackException.class})
 public class RegistrationController implements RegistrationControllerInterface {
 
     /**
@@ -59,11 +59,11 @@ public class RegistrationController implements RegistrationControllerInterface {
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     * layer of facade and service components in the application.
+     *                                  layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ANONYMOUS", "ADMIN" })
+    @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     @Operation(summary = "Register client", description = "Register new user account with client user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with client user level was created successfully and account activation message was sent."),
@@ -91,11 +91,11 @@ public class RegistrationController implements RegistrationControllerInterface {
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     * layer of facade and service components in the application.
+     *                                  layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Operation(summary = "Register staff", description = "Register new user account with staff user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with staff user level was created successfully and account activation message was sent."),
@@ -123,11 +123,11 @@ public class RegistrationController implements RegistrationControllerInterface {
      * during create operation of AccountFacade, AccountCreationException is thrown, which results in 400 BAD REQUEST, with message explaining the problem.
      * If any other exception is thrown, then 400 BAD REQUEST is returned without any additional information.
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
-     * layer of facade and service components in the application.
+     *                                  layer of facade and service components in the application.
      */
     @Override
     @PostMapping(value = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed({ "ADMIN" })
+    @RolesAllowed({Roles.ADMIN})
     @Operation(summary = "Register admin", description = "Register new user account with admin user level, and send account activation e-mail message to given e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New user account with admin user level was created successfully and account activation message was sent."),

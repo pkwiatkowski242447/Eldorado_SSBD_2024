@@ -1,10 +1,5 @@
 import {Pathnames} from "./pathnames";
 import {RouteType} from "../types/RouteType";
-// import UsersPage from "../pages/UsersPage";
-// import AddUserPage from "../pages/AddUserPage";
-// import ClientsPage from "../pages/ClientsPage";
-// import CourtsPage from "../pages/CourtsPage";
-// import ReservationsPage from "../pages/ReservationsPage";
 import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage.tsx";
 import RegisterPage from "@/pages/RegisterPage.tsx";
@@ -15,10 +10,10 @@ import LandingPage from "@/pages/LandingPage.tsx";
 import UserManagementPage from "@/pages/UserManagementPage.tsx";
 import AccountSettings from "@/pages/AccountSettings.tsx";
 import ChangeUserLevelPage from "@/pages/ChangeUserLevelPage.tsx";
-// import RegisterPage from "../pages/RegisterPage";
-// import ChangePasswordFormForm from "../components/forms/ChangePasswordForm";
-// import ChangePasswordPage from "../pages/ChangePasswordPage";
-// import ChangeDetailsPage from "../pages/ChangeDetailsPage";
+import ConfirmEmailChangePage from "@/pages/ConfirmEmailChangePage.tsx";
+import UserAccountSettings from "@/pages/UserAccountSettings.tsx";
+import TwoFactorAuthPage from "@/pages/TwoFactorAuthPage.tsx";
+
 
 export const PublicRoutes: RouteType[] = [
     {
@@ -28,6 +23,10 @@ export const PublicRoutes: RouteType[] = [
     {
         path: Pathnames.public.login,
         Component: LoginPage
+    },
+    {
+        path: Pathnames.public.twoFactorAuth,
+        Component: TwoFactorAuthPage
     },
     {
         path: Pathnames.public.register,
@@ -62,6 +61,14 @@ export const PublicRoutes: RouteType[] = [
         path: Pathnames.public.accountSettings,
         Component: AccountSettings
     },
+    {
+        path: Pathnames.public.confirmEmailChange,
+        Component: ConfirmEmailChangePage
+    },
+    {
+        path: Pathnames.public.userAccountSettings,
+        Component: UserAccountSettings
+    }
 
 ]
 

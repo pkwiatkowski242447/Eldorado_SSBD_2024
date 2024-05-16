@@ -1,15 +1,20 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 
 import java.util.Set;
 
-@Getter
+@Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountConstraintViolationExceptionDTO {
 
-    private final String message;
-    private final Set<String> violations;
+    private String message;
+    private Set<String> violations;
 
     public AccountConstraintViolationExceptionDTO(AccountConstraintViolationException exception) {
         this.message = exception.getMessage();

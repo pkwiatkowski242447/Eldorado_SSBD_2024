@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
@@ -60,6 +62,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void findTestPositive() throws ApplicationBaseException {
         Optional<UserLevel> userLevel =  userLevelFacade.find(uuidClientLevelUuid);
 
@@ -70,6 +73,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void findAndRefreshTestPositive() {
         Optional<UserLevel> userLevel =  userLevelFacade.findAndRefresh(uuidClientLevelUuid);
 
@@ -80,6 +84,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void findAllTestPositive() {
         List<UserLevel> list = userLevelFacade.findAll();
 
@@ -89,6 +94,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void countTestPositive() {
         teardown();
 
@@ -99,6 +105,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void createAndRemoveTestPositive() throws ApplicationBaseException {
         UserLevel userLevel = userLevelFacade.find(uuidUserLevelNo1).orElseThrow(NoSuchElementException::new);
         Account account = userLevel.getAccount();
@@ -130,6 +137,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Roles.ADMIN})
     public void editTestPositive() throws ApplicationBaseException {
         //pobieram user level staff dla klienta
         UserLevel staffUserLevel = userLevelFacade.find(UUID.fromString("2488831d-c7c4-4f61-b48a-3be87364271f")).orElseThrow(NoSuchElementException::new);

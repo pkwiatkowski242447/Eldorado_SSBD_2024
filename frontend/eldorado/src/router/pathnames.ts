@@ -10,6 +10,9 @@ export const Pathnames = {
         userManagement: '/manage-users',
         accountSettings: '/account-settings',
         changeUserLevel: '/change-user-level',
+        confirmEmailChange: '/confirm-email/:token',
+        userAccountSettings: '/manage-users/:id',
+        twoFactorAuth: '/login/2fa/:login',
     },
     // admin: {
     //     home: '/',
