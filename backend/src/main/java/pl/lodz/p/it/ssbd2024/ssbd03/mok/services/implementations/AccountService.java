@@ -67,6 +67,8 @@ public class AccountService implements AccountServiceInterface {
     private int accountCreationConfirmationPeriodLengthHours;
     @Value("${account.password.reset.period.length.minutes}")
     private int passwordResetPeriodLengthMinutes;
+    @Value("${email.change.confirmation.period.length.hours}")
+    private int emailChangeConfirmationPeriodLengthHours;
 
     /**
      * AccountFacade used for operations on account entities.
@@ -521,7 +523,7 @@ public class AccountService implements AccountServiceInterface {
 
         tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
 
-        String tokenValue = this.jwtProvider.generateEmailToken(account, newEmail, 24);
+        String tokenValue = this.jwtProvider.generateEmailToken(account, newEmail, emailChangeConfirmationPeriodLengthHours);
         Token emailToken = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
         this.tokenFacade.create(emailToken);
 
@@ -549,7 +551,7 @@ public class AccountService implements AccountServiceInterface {
                 .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
 
         String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
-        String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, 24);
+        String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, emailChangeConfirmationPeriodLengthHours);
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(newTokenValue.getBytes()));
         String confirmationURL = accountConfirmEmail + encodedTokenValue;

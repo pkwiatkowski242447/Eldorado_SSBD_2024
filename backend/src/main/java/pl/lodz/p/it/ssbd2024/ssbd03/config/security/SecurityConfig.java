@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +27,8 @@ import java.util.List;
         jsr250Enabled = true
 )
 public class SecurityConfig {
-
+    @Value("${base.app.url}")
+    private String app_url;
     private final AuthenticationProvider authenticationProvider;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
@@ -53,7 +55,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    private static CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
@@ -62,7 +64,7 @@ public class SecurityConfig {
                 HttpHeaders.CONTENT_TYPE,
                 HttpHeaders.IF_MATCH,
                 HttpHeaders.ACCEPT));
-        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+        corsConfiguration.setAllowedOriginPatterns(List.of(app_url));
         corsConfiguration.addExposedHeader("Access-Token");
         corsConfiguration.addExposedHeader("Uid");
         corsConfiguration.addExposedHeader("ETag");

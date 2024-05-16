@@ -4,8 +4,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
@@ -14,8 +16,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderExcep
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-
-import java.nio.file.AccessDeniedException;
 
 /**
  * General exception handling component in a form of @ControllerAdvice for exceptions that are shared
@@ -135,10 +135,9 @@ public class GenericExceptionResolver {
     }
 
     @ExceptionHandler(value = {AccessDeniedException.class})
-    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException accessDeniedException) {
+    public ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(I18n.ACCESS_DENIED_EXCEPTION);
     }
-
 }

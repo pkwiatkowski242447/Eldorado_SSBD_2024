@@ -183,7 +183,12 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeEmailTestSuccessful() throws ApplicationBaseException {
+    void changeEmailTestSuccessful() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
+        Field emailChangeConfirmationPeriodLengthHoursField = AccountService.class.getDeclaredField("emailChangeConfirmationPeriodLengthHours");
+        emailChangeConfirmationPeriodLengthHoursField.setAccessible(true);
+        emailChangeConfirmationPeriodLengthHoursField.set(accountService, 24);
+        emailChangeConfirmationPeriodLengthHoursField.setAccessible(false);
+
         Account a = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         a.setAccountLanguage("pl");
         String newEmail = "new@email.com";
@@ -1102,7 +1107,12 @@ public class AccountServiceMockTest {
 
     @Test
     @WithMockUser(username = "login")
-    void resendEmailConfirmationTestSuccessful() throws ApplicationBaseException {
+    void resendEmailConfirmationTestSuccessful() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
+        Field emailChangeConfirmationPeriodLengthHoursField = AccountService.class.getDeclaredField("emailChangeConfirmationPeriodLengthHours");
+        emailChangeConfirmationPeriodLengthHoursField.setAccessible(true);
+        emailChangeConfirmationPeriodLengthHoursField.set(accountService, 24);
+        emailChangeConfirmationPeriodLengthHoursField.setAccessible(false);
+
         String tokenEmail = "token@email.com";
         String newToken = "NEW TOKEN VALUE";
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");

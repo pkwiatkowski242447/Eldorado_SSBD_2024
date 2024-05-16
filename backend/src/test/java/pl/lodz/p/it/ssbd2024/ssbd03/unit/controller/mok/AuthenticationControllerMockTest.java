@@ -90,6 +90,31 @@ public class AuthenticationControllerMockTest {
     }
 
     @Test
+    public void loginUsingCredentialsSuccessfulWithXForwardedFor() throws Exception {
+        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenReturn(null);
+        Mockito.when(authenticationService.registerSuccessfulLoginAttempt(
+                Mockito.eq("johann13"),
+                Mockito.eq(false),
+                Mockito.anyString(),
+                Mockito.eq("pl"))).thenReturn("TEST_TOKEN");
+        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+                        .header("X-Forwarded-For", "192.168.0.2, 1050:0000:0000:0000:0005:0600:300c:326b, 10.10.10.10")
+                        .contentType(CONTENT_TYPE)
+                        .content(mapper.writeValueAsString(accountLoginDTO)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_PLAIN))
+                .andExpect(result -> assertEquals("TEST_TOKEN", result.getResponse().getContentAsString()));
+
+        // Verify
+        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+
+        assertEquals(accountLoginDTO.getLogin(), ((Authentication)argCaptor.getValue()).getName());
+        assertEquals(accountLoginDTO.getPassword(), ((Authentication)argCaptor.getValue()).getCredentials());
+    }
+
+    @Test
     public void loginUsingCredentialsSuccessfulNoContent() throws Exception {
         Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenReturn(null);
         Mockito.when(authenticationService.registerSuccessfulLoginAttempt(
