@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
  * General exception handling component in a form of @ControllerAdvice for Token exceptions.
  */
 @ControllerAdvice
+@Order(1)
 public class TokenExceptionResolver {
 
     /**

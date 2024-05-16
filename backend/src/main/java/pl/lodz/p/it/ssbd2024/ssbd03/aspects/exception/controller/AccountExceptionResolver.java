@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstra
  * General exception handling component in a form of @ControllerAdvice for Account exceptions.
  */
 @ControllerAdvice
+@Order(1)
 public class AccountExceptionResolver {
 
     /**
@@ -26,11 +28,10 @@ public class AccountExceptionResolver {
      * that is being propagated from controller component into HTTP response, so that exception is handled without container intervention.
      *
      * @param accountConstraintViolationException Exception that will be processed into HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { AccountConstraintViolationException.class })
+    @ExceptionHandler(value = {AccountConstraintViolationException.class})
     public ResponseEntity<?> handleAccountConstraintViolationException(AccountConstraintViolationException accountConstraintViolationException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -43,15 +44,14 @@ public class AccountExceptionResolver {
      * status code.
      *
      * @param accountConflictException AccountConflictException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 409 CONFLICT.
      */
-    @ExceptionHandler(value = { AccountConflictException.class })
+    @ExceptionHandler(value = {AccountConflictException.class})
     public ResponseEntity<?> handleAccountConflictException(AccountConflictException accountConflictException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-               .contentType(MediaType.TEXT_PLAIN)
-               .body(accountConflictException.getMessage());
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountConflictException.getMessage());
     }
 
     /**
@@ -60,11 +60,10 @@ public class AccountExceptionResolver {
      * it will be caught and transformed into HTTP Response.
      *
      * @param accountNotFoundException AccountNotFoundException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { AccountNotFoundException.class })
+    @ExceptionHandler(value = {AccountNotFoundException.class})
     public ResponseEntity<?> handleAccountNotFoundException(AccountNotFoundException accountNotFoundException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -78,15 +77,14 @@ public class AccountExceptionResolver {
      *
      * @param accountStatusException Exception propagated from controller component, related to the lack of permissions
      *                               to perform some action due to the account status.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 412 PRECONDITION FAILED.
      */
-    @ExceptionHandler(value = { AccountStatusException.class })
+    @ExceptionHandler(value = {AccountStatusException.class})
     public ResponseEntity<?> handleAccountStatusException(AccountStatusException accountStatusException) {
         return ResponseEntity.badRequest()
-               .contentType(MediaType.TEXT_PLAIN)
-               .body(accountStatusException.getMessage());
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(accountStatusException.getMessage());
     }
 
     /**
@@ -95,11 +93,10 @@ public class AccountExceptionResolver {
      * it will be caught and transformed into HTTP Response.
      *
      * @param accountDataIntegrityCompromisedException AccountDataIntegrityCompromisedException that was caught in order to be transformed to HTTP Response.
-     *
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST
      */
-    @ExceptionHandler(value = { AccountDataIntegrityCompromisedException.class })
+    @ExceptionHandler(value = {AccountDataIntegrityCompromisedException.class})
     public ResponseEntity<?> handleAccountDataIntegrityCompromisedException(AccountDataIntegrityCompromisedException accountDataIntegrityCompromisedException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -114,7 +111,7 @@ public class AccountExceptionResolver {
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST.
      */
-    @ExceptionHandler(value = { ResetOwnPasswordException.class })
+    @ExceptionHandler(value = {ResetOwnPasswordException.class})
     public ResponseEntity<?> handleResetOwnPasswordException(ResetOwnPasswordException resetOwnPasswordException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
@@ -129,11 +126,11 @@ public class AccountExceptionResolver {
      * @return 401 UNAUTHORIZED is returned when this exception is caught while propagating
      * from controller component.
      */
-    @ExceptionHandler(value = { InvalidLoginAttemptException.class })
+    @ExceptionHandler(value = {InvalidLoginAttemptException.class})
     public ResponseEntity<?> handleInvalidLoginAttemptException(InvalidLoginAttemptException invalidLoginAttemptException) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-               .contentType(MediaType.TEXT_PLAIN)
-               .body(invalidLoginAttemptException.getMessage());
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(invalidLoginAttemptException.getMessage());
     }
 
     /**
@@ -144,7 +141,7 @@ public class AccountExceptionResolver {
      * @return When specified exception is propagated from controller component this method will catch it and transform
      * to HTTP Response with status code 400 BAD REQUEST.
      */
-    @ExceptionHandler(value = { AccountUserLevelException.class })
+    @ExceptionHandler(value = {AccountUserLevelException.class})
     public ResponseEntity<?> handleAccountUserLevelException(AccountUserLevelException accountUserLevelException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.TEXT_PLAIN)
