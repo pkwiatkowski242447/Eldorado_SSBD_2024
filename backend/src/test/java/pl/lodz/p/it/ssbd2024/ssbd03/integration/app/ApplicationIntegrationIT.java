@@ -9,6 +9,7 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -24,18 +25,19 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
-import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     private static final String CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
     private static final String BASE_URL = "http://localhost:8181/api/v1";
     private static final ObjectMapper mapper = new ObjectMapper();
-
 
     @BeforeAll
     public static void setup(){
@@ -373,6 +375,86 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
+    @Test
+    public void getSelfInfoAboutAccountSuccessfulTest() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        List<String> list = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .get(BASE_URL + "/accounts/self")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("login", Matchers.equalTo("jerzybem"))
+                .body("name", Matchers.equalTo("Jerzy"))
+                .body("lastname", Matchers.equalTo("Bem"))
+                .body("email", Matchers.equalTo("jbem@example.com"))
+                .body("phoneNumber", Matchers.equalTo("111111111"))
+                .body("verified", Matchers.equalTo(true))
+                .body("active", Matchers.equalTo(true))
+                .body("blocked", Matchers.equalTo(false))
+                .body("accountLanguage", Matchers.equalTo("pl"))
+                .extract()
+                .jsonPath().getList("userLevelsDto.roleName");
+
+        assertTrue(list.contains("ADMIN"));
+        assertTrue(list.contains("STAFF"));
+    }
+
+    @Test
+    public void getInfoAboutAccountSuccessfulTest() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        List<String> list = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .pathParam("id", "d20f860d-555a-479e-8783-67aee5b66692")
+                .get(BASE_URL + "/accounts/{id}")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("login", Matchers.equalTo("adamn"))
+                .body("name", Matchers.equalTo("Adam"))
+                .body("lastname", Matchers.equalTo("Niezgodka"))
+                .body("email", Matchers.equalTo("adamn@example.com"))
+                .body("phoneNumber", Matchers.equalTo("200000000"))
+                .body("verified", Matchers.equalTo(false))
+                .body("active", Matchers.equalTo(true))
+                .body("blocked", Matchers.equalTo(false))
+                .body("accountLanguage", Matchers.equalTo("PL"))
+                .extract()
+                .jsonPath().getList("userLevelsDto.roleName");
+
+        assertTrue(list.contains("STAFF"));
+    }
+
+    @Test
+    public void getInfoABoutAccountNotFoundTest() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .pathParam("id", "d20f900d-555a-479e-8783-67aee0b66692")
+                .get(BASE_URL + "/accounts/{id}")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+    }
+
+    @Test
+    public void getInfoAboutAccountBadRequestTest() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .pathParam("id", "ssbdtest")
+                .get(BASE_URL + "/accounts/{id}")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+
+    }
+
     private String login(String login, String password, String language) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO(login, password, language);
@@ -384,4 +466,5 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         Response response = request.post(BASE_URL+"/auth/login-credentials");
         return response.asString();
     }
+
 }
