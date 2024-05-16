@@ -1,4 +1,4 @@
-import {API_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
+import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
 
@@ -12,8 +12,7 @@ export const api = {
     logIn2fa: (userLogin: string, authCodeValue: string) => {
         let language = window.navigator.language;
         language = language.substring(0, 2)
-        const a = apiWithConfig.post('/auth/login-auth-code', {userLogin, authCodeValue, language})
-        return a
+        return apiWithConfig.post('/auth/login-auth-code', {userLogin, authCodeValue, language})
     },
 
     logOut: () => {
@@ -101,7 +100,7 @@ export const api = {
 
     confirmEmail: (token: string) => {
         return axios.create({
-            baseURL: API_URL,
+            baseURL: API_TEST_URL,
             timeout: TIMEOUT_IN_MS,
             headers: DEFAULT_HEADERS,
         }).post(`/accounts/confirm-email/${token}`)

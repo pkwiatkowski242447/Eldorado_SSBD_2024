@@ -1,7 +1,6 @@
 import {Route, Routes} from "react-router-dom";
 // import {AdminRoutes, ClientRoutes, PublicRoutes, STAFFRoutes} from "../routes";
 import PublicLayout from "../../components/layouts/PublicLayout";
-import {useAccount} from "../../hooks/useAccount";
 // import AdminLayout from "../../components/layouts/AdminLayout";
 // import ClientLayout from "../../components/layouts/ClientLayout";
 import {useEffect} from "react";
@@ -10,7 +9,7 @@ import {PublicRoutes} from "../routes";
 // import ResourceAdminLayout from "../../components/layouts/ResourceAdminLayout";
 
 export const RoutesComponents = () => {
-    const {isAuthenticated} = useAccount();
+    // const {isAuthenticated} = useAccount();
     useEffect(() => {
         // getCurrentAccount();
     }, []);

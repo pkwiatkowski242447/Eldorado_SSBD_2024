@@ -41,6 +41,7 @@ const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> =
                      *
                      * @param {E164Number | undefined} value - The entered value
                      */
+                    // @ts-expect-error idk
                     onChange={(value) => onChange?.(value || "")}
                     {...props}
                 />

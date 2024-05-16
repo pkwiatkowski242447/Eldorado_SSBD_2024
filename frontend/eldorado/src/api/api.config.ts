@@ -1,13 +1,14 @@
 import axios from 'axios'
 
-export const API_URL = "http://localhost:8080/api/v1"
+export const API_URL = "https://team-3.proj-sum.it.p.lodz.pl/api/v1"
+export const API_TEST_URL = "http://localhost:8080/api/v1"
 export const TIMEOUT_IN_MS = 30000
 export const DEFAULT_HEADERS = {
     Accept: 'application/json',
     'Content-type': 'application/json',
 }
 export const apiWithConfig = axios.create({
-    baseURL: API_URL,
+    baseURL: API_TEST_URL,
     timeout: TIMEOUT_IN_MS,
     headers: DEFAULT_HEADERS,
 })

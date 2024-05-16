@@ -9,23 +9,25 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {useToast} from "@/components/ui/use-toast.ts";
 import {isValidPhoneNumber} from "react-phone-number-input";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
-
-const formSchema = z.object({
-    email: z.string().min(1, {message: "This field has to be filled."})
-        .email("This is not a valid email."),
-    login: z.string().min(2, {message: "Login has to be at least 2 characters long."})
-        .max(32, {message: "Login has to be at most 32 characters long."}), //TODO add regex for login
-    password: z.string().min(2, {message: "Password has to be at least 2 characters long."})
-        .max(60, {message: "Password has to be at most 60 characters long."}),
-    firstName: z.string().min(2, {message: "First name has to be at least 2 characters long."})
-        .max(32, {message: "First name has to be at most 32 characters long."}),
-    lastName: z.string().min(2, {message: "Last name has to be at least 2 characters long."})
-        .max(32, {message: "Last name has to be at most 32 characters long."}),
-    phoneNumber: z.string().refine(isValidPhoneNumber, {message: "Invalid phone number"}),
-})
+import {useTranslation} from "react-i18next";
 
 export function RegisterForm() {
     const {toast} = useToast()
+    const {t} = useTranslation();
+
+    const formSchema = z.object({
+        email: z.string().min(1, {message: t("registerPage.emptyEmail")})
+            .email(t("registerPage.wrongEmail")),
+        login: z.string().min(3, {message: t("registerPage.loginTooShort")})
+            .max(50, {message: t("registerPage.loginTooLong")}),
+        password: z.string().min(8, {message: t("registerPage.passwordTooShort")})
+            .max(60, {message: t("registerPage.passwordTooLong")}),
+        firstName: z.string().min(2, {message: t("registerPage.firstNameTooShort")})
+            .max(50, {message: t("registerPage.firstNameTooLong")}),
+        lastName: z.string().min(2, {message: t("registerPage.lastNameTooShort")})
+            .max(50, {message: t("registerPage.lastNameTooLong")}),
+        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("registerPage.phoneNumberInvalid")}),
+    })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -40,30 +42,48 @@ export function RegisterForm() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.table(values)
-        api.registerClient(values.login, values.password, values.firstName, values.lastName, values.email,
-            values.phoneNumber, navigator.language.substring(0, 2))
+        // console.table(values);
+        api.registerClient(
+            values.login,
+            values.password,
+            values.firstName,
+            values.lastName,
+            values.email,
+            values.phoneNumber,
+            navigator.language.substring(0, 2)
+        )
             .then(() => {
                 toast({
-                    title: "Almost there!",
-                    description: "Check the e-mail you provided in order to activate your Eldorado account.",
+                    title: t("registerPage.popUp.registerOK.title"),
+                    description: t("registerPage.popUp.registerOK.text"),
                 });
             })
             .catch((error) => {
-                toast({
-                    variant: "destructive",
-                    description: "Something went wrong. Please try again later.",
-                })
-                console.log(error.response.data)
+                if (error.response && error.response.data) {
+                    const {message, violations} = error.response.data;
+                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+
+                    toast({
+                        variant: "destructive",
+                        title: t(message),
+                        description: violationMessages,
+                    });
+                } else {
+                    toast({
+                        variant: "destructive",
+                        description: "Error",
+                    });
+                }
+                // console.log(error.response ? error.response.data : error);
             });
     }
 
     return (
         <Card className="mx-auto max-w-2xl">
             <CardHeader>
-                <CardTitle className="text-2xl">Sign Up</CardTitle>
+                <CardTitle className="text-2xl">{t("registerPage.title")}</CardTitle>
                 <CardDescription>
-                    Enter your information to create an account
+                    {t("registerPage.info")}
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -77,7 +97,8 @@ export function RegisterForm() {
                                         name="firstName"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel className="text-black">First Name</FormLabel>
+                                                <FormLabel
+                                                    className="text-black">{t("registerPage.firstName")}</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="" {...field}/>
                                                 </FormControl>
@@ -92,7 +113,8 @@ export function RegisterForm() {
                                         name="lastName"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel className="text-black">Last Name</FormLabel>
+                                                <FormLabel
+                                                    className="text-black">{t("registerPage.lastName")}</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="" {...field}/>
                                                 </FormControl>
@@ -109,7 +131,8 @@ export function RegisterForm() {
                                         name="phoneNumber"
                                         render={({field}) => (
                                             <FormItem className="items-start">
-                                                <FormLabel className="text-black text-center">Phone Number</FormLabel>
+                                                <FormLabel
+                                                    className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                 <FormControl className="w-full">
                                                     {// @ts-expect-error - fix this maybe
                                                         <PhoneInput //TODO fix this
@@ -126,7 +149,7 @@ export function RegisterForm() {
                                         name="email"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel className="text-black">E-mail</FormLabel>
+                                                <FormLabel className="text-black">{t("registerPage.email")}</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="mail@example.com" {...field}/>
                                                 </FormControl>
@@ -142,7 +165,7 @@ export function RegisterForm() {
                                     name="login"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel className="text-black">Login</FormLabel>
+                                            <FormLabel className="text-black">{t("registerPage.login")}</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="" {...field}/>
                                             </FormControl>
@@ -157,7 +180,7 @@ export function RegisterForm() {
                                     name="password"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel className="text-black">Password</FormLabel>
+                                            <FormLabel className="text-black">{t("registerPage.password")}</FormLabel>
                                             <FormControl>
                                                 <Input type="password" {...field}/>
                                             </FormControl>
@@ -167,13 +190,13 @@ export function RegisterForm() {
                                 />
                             </div>
                             <Button type="submit" className="w-full">
-                                Create an account
+                                {t("registerPage.submit")}
                             </Button>
                         </div>
                         <div className="mt-4 text-center text-sm">
-                            Already have an account?{" "}
+                            {t("registerPage.hasAccount")}{" "}
                             <a href="/login" className="font-medium text-black hover:text-blue-500">
-                                Log in </a>
+                                {t("registerPage.logIn")} </a>
                         </div>
                     </form>
                 </Form>

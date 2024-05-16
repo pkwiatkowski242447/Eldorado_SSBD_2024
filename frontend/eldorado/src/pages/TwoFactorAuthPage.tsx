@@ -9,14 +9,19 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {InputOTP, InputOTPGroup, InputOTPSlot,} from "@/components/ui/input-otp"
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useParams} from "react-router-dom";
+import {useTranslation} from "react-i18next";
+import {toast} from "@/components/ui/use-toast.ts";
 
-const FormSchema = z.object({
-    pin: z.string().min(8, {
-        message: "Your one-time password must be 8 characters.",
-    }),
-})
 
 function TwoFactorAuthPage() {
+    const {t} = useTranslation();
+
+    const FormSchema = z.object({
+        pin: z.string().min(8, {
+            message: t("twoFactorAuthPage.wrongCode"),
+        }),
+    })
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -31,10 +36,25 @@ function TwoFactorAuthPage() {
     function onSubmit(data: z.infer<typeof FormSchema>) {
         if (login) {
             logIn2fa(login, data.pin).then(() => {
-                console.log(login);
-                console.log(data.pin);
+                // console.log(login);
+                // console.log(data.pin);
             }).catch((error) => {
-                console.log(error);
+                if (error.response && error.response.data) {
+                    const {message, violations} = error.response.data;
+                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+
+                    toast({
+                        variant: "destructive",
+                        title: t(message),
+                        description: violationMessages,
+                    });
+                } else {
+                    toast({
+                        variant: "destructive",
+                        description: "Error",
+                    });
+                }
+                // console.log(error.response ? error.response.data : error);
             });
         }
     }
@@ -49,7 +69,7 @@ function TwoFactorAuthPage() {
                         name="pin"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>One-Time Password</FormLabel>
+                                <FormLabel>{t("twoFactorAuthPage.title")}</FormLabel>
                                 <FormControl>
                                     <InputOTP maxLength={8} {...field}>
                                         <InputOTPGroup>
@@ -65,14 +85,14 @@ function TwoFactorAuthPage() {
                                     </InputOTP>
                                 </FormControl>
                                 <FormDescription>
-                                    Please enter the one-time password sent to your e-mail address.
+                                    {t("twoFactorAuthPage.info")}
                                 </FormDescription>
                                 <FormMessage/>
                             </FormItem>
                         )}
                     />
 
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit">{t("twoFactorAuthPage.submit")}</Button>
                 </form>
             </Form>
         </div>
