@@ -18,10 +18,25 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {useNavigate} from "react-router-dom";
+import {FiSettings} from 'react-icons/fi';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
+import {toast} from "@/components/ui/use-toast.ts";
+import {useAccountState} from "@/context/AccountContext.tsx";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [users, setUsers] = useState<ManagedUserType[]>([]);
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<ManagedUserType | null>(null);
+
+    const {account} = useAccountState();
 
     const navigator = useNavigate();
 
@@ -29,8 +44,50 @@ function UserManagementPage() {
         navigator(`/manage-users/${userId}`);
     };
 
-    const handleBlockUnblockClick = (userId: string) => {
-        console.log(userId)
+    const handleBlockUnblockClick = (user: ManagedUserType) => {
+        setSelectedUser(user);
+        setAlertDialogOpen(true);
+    };
+
+    const handleConfirmBlockUnblock = () => {
+        if (selectedUser) {
+            if (selectedUser.blocked) {
+                api.unblockAccount(selectedUser.id).then(() => {
+                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
+                        if (response.status === 204) {
+                            setUsers([]);
+                        } else {
+                            setUsers(response.data);
+                        }
+                    });
+                    setAlertDialogOpen(false)
+                }).catch(error => {
+                    toast({
+                        variant: "destructive",
+                        description: "Something went wrong. Please try again later.",
+                    })
+                    console.table(error);
+                });
+            } else {
+                api.blockAccount(selectedUser.id).then(() => {
+                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
+                        if (response.status === 204) {
+                            setUsers([]);
+                        } else {
+                            setUsers(response.data);
+                        }
+                    });
+                    setAlertDialogOpen(false);
+                }).catch(error => {
+                    toast({
+                        variant: "destructive",
+                        description: "Something went wrong. Please try again later.",
+                    })
+                    console.table(error);
+                });
+            }
+        }
+        setAlertDialogOpen(false);
     };
 
     useEffect(() => {
@@ -56,7 +113,7 @@ function UserManagementPage() {
                         <TableHead>Blocked</TableHead>
                         <TableHead>Verified</TableHead>
                         <TableHead>User Levels</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -90,14 +147,17 @@ function UserManagementPage() {
                             <TableCell>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger>
-                                        Manage
+                                        <FiSettings/>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuItem onClick={() => handleSettingsClick(user.id)}>
-                                            Settings
+                                            Manage
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => handleBlockUnblockClick(user.id)}>
-                                            Block/Unblock
+                                        <DropdownMenuItem
+                                            onClick={() => handleBlockUnblockClick(user)}
+                                            disabled={user.id === account?.id}
+                                        >
+                                            {user.blocked ? 'Unblock' : 'Block'}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -105,6 +165,16 @@ function UserManagementPage() {
                         </TableRow>
                     ))}
                 </TableBody>
+                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogTitle>Confirm</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to {selectedUser?.blocked ? 'unblock' : 'block'} this user?
+                        </AlertDialogDescription>
+                        <AlertDialogAction onClick={handleConfirmBlockUnblock}>OK</AlertDialogAction>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    </AlertDialogContent>
+                </AlertDialog>
             </Table>
             <Pagination>
                 <PaginationContent>

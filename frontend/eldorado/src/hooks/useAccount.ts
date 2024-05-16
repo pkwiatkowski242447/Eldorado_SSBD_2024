@@ -44,12 +44,17 @@ export const useAccount = () => {
     }
     const logIn = async (login: string, password: string) => {
         try {
-            const token = (await api.logIn(login, password)).data;
-            localStorage.setItem('token', token);
-            console.log(token)
-            await getCurrentAccount()
-            setIsAuthenticated(true);
-            navigate(Pathnames.public.home)
+            const response = await api.logIn(login, password);
+            if (response.status === 200) {
+                const token = response.data;
+                localStorage.setItem('token', token);
+                await getCurrentAccount()
+                setIsAuthenticated(true);
+                navigate(Pathnames.public.home)
+            } else if (response.status === 204) {
+                console.log(login)
+                navigate(`/login/2fa/${login}`);
+            }
         } catch (e) {
             toast({
                 variant: "destructive",
@@ -60,6 +65,28 @@ export const useAccount = () => {
         } finally { /* empty */
         }
     }
+
+    const logIn2fa = async (userLogin: string, authCodeValue: string) => {
+        try {
+            const response = await api.logIn2fa(userLogin, authCodeValue);
+            if (response.status === 200) {
+                const token = response.data;
+                localStorage.setItem('token', token);
+                await getCurrentAccount()
+                setIsAuthenticated(true);
+                navigate(Pathnames.public.home)
+            }
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                description: "Something went wrong. Please try again later.",
+            })
+            console.log(e);
+            if (isAuthenticated) await logOut();
+        } finally { /* empty */
+        }
+    }
+
     const getCurrentAccount = async () => {
         try {
             const tokenRaw = localStorage.getItem("token");
@@ -121,5 +148,6 @@ export const useAccount = () => {
         logIn,
         getCurrentAccount,
         logOut,
+        logIn2fa
     }
 }

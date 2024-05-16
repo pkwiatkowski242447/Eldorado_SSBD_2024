@@ -11,8 +11,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,19 +24,18 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
-import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     private static final String CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
-
     private static final String BASE_URL = "http://localhost:8181/api/v1";
-
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final Logger log = LoggerFactory.getLogger(ApplicationIntegrationIT.class);
+
 
     @BeforeAll
     public static void setup(){
@@ -240,7 +237,144 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         assertEquals(1, accountConstraintViolationExceptionDTO.getViolations().size());
     }
 
+    @Test
+    public void logoutTestSuccessfulLogoutAfterLogin() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .post(BASE_URL + "/auth/logout")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void logoutAsUnauthenticatedUser() {
+        RestAssured.given().when().post(BASE_URL + "/auth/logout").then().assertThat().statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void logoutAfterSuccessfulLogout() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .post(BASE_URL + "/auth/logout");
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .post(BASE_URL + "/auth/logout")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void getAllUsersReturnListAndOKStatusCode() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        List<String> list1 = RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 3)
+                .get(BASE_URL+"/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .jsonPath()
+                .getList("id");
+
+        assertEquals(3, list1.size());
+
+        List<String> list2 = RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 10)
+                .get(BASE_URL+"/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .jsonPath()
+                .getList("login");
+
+        assertEquals(list2.get(0), "adamn");
+        assertEquals(list2.get(1), "jakubkoza");
+        assertEquals(list2.get(2), "jchrystus");
+        assertEquals(list2.get(3), "jerzybem");
+        assertEquals(list2.get(4), "juleswinnfield");
+        assertEquals(list2.get(5), "kamilslimak");
+        assertEquals(list2.get(6), "michalkowal");
+        assertEquals(list2.get(7), "piotrnowak");
+        assertEquals(list2.get(8), "tonyhalik");
+        assertEquals(list2.get(9), "vincentvega");
+
+
+        List<String> list3 = RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 1)
+                .param("pageSize", 3)
+                .get(BASE_URL+"/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .jsonPath()
+                .getList("id");
+
+        assertEquals(3, list3.size());
+    }
+
+    @Test
+    public void getAllUsersReturnNoContent() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 4)
+                .param("pageSize", 5)
+                .get(BASE_URL+"/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void getAllUsersAsUnauthenticatedUserForbidden() {
+        RestAssured
+                .given()
+                .param("pageNumber", 0)
+                .param("pageSize", 5)
+                .get(BASE_URL + "/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void getAllUsersAsUnauthorizedUserForbidden() throws JsonProcessingException {
+        String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 5)
+                .get(BASE_URL + "/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
     private String login(String login, String password, String language) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO(login, password, language);
 
         RequestSpecification request = RestAssured.given();
@@ -249,22 +383,5 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
         Response response = request.post(BASE_URL+"/auth/login-credentials");
         return response.asString();
-    }
-
-    private String decodeJwtTokenAndExtractValue(String payload, String key) {
-        String[] parts = payload.split("\\.");
-        for (String part : parts) {
-            byte[] dec = Base64.getDecoder().decode(part);
-            String str = new String(dec);
-
-            if (str.contains(key)) {
-                // In JWT token key and value pair comes in "key":"value",
-                // so the first letter of value is equal to the length of key plus 3 characters.
-                str = str.substring(str.indexOf(key) + key.length() + 3);
-                return str.substring(0, str.indexOf("\","));
-            }
-        }
-
-        return null;
     }
 }
