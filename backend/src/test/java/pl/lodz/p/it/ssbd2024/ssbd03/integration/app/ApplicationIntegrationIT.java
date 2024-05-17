@@ -31,9 +31,12 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
+
 import java.util.List;
+
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
@@ -124,20 +127,18 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request.contentType(CONTENT_TYPE_JSON);
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
-        Response response = request.post(BASE_URL + "/auth/login-credentials");
-
-        String forbiddenKey = request
+        request
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mapper.writeValueAsString(accountLoginDTO))
                 .when()
                 .post(BASE_URL + "/auth/login-credentials")
                 .then()
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION)
+                )
                 .extract()
                 .asString();
-
-        assertNotNull(forbiddenKey);
-        assertEquals(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION, forbiddenKey);
     }
 
     @Test
@@ -145,18 +146,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!1", "pl");
         RequestSpecification request = RestAssured.given();
 
-        String forbiddenKey = request
+        request
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mapper.writeValueAsString(accountLoginDTO))
                 .when()
                 .post(BASE_URL + "/auth/login-credentials")
                 .then()
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
-                .extract()
-                .asString();
-
-        assertNotNull(forbiddenKey);
-        assertEquals(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION, forbiddenKey);
+                .body(
+                        "message", Matchers.equalTo(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION)
+                );
     }
 
     @Test
@@ -165,7 +164,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String previousToken = this.login(accountLoginDTO.getLogin(), accountLoginDTO.getPassword(), accountLoginDTO.getLanguage());
         RequestSpecification request = RestAssured.given();
 
-        String forbiddenKey = request
+        request
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(previousToken))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mapper.writeValueAsString(accountLoginDTO))
@@ -173,11 +172,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/auth/login-credentials")
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-
-        assertNotNull(forbiddenKey);
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, forbiddenKey);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @Test
@@ -185,18 +182,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jchrystus", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
-        String accountBlockedByAdminKey = request
+        request
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mapper.writeValueAsString(accountLoginDTO))
                 .when()
                 .post(BASE_URL + "/auth/login-credentials")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertNotNull(accountBlockedByAdminKey);
-        assertEquals(I18n.ACCOUNT_INACTIVE_EXCEPTION, accountBlockedByAdminKey);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_INACTIVE_EXCEPTION)
+                );
     }
 
     @Test
@@ -204,18 +199,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("juleswinnfield", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
-        String accountBlockedByAdminKey = request
+        request
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mapper.writeValueAsString(accountLoginDTO))
                 .when()
                 .post(BASE_URL + "/auth/login-credentials")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertNotNull(accountBlockedByAdminKey);
-        assertEquals(I18n.ACCOUNT_BLOCKED_BY_ADMIN, accountBlockedByAdminKey);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_BLOCKED_BY_ADMIN)
+                );
     }
 
     @Test
@@ -223,18 +216,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("vincentvega", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
-        String accountBlockedByAdminKey = request
+        request
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mapper.writeValueAsString(accountLoginDTO))
                 .when()
                 .post(BASE_URL + "/auth/login-credentials")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertNotNull(accountBlockedByAdminKey);
-        assertEquals(I18n.ACCOUNT_BLOCKED_BY_FAILED_LOGIN_ATTEMPTS, accountBlockedByAdminKey);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_BLOCKED_BY_FAILED_LOGIN_ATTEMPTS)
+                );
     }
 
     @Test
@@ -301,7 +292,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .header("Authorization", "Bearer " + loginToken)
                 .param("pageNumber", 0)
                 .param("pageSize", 3)
-                .get(BASE_URL+"/accounts")
+                .get(BASE_URL + "/accounts")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.OK.value())
@@ -316,7 +307,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .header("Authorization", "Bearer " + loginToken)
                 .param("pageNumber", 0)
                 .param("pageSize", 10)
-                .get(BASE_URL+"/accounts")
+                .get(BASE_URL + "/accounts")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.OK.value())
@@ -340,7 +331,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .header("Authorization", "Bearer " + loginToken)
                 .param("pageNumber", 1)
                 .param("pageSize", 3)
-                .get(BASE_URL+"/accounts")
+                .get(BASE_URL + "/accounts")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.OK.value())
@@ -360,7 +351,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .header("Authorization", "Bearer " + loginToken)
                 .param("pageNumber", 4)
                 .param("pageSize", 5)
-                .get(BASE_URL+"/accounts")
+                .get(BASE_URL + "/accounts")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -587,15 +578,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
 
         // Try to block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
@@ -607,15 +597,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
 
         // Try to block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @Test
@@ -626,15 +615,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = UUID.randomUUID().toString();
 
         // Try to block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCOUNT_NOT_FOUND_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_NOT_FOUND_EXCEPTION)
+                );
     }
 
     @Test
@@ -645,15 +633,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = "b3b8c2ac-21ff-434b-b490-aa6d717447c0";
 
         // Try to block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION)
+                );
     }
 
     @Test
@@ -672,16 +659,15 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         // Try to block account second time
-        String response = RestAssured.given()
+        RestAssured.given()
                 .spec(requestSpec)
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCOUNT_ALREADY_BLOCKED, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_ALREADY_BLOCKED)
+                );
 
         //------------------------------------------------------------------------------------//
 
@@ -715,15 +701,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request.header("Authorization", "Bearer " + loginToken);
 
         // Try to block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
     }
 
     // Negative unblocking
@@ -734,14 +719,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
 
         // Try to unblock account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
@@ -795,46 +780,46 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @MethodSource("provideOldUserLevelForAccountParameters")
     public void addUserLevelTestAccountHasUserLevel(String id, String oldUserLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/{id}/add-level-{level}", id, oldUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.USER_LEVEL_DUPLICATED, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.USER_LEVEL_DUPLICATED)
+                );
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void addUserLevelTestInvalidId(String userLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/invalid-id/add-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
     @MethodSource("provideNewUserLevelForAccountParameters")
     public void addUserLevelTestUnauthorized(String id, String newUserLevel) {
-        String response = RestAssured.given()
+        RestAssured.given()
                 .when()
                 .post(BASE_URL + "/accounts/{id}/add-level-{level}", id, newUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
@@ -846,15 +831,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
 
         // Try to block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @Test
@@ -865,15 +849,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = UUID.randomUUID().toString();
 
         // Try to block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCOUNT_NOT_FOUND_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_NOT_FOUND_EXCEPTION)
+                );
     }
 
     @Test
@@ -884,15 +867,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String userId = "e0bf979b-6b42-432d-8462-544d88b1ab5f";
 
         // Unblock account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCOUNT_ALREADY_UNBLOCKED, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_ALREADY_UNBLOCKED)
+                );
     }
 
     @ParameterizedTest
@@ -903,15 +885,14 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request.header("Authorization", "Bearer " + loginToken);
 
         // Try to un block account
-        String response = request
+        request
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
     }
 
     // Modify self account
@@ -998,7 +979,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         accountModifyDTO.setName("Adam");
 
         // Try to modify account
-        String responseModify = RestAssured.given()
+        RestAssured.given()
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
                 .contentType(CONTENT_TYPE_JSON)
@@ -1006,10 +987,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts/self")
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, responseModify);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
@@ -1041,7 +1021,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         accountModifyDTO.setName("Alalalala");
 
         // Modify account
-        String responseModify = RestAssured.given()
+        RestAssured.given()
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
@@ -1050,10 +1030,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts/self")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.DATA_INTEGRITY_COMPROMISED, responseModify);
+                .body(
+                        "message", Matchers.equalTo(I18n.DATA_INTEGRITY_COMPROMISED)
+                );
 
         // Check after modifying
         RestAssured.given()
@@ -1095,7 +1074,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         accountModifyDTO.setName("Alalalala");
 
         // Modify account
-        String responseModify = RestAssured.given()
+        RestAssured.given()
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", ifMatch)
@@ -1104,10 +1083,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts/self")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.MISSING_HEADER_IF_MATCH, responseModify);
+                .body(
+                        "message", Matchers.equalTo(I18n.MISSING_HEADER_IF_MATCH)
+                );
     }
 
     @ParameterizedTest
@@ -1172,7 +1150,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
 
         // Modify account v2
-        String responseModify_V2 = RestAssured.given()
+        RestAssured.given()
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
@@ -1181,10 +1159,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts/self")
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.OPTIMISTIC_LOCK_EXCEPTION, responseModify_V2);
+                .body(
+                        "message", Matchers.equalTo(I18n.OPTIMISTIC_LOCK_EXCEPTION)
+                );
 
         // Check after modifying
         RestAssured.given()
@@ -1344,7 +1321,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         accountModifyDTO.setName("Adam");
 
         // Try to modify account
-        String responseModify = RestAssured.given()
+        RestAssured.given()
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
                 .contentType(CONTENT_TYPE_JSON)
@@ -1352,10 +1329,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts")
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, responseModify);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
@@ -1384,7 +1360,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
         String loginTokenNoAdmin = this.login(login, "P@ssw0rd!", "pl");
         // Try to modify account
-        String responseModify = RestAssured.given()
+        RestAssured.given()
                 .when()
                 .header("Authorization", "Bearer " + loginTokenNoAdmin)
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
@@ -1393,10 +1369,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts")
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, responseModify);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @Test
@@ -1428,7 +1403,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         accountModifyDTO.setName("Alalalala");
 
         // Modify account
-        String responseModify = RestAssured.given()
+        RestAssured.given()
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
@@ -1437,10 +1412,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.DATA_INTEGRITY_COMPROMISED, responseModify);
+                .body(
+                        "message", Matchers.equalTo(I18n.DATA_INTEGRITY_COMPROMISED)
+                );
 
         // Check after modifying
         RestAssured.given()
@@ -1483,7 +1457,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         accountModifyDTO.setName("Alalalala");
 
         // Modify account
-        String responseModify = RestAssured.given()
+        RestAssured.given()
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", ifMatch)
@@ -1492,10 +1466,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.MISSING_HEADER_IF_MATCH, responseModify);
+                .body(
+                        "message", Matchers.equalTo(I18n.MISSING_HEADER_IF_MATCH)
+                );
     }
 
     @Test
@@ -1560,7 +1533,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
 
         // Modify account v2
-        String responseModify_V2 = RestAssured.given()
+        RestAssured.given()
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
@@ -1569,10 +1542,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .put(BASE_URL + "/accounts")
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-
-        assertEquals(I18n.OPTIMISTIC_LOCK_EXCEPTION, responseModify_V2);
+                .body(
+                        "message", Matchers.equalTo(I18n.OPTIMISTIC_LOCK_EXCEPTION)
+                );
 
         // Check after modifying
         RestAssured.given()
@@ -1649,144 +1621,145 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void addUserLevelTestAccountNotFound(String userLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/159cf8d2-4c75-4f7f-868d-adfaa6a842c0/add-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCOUNT_NOT_FOUND_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_NOT_FOUND_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void addUserLevelTestNotAdmin(String userLevel) throws JsonProcessingException {
         String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/f512c0b6-40b2-4bcb-8541-46077ac02101/add-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
     @MethodSource("provideOldUserLevelForAccountParameters")
     public void removeUserLevelTestAccountHasOneUserLevel(String id, String oldUserLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, oldUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ONE_USER_LEVEL, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ONE_USER_LEVEL)
+                );
     }
 
     @ParameterizedTest
     @MethodSource("provideNewUserLevelForAccountParameters")
     public void removeUserLevelTestAccountNoSuchUserLevel(String id, String newUserLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, newUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.NO_SUCH_USER_LEVEL_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.NO_SUCH_USER_LEVEL_EXCEPTION)
+                );
     }
 
     @Test
     public void removeUserLevelTestAdminRemovingOwnAdminUserLevel() throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/b3b8c2ac-21ff-434b-b490-aa6d717447c0/remove-level-admin")
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
     @MethodSource("provideOldUserLevelForAccountParameters")
     public void removeUserLevelTestUnauthorized(String id, String oldUserLevel) {
-        String response = RestAssured.given()
+        RestAssured.given()
                 .when()
                 .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, oldUserLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void removeUserLevelTestInvalidId(String userLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/invalid-id/remove-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void removeUserLevelTestAccountNotFound(String userLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/159cf8d2-4c75-4f7f-868d-adfaa6a842c0/remove-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCOUNT_NOT_FOUND_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_NOT_FOUND_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void removeUserLevelTestNotAdmin(String userLevel) throws JsonProcessingException {
         String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .post(BASE_URL + "/accounts/f512c0b6-40b2-4bcb-8541-46077ac02101/remove-level-{level}", userLevel)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
     }
 
     @ParameterizedTest
@@ -1864,7 +1837,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String email = userLevel + "@email.com";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .contentType(CONTENT_TYPE)
@@ -1873,9 +1846,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCOUNT_LOGIN_ALREADY_TAKEN, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_LOGIN_ALREADY_TAKEN)
+                );
     }
 
     @ParameterizedTest
@@ -1888,7 +1861,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String email = "jerzybem@spoko.pl";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .contentType(CONTENT_TYPE)
@@ -1897,9 +1870,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCOUNT_EMAIL_ALREADY_TAKEN, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_EMAIL_ALREADY_TAKEN)
+                );
     }
 
     @ParameterizedTest
@@ -1912,7 +1885,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String email = userLevel + "@email.com";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .contentType(CONTENT_TYPE)
@@ -1921,9 +1894,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCESS_DENIED_EXCEPTION, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                );
 
     }
 
@@ -1995,7 +1968,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String email = "veryunique@email.com";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .when()
                 .contentType(CONTENT_TYPE)
                 .body(registerDTO)
@@ -2003,9 +1976,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCOUNT_LOGIN_ALREADY_TAKEN, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_LOGIN_ALREADY_TAKEN)
+                );
     }
 
     @Test
@@ -2016,7 +1989,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         String email = "jerzybem@spoko.pl";
         AccountRegisterDTO registerDTO = new AccountRegisterDTO(username, "P@ssw0rd!", name, lastname,
                 email, "111111111", "pl");
-        String response = RestAssured.given()
+        RestAssured.given()
                 .header("Authorization", "Bearer ")
                 .when()
                 .contentType(CONTENT_TYPE)
@@ -2025,9 +1998,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .extract()
-                .asString();
-        assertEquals(I18n.ACCOUNT_EMAIL_ALREADY_TAKEN, response);
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_EMAIL_ALREADY_TAKEN)
+                );
     }
 
     private static Stream<Arguments> provideNewUserLevelForAccountParameters() {
