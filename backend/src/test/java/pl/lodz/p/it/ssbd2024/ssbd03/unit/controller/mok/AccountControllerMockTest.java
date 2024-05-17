@@ -23,6 +23,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.TokenExceptionR
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -648,8 +649,13 @@ public class AccountControllerMockTest {
         mockMvc.perform(
                         post("/api/v1/accounts/{id}/block", id))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
     }
 
     @Test
@@ -660,8 +666,13 @@ public class AccountControllerMockTest {
         mockMvc.perform(
                         post("/api/v1/accounts/{id}/block", testId))
                 .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
     }
 
     @Test
@@ -671,8 +682,13 @@ public class AccountControllerMockTest {
         mockMvc.perform(
                         post("/api/v1/accounts/{id}/block", testId))
                 .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.ACCOUNT_ALREADY_BLOCKED, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_ALREADY_BLOCKED)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         verify(accountService, times(1)).blockAccount(UUID.fromString(testId));
     }
@@ -694,8 +710,13 @@ public class AccountControllerMockTest {
         mockMvc.perform(
                         post("/api/v1/accounts/{id}/unblock", id))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
     }
 
     @Test
@@ -705,8 +726,13 @@ public class AccountControllerMockTest {
         mockMvc.perform(
                         post("/api/v1/accounts/{id}/unblock", testId))
                 .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.ACCOUNT_ALREADY_UNBLOCKED, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_ALREADY_UNBLOCKED)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         verify(accountService, times(1)).unblockAccount(UUID.fromString(testId));
     }
@@ -737,7 +763,7 @@ public class AccountControllerMockTest {
         mockMvc.perform(
                         get("/api/v1/accounts/self"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Captor
@@ -806,8 +832,13 @@ public class AccountControllerMockTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(accountModifyDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.MISSING_HEADER_IF_MATCH, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.MISSING_HEADER_IF_MATCH)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
     }
 
     @Test
@@ -830,8 +861,13 @@ public class AccountControllerMockTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(accountModifyDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.DATA_INTEGRITY_COMPROMISED, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.DATA_INTEGRITY_COMPROMISED)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         // Verify
         verify(jwtProvider, times(1)).generateObjectSignature(modifyDtoCaptor.capture());
@@ -900,8 +936,13 @@ public class AccountControllerMockTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(accountModifyDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.MISSING_HEADER_IF_MATCH, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.MISSING_HEADER_IF_MATCH)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
     }
 
     @Test
@@ -924,8 +965,13 @@ public class AccountControllerMockTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(accountModifyDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals(I18n.DATA_INTEGRITY_COMPROMISED, result.getResponse().getContentAsString()));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(result ->
+                        assertEquals(
+                                mapper.writeValueAsString(new ExceptionDTO(I18n.DATA_INTEGRITY_COMPROMISED)),
+                                result.getResponse().getContentAsString()
+                        )
+                );
 
         // Verify
         verify(jwtProvider, times(1)).generateObjectSignature(modifyDtoCaptor.capture());

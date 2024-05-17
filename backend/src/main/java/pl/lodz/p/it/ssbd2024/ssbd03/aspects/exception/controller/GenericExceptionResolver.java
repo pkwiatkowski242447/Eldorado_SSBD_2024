@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
@@ -37,8 +38,8 @@ public class GenericExceptionResolver {
     @ExceptionHandler(value = {ApplicationOptimisticLockException.class})
     public ResponseEntity<?> handleOptimisticLockException(ApplicationOptimisticLockException optimisticLockException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(optimisticLockException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(optimisticLockException));
     }
 
     /**
@@ -52,8 +53,8 @@ public class GenericExceptionResolver {
     @ExceptionHandler(value = {InvalidRequestHeaderException.class})
     public ResponseEntity<?> handleInvalidRequestHeaderException(InvalidRequestHeaderException invalidRequestHeaderException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(invalidRequestHeaderException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(invalidRequestHeaderException));
     }
 
     /**
@@ -67,8 +68,8 @@ public class GenericExceptionResolver {
     @ExceptionHandler(value = {ApplicationInternalServerErrorException.class})
     public ResponseEntity<?> handleUnexpectedException(ApplicationInternalServerErrorException applicationInternalServerErrorException) {
         return ResponseEntity.internalServerError()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(applicationInternalServerErrorException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(applicationInternalServerErrorException));
     }
 
     /**
@@ -83,8 +84,8 @@ public class GenericExceptionResolver {
     @ExceptionHandler(value = {MapperBaseException.class})
     public ResponseEntity<?> handleMapperBaseException(MapperBaseException mapperBaseException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(mapperBaseException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(mapperBaseException));
     }
 
     /**
@@ -99,8 +100,8 @@ public class GenericExceptionResolver {
     @ExceptionHandler(value = {ApplicationDatabaseException.class})
     public ResponseEntity<?> handleApplicationDatabaseException(ApplicationDatabaseException applicationDatabaseException) {
         return ResponseEntity.internalServerError()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(applicationDatabaseException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(applicationDatabaseException));
     }
 
     /**
@@ -114,8 +115,8 @@ public class GenericExceptionResolver {
     @ExceptionHandler(value = {InvalidDataFormatException.class})
     public ResponseEntity<?> handleInvalidDataFormatException(InvalidDataFormatException invalidDataFormatException) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(invalidDataFormatException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(invalidDataFormatException));
     }
 
     /**
@@ -130,14 +131,14 @@ public class GenericExceptionResolver {
     @ExceptionHandler(value = {IllegalOperationException.class})
     public ResponseEntity<?> handleIllegalOperationException(IllegalOperationException illegalOperationException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(illegalOperationException.getMessage());
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(illegalOperationException));
     }
 
     @ExceptionHandler(value = {AccessDeniedException.class})
     public ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(I18n.ACCESS_DENIED_EXCEPTION);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(I18n.ACCESS_DENIED_EXCEPTION));
     }
 }
