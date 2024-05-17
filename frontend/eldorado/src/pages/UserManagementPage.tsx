@@ -29,13 +29,14 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccountState} from "@/context/AccountContext.tsx";
+import {useTranslation} from "react-i18next";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [users, setUsers] = useState<ManagedUserType[]>([]);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<ManagedUserType | null>(null);
-
+    const {t} = useTranslation();
     const {account} = useAccountState();
 
     const navigator = useNavigate();
@@ -61,12 +62,23 @@ function UserManagementPage() {
                         }
                     });
                     setAlertDialogOpen(false)
-                }).catch(error => {
-                    toast({
-                        variant: "destructive",
-                        description: "Something went wrong. Please try again later.",
-                    })
-                    console.table(error);
+                }).catch((error) => {
+                    if (error.response && error.response.data) {
+                        const {message, violations} = error.response.data;
+                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+
+                        toast({
+                            variant: "destructive",
+                            title: t(message),
+                            description: violationMessages,
+                        });
+                    } else {
+                        toast({
+                            variant: "destructive",
+                            description: "Error",
+                        });
+                    }
+                    // console.log(error.response ? error.response.data : error);
                 });
             } else {
                 api.blockAccount(selectedUser.id).then(() => {
@@ -78,12 +90,23 @@ function UserManagementPage() {
                         }
                     });
                     setAlertDialogOpen(false);
-                }).catch(error => {
-                    toast({
-                        variant: "destructive",
-                        description: "Something went wrong. Please try again later.",
-                    })
-                    console.table(error);
+                }).catch((error) => {
+                    if (error.response && error.response.data) {
+                        const {message, violations} = error.response.data;
+                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+
+                        toast({
+                            variant: "destructive",
+                            title: t(message),
+                            description: violationMessages,
+                        });
+                    } else {
+                        toast({
+                            variant: "destructive",
+                            description: "Error",
+                        });
+                    }
+                    // console.log(error.response ? error.response.data : error);
                 });
             }
         }
@@ -106,13 +129,13 @@ function UserManagementPage() {
             <Table className="p-10">
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Login</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Lastname</TableHead>
-                        <TableHead>Active</TableHead>
-                        <TableHead>Blocked</TableHead>
-                        <TableHead>Verified</TableHead>
-                        <TableHead>User Levels</TableHead>
+                        <TableHead>{t("accountSettings.users.table.header.login")}</TableHead>
+                        <TableHead>{t("accountSettings.users.table.header.name")}</TableHead>
+                        <TableHead>{t("accountSettings.users.table.header.lastName")}</TableHead>
+                        <TableHead>{t("accountSettings.users.table.header.active")}</TableHead>
+                        <TableHead>{t("accountSettings.users.table.header.blocked")}</TableHead>
+                        <TableHead>{t("accountSettings.users.table.header.verified")}</TableHead>
+                        <TableHead>{t("accountSettings.users.table.header.userLevels")}</TableHead>
                         <TableHead></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -141,7 +164,7 @@ function UserManagementPage() {
                                         default:
                                             color = 'black';
                                     }
-                                    return <span style={{color}}>{level}</span>;
+                                    return <span style={{color}}>{level} </span>;
                                 })}
                             </TableCell>
                             <TableCell>
@@ -151,13 +174,13 @@ function UserManagementPage() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuItem onClick={() => handleSettingsClick(user.id)}>
-                                            Manage
+                                            {t("accountSettings.users.table.settings.manage")}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => handleBlockUnblockClick(user)}
                                             disabled={user.id === account?.id}
                                         >
-                                            {user.blocked ? 'Unblock' : 'Block'}
+                                            {user.blocked ? t("accountSettings.users.table.settings.unblock") : t("accountSettings.users.table.settings.block")}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -167,12 +190,14 @@ function UserManagementPage() {
                 </TableBody>
                 <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
                     <AlertDialogContent>
-                        <AlertDialogTitle>Confirm</AlertDialogTitle>
+                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to {selectedUser?.blocked ? 'unblock' : 'block'} this user?
+                            {t("accountSettings.users.table.settings.block.confirm1")}
+                            {selectedUser?.blocked ? t("accountSettings.users.table.settings.unblock2") : t("accountSettings.users.table.settings.block2")}
+                            {t("accountSettings.users.table.settings.block.confirm2")}
                         </AlertDialogDescription>
-                        <AlertDialogAction onClick={handleConfirmBlockUnblock}>OK</AlertDialogAction>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmBlockUnblock}>{t("general.ok")}</AlertDialogAction>
+                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
                     </AlertDialogContent>
                 </AlertDialog>
             </Table>

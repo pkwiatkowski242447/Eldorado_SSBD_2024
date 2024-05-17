@@ -14,11 +14,13 @@ import {RolesEnum} from "@/types/TokenPayload.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {useNavigate} from "react-router-dom";
 import {useAccount} from "@/hooks/useAccount.ts";
+import {useTranslation} from "react-i18next";
 
 
 const SiteHeader = () => {
     const {account} = useAccountState();
     const navigator = useNavigate();
+    const {t} = useTranslation();
 
     const {logOut} = useAccount();
 
@@ -69,20 +71,20 @@ const SiteHeader = () => {
                         href="/manage-users"
                         className="text-muted-foreground transition-colors hover:text-foreground"
                     >
-                        Users
+                        {t("siteHeader.users")}
                     </a>
                 )}
                 <a
-                    href="#"
+                    href=""
                     className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                    Parkings
+                    {t("siteHeader.parkings")}
                 </a>
 
             </nav>
             <div className="flex w-full items-right gap-4 md:ml-auto md:gap-2 lg:gap-4 justify-end">
                 <div className="flex items-center w-full gap-4 md:ml-auto md:gap-2 lg:gap-4 justify-end">
-                    <small className="text-sm font-medium leading-none">Hello, {account?.login}</small>
+                    <small className="text-sm font-medium leading-none">{t("siteHeader.hello")}{account?.login}</small>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -92,22 +94,22 @@ const SiteHeader = () => {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuLabel>{t("siteHeader.myAccount")}</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem
                                 onClick={onClickSettings}>
-                                Settings
+                                {t("siteHeader.settings")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem
                                 onClick={onClickChangeUserLevel}>
-                                Change Access Level
+                                {t("siteHeader.changeLevel")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem
                                 className="font-bold"
                                 onClick={onClickLogout}>
-                                Logout
+                                {t("siteHeader.logout")}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

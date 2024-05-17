@@ -8,14 +8,16 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {api} from "@/api/api.ts";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
-
-const formSchema = z.object({
-    email: z.string().min(1, {message: "This field has to be filled."})
-        .email("This is not a valid email."),
-})
+import {useTranslation} from "react-i18next";
 
 function ForgotPasswordPage() {
     const {toast} = useToast()
+    const {t} = useTranslation();
+
+    const formSchema = z.object({
+        email: z.string().min(1, {message: t("forgotPasswordPage.emptyEmail")})
+            .email(t("forgotPasswordPage.wrongEmail")),
+    })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -25,21 +27,31 @@ function ForgotPasswordPage() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.table(values)
+        // console.table(values)
         api.forgotPassword(values.email)
             .then(() => {
                 toast({
-                    title: "Almost there!",
-                    description: "Check the e-mail you provided in order to reset the password" +
-                        "to your Eldorado account.",
+                    title: t("forgotPasswordPage.popUp.resetPasswordOK.title"),
+                    description: t("forgotPasswordPage.popUp.resetPasswordOK.text"),
                 });
             })
             .catch((error) => {
-                toast({
-                    variant: "destructive",
-                    description: "Something went wrong. Please try again later.",
-                })
-                console.log(error.response.data)
+                if (error.response && error.response.data) {
+                    const {message, violations} = error.response.data;
+                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+
+                    toast({
+                        variant: "destructive",
+                        title: t(message),
+                        description: violationMessages,
+                    });
+                } else {
+                    toast({
+                        variant: "destructive",
+                        description: "Error",
+                    });
+                }
+                // console.log(error.response ? error.response.data : error);
             });
     }
 
@@ -48,9 +60,8 @@ function ForgotPasswordPage() {
             <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2"/>
             <Card className="mx-auto max-w-2xl">
                 <CardHeader>
-                    <CardTitle>Forgot Password</CardTitle>
-                    <CardDescription>Press the button below to send an e-mail with a password reset
-                        link</CardDescription>
+                    <CardTitle>{t("forgotPasswordPage.title")}</CardTitle>
+                    <CardDescription>{t("forgotPasswordPage.info")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
@@ -62,7 +73,8 @@ function ForgotPasswordPage() {
                                         name="email"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel className="text-black">E-mail</FormLabel>
+                                                <FormLabel
+                                                    className="text-black">{t("forgotPasswordPage.email")}</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="mail@example.com" {...field}/>
                                                 </FormControl>
@@ -71,7 +83,7 @@ function ForgotPasswordPage() {
                                         )}
                                     />
                                 </div>
-                                <Button type="submit">Send reset link</Button>
+                                <Button type="submit">{t("forgotPasswordPage.submit")}</Button>
                             </div>
                         </form>
                     </Form>

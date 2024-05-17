@@ -1,0 +1,333 @@
+{
+  "general.ok": "OK",
+  "general.cancel": "Cancel",
+  "general.confirm": "Confirm",
+
+
+  "landingPage.title": "Coming soon",
+  "landingPage.text": "Most likely",
+  "landingPage.logIn": "Log In",
+  "landingPage.register": "Register",
+
+
+  "loginPage.title": "Login",
+  "loginPage.info": "Enter your login information to proceed",
+  "loginPage.login": "Login",
+  "loginPage.password": "Password",
+  "loginPage.forgotPassword": "Forgot your password?",
+  "loginPage.submit": "Submit",
+  "loginPage.noAccount": "Don't have an account? ",
+  "loginPage.signUp": "Sign up",
+  "loginPage.loginTooShort": "Login has to be at least 3 characters long",
+  "loginPage.loginTooLong": "Login can be at most 50 characters long",
+  "loginPage.passwordTooShort": "Password has to be at least 8 characters long",
+  "loginPage.passwordTooLong": "Password can be at most 60 characters long",
+
+
+  "registerPage.title": "Sign Up",
+  "registerPage.info": "Enter your information to create an account",
+  "registerPage.login": "Login",
+  "registerPage.password": "Password",
+  "registerPage.firstName": "First Name",
+  "registerPage.lastName": "Last Name",
+  "registerPage.email": "E-mail",
+  "registerPage.submit": "Create an account",
+  "registerPage.phoneNumber": "Phone number",
+  "registerPage.loginTooShort": "Login has to be at least 3 characters long",
+  "registerPage.loginTooLong": "Login can be at most 50 characters long",
+  "registerPage.passwordTooShort": "Password has to be at least 8 characters long",
+  "registerPage.passwordTooLong": "Password can be at most 60 characters long",
+  "registerPage.wrongEmail": "The email address is not valid",
+  "registerPage.emptyEmail": "The email address cannot be empty",
+  "registerPage.wrongPhoneNumber": "The phone number is not valid",
+  "registerPage.firstNameTooShort": "First name has to be at least 2 characters long",
+  "registerPage.firstNameTooLong": "First name can be at most 50 characters long",
+  "registerPage.lastNameTooShort": "Last name has to be at least 2 characters long",
+  "registerPage.lastNameTooLong": "Last name can be at most 50 characters long",
+  "registerPage.phoneNumberInvalid": "Phone number is not valid",
+  "registerPage.hasAccount": "Already have an account?",
+  "registerPage.logIn": "Log In",
+
+
+  "forgotPasswordPage.title": "Forgot Password",
+  "forgotPasswordPage.info": "Enter your email address to reset your password",
+  "forgotPasswordPage.email": "E-mail",
+  "forgotPasswordPage.submit": "Send reset link",
+  "forgotPasswordPage.wrongEmail": "The email address is not valid",
+  "forgotPasswordPage.emptyEmail": "The email address cannot be empty",
+
+
+  "siteHeader.hello": "Hello, ",
+  "siteHeader.users": "Users",
+  "siteHeader.parkings": "Parkings",
+  "siteHeader.logout": "Logout",
+  "siteHeader.myAccount": "My Account",
+  "siteHeader.settings": "Settings",
+  "siteHeader.changeLevel": "Change access level",
+  "siteHeader.changeLevel.select": "Select your active role:",
+  "siteHeader.changeLevel.select.save": "Save",
+
+
+  "accountSettings.title": "Change your account settings",
+  "accountSettings.authentication": "Authentication",
+  "accountSettings.personalInfo": "Personal Info",
+  "accountSettings.authentication.email": "E-mail",
+  "accountSettings.authentication.email.change": "Change your email",
+  "accountSettings.personalInfo.firstName": "First Name",
+  "accountSettings.personalInfo.lastName": "Last Name",
+  "accountSettings.personalInfo.phoneNumber": "Phone Number",
+  "accountSettings.personalInfo.saveChanges": "Save Changes",
+  "accountSettings.firstNameTooShort": "First name has to be at least 2 characters long",
+  "accountSettings.firstNameTooLong": "First name can be at most 50 characters long",
+  "accountSettings.lastNameTooShort": "Last name has to be at least 2 characters long",
+  "accountSettings.lastNameTooLong": "Last name can be at most 50 characters long",
+  "accountSettings.phoneNumberInvalid": "Phone number is not valid",
+  "accountSettings.wrongEmail": "The email address is not valid",
+
+
+  "accountSettings.users.table.header.login": "Login",
+  "accountSettings.users.table.header.name": "Name",
+  "accountSettings.users.table.header.lastName": "E-mail",
+  "accountSettings.users.table.header.active": "Active",
+  "accountSettings.users.table.header.blocked": "Blocked",
+  "accountSettings.users.table.header.verified": "Verfied",
+  "accountSettings.users.table.header.userLevels": "User Levels",
+  "accountSettings.users.table.pagination.next": "Next",
+  "accountSettings.users.table.pagination.previous": "Previous",
+  "accountSettings.users.table.settings.manage": "Manage",
+  "accountSettings.users.table.settings.block": "Block",
+  "accountSettings.users.table.settings.unblock": "Unblock",
+  "accountSettings.users.table.settings.block2": "Block",
+  "accountSettings.users.table.settings.unblock2": "Unblock",
+  "accountSettings.confirmUserDataChange": "Are you sure you want to change user data?",
+  "accountSettings.confirmEmailChange": "Are you sure you want to change the email address?",
+
+
+  "accountSettings.users.table.settings.account.title": "Modify account - ",
+  "accountSettings.users.table.settings.account.userLevels": "User Levels",
+  "accountSettings.users.table.settings.account.authentication": "Authentication",
+  "accountSettings.users.table.settings.account.personalInfo": "Personal Info",
+  "accountSettings.users.table.settings.account.userLevels.add": "Add",
+  "accountSettings.users.table.settings.account.userLevels.add2": "add",
+  "accountSettings.users.table.settings.account.userLevels.remove": "Remove",
+  "accountSettings.users.table.settings.account.userLevels.remove2": "remove",
+  "accountSettings.users.table.settings.account.authentication.email": "E-mail",
+  "accountSettings.users.table.settings.account.authentication.email.change": "Change your email",
+  "accountSettings.users.table.settings.account.personalInfo.firstName": "First Name",
+  "accountSettings.users.table.settings.account.personalInfo.lastName": "Last Name",
+  "accountSettings.users.table.settings.account.personalInfo.phoneNumber": "Phone Number",
+  "accountSettings.users.table.settings.account.personalInfo.saveChanges": "Save Changes",
+  "accountSettings.users.table.settings.block.confirm1": "Are you sure you want to ",
+  "accountSettings.users.table.settings.block.confirm2": " this user?",
+  "accountSettings.users.table.settings.block.confirm3": "Are you sure you want to ",
+  "accountSettings.users.table.settings.block.level": "level",
+  "accountSettings.users.table.settings.block.to": " to",
+  "accountSettings.users.table.settings.block.from": " from",
+
+  "twoFactorAuthPage.title": "One-Time Password",
+  "twoFactorAuthPage.info": "Enter the code sent to your email address",
+  "twoFactorAuthPage.submit": "Submit",
+  "twoFactorAuthPage.wrongCode": "The one-time password must be 8 characters long",
+
+
+  "confirmEmailPage.title": "Almost there!",
+  "confirmEmailPage.info": "Confirm the change of your Eldorado email account by pressing the button below.",
+  "confirmEmailPage.button": "Change Email",
+
+
+  "resetPasswordPage.title": "Reset Password",
+  "resetPasswordPage.info": "Enter your new password",
+  "resetPasswordPage.passwordTooShort": "Password has to be at least 8 characters long",
+  "resetPasswordPage.passwordTooLong": "Password can be at most 60 characters long",
+  "resetPasswordPage.password": "Password",
+  "resetPasswordPage.button": "Change Password",
+
+
+  "activateAccountPage.title": "Almost there!",
+  "activateAccountPage.info": "Activate your Eldorado account by pressing the button below.",
+  "activateAccountPage.button": "Activate!",
+  "activateAccountPage.popUp": "Your account has been activated.",
+  "activateAccountPage.popUp.button": "Log In",
+  "activateAccountPage.popUp.title": "Account activated!",
+  "activateAccountPage.popUp.text": "Your account has been successfully activated. You can now log in",
+
+
+  "registerPage.popUp.registerOK.title": "Almost there!",
+  "registerPage.popUp.registerOK.text": "We have sent you an email with a link to activate your account. Please check your inbox and click the link to complete the registration process.",
+
+
+  "forgotPasswordPage.popUp.resetPasswordOK.title": "Almost there!",
+  "forgotPasswordPage.popUp.resetPasswordOK.text": "We have sent you an email with a link to change your password. Please check your inbox and click the link to complete the process.",
+
+
+  "accountSettings.popUp.changeEmailOK.title": "Almost there!",
+  "accountSettings.popUp.changeEmailOK.text": "We have sent a confirmation email to the provided address.",
+  "accountSettings.popUp.changeUserDataOK.title": "Success!",
+  "accountSettings.popUp.changeUserDataOK.text": "Your personal data has been successfully changed.",
+  "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "User level has been removed successfully.",
+  "accountSettings.popUp.changeUserDataOK.userLevelAdded": "User level has been added successfully.",
+
+
+  "confirmEmailPage.popUp.confirmEmailOK.title": "Success!",
+  "confirmEmailPage.popUp.confirmEmailOK.loggedIn.text": "Your email has been successfully changed.",
+  "confirmEmailPage.popUp.confirmEmailOK.loggedIn.button": "Go Home",
+  "confirmEmailPage.popUp.confirmEmailOK.loggedOut.button": "Log In",
+  "confirmEmailPage.popUp.confirmEmailOK.loggedOut.text": "Your email has been successfully changed. You can log in now.",
+
+
+  "resetPasswordPage.popUp.resetPasswordOK.title": "Success!",
+  "resetPasswordPage.popUp.resetPasswordOK.text": "Your password has been successfully changed. You can log in now.",
+  "resetPasswordPage.popUp.resetPasswordOK.button": "Log In",
+
+  "bean.validation.account.login.blank" : "Login cannot be blank",
+  "bean.validation.account.login.regex.not.met" : "Login does not meet format requirements",
+  "bean.validation.account.login.too.short" : "Login must be at least 3 characters long",
+  "bean.validation.account.login.too.long" : "Login can be at most 50 characters long",
+
+  "bean.validation.account.password.blank" : "Password cannot be blank",
+  "bean.validation.account.password.invalid.length" : "Password must be between 8 and 60 characters long",
+
+  "bean.validation.account.verified.flag.null" : "Verified flag cannot be null",
+  "bean.validation.account.active.flag.null" : "Active flag cannot be null",
+  "bean.validation.account.blocked.flag.null" : "Blocked flag cannot be null",
+  "bean.validation.account.two.factor.auth.flag.null" : "Two-factor authentication flag cannot be null",
+
+  "bean.validation.account.first.name.blank" : "First name cannot be blank",
+  "bean.validation.account.first.name.regex.not.met" : "First name does not meet format requirements",
+  "bean.validation.account.first.name.too.short" : "First name must be at least 2 characters long",
+  "bean.validation.account.first.name.too.long" : "First name can be at most 50 characters long",
+
+  "bean.validation.account.last.name.blank" : "Last name cannot be blank",
+  "bean.validation.account.last.name.regex.not.met" : "Last name does not meet format requirements",
+  "bean.validation.account.last.name.too.short" : "Last name must be at least 2 characters long",
+  "bean.validation.account.last.name.too.long" : "Last name can be at most 50 characters long",
+
+  "bean.validation.account.email.constraint.not.met" : "Email address is not valid",
+  "bean.validation.account.email.too.short" : "Email address must be at least 5 characters long",
+  "bean.validation.account.email.too.long" : "Email address can be at most 100 characters long",
+
+  "bean.validation.account.user.level.empty" : "User level cannot be empty",
+  "bean.validation.account.user.level.full" : "User level is full",
+
+  "bean.validation.account.language.blank" : "Language cannot be blank",
+  "bean.validation.account.language.regex.not.met" : "Language does not meet format requirements",
+
+  "bean.validation.account.phone.number.blank" : "Phone number cannot be blank",
+  "bean.validation.account.phone.number.regex.not.met" : "Phone number does not meet format requirements",
+
+  "bean.validation.activity.log.successful.login.ip.not.valid" : "The IP address of the last successful login is not valid",
+  "bean.validation.activity.log.unsuccessful.login.ip.not.valid" : "The IP address of the last unsuccessful login is not valid",
+  "bean.validation.client.user.level.client.type.null" : "Client type cannot be null",
+  "jwt.auth.filter.authorization.header.blank.or.incorrectly.formatted" : "Authorization header is blank or incorrectly formatted",
+  "jwt.auth.filter.access.token.invalid" : "Access token is invalid",
+
+  "account.constraint.violation.exception" : "Account constraint violation",
+  "account.with.given.email.not.found.exception" : "Account with the given email not found",
+  "account.with.given.id.not.found.exception" : "Account with the given ID not found",
+  "account.status.blocked.exception" : "Account is blocked",
+  "account.status.inactive.exception" : "Account is inactive",
+
+  "account.reset.password.same.passwords.exception" : "New password cannot be the same as the current one",
+  "account.reset.password.incorrect.current.password" : "Incorrect current password",
+
+  "account.login.already.taken.exception" : "Login is already taken",
+  "account.email.already.taken.exception" : "Email is already taken",
+  "account.blocked.exception" : "Account is blocked",
+  "account.blocked.by.admin.exception" : "Account is blocked by an admin",
+  "account.blocked.by.too.many.failed.attempts.exception" : "Account is blocked due to too many failed login attempts",
+  "account.already.blocked.exception" : "Account is already blocked",
+  "account.already.unblocked.exception" : "Account is already unblocked",
+
+  "token.token.value.not.found.exception" : "Token value not found",
+  "token.token.value.not.valid.exception" : "Token value is not valid",
+  "token.data.extraction.taken.exception" : "Error extracting token data",
+
+  "token.value.already.taken.exception" : "Token value is already taken",
+
+  "application.optimistic.lock.exception" : "Optimistic lock exception",
+  "application.internal.server.error.exception" : "Internal server error",
+  "application.access.denied.exception" : "Access denied",
+  "application.database.server.exception" : "Unexpected database exception",
+  "application.path.not.found.exception" : "Path not found",
+
+  "authentication.service.account.credentials.not.valid.exception" : "Invalid account credentials",
+  "authentication.service.account.login.not.found.exception" : "Account login not found",
+  "authentication.service.activity.log.update.exception" : "Failed to update activity log",
+
+  "account.service.staff.account.not.created.exception" : "Staff account creation failed",
+  "account.service.admin.account.not.created.exception" : "Admin account creation failed",
+  "account.service.admin.remove.own.admin.user.level.exception" : "Cannot remove own admin user level",
+  "user_level.no.such.user.level.exception" : "No such user level",
+  "user_level.one.user.level" : "Only one user level is allowed",
+  "user_level.client.client_type.unexpected.exception" : "Unexpected client type",
+  "user_level.type.duplicated.exception" : "Duplicate user level",
+
+  "authentication.controller.account.not.active" : "Account is not active",
+  "authentication.controller.account.blocked" : "Account is blocked",
+  "authentication.controller.account.logout" : "Account logout",
+
+  "account.service.invalid.login.attempt.exception" : "Invalid login attempt",
+  "account.service.account.not.found.exception" : "Account not found",
+  "account.service.account.constraint.validation.exception" : "Account constraint validation failed",
+  "account.service.account.same.email.exception" : "New email is the same as the current email",
+  "account.service.account.email.collision.exception" : "Email collision detected",
+  "account.service.account.try_to_block_own.exception" : "Cannot block own account",
+  "account.service.email_from_token_null.exception" : "Email from token is null",
+  "token.not.found.exception" : "Token not found",
+
+  "account.controller.token.invalid.or.expired" : "Token is invalid or expired",
+  "account.controller.uuid.invalid" : "Invalid UUID",
+  "account.controller.uuid.invalid.format.exception" : "UUID format is invalid",
+  "account.controller.missing.header.if_match.exception" : "Missing If-Match header",
+
+  "controller.data.integrity.compromised.exception" : "Data integrity compromised",
+
+  "controller.data.integrity.user_level.missing.exception" : "User level is missing",
+
+  "mail.confirm.register.greeting.message" : "Welcome to our service!",
+  "mail.confirm.register.message.subject" : "Confirm your registration",
+  "mail.confirm.register.result_message" : "Thank you for registering. Please confirm your email address.",
+  "mail.confirm.register.action_description" : "Click the link below to confirm your registration.",
+  "mail.confirm.register.note_title" : "Note",
+
+  "mail.login.auth.code.greeting.message" : "Hello!",
+  "mail.login.auth.code.message.subject" : "Your authentication code",
+  "mail.login.auth.code.result_message" : "Here is your authentication code.",
+  "mail.login.auth.code.action_description" : "Enter the code to log in.",
+  "mail.login.auth.code.note_title" : "Note",
+
+  "mail.confirm.account.activation.greeting.message" : "Congratulations!",
+  "mail.confirm.account.activation.message.subject" : "Activate your account",
+  "mail.confirm.account.activation.result_message" : "Your account has been created. Please activate it.",
+  "mail.confirm.account.activation.action_description" : "Click the link below to activate your account.",
+  "mail.confirm.account.activation.note_title" : "Note",
+
+  "mail.confirm.email.greeting.message" : "Hello!",
+  "mail.confirm.email.message.subject" : "Confirm your email address",
+  "mail.confirm.email.result_message" : "Please confirm your email address.",
+  "mail.confirm.email.action_description" : "Click the link below to confirm your email.",
+  "mail.confirm.email.note_title" : "Note",
+  "account.controller.account.not.found" : "Account not found",
+
+  "mail.block.account.greeting.message" : "Important notice",
+  "mail.block.account.message.subject" : "Your account has been blocked",
+  "mail.block.account.result_message_auto" : "Your account has been automatically blocked.",
+  "mail.block.account.result_message_admin" : "Your account has been blocked by an admin.",
+  "mail.block.account.action_description_auto" : "Please contact support for assistance.",
+  "mail.block.account.action_description_admin" : "Please contact support for assistance.",
+  "mail.block.account.note_title" : "Note",
+
+  "mail.unblock.account.greeting.message" : "Good news!",
+  "mail.unblock.account.message.subject" : "Your account has been unblocked",
+  "mail.unblock.account.result_message" : "Your account has been unblocked.",
+  "mail.unblock.account.action_description" : "You can now log in.",
+  "mail.unblock.account.note_title" : "Note",
+
+  "mail.reset.password.greeting.message" : "Password reset request",
+  "mail.reset.password.message.subject" : "Reset your password",
+  "mail.reset.password.result_message" : "Click the link below to reset your password.",
+  "mail.reset.password.action_description" : "Reset your password",
+  "mail.reset.password.note_title" : "Note",
+
+  "mail.auto.generate.message.note" : "This is an auto-generated message. Please do not reply."
+}

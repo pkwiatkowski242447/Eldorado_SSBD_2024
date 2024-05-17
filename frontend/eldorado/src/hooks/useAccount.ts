@@ -7,6 +7,7 @@ import {usersApi} from "@/api/userApi.ts";
 import {useEffect, useState} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
+import {useTranslation} from "react-i18next";
 
 export const useAccount = () => {
 
@@ -14,6 +15,7 @@ export const useAccount = () => {
     const {account, setAccount} = useAccountState()
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const {toast} = useToast()
+    const {t} = useTranslation();
 
     useEffect(() => {
         const storedAccount = localStorage.getItem('account');
@@ -52,15 +54,25 @@ export const useAccount = () => {
                 setIsAuthenticated(true);
                 navigate(Pathnames.public.home)
             } else if (response.status === 204) {
-                console.log(login)
                 navigate(`/login/2fa/${login}`);
             }
-        } catch (e) {
-            toast({
-                variant: "destructive",
-                description: "Something went wrong. Please try again later.",
-            })
-            console.log(e);
+        } catch (error) {
+            //@ts-expect-error works tho
+            if (error.response && error.response.data) {
+                //@ts-expect-error works tho
+                const {message, violations} = error.response.data;
+                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+                toast({
+                    variant: "destructive",
+                    title: t(message),
+                    description: violationMessages,
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    description: "Error",
+                });
+            }
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
@@ -81,7 +93,7 @@ export const useAccount = () => {
                 variant: "destructive",
                 description: "Something went wrong. Please try again later.",
             })
-            console.log(e);
+            // console.log(e);
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
@@ -99,13 +111,13 @@ export const useAccount = () => {
                         if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
                             if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
                                 activeUserLevel = token.data.userLevelsDto[i];
-                                console.log(activeUserLevel)
+                                // console.log(activeUserLevel)
                                 break;
                             }
                         } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
                             if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
                                 activeUserLevel = token.data.userLevelsDto[i];
-                                console.log(activeUserLevel)
+                                // console.log(activeUserLevel)
                                 break;
                             }
                         }

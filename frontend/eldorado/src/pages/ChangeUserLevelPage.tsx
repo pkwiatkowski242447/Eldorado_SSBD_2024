@@ -7,13 +7,13 @@ import {z} from "zod"
 import {Button} from "@/components/ui/button"
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
-import {toast} from "@/components/ui/use-toast"
 import SiteHeader from "@/components/SiteHeader.tsx";
 import {Card, CardHeader} from "@/components/ui/card.tsx";
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 import {useAccount} from "@/hooks/useAccount.ts";
+import {useTranslation} from "react-i18next";
 
 const FormSchema = z.object({
     type: z.any()
@@ -25,41 +25,30 @@ function ChangeUserLevelPage() {
     })
     const navigator = useNavigate()
     const {account} = useAccountState()
-
     const {getCurrentAccount} = useAccount();
+    const {t} = useTranslation();
 
     //It has to be that way afaik so ignore the warning and enjoy your day :)
     useEffect(() => {
         getCurrentAccount();
     }, []);
 
-
+    //TODO maybe add a toast message
     function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
             if (account) {
                 // @ts-expect-error this works like a charm tho why mad
                 account.activeUserLevel = account.userLevelsDto.find((userLevel) => userLevel.roleName === data.type)
-                console.log(data)
-                console.log(account.activeUserLevel)
+                // console.log(data)
+                // console.log(account.activeUserLevel)
                 localStorage.setItem('account', JSON.stringify(account));
-                console.log(localStorage.getItem('account'))
+                // console.log(localStorage.getItem('account'))
             }
-            toast({
-                title: "Hurray!",
-                description: "User level successfully changed."
-            })
             navigator("/home")
 
         } catch (e) {
-            toast({
-                title: "Oh no!",
-                description: "Something went wrong."
-            })
+            console.log(e)
         }
-        toast({
-            title: "Hurray!",
-            description: "User level successfully changed!"
-        })
     }
 
     return (
@@ -68,7 +57,7 @@ function ChangeUserLevelPage() {
             <div className="flex justify-between items-center mx-auto p-10">
                 <Card>
                     <CardHeader className={"p-3 font-bold"}>
-                        Select your active role:
+                        {t("siteHeader.changeLevel.select")}
                     </CardHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-5 p-5">
@@ -100,7 +89,7 @@ function ChangeUserLevelPage() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit">Save</Button>
+                            <Button type="submit">{t("siteHeader.changeLevel.select.save")}</Button>
                         </form>
                     </Form>
                 </Card>

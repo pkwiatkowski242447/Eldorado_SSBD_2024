@@ -7,17 +7,19 @@ import {useForm} from "react-hook-form"
 import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components/ui/form"
 import {FormLabel} from "react-bootstrap";
 import {useAccount} from "@/hooks/useAccount.ts";
+import {useTranslation} from "react-i18next";
 
-const formSchema = z.object({
-    login: z.string().min(2, {message: "Login has to be at least 2 characters long."})
-        .max(32, {message: "Login has to be at most 32 characters long."}), //TODO add regex for login
-    password: z.string().min(2, {message: "Password has to be at least 2 characters long."})
-        .max(60, {message: "Password has to be at most 60 characters long."})
-})
 
 function LoginForm() {
-
     const {logIn} = useAccount();
+    const {t} = useTranslation();
+
+    const formSchema = z.object({
+        login: z.string().min(5, {message: t("loginPage.loginTooShort")})
+            .max(32, {message: t("loginPage.loginTooLong")}),
+        password: z.string().min(8, {message: t("loginPage.passwordTooShort")})
+            .max(60, {message: t("loginPage.passwordTooLong")})
+    })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -36,9 +38,9 @@ function LoginForm() {
     return (
         <Card className="mx-auto max-w-sm">
             <CardHeader>
-                <CardTitle className="text-2xl">Login</CardTitle>
+                <CardTitle className="text-2xl">{t("loginPage.title")}</CardTitle>
                 <CardDescription>
-                    Enter your login info below to proceed
+                    {t('loginPage.info')}
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -50,7 +52,7 @@ function LoginForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <div className="grid gap-4">
-                                        <FormLabel className="text-left">Login</FormLabel>
+                                        <FormLabel className="text-left">{t("loginPage.login")}</FormLabel>
                                         <FormControl>
                                             <Input placeholder="" {...field} />
                                         </FormControl>
@@ -66,10 +68,10 @@ function LoginForm() {
                                 <FormItem>
                                     <div className="grid gap-4">
                                         <div className="flex justify-between items-center">
-                                            <FormLabel className="text-left">Password</FormLabel>
+                                            <FormLabel className="text-left">{t("loginPage.password")}</FormLabel>
                                             <a href="/forgot-password"
                                                className="inline-block text-black underline">
-                                                Forgot your password?
+                                                {t('loginPage.forgotPassword')}
                                             </a>
                                         </div>
                                         <FormControl>
@@ -80,11 +82,11 @@ function LoginForm() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full">Submit</Button>
+                        <Button type="submit" className="w-full">{t("loginPage.submit")}</Button>
                         <div className="mt-4 text-center text-sm">
-                            Don&apos;t have an account?{" "}
+                            {t("loginPage.noAccount")}
                             <a href="/register" className="font-medium text-black hover:text-blue-500">
-                                Sign up </a>
+                                {t("loginPage.signUp")} </a>
                         </div>
                     </form>
                 </Form>
