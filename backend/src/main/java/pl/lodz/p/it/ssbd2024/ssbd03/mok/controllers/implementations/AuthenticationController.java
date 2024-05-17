@@ -162,7 +162,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({Roles.ANONYMOUS})
     @TxTracked
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Enter authentication code", description = "This endpoint is used to perform second step in multifactor authentication in the application.")

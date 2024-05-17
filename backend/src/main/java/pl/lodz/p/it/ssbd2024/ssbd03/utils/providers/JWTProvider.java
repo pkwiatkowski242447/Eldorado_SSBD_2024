@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenDataExtractionException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
 import java.time.Instant;
@@ -206,13 +209,15 @@ public class JWTProvider {
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
-    public String extractHashedCodeValueFromToken(String token) throws TokenDataExtractionException {
+    public String extractHashedCodeValueFromToken(String token) throws TokenDataExtractionException, TokenNotValidException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
             return decodedJWT.getClaim(JWTConsts.CODE_VALUE).asString();
         } catch (SignatureVerificationException exception) {
             throw new TokenDataExtractionException();
+        } catch (TokenExpiredException exception){
+            throw new TokenNotValidException(I18n.TOKEN_INVALID_OR_EXPIRED);
         }
     }
 

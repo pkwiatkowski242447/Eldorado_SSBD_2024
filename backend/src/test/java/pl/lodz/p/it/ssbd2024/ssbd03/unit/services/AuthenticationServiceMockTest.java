@@ -24,6 +24,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AuthenticationS
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -274,11 +275,11 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void registerSuccessfulLoginAttemptFor2FATestPositive() throws ApplicationBaseException {
+    public void registerSuccessfulLoginAttemptFor2FATestPositive() throws ApplicationBaseException, NoSuchAlgorithmException {
+        authenticationService.generateKey();
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleIpAddress = "ExampleIpAddress";
         String exampleLanguage = "ExampleLanguage";
-        String exampleToken = "ExampleToken";
         account.setAccountLanguage(exampleLanguage);
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
 
