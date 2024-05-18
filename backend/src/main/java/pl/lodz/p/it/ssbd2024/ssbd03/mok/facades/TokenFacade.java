@@ -7,7 +7,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -182,7 +181,6 @@ public class TokenFacade extends AbstractFacade<Token> {
             refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }

@@ -96,10 +96,9 @@ public class LoggerAspect {
                     stringBuilder.append(parameter).append(": ").append(parameter != null ? parameter.getClass().getSimpleName() : "null");
                     if (Arrays.stream(point.getArgs()).toList().getLast() != parameter) stringBuilder.append(", ");
                 }
-                stringBuilder.append(" ]")
-                        .append('\n');
+                stringBuilder.append(" ]").append('\n');
             } catch (Exception exception) {
-                log.error("Exception occurred while processing logger aspect message: ", exception);
+                log.error("Exception: {} occurred while processing logger aspect message, since:  ", exception.getClass().getSimpleName(), exception.getCause());
                 throw exception;
             }
 
@@ -121,6 +120,7 @@ public class LoggerAspect {
         } else {
             stringBuilder.append(" Method did not return any value.");
         }
+
         log.info(stringBuilder.toString());
 
         return result;

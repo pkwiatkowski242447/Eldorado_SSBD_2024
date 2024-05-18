@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.util.UUID;
  * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client
  * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff
  */
+@Slf4j
 @Repository
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)

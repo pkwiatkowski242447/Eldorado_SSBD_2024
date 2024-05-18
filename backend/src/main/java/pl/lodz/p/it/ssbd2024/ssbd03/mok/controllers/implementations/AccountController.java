@@ -109,7 +109,7 @@ public class AccountController implements AccountControllerInterface {
             }
 
             accountService.blockAccount(UUID.fromString(id));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException illegalArgumentException) {
             //TODO check this error handling in other methods after big merging
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
@@ -143,7 +143,7 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> unblockAccount(@PathVariable("id") String id) throws ApplicationBaseException {
         try {
             accountService.unblockAccount(UUID.fromString(id));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException illegalArgumentException) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
         return ResponseEntity.noContent().build();
@@ -175,7 +175,7 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> forgetAccountPassword(@RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
         try {
             accountService.forgetAccountPassword(accountEmailDTO.getEmail());
-        } catch (AccountNotFoundException | AccountNotActivatedException e) {
+        } catch (AccountNotFoundException | AccountNotActivatedException exception) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.noContent().build();
@@ -213,9 +213,9 @@ public class AccountController implements AccountControllerInterface {
             this.accountService.forgetAccountPassword(account.getEmail());
 
             return ResponseEntity.noContent().build();
-        } catch (AccountNotFoundException anfe) {
+        } catch (AccountNotFoundException accountNotFoundException) {
             return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException illegalArgumentException) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
     }
@@ -519,9 +519,9 @@ public class AccountController implements AccountControllerInterface {
             headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(accountOutputDTO)));
 
             return ResponseEntity.ok().headers(headers).body(accountOutputDTO);
-        } catch (IllegalArgumentException iae) {
+        } catch (IllegalArgumentException illegalArgumentException) {
             return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
-        } catch (AccountNotFoundException anfe) {
+        } catch (AccountNotFoundException accountNotFoundException) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -825,8 +825,6 @@ public class AccountController implements AccountControllerInterface {
         String newPassword = accountChangePasswordDTO.getNewPassword();
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        log.info(username);
 
         accountService.changePasswordSelf(oldPassword, newPassword, username);
 

@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -58,7 +57,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     private final AuthenticationServiceInterface authenticationService;
 
     /**
-     * AuthenticationManager used for authenticate user.
+     * AuthenticationManager used for authenticating user in the application (Spring Security component).
      */
     private final AuthenticationManager authenticationManager;
 
@@ -77,7 +76,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     }
 
     /**
-     * Allows an unauthenticated user to perform the first step in multifactor authentication,
+     * Allows an unauthenticated user to perform the first step in the multifactor authentication,
      * which is to provide credentials to check users identity and for generating the code, which is sent
      * to the users e-mail address.
      *
@@ -98,7 +97,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     @Operation(summary = "Enter credentials", description = "This endpoint is used to perform first step in multifactor authentication in the application.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "First step of multifactor authentication was successful. Since user enabled only one factor authentication, then acces token is returned."),
+            @ApiResponse(responseCode = "200", description = "First step of multifactor authentication was successful. Since user enabled only one factor authentication, then access token is returned."),
             @ApiResponse(responseCode = "204", description = "First step of multifactor authentication was successful. Now enter authentication code for the second step."),
             @ApiResponse(responseCode = "400", description = "User account is blocked, and therefore could not be used authenticated."),
             @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
@@ -111,34 +110,34 @@ public class AuthenticationController implements AuthenticationControllerInterfa
                     accountLoginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(accountLoginDTO.getLogin(), false,
-                   sourceAddress, accountLoginDTO.getLanguage());
+                    sourceAddress, accountLoginDTO.getLanguage());
             if (accessToken != null) {
-                log.info("User: %s successfully authenticated during one factor authentication in the application, starting session at %s from IPv4: %s"
-                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
+                log.info("User: {} successfully authenticated during one factor authentication in the application, starting session at {} from IPv4: {}",
+                        accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
                 return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
             }
-            log.debug("User: %s successfully authenticated in the first step of multifactor authentication at %s from IPv4: %s"
-                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
+            log.info("User: {} successfully authenticated in the first step of multifactor authentication at {} from IPv4: {}",
+                    accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
         } catch (BadCredentialsException badCredentialsException) {
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithIncrement(accountLoginDTO.getLogin(),sourceAddress);
-            log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: invalid login credentials."
-                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithIncrement(accountLoginDTO.getLogin(), sourceAddress);
+            log.error("Authentication to user account with login: {} at {} from IPv4: {} was not successful. Cause: invalid login credentials.",
+                    accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
             throw new InvalidLoginAttemptException();
         } catch (DisabledException disabledException) {
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(),sourceAddress);
-            log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: User account has not been activated."
-                    .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), sourceAddress);
+            log.error("Authentication to user account with login: {} at {} from IPv4: {} was not successful. Cause: User account has not been activated.",
+                    accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
             throw new AccountNotActivatedException();
         } catch (LockedException lockedException) {
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(),sourceAddress);
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(accountLoginDTO.getLogin(), sourceAddress);
             Account account = this.authenticationService.findByLogin(accountLoginDTO.getLogin()).orElseThrow(InvalidLoginAttemptException::new);
             if (account.getBlockedTime() == null) {
-                log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: User account has been blocked by the admin."
-                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress));
+                log.error("Authentication to user account with login: {} at {} from IPv4: {} was not successful. Cause: User account has been blocked by the admin.",
+                        accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
                 throw new AccountBlockedByAdminException();
             } else {
-                log.error("Authentication to user account with login: %s at %s from IPv4: %s was not successful. Cause: User account has been blocked by logging unsuccessfully %d amount of time."
-                        .formatted(accountLoginDTO.getLogin(), LocalDateTime.now().toString(),sourceAddress, this.loginFailedAttemptMaxCount));
+                log.error("Authentication to user account with login: {} at {} from IPv4: {} was not successful. Cause: User account has been blocked by logging unsuccessfully {} amount of time.",
+                        accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress, this.loginFailedAttemptMaxCount);
                 throw new AccountBlockedByFailedLoginAttemptsException();
             }
         } catch (AuthenticationException authenticationException) {
@@ -177,15 +176,15 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         try {
             this.authenticationService.loginUsingAuthenticationCode(authenticationCodeDTO.getUserLogin(), authenticationCodeDTO.getAuthCodeValue());
         } catch (ApplicationBaseException applicationBaseException) {
-            log.error("Authentication to user account with login: %s at %s from IPv4: %s in the second step of multifactor authentication was not successful."
-                    .formatted(authenticationCodeDTO.getUserLogin(), LocalDateTime.now(),sourceAddress));
-            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(authenticationCodeDTO.getUserLogin(),sourceAddress);
+            log.error("Authentication to user account with login: {} at {} from IPv4: {} in the second step of multifactor authentication was not successful.",
+                    authenticationCodeDTO.getUserLogin(), LocalDateTime.now(), sourceAddress);
+            this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(authenticationCodeDTO.getUserLogin(), sourceAddress);
             throw applicationBaseException;
         }
         String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(authenticationCodeDTO.getUserLogin(), true,
-               sourceAddress, authenticationCodeDTO.getLanguage());
-        log.info("User: %s successfully authenticated during two factor authentication in the application, starting session at %s from IPv4: %s"
-                .formatted(SecurityContextHolder.getContext().getAuthentication().getName(), LocalDateTime.now().toString(),sourceAddress));
+                sourceAddress, authenticationCodeDTO.getLanguage());
+        log.info("User: {} successfully authenticated during two factor authentication in the application, starting session at {} from IPv4: {}",
+                SecurityContextHolder.getContext().getAuthentication().getName(), LocalDateTime.now(), sourceAddress);
         return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
     }
 
@@ -209,13 +208,22 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        log.info("User: %s successfully logged out from the application at %s from IPv4: %s, ending their session in the application."
-                .formatted(userName, LocalDateTime.now().toString(),sourceAddress));
+        log.info("User: {} successfully logged out from the application at {} from IPv4: {}, ending their session in the application.",
+                userName, LocalDateTime.now(), sourceAddress);
         return ResponseEntity.noContent().build();
     }
 
-    private String getSourceAddress(String proxyChain, HttpServletRequest request){
-        if(proxyChain != null) {
+    /**
+     * This method is used to extract "real" IP address of the user from the HttpServletRequest object.
+     * It is requited since user request is forwarded to the application server by proxy.
+     *
+     * @param proxyChain X-Forwarded-For header content, if present or null otherwise.
+     * @param request    HttpServletRequest object, associated with user request.
+     * @return           This method returns the actual IPv4 address of the user. If the X-Forwarded-For header is empty or not
+     * present (basically null) then IPv4 address is extracted from IP packet as source address, which will be proxy.
+     */
+    private String getSourceAddress(String proxyChain, HttpServletRequest request) {
+        if (proxyChain != null) {
             return proxyChain.indexOf(',') == -1 ? proxyChain : proxyChain.split(",")[0];
         } else {
             return request.getRemoteAddr();

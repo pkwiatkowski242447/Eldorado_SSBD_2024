@@ -398,7 +398,6 @@ public class AccountService implements AccountServiceInterface {
         Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
                 .orElseThrow(AccountIdNotFoundException::new);
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
-            log.info(account.toString());
             account.setActive(true);
             account.setVerified(true);
             accountFacade.edit(account);
