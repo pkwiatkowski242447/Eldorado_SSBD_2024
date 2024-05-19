@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 
@@ -39,5 +40,18 @@ public class AccountModifyDTO extends AccountSignableDTO {
         this.lastname = lastname;
         this.phoneNumber = phoneNumber;
         this.twoFactorAuth = twoFactorAuth;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the AccountModifyDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .toString();
     }
 }

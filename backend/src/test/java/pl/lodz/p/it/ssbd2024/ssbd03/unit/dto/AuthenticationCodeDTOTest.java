@@ -1,11 +1,13 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 public class AuthenticationCodeDTOTest {
 
     private String userLoginNo1;
@@ -85,5 +87,14 @@ public class AuthenticationCodeDTOTest {
         assertNotEquals(languageBefore, languageAfter);
         assertNotEquals(languageBefore, newLanguage);
         assertEquals(newLanguage, languageAfter);
+    }
+
+    @Test
+    public void authenticationCodeDTOToStringTestPositive() {
+        String result = authenticationCodeDTONo1.toString();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        log.debug("Test result: {}", result);
     }
 }

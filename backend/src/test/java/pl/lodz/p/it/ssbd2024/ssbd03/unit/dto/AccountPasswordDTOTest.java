@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
@@ -7,6 +8,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountPasswordDTO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@Slf4j
 public class AccountPasswordDTOTest {
 
     private String passwordNo1;
@@ -33,7 +35,7 @@ public class AccountPasswordDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOPasswordSetterTestPositive() {
+    public void accountPasswordDTOPasswordSetterTestPositive() {
         String passwordBefore = accountPasswordDTONo1.getPassword();
         assertNotNull(passwordBefore);
 
@@ -46,5 +48,14 @@ public class AccountPasswordDTOTest {
         assertNotEquals(passwordBefore, passwordAfter);
         assertNotEquals(passwordBefore, newPassword);
         assertEquals(newPassword, passwordAfter);
+    }
+
+    @Test
+    public void accountPasswordDTOToStringTestPositive() {
+        String result = accountPasswordDTONo1.toString();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        log.debug("Test result: {}", result);
     }
 }

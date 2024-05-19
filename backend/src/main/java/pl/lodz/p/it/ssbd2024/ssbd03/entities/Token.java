@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
@@ -11,7 +12,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
  */
 @Entity
 @Table(name = DatabaseConsts.TOKEN_TABLE)
-@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -81,4 +81,18 @@ public class Token extends AbstractEntity {
     @Column(name = DatabaseConsts.TOKEN_TOKEN_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
     private TokenType type = TokenType.RESET_PASSWORD;
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the Token object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .toString();
+    }
 }

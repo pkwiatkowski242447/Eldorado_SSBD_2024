@@ -7,6 +7,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class ParkingUnitTest {
 
     //ADDRESS DATA
@@ -52,7 +55,7 @@ public class ParkingUnitTest {
     @Test
     void parkingConstructorNotNullObjectPositiveTest() {
         Parking parking = new Parking(ADDRESS);
-        Assertions.assertNotNull(parking);
+        assertNotNull(parking);
     }
 
     @Test
@@ -64,7 +67,7 @@ public class ParkingUnitTest {
     @Test
     void parkingGetSectorsTestPositive() {
         Parking parking = new Parking(ADDRESS);
-        Assertions.assertNotNull(parking.getSectors());
+        assertNotNull(parking.getSectors());
         Assertions.assertEquals(0, parking.getSectors().size());
     }
 
@@ -106,9 +109,11 @@ public class ParkingUnitTest {
 
     @Test
     void parkingToStringPositiveTest() {
-        String testString = "Parking(super=AbstractEntity(id=null, version=null), address=Address(city=" + CITY + ", zipCode=" + ZIP_CODE + ", street=" + STREET + "))";
         Parking parking = new Parking(ADDRESS);
-        Assertions.assertEquals(testString, parking.toString());
+        String testString = parking.toString();
+        assertNotNull(testString);
+        assertFalse(testString.isEmpty());
+        assertFalse(testString.isBlank());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
@@ -7,6 +8,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountEmailDTO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@Slf4j
 public class AccountEmailDTOTest {
 
     private String emailNo1;
@@ -33,7 +35,7 @@ public class AccountEmailDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOEmailSetterTestPositive() {
+    public void accountEmailDTOEmailSetterTestPositive() {
         String emailBefore = accountEmailDTONo1.getEmail();
         assertNotNull(emailBefore);
 
@@ -46,5 +48,14 @@ public class AccountEmailDTOTest {
         assertNotEquals(emailBefore, emailAfter);
         assertNotEquals(emailBefore, newEmail);
         assertEquals(newEmail, emailAfter);
+    }
+
+    @Test
+    public void accountEmailDTOToStringTestPositive() {
+        String result = accountEmailDTONo1.toString();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        log.debug("Test result: {}", result);
     }
 }

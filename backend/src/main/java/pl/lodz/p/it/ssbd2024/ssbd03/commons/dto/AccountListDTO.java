@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,4 +32,19 @@ public class AccountListDTO {
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     private LocalDateTime lastUnsuccessfulLoginTime;
     private List<String> userLevels;
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the AccountListDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("Id: ", id)
+                .append("Login: ", login)
+                .toString();
+    }
 }

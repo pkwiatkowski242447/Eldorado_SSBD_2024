@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
@@ -14,6 +15,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@Slf4j
 public class AccountModifyDTOTest {
 
     private final String login = "exampleLoginNo1";
@@ -61,7 +63,7 @@ public class AccountModifyDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTONameSetterTestPositive() {
+    public void accountModifyDTONameSetterTestPositive() {
         String nameBefore = accountModifyDTONo1.getName();
         assertNotNull(nameBefore);
 
@@ -77,7 +79,7 @@ public class AccountModifyDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOLastNameSetterTestPositive() {
+    public void accountModifyDTOLastNameSetterTestPositive() {
         String lastNameBefore = accountModifyDTONo1.getLastname();
         assertNotNull(lastNameBefore);
 
@@ -93,7 +95,7 @@ public class AccountModifyDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOPhoneNumberSetterTestPositive() {
+    public void accountModifyDTOPhoneNumberSetterTestPositive() {
         String phoneNumberBefore = accountModifyDTONo1.getPhoneNumber();
         assertNotNull(phoneNumberBefore);
 
@@ -109,7 +111,7 @@ public class AccountModifyDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOTwoFactorAuthSetterTestPositive() {
+    public void accountModifyDTOTwoFactorAuthSetterTestPositive() {
         boolean twoFactorAuthBefore = accountModifyDTONo1.isTwoFactorAuth();
 
         boolean newTwoFactorAuth = !twoFactorAuthBefore;
@@ -120,5 +122,14 @@ public class AccountModifyDTOTest {
         assertNotEquals(twoFactorAuthBefore, twoFactorAuthAfter);
         assertNotEquals(twoFactorAuthBefore, newTwoFactorAuth);
         assertEquals(newTwoFactorAuth, twoFactorAuthAfter);
+    }
+
+    @Test
+    public void accountModifyDTOToStringTestPositive() {
+        String result = accountModifyDTONo1.toString();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        log.debug("Test result: {}", result);
     }
 }

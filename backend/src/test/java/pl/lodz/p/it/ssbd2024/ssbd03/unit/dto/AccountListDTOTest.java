@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@Slf4j
 public class AccountListDTOTest {
 
     private UUID idNo1;
@@ -65,7 +67,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOIdSetterTestPositive() {
+    public void accountListDTOIdSetterTestPositive() {
         UUID idBefore = accountListDTONo1.getId();
         assertNotNull(idBefore);
 
@@ -81,7 +83,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOUserLoginSetterTestPositive() {
+    public void accountListDTOUserLoginSetterTestPositive() {
         String userLoginBefore = accountListDTONo1.getLogin();
         assertNotNull(userLoginBefore);
 
@@ -97,7 +99,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOFirstNameSetterTestPositive() {
+    public void accountListDTOFirstNameSetterTestPositive() {
         String firstNameBefore = accountListDTONo1.getName();
         assertNotNull(firstNameBefore);
 
@@ -113,7 +115,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOLastNameSetterTestPositive() {
+    public void accountListDTOLastNameSetterTestPositive() {
         String lastNameBefore = accountListDTONo1.getLastName();
         assertNotNull(lastNameBefore);
 
@@ -129,7 +131,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOActiveSetterTestPositive() {
+    public void accountListDTOActiveSetterTestPositive() {
         boolean activeBefore = accountListDTONo1.isActive();
 
         boolean newActive = !activeBefore;
@@ -143,7 +145,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOBlockedSetterTestPositive() {
+    public void accountListDTOBlockedSetterTestPositive() {
         boolean blockedBefore = accountListDTONo1.isBlocked();
 
         boolean newBlocked = !blockedBefore;
@@ -157,7 +159,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOVerifiedSetterTestPositive() {
+    public void accountListDTOVerifiedSetterTestPositive() {
         boolean verifiedBefore = accountListDTONo1.isVerified();
 
         boolean newVerified = !verifiedBefore;
@@ -171,7 +173,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOLastSuccessfulLoginTimeSetterTestPositive() {
+    public void accountListDTOLastSuccessfulLoginTimeSetterTestPositive() {
         LocalDateTime lastSuccessfulLoginTimeBefore = accountListDTONo1.getLastSuccessfulLoginTime();
         assertNotNull(lastSuccessfulLoginTimeBefore);
 
@@ -187,7 +189,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOLastUnsuccessfulLoginTimeSetterTestPositive() {
+    public void accountListDTOLastUnsuccessfulLoginTimeSetterTestPositive() {
         LocalDateTime lastUnsuccessfulLoginTimeBefore = accountListDTONo1.getLastUnsuccessfulLoginTime();
         assertNotNull(lastUnsuccessfulLoginTimeBefore);
 
@@ -203,7 +205,7 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOUserLevelsSetterTestPositive() {
+    public void accountListDTOUserLevelsSetterTestPositive() {
         List<String> userLevelsBefore = accountListDTONo1.getUserLevels();
         assertNotNull(userLevelsBefore);
 
@@ -216,5 +218,14 @@ public class AccountListDTOTest {
         assertNotEquals(userLevelsBefore, userLevelsAfter);
         assertNotEquals(userLevelsBefore, newUserLevels);
         assertEquals(newUserLevels, userLevelsAfter);
+    }
+
+    @Test
+    public void accountListDTOToStringTestPositive() {
+        String result = accountListDTONo1.toString();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        log.debug("Test result: {}", result);
     }
 }

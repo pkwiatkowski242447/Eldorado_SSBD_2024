@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
@@ -7,6 +8,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@Slf4j
 public class AccountRegisterDTOTest {
 
     private String loginNo1;
@@ -53,7 +55,7 @@ public class AccountRegisterDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOUserLoginSetterTestPositive() {
+    public void accountRegisterDTOUserLoginSetterTestPositive() {
         String userLoginBefore = accountRegisterDTONo1.getLogin();
         assertNotNull(userLoginBefore);
 
@@ -69,7 +71,7 @@ public class AccountRegisterDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOPasswordSetterTestPositive() {
+    public void accountRegisterDTOPasswordSetterTestPositive() {
         String passwordBefore = accountRegisterDTONo1.getPassword();
         assertNotNull(passwordBefore);
 
@@ -85,7 +87,7 @@ public class AccountRegisterDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOFirstNameSetterTestPositive() {
+    public void accountRegisterDTOFirstNameSetterTestPositive() {
         String firstNameBefore = accountRegisterDTONo1.getFirstName();
         assertNotNull(firstNameBefore);
 
@@ -101,7 +103,7 @@ public class AccountRegisterDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOLastNameSetterTestPositive() {
+    public void accountRegisterDTOLastNameSetterTestPositive() {
         String lastNameBefore = accountRegisterDTONo1.getLastName();
         assertNotNull(lastNameBefore);
 
@@ -117,7 +119,7 @@ public class AccountRegisterDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOEmailSetterTestPositive() {
+    public void accountRegisterDTOEmailSetterTestPositive() {
         String emailBefore = accountRegisterDTONo1.getEmail();
         assertNotNull(emailBefore);
 
@@ -133,7 +135,7 @@ public class AccountRegisterDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOPhoneNumberSetterTestPositive() {
+    public void accountRegisterDTOPhoneNumberSetterTestPositive() {
         String phoneNumberBefore = accountRegisterDTONo1.getPhoneNumber();
         assertNotNull(phoneNumberBefore);
 
@@ -149,7 +151,7 @@ public class AccountRegisterDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOLanguageSetterTestPositive() {
+    public void accountRegisterDTOLanguageSetterTestPositive() {
         String languageBefore = accountRegisterDTONo1.getLanguage();
         assertNotNull(languageBefore);
 
@@ -162,5 +164,14 @@ public class AccountRegisterDTOTest {
         assertNotEquals(languageBefore, languageAfter);
         assertNotEquals(languageBefore, newLanguage);
         assertEquals(newLanguage, languageAfter);
+    }
+
+    @Test
+    public void accountRegisterDTOToStringTestPositive() {
+        String result = accountRegisterDTONo1.toString();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        log.debug("Test result: {}", result);
     }
 }

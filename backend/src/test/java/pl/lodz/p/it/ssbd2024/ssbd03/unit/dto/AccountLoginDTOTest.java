@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
@@ -7,6 +8,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@Slf4j
 public class AccountLoginDTOTest {
 
     private String loginNo1;
@@ -40,7 +42,7 @@ public class AccountLoginDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOUserLoginSetterTestPositive() {
+    public void accountLoginDTOUserLoginSetterTestPositive() {
         String userLoginBefore = accountLoginDTONo1.getLogin();
         assertNotNull(userLoginBefore);
 
@@ -56,7 +58,7 @@ public class AccountLoginDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOPasswordSetterTestPositive() {
+    public void accountLoginDTOPasswordSetterTestPositive() {
         String passwordBefore = accountLoginDTONo1.getPassword();
         assertNotNull(passwordBefore);
 
@@ -72,7 +74,7 @@ public class AccountLoginDTOTest {
     }
 
     @Test
-    public void authenticationCodeDTOLanguageSetterTestPositive() {
+    public void accountLoginDTOLanguageSetterTestPositive() {
         String languageBefore = accountLoginDTONo1.getLanguage();
         assertNotNull(languageBefore);
 
@@ -85,5 +87,14 @@ public class AccountLoginDTOTest {
         assertNotEquals(languageBefore, languageAfter);
         assertNotEquals(languageBefore, newLanguage);
         assertEquals(newLanguage, languageAfter);
+    }
+
+    @Test
+    public void accountLoginDTOToStringTestPositive() {
+        String result = accountLoginDTONo1.toString();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        log.debug("Test result: {}", result);
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.ClientMessages;
 
@@ -21,7 +22,6 @@ import java.io.Serializable;
 @Entity
 @Table(name = DatabaseConsts.CLIENT_DATA_TABLE)
 @DiscriminatorValue(value = DatabaseConsts.CLIENT_DISCRIMINATOR)
-@ToString(callSuper = true)
 @NoArgsConstructor
 public class Client extends UserLevel implements Serializable {
 
@@ -49,5 +49,19 @@ public class Client extends UserLevel implements Serializable {
 
     public Client(Long version) {
         super(version);
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the client object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .toString();
     }
 }
