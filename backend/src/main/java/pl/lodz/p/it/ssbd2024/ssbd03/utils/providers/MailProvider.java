@@ -15,8 +15,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.ImageNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.MailProviderMessages;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -75,7 +73,8 @@ public class MailProvider {
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.CONFIRM_REGISTER_MESSAGE_SUBJECT, language));
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
-            log.error(exception.getMessage(), exception.getCause());
+            log.error("Exception of type: {} was throw while sending account activation e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
 
@@ -104,7 +103,8 @@ public class MailProvider {
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.BLOCK_ACCOUNT_MESSAGE_SUBJECT, language));
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
-            log.error(exception.getMessage(), exception.getCause());
+            log.error("Exception of type: {} was throw while sending account block e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
 
@@ -131,7 +131,8 @@ public class MailProvider {
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.UNBLOCK_ACCOUNT_MESSAGE_SUBJECT, language));
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
-            log.error(exception.getMessage(), exception.getCause());
+            log.error("Exception of type: {} was throw while sending account unblock e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
 
@@ -158,8 +159,10 @@ public class MailProvider {
                     .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.CONFIRM_EMAIL_MESSAGE_SUBJECT, language));
-        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException | NullPointerException exception) {
-            log.error(exception.getMessage(), exception.getCause());
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending e-mail change confirmation message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
 
@@ -187,8 +190,10 @@ public class MailProvider {
                     .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.PASSWORD_RESET_MESSAGE_SUBJECT, language));
-        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException | NullPointerException exception) {
-            log.error(exception.getMessage(), exception.getCause());
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending password reset e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
 
@@ -196,11 +201,11 @@ public class MailProvider {
      * Sends e-mail message with authentication code for the second step in multifactor authentication to the e-mail
      * address, attached to user account.
      *
-     * @param firstName User's first name.
-     * @param lastName User's last name.
-     * @param authCode Authentication code used for the second step of multifactor authentication.
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
+     * @param authCode      Authentication code used for the second step of multifactor authentication.
      * @param emailReceiver E-mail address to which the message will be sent.
-     * @param language Language of the message.
+     * @param language      Language of the message.
      */
     public void sendTwoFactorAuthCode(String firstName, String lastName, String authCode, String emailReceiver, String language) {
         try {
@@ -216,18 +221,20 @@ public class MailProvider {
                     .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.LOGIN_AUTHENTICATION_CODE_MESSAGE_SUBJECT, language));
-        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException | NullPointerException exception) {
-            log.error(exception.getMessage(), exception.getCause());
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending two factor auth code e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
 
     /**
      * This method is used to send e-mail message when newly registered user account is being activated.
      *
-     * @param firstName       User's first name.
-     * @param lastName        User's last name.
-     * @param emailReceiver   E-mail address to which the message will be sent.
-     * @param language        Language of the message.
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language      Language of the message.
      */
     public void sendActivationConfirmationEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
@@ -242,18 +249,20 @@ public class MailProvider {
                     .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.CONFIRM_ACCOUNT_ACTIVATION_MESSAGE_SUBJECT, language));
-        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException | NullPointerException exception) {
-            log.error(exception.getMessage(), exception.getCause());
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending successful account activation e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
 
     /**
      * This method is used to send the user e-mail address.
      *
-     * @param emailContent E-mail content that will be sent to the user e-mail address (in HTML format).
+     * @param emailContent  E-mail content that will be sent to the user e-mail address (in HTML format).
      * @param emailReceiver E-mail address of the user, which the mail is sent to.
-     * @param senderEmail E-mail address of the sender - that is the Eldorado application.
-     * @param emailSubject Topic of the e-mail message.
+     * @param senderEmail   E-mail address of the sender - that is the Eldorado application.
+     * @param emailSubject  Topic of the e-mail message.
      * @throws MessagingException Exception thrown while the e-mail message is being sent.
      */
     private void sendEmail(String emailContent, String emailReceiver, String senderEmail, String emailSubject) throws MessagingException {
@@ -284,8 +293,9 @@ public class MailProvider {
             while ((placeHolder = bufferedReader.readLine()) != null) {
                 builder.append(placeHolder);
             }
-        } catch (IOException | NullPointerException e) {
-            log.error(MailProviderMessages.EMAIL_TEMPLATE_READ_EXCEPTION, e.getCause());
+        } catch (IOException | NullPointerException exception) {
+            log.error("Exception: {} thrown while reading template: {} from a file. Cause: {}. Make sure that the file containing the template is located in the templates/ folder.",
+                    exception.getClass().getSimpleName(), templateName, exception.getMessage());
         }
         return Optional.of(builder.toString());
     }
@@ -301,11 +311,11 @@ public class MailProvider {
         StringBuilder builder = new StringBuilder();
         try {
             URL imagePath = getClass().getClassLoader().getResource("templates/images/" + imageName);
-            BufferedImage image = ImageIO.read(imagePath);
             byte[] imageContent = Files.readAllBytes(Path.of(imagePath.toURI()));
             builder.append(new String(Base64.getEncoder().encode(imageContent)));
-        } catch (IOException | URISyntaxException | NullPointerException e) {
-            log.error(MailProviderMessages.IMAGE_READ_EXCEPTION, e.getCause());
+        } catch (IOException | URISyntaxException | NullPointerException exception) {
+            log.error("Exception: {} thrown while reading image: {} from a file. Cause: {}. Make sure that the file containing the image is located in the templates/images/ folder.",
+                    exception.getClass().getSimpleName(), imageName, exception.getMessage());
         }
         return Optional.of(builder.toString());
     }
