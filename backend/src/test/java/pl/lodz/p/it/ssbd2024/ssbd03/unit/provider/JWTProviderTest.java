@@ -38,6 +38,7 @@ public class JWTProviderTest {
     private static final String secretTokenKey = "ZG9lc3Rob3V3b3JkbmVydm91c3NlZWRzdHJpcGNsb3RoZXNrZXllc3NlbnRpYWxmaW5hbGF0b21pY25lZWRzZG91YmxlZXZlcnNoZWVwcmFiYml0YXZhaWxhYmxlY29sbGVjdGNvbnZlcnNhdGlvbnNhbGVjYW1lc3RlcGhpZ2hlcnNodXRkaWdjYXN0bG9zc3RyaWJlb2xkbWFuYWdlZGN1cnJlbnRkaXNjdXNzaW9ubGVhdmVlaWdodHN0b3JlcHVsbGJlc2lkZXBhcnRzY2FtZWFnb2hhdmluZ2Jyb2Fkc2hhcGVleGNsYWltZWRhcmVhdm95YWdlbG92ZXRocg==";
     private static final String otherTokenKey = "ZXhjZXB0YWN0ZGFuZ2Vyb3VzaG91c2VzdW5mb3VydGhrbm93c2hhZGVsdW5nc25lZ2F0aXZlZmxvYXRpbmdlc3NlbnRpYWxmcmVlZmxvYXRpbmdjaG9zZW51c3dlbGNvbWVwcmVwYXJlY2hhbmdpbmdhbGxvd2NlbnRlcmVhc2lseXJvc2VtaXhuZWFyZXN0d29tZW5lbnRpcmVseXBlcmlvZGhpc3dyb3RlZG91YnRjb250cm9sbGFuZ3VhZ2VyZWxpZ2lvdXNldmVyeXRoaW5nZmxhZ2ltcHJvdmVjb29raWVzbWlsZXdlaWdodG5lcnZvdXNtYWNoaW5laGlnaA==";
     private static final int authenticationCodeValidityLengthValue = 5;
+    private static final int jwtTokenValidityLengthValue = 15;
     private static Account accountNo1;
     private static Client clientLevelNo1;
     private static Admin adminLevelNo1;
@@ -71,6 +72,11 @@ public class JWTProviderTest {
             authenticationCodeValidityLength.setAccessible(true);
             authenticationCodeValidityLength.set(jwtProvider, authenticationCodeValidityLengthValue);
             authenticationCodeValidityLength.setAccessible(false);
+
+            Field jwtTokenValidityLength = JWTProvider.class.getDeclaredField("jwtTokenValidityLength");
+            jwtTokenValidityLength.setAccessible(true);
+            jwtTokenValidityLength.set(jwtProvider, jwtTokenValidityLengthValue);
+            jwtTokenValidityLength.setAccessible(false);
         } catch (Exception exception) {
             log.error("Exception: {} occurred during initialization phase of the test class for JWTProvider. Cause: {}",
                     exception.getClass().getSimpleName(), exception.getMessage());

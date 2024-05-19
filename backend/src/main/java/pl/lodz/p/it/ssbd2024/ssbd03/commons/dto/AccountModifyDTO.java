@@ -1,10 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 
@@ -15,7 +12,6 @@ import java.util.Set;
  */
 @Getter @Setter
 @NoArgsConstructor
-@ToString(callSuper = true)
 public class AccountModifyDTO extends AccountSignableDTO {
     @Schema(description = "First name of the user", example = "Boleslaw", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
