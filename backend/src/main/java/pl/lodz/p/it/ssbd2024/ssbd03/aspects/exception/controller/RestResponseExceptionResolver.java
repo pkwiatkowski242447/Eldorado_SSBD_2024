@@ -26,14 +26,14 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .contentType(MediaType.TEXT_PLAIN)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(I18n.PATH_NOT_FOUND_EXCEPTION));
     }
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<?> handleUnknownException(Exception ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.TEXT_PLAIN)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(I18n.INTERNAL_SERVER_ERROR));
     }
 }

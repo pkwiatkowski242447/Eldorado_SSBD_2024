@@ -1,9 +1,9 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.entities;
+package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
 /**
@@ -54,6 +54,7 @@ public class Token extends AbstractEntity {
      * Used to specify the type of the Account action related to the token.
      */
     public enum TokenType {
+        REFRESH_TOKEN,
         MULTI_FACTOR_AUTHENTICATION_CODE,
         REGISTER,
         RESET_PASSWORD,

@@ -8,7 +8,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,14 +19,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.AccountExceptionResolver;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.GenericExceptionResolver;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.RefreshTokenDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
@@ -39,6 +39,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @ContextConfiguration(classes = SpringWebInitializer.class)
@@ -50,6 +54,8 @@ public class AuthenticationControllerMockTest {
     private AuthenticationManager authenticationManager;
     @InjectMocks
     private AuthenticationController authenticationController;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private MockMvc mockMvc;
 
@@ -68,23 +74,24 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsSuccessful() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenReturn(null);
-        Mockito.when(authenticationService.registerSuccessfulLoginAttempt(
-                Mockito.eq("johann13"),
-                Mockito.eq(false),
-                Mockito.anyString(),
-                Mockito.eq("pl"))).thenReturn("TEST_TOKEN");
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = new AccessAndRefreshTokensDTO("TEST_ACCESS_TOKEN", "TEST_REFRESH_TOKEN");
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(null);
+        when(authenticationService.registerSuccessfulLoginAttempt(
+                eq("johann13"),
+                eq(false),
+                anyString(),
+                eq("pl"))).thenReturn(accessAndRefreshTokensDTO);
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals("TEST_TOKEN", result.getResponse().getContentAsString()));
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertEquals(objectMapper.writeValueAsString(accessAndRefreshTokensDTO), result.getResponse().getContentAsString()));
 
         // Verify
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -92,24 +99,25 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsSuccessfulWithXForwardedFor() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenReturn(null);
-        Mockito.when(authenticationService.registerSuccessfulLoginAttempt(
-                Mockito.eq("johann13"),
-                Mockito.eq(false),
-                Mockito.anyString(),
-                Mockito.eq("pl"))).thenReturn("TEST_TOKEN");
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = new AccessAndRefreshTokensDTO("TEST_ACCESS_TOKEN", "TEST_REFRESH_TOKEN");
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(null);
+        when(authenticationService.registerSuccessfulLoginAttempt(
+                eq("johann13"),
+                eq(false),
+                anyString(),
+                eq("pl"))).thenReturn(accessAndRefreshTokensDTO);
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .header("X-Forwarded-For", "192.168.0.2, 1050:0000:0000:0000:0005:0600:300c:326b, 10.10.10.10")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals("TEST_TOKEN", result.getResponse().getContentAsString()));
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertEquals(objectMapper.writeValueAsString(accessAndRefreshTokensDTO), result.getResponse().getContentAsString()));
 
         // Verify
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -117,21 +125,21 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsSuccessfulNoContent() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenReturn(null);
-        Mockito.when(authenticationService.registerSuccessfulLoginAttempt(
-                Mockito.eq("johann13"),
-                Mockito.eq(false),
-                Mockito.anyString(),
-                Mockito.eq("pl"))).thenReturn(null);
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(null);
+        when(authenticationService.registerSuccessfulLoginAttempt(
+                eq("johann13"),
+                eq(false),
+                anyString(),
+                eq("pl"))).thenReturn(null);
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(status().isNoContent());
 
         // Verify
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -139,16 +147,16 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsFailedBadCredentials() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenThrow(BadCredentialsException.class);
-        Mockito.doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithIncrement(
-                Mockito.eq("johann13"),
-                Mockito.anyString());
+        when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(BadCredentialsException.class);
+        doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithIncrement(
+                eq("johann13"),
+                anyString());
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().is(401))
+                .andExpect(status().is(401))
                 .andExpect(result ->
                         assertEquals(
                                 mapper.writeValueAsString(new ExceptionDTO(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION)),
@@ -157,9 +165,9 @@ public class AuthenticationControllerMockTest {
                 );
 
         // Verify
-        Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithIncrement(Mockito.eq("johann13"), Mockito.anyString());
+        verify(authenticationService, times(1)).registerUnsuccessfulLoginAttemptWithIncrement(eq("johann13"), anyString());
 
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -167,16 +175,16 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsFailedDisabledAccount() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenThrow(DisabledException.class);
-        Mockito.doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
-                Mockito.eq("johann13"),
-                Mockito.anyString());
+        when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(DisabledException.class);
+        doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
+                eq("johann13"),
+                anyString());
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().is(400))
+                .andExpect(status().is(400))
                 .andExpect(result ->
                         assertEquals(
                                 mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_INACTIVE_EXCEPTION)),
@@ -185,9 +193,9 @@ public class AuthenticationControllerMockTest {
                 );
 
         // Verify
-        Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(Mockito.eq("johann13"), Mockito.anyString());
+        verify(authenticationService, times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(eq("johann13"), anyString());
 
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -195,21 +203,21 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsFailedLockedByAdminAccount() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenThrow(LockedException.class);
-        Mockito.doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
-                Mockito.eq("johann13"),
-                Mockito.anyString());
+        when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(LockedException.class);
+        doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
+                eq("johann13"),
+                anyString());
 
         Account account = new Account();
         account.blockAccount(true);
 
-        Mockito.when(authenticationService.findByLogin("johann13")).thenReturn(Optional.of(account));
+        when(authenticationService.findByLogin("johann13")).thenReturn(Optional.of(account));
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().is(400))
+                .andExpect(status().is(400))
                 .andExpect(result ->
                         assertEquals(
                                 mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_BLOCKED_BY_ADMIN)),
@@ -218,9 +226,9 @@ public class AuthenticationControllerMockTest {
                 );
 
         // Verify
-        Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(Mockito.eq("johann13"), Mockito.anyString());
+        verify(authenticationService, times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(eq("johann13"), anyString());
 
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -228,21 +236,21 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsFailedLockedAccount() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenThrow(LockedException.class);
-        Mockito.doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
-                Mockito.eq("johann13"),
-                Mockito.anyString());
+        when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(LockedException.class);
+        doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
+                eq("johann13"),
+                anyString());
 
         Account account = new Account();
         account.blockAccount(false);
 
-        Mockito.when(authenticationService.findByLogin("johann13")).thenReturn(Optional.of(account));
+        when(authenticationService.findByLogin("johann13")).thenReturn(Optional.of(account));
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().is(400))
+                .andExpect(status().is(400))
                 .andExpect(result ->
                         assertEquals(
                                 mapper.writeValueAsString(new ExceptionDTO(I18n.ACCOUNT_BLOCKED_BY_FAILED_LOGIN_ATTEMPTS)),
@@ -251,9 +259,9 @@ public class AuthenticationControllerMockTest {
                 );
 
         // Verify
-        Mockito.verify(authenticationService, Mockito.times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(Mockito.eq("johann13"), Mockito.anyString());
+        verify(authenticationService, times(1)).registerUnsuccessfulLoginAttemptWithoutIncrement(eq("johann13"), anyString());
 
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -261,14 +269,14 @@ public class AuthenticationControllerMockTest {
 
     @Test
     public void loginUsingCredentialsFailedAuthenticationException() throws Exception {
-        Mockito.when(authenticationManager.authenticate(Mockito.any(Authentication.class))).thenThrow(UsernameNotFoundException.class);
+        when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(UsernameNotFoundException.class);
 
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-credentials")
+        mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountLoginDTO)))
-                .andExpect(MockMvcResultMatchers.status().is(401))
+                .andExpect(status().is(401))
                 .andExpect(result ->
                         assertEquals(
                                 mapper.writeValueAsString(new ExceptionDTO(I18n.INVALID_LOGIN_ATTEMPT_EXCEPTION)),
@@ -276,7 +284,7 @@ public class AuthenticationControllerMockTest {
                         )
                 );
 
-        Mockito.verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
+        verify(authenticationManager).authenticate((Authentication) argCaptor.capture());
 
         assertEquals(accountLoginDTO.getLogin(), ((Authentication) argCaptor.getValue()).getName());
         assertEquals(accountLoginDTO.getPassword(), ((Authentication) argCaptor.getValue()).getCredentials());
@@ -285,41 +293,42 @@ public class AuthenticationControllerMockTest {
     @WithMockUser(username = "johann13", roles = {"CLIENT"})
     @Test
     public void loginUsingAuthenticationCodeSuccessful() throws Exception {
-        Mockito.doNothing().when(authenticationService).loginUsingAuthenticationCode(
-                Mockito.eq("johann13"),
-                Mockito.eq("TEST_VALUE"));
-        Mockito.when(authenticationService.registerSuccessfulLoginAttempt(
-                Mockito.eq("johann13"),
-                Mockito.eq(true),
-                Mockito.anyString(),
-                Mockito.eq("pl"))).thenReturn("TEST_TOKEN");
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = new AccessAndRefreshTokensDTO("TEST_ACCESS_TOKEN", "TEST_REFRESH_TOKEN");
+        doNothing().when(authenticationService).loginUsingAuthenticationCode(
+                eq("johann13"),
+                eq("TEST_VALUE"));
+        when(authenticationService.registerSuccessfulLoginAttempt(
+                eq("johann13"),
+                eq(true),
+                anyString(),
+                eq("pl"))).thenReturn(accessAndRefreshTokensDTO);
         AuthenticationCodeDTO authenticationCodeDTO = new AuthenticationCodeDTO("johann13", "TEST_VALUE", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-auth-code")
+        mockMvc.perform(post("/api/v1/auth/login-auth-code")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(authenticationCodeDTO)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_PLAIN))
-                .andExpect(result -> assertEquals("TEST_TOKEN", result.getResponse().getContentAsString()));
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertEquals(objectMapper.writeValueAsString(accessAndRefreshTokensDTO), result.getResponse().getContentAsString()));
 
         // Verify
-        Mockito.verify(authenticationService, Mockito.times(1)).loginUsingAuthenticationCode(Mockito.eq("johann13"), Mockito.eq("TEST_VALUE"));
+        verify(authenticationService, times(1)).loginUsingAuthenticationCode(eq("johann13"), eq("TEST_VALUE"));
     }
 
     @Test
     public void loginUsingAuthenticationCodeFailed() throws Exception {
-        Mockito.doThrow(new AccountNotActivatedException()).when(authenticationService).loginUsingAuthenticationCode(
-                Mockito.eq("johann13"),
-                Mockito.eq("TEST_VALUE"));
-        Mockito.doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
-                Mockito.eq("johann13"),
-                Mockito.anyString());
+        doThrow(new AccountNotActivatedException()).when(authenticationService).loginUsingAuthenticationCode(
+                eq("johann13"),
+                eq("TEST_VALUE"));
+        doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
+                eq("johann13"),
+                anyString());
         AuthenticationCodeDTO authenticationCodeDTO = new AuthenticationCodeDTO("johann13", "TEST_VALUE", "pl");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/login-auth-code")
+        mockMvc.perform(post("/api/v1/auth/login-auth-code")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(authenticationCodeDTO)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(result ->
                         assertEquals(
@@ -329,13 +338,36 @@ public class AuthenticationControllerMockTest {
                 );
 
         // Verify
-        Mockito.verify(authenticationService, Mockito.times(1)).loginUsingAuthenticationCode(Mockito.eq("johann13"), Mockito.eq("TEST_VALUE"));
+        verify(authenticationService, times(1)).loginUsingAuthenticationCode(eq("johann13"), eq("TEST_VALUE"));
     }
 
     @WithMockUser(username = "ExampleAdminNo1", roles = {"ADMIN"})
     @Test
     public void logoutSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/logout"))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        mockMvc.perform(post("/api/v1/auth/logout"))
+                .andExpect(status().isNoContent());
+    }
+
+    @WithMockUser(username = "ExampleAdminNo3", roles = {"ADMIN"})
+    @Test
+    public void refreshUserSessionTestPositive() throws Exception {
+        String userLogin = "ExampleAdminNo3";
+        String exampleRefreshToken = "exampleRefreshToken";
+
+        String newAccessToken = "newAccessTokenNo1";
+        String newRefreshToken = "newRefreshTokenNo1";
+
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = new AccessAndRefreshTokensDTO(newAccessToken, newRefreshToken);
+
+        when(authenticationService.refreshUserSession(exampleRefreshToken, userLogin)).thenReturn(accessAndRefreshTokensDTO);
+
+        mockMvc.perform(post("/api/v1/auth/refresh-session")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new RefreshTokenDTO(exampleRefreshToken))))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    assertEquals(objectMapper.writeValueAsString(accessAndRefreshTokensDTO),
+                            result.getResponse().getContentAsString());
+                });
     }
 }

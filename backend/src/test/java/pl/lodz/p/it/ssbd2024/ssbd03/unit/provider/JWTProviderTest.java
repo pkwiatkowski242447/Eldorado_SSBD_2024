@@ -73,7 +73,7 @@ public class JWTProviderTest {
             authenticationCodeValidityLength.set(jwtProvider, authenticationCodeValidityLengthValue);
             authenticationCodeValidityLength.setAccessible(false);
 
-            Field jwtTokenValidityLength = JWTProvider.class.getDeclaredField("jwtTokenValidityLength");
+            Field jwtTokenValidityLength = JWTProvider.class.getDeclaredField("accessTokenTTL");
             jwtTokenValidityLength.setAccessible(true);
             jwtTokenValidityLength.set(jwtProvider, jwtTokenValidityLengthValue);
             jwtTokenValidityLength.setAccessible(false);

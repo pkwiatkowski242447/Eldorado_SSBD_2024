@@ -33,7 +33,7 @@ public class JWTProvider {
     private int authenticationCodeValidityLength;
 
     @Value("${jwt.token.validity.period.length.minutes}")
-    private int jwtTokenValidityLength;
+    private int accessTokenTTL;
 
     @Value("${secret.key}")
     private String secretKey;
@@ -62,7 +62,7 @@ public class JWTProvider {
                 .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
                 .withClaim(JWTConsts.USER_LEVELS, listOfRoles)
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plus(this.jwtTokenValidityLength, ChronoUnit.MINUTES))
+                .withExpiresAt(Instant.now().plus(this.accessTokenTTL, ChronoUnit.MINUTES))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
@@ -172,16 +172,6 @@ public class JWTProvider {
         }
     }
 
-    /**
-     * Decodes the key to String format and returns it.
-     *
-     * @return Returns signing key.
-     */
-    private String getSignInKey() {
-        byte[] keyBytes = Base64.getDecoder().decode(this.secretKey);
-        return new String(keyBytes);
-    }
-
     // Multifactor Auth
 
     /**
@@ -220,6 +210,16 @@ public class JWTProvider {
         } catch (JWTVerificationException exception) {
             return false;
         }
+    }
+
+    /**
+     * Decodes the key to String format and returns it.
+     *
+     * @return Returns signing key.
+     */
+    private String getSignInKey() {
+        byte[] keyBytes = Base64.getDecoder().decode(this.secretKey);
+        return new String(keyBytes);
     }
 
     //=================================================JWS==========================================================\\

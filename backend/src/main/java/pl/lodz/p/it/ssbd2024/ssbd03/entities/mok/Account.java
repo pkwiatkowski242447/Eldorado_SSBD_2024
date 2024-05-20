@@ -5,7 +5,6 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
@@ -407,6 +406,11 @@ public class Account extends AbstractEntity {
         this.blockedTime = null;
         // Reset unsuccessful login counter
         this.getActivityLog().setUnsuccessfulLoginCounter(0);
+    }
+
+
+    public boolean couldAuthenticate() {
+        return !this.getBlocked() || this.getActive();
     }
 
     /**

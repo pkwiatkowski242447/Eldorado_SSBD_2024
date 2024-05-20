@@ -23,8 +23,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.RefreshTokenDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -89,7 +91,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      *                                  layer of facade and service components in the application.
      */
     @Override
-    @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login-credentials", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({Roles.ANONYMOUS})
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
@@ -103,18 +105,19 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
-    public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain, @RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
+    public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
+                                                   @RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
             Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
                     accountLoginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(accountLoginDTO.getLogin(), false,
+            AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = this.authenticationService.registerSuccessfulLoginAttempt(accountLoginDTO.getLogin(), false,
                     sourceAddress, accountLoginDTO.getLanguage());
-            if (accessToken != null) {
+            if (accessAndRefreshTokensDTO != null) {
                 log.info("User: {} successfully authenticated during one factor authentication in the application, starting session at {} from IPv4: {}",
                         accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
-                return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(accessAndRefreshTokensDTO);
             }
             log.info("User: {} successfully authenticated in the first step of multifactor authentication at {} from IPv4: {}",
                     accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
@@ -158,7 +161,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      *                                  layer of facade and service components in the application.
      */
     @Override
-    @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login-auth-code", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed({Roles.ANONYMOUS})
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
@@ -171,7 +174,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
-    public ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain, @RequestBody AuthenticationCodeDTO authenticationCodeDTO, HttpServletRequest request) throws ApplicationBaseException {
+    public ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
+                                                          @RequestBody AuthenticationCodeDTO authenticationCodeDTO, HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
             this.authenticationService.loginUsingAuthenticationCode(authenticationCodeDTO.getUserLogin(), authenticationCodeDTO.getAuthCodeValue());
@@ -181,11 +185,45 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             this.authenticationService.registerUnsuccessfulLoginAttemptWithoutIncrement(authenticationCodeDTO.getUserLogin(), sourceAddress);
             throw applicationBaseException;
         }
-        String accessToken = this.authenticationService.registerSuccessfulLoginAttempt(authenticationCodeDTO.getUserLogin(), true,
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = this.authenticationService.registerSuccessfulLoginAttempt(authenticationCodeDTO.getUserLogin(), true,
                 sourceAddress, authenticationCodeDTO.getLanguage());
         log.info("User: {} successfully authenticated during two factor authentication in the application, starting session at {} from IPv4: {}",
                 SecurityContextHolder.getContext().getAuthentication().getName(), LocalDateTime.now(), sourceAddress);
-        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(accessToken);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(accessAndRefreshTokensDTO);
+    }
+
+    /**
+     * Allows authenticated user to refresh session in the application, after authentication, performed while logging in.
+     * After refreshing session new access token and refresh token are generated.
+     *
+     * @param proxyChain      Header containing IPv4 address of the user.
+     * @param refreshTokenDTO Data transfer object containing refresh token, used for refreshing session of authenticated
+     *                        user in the application.
+     * @param request         HTTP Request in which the credentials.
+     * @return Data transfer object containing access token (used for authentication purposes) and refresh token (for
+     * refreshing authenticated user session).
+     * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
+     *                                  layer of facade and service components in the application.
+     */
+    @Override
+    @PostMapping(value = "/refresh-session", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed({Roles.AUTHENTICATED})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
+    @Operation(summary = "Refresh session", description = "This endpoint is used to refresh authenticated user session in the application.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Session was refreshed successfully and new access and refresh token were generated."),
+            @ApiResponse(responseCode = "400", description = "User account is blocked or not active, and therefore could not be used authenticated."),
+            @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
+    })
+    public ResponseEntity<?> refreshUserSession(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
+                                                @RequestBody RefreshTokenDTO refreshTokenDTO, HttpServletRequest request) throws ApplicationBaseException {
+        String sourceAddress = getSourceAddress(proxyChain, request);
+        String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = this.authenticationService.refreshUserSession(refreshTokenDTO.getRefreshToken(), userLogin);
+        log.info("User: {} refreshed their session in the application at: {} from IPv4: {}",
+                userLogin, LocalDateTime.now(), sourceAddress);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(accessAndRefreshTokensDTO);
     }
 
     /**
@@ -219,7 +257,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      *
      * @param proxyChain X-Forwarded-For header content, if present or null otherwise.
      * @param request    HttpServletRequest object, associated with user request.
-     * @return           This method returns the actual IPv4 address of the user. If the X-Forwarded-For header is empty or not
+     * @return This method returns the actual IPv4 address of the user. If the X-Forwarded-For header is empty or not
      * present (basically null) then IPv4 address is extracted from IP packet as source address, which will be proxy.
      */
     private String getSourceAddress(String proxyChain, HttpServletRequest request) {

@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -18,7 +19,7 @@ public interface AuthenticationServiceInterface {
      *                 address.
      * @param language Language constant set in the user browser.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade and service layer components.
+     *                                  on facade and service layer components.
      */
     void loginUsingAuthenticationCode(String code, String language) throws ApplicationBaseException;
 
@@ -31,12 +32,13 @@ public interface AuthenticationServiceInterface {
      * @param confirmed Boolean flag indicating whether user identity is confirmed - used to send e-mail when first step of multifactor authentication is completed.
      * @param ipAddress Logical IPv4 address, which the user is authenticating from.
      * @param language  Language constant, read as a setting in the user's browser.
-     * @return String containing a JWT token is returned if user identity is confirmed, that is after the authentication code is entered and
-     * validated. Otherwise, it sends e-mail message containing the authentication code.
+     * @return Data transfer object containing a JWT token is returned if user identity is confirmed, that is after the authentication code
+     * is entered and validated, and refresh token used to refresh user session. Otherwise, it sends e-mail message containing the
+     * authentication code.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
-    String registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException;
+    AccessAndRefreshTokensDTO registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException;
 
     /**
      * This method is used to register unsuccessful login attempt made by the user - specifically when credentials
@@ -45,7 +47,7 @@ public interface AuthenticationServiceInterface {
      * @param userLogin Login of the user that is trying to authenticate in the application.
      * @param ipAddress Logical IPv4 address, which the user is authenticating from.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
     void registerUnsuccessfulLoginAttemptWithIncrement(String userLogin, String ipAddress) throws ApplicationBaseException;
 
@@ -57,9 +59,23 @@ public interface AuthenticationServiceInterface {
      * @param userLogin Login of the user that is trying to authenticate in the application.
      * @param ipAddress Logical IPv4 address, which the user is authenticating from.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     * on facade components.
+     *                                  on facade components.
      */
     void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException;
+
+    /**
+     * This method is used to refresh user session in the application using refreshToken sent to the
+     * client while logging in.
+     *
+     * @param refreshToken String identified as refreshToken, used to refresh user session in the application,
+     *                     sent to the client during logging in.
+     * @param userLogin    Login of the currently authenticated in the application user.
+     * @return Data transfer object containing new access token (used for authentication purposes) and refresh token
+     * (used for refreshing user session).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     *                                  on facade components.
+     */
+    AccessAndRefreshTokensDTO refreshUserSession(String refreshToken, String userLogin) throws ApplicationBaseException;
 
     /**
      * Retrieves an Account with given login.
