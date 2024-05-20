@@ -22,9 +22,10 @@ import org.springframework.http.MediaType;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfigFull;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.io.IOException;
@@ -49,8 +50,7 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.Date;
 
 public class ApplicationIntegrationIT extends TestcontainersConfigFull {
-
-    private static final String CONTENT_TYPE_JSON = MediaType.APPLICATION_JSON_VALUE;
+    
     private static final String CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
     private static final String BASE_URL = "http://localhost:8181/api/v1";
 
@@ -124,7 +124,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("iosif_wissarionowicz", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
-        request.contentType(CONTENT_TYPE_JSON);
+        request.contentType(CONTENT_TYPE);
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
         request
@@ -489,20 +489,22 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
 
         RequestSpecification request = RestAssured.given();
-        request.contentType(CONTENT_TYPE_JSON);
+        request.contentType(CONTENT_TYPE);
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
         Response response = request.post(BASE_URL + "/auth/login-credentials");
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = response.as(AccessAndRefreshTokensDTO.class);
+        DecodedJWT decodedJWT = JWT.decode(accessAndRefreshTokensDTO.getAccessToken());
 
-        assertEquals(200, response.getStatusCode());
-        assertEquals("jerzybem", decodeJwtTokenAndExtractValue(response.asString(), "sub"));
+        assertEquals(HttpStatus.OK.value(), response.getStatusCode());
+        assertEquals("jerzybem", decodedJWT.getSubject());
 
         request = RestAssured.given();
-        request.contentType(CONTENT_TYPE_JSON);
+        request.contentType(CONTENT_TYPE);
 
-        response = request.header("Authorization", "Bearer " + response.asString()).get(BASE_URL + "/accounts/self");
+        response = request.header("Authorization", "Bearer " + accessAndRefreshTokensDTO.getAccessToken()).get(BASE_URL + "/accounts/self");
 
-        assertEquals(200, response.getStatusCode());
+        assertEquals(HttpStatus.OK.value(), response.getStatusCode());
     }
 
     // Block and unblock
@@ -930,7 +932,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts/self")
                 .then()
@@ -982,7 +984,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         RestAssured.given()
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts/self")
                 .then()
@@ -1025,7 +1027,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts/self")
                 .then()
@@ -1078,7 +1080,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", ifMatch)
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts/self")
                 .then()
@@ -1102,7 +1104,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .get(BASE_URL + "/accounts/self")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(
                         "login", Matchers.equalTo(login),
                         "lastname", Matchers.not(Matchers.equalTo("Bbbbbb"))
@@ -1139,7 +1141,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO_V1)
                 .put(BASE_URL + "/accounts/self")
                 .then()
@@ -1154,7 +1156,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO_V1)
                 .put(BASE_URL + "/accounts/self")
                 .then()
@@ -1208,7 +1210,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts/self")
                 .then()
@@ -1271,7 +1273,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -1324,7 +1326,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         RestAssured.given()
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -1364,7 +1366,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .header("Authorization", "Bearer " + loginTokenNoAdmin)
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -1407,7 +1409,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -1461,7 +1463,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", ifMatch)
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -1485,7 +1487,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .get(BASE_URL + String.format("/accounts/%s", userId))
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(
                         "login", Matchers.equalTo("piotrnowak"),
                         "lastname", Matchers.not(Matchers.equalTo("Bbbbbb"))
@@ -1522,7 +1524,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO_V1)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -1537,7 +1539,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore_V1.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO_V1)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -1591,7 +1593,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .spec(requestSpec)
                 .when()
                 .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(CONTENT_TYPE)
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts")
                 .then()
@@ -2028,7 +2030,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         request.body(mapper.writeValueAsString(accountLoginDTO));
 
         Response response = request.post(BASE_URL + "/auth/login-credentials");
-        return response.asString();
+        return response.as(AccessAndRefreshTokensDTO.class).getAccessToken();
     }
 
     private static Stream<Arguments> provideNoAdminLevelAccountsParameters() {

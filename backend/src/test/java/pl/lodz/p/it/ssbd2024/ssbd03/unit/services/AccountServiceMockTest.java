@@ -12,7 +12,7 @@ import org.springframework.security.test.context.annotation.SecurityTestExecutio
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
@@ -38,6 +38,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AccountService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
 import java.lang.reflect.Field;
 import java.time.temporal.ChronoUnit;
@@ -53,32 +54,52 @@ import static org.mockito.Mockito.*;
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @SecurityTestExecutionListeners
 public class AccountServiceMockTest {
+
     @Mock
     private MailProvider mailProvider;
+
     @Mock
     private JWTProvider jwtProvider;
+
     @Mock
     private TokenFacade tokenFacade;
+
     @Mock
     private AccountMOKFacade accountMOKFacade;
+
     @Mock
     private UserLevelFacade userLevelFacade;
+
     @Mock
     private PasswordEncoder encoder;
+
+    @Mock
+    private TokenProvider tokenProvider;
+
     @InjectMocks
     private AccountService accountService;
 
     @Test
     void registerClientTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
-        String testToken = "TestTokenValue";
+        String hashedPassword = "HASHED_PASSWORD";
+        Account clientAccount = new Account("Testowy", password,"Imie","Nazwisko","test@example.com","123123123");
+
+        String exampleTokenValue = "exampleActivationTokenValue";
+        Token accountActivationToken = new Token(exampleTokenValue, clientAccount, Token.TokenType.REGISTER);
 
         doNothing().when(accountMOKFacade).create(any(Account.class));
-        when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
-        when(jwtProvider.generateActionToken(any(Account.class), anyInt(), any())).thenReturn(testToken);
+        when(encoder.encode(password)).thenReturn(hashedPassword);
+        when(tokenProvider.generateAccountActivationToken(clientAccount)).thenReturn(accountActivationToken);
+        doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
 
-        accountService.registerClient("Testowy", password, "Imie",
-                "Nazwisko", "test@example.com", "123123123", "pl");
+        accountService.registerClient(clientAccount.getLogin(),
+                password,
+                clientAccount.getName(),
+                clientAccount.getLastname(),
+                clientAccount.getEmail(),
+                clientAccount.getPhoneNumber(),
+                clientAccount.getAccountLanguage());
 
         Mockito.verify(accountMOKFacade, Mockito.times(1)).create(any(Account.class));
     }
@@ -86,30 +107,48 @@ public class AccountServiceMockTest {
     @Test
     void registerStaffTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
-        String testToken = "TestTokenValue";
+        String hashedPassword = "HASHED_PASSWORD";
+        Account staffAccount = new Account("Testowy", hashedPassword, "Imie", "Nazwisko", "test@example.com", "123123123");
+
+        String exampleTokenValue = "exampleActivationTokenValue";
+        Token accountActivationToken = new Token(exampleTokenValue, staffAccount, Token.TokenType.REGISTER);
 
         doNothing().when(accountMOKFacade).create(any(Account.class));
-        when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
+        when(encoder.encode(password)).thenReturn(hashedPassword);
+        when(tokenProvider.generateAccountActivationToken(staffAccount)).thenReturn(accountActivationToken);
         doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
-        when(jwtProvider.generateActionToken(any(Account.class), anyInt(), any())).thenReturn(testToken);
 
-        accountService.registerStaff("Testowy", password, "Imie",
-                "Nazwisko", "test@example.com", "123123123", "pl");
+        accountService.registerStaff(staffAccount.getLogin(),
+                password,
+                staffAccount.getName(),
+                staffAccount.getLastname(),
+                staffAccount.getEmail(),
+                staffAccount.getPhoneNumber(),
+                staffAccount.getAccountLanguage());
         Mockito.verify(accountMOKFacade, Mockito.times(1)).create(any(Account.class));
     }
 
     @Test
     void registerAdminTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
-        String testToken = "TestTokenValue";
+        String hashedPassword = "HASHED_PASSWORD";
+        Account adminAccount = new Account("Testowy", password, "Imie", "Nazwisko", "test@example.com", "123123123");
+
+        String exampleTokenValue = "exampleActivationTokenValue";
+        Token accountActivationToken = new Token(exampleTokenValue, adminAccount, Token.TokenType.REGISTER);
 
         doNothing().when(accountMOKFacade).create(any(Account.class));
-        when(encoder.encode(password)).thenReturn(new BCryptPasswordEncoder().encode(password));
+        when(encoder.encode(password)).thenReturn(hashedPassword);
+        when(tokenProvider.generateAccountActivationToken(adminAccount)).thenReturn(accountActivationToken);
         doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
-        when(jwtProvider.generateActionToken(any(Account.class), anyInt(), any())).thenReturn(testToken);
 
-        accountService.registerAdmin("Testowy", password, "Imie",
-                "Nazwisko", "test@example.com", "123123123", "pl");
+        accountService.registerAdmin(adminAccount.getLogin(),
+                password,
+                adminAccount.getName(),
+                adminAccount.getLastname(),
+                adminAccount.getEmail(),
+                adminAccount.getPhoneNumber(),
+                adminAccount.getAccountLanguage());
         Mockito.verify(accountMOKFacade, Mockito.times(1)).create(any(Account.class));
     }
 
@@ -184,18 +223,14 @@ public class AccountServiceMockTest {
 
     @Test
     void changeEmailTestSuccessful() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
-        Field emailChangeConfirmationPeriodLengthHoursField = AccountService.class.getDeclaredField("emailChangeConfirmationPeriodLengthHours");
-        emailChangeConfirmationPeriodLengthHoursField.setAccessible(true);
-        emailChangeConfirmationPeriodLengthHoursField.set(accountService, 24);
-        emailChangeConfirmationPeriodLengthHoursField.setAccessible(false);
-
         Account a = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         a.setAccountLanguage("pl");
         String newEmail = "new@email.com";
+        Token emailChangeToken = new Token("TOKEN VALUE", a, Token.TokenType.CONFIRM_EMAIL);
 
         when(accountMOKFacade.find(any())).thenReturn(Optional.of(a));
         when(tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, a.getId())).thenReturn(Optional.empty());
-        when(jwtProvider.generateEmailToken(a, newEmail, 24)).thenReturn("TOKEN VALUE");
+        when(tokenProvider.generateEmailChangeToken(a, newEmail)).thenReturn(emailChangeToken);
         doNothing().when(tokenFacade).create(any(Token.class));
         doNothing().when(mailProvider).sendEmailConfirmEmail(eq(a.getName()), eq(a.getLastname()), eq(newEmail), any(), eq(a.getAccountLanguage()));
 
@@ -683,7 +718,7 @@ public class AccountServiceMockTest {
     @WithMockUser(username = "login")
     void removeAdminUserLevelTestSuccessful() throws ApplicationBaseException {
         Account accountActor = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
-        Account accountTarget = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
+        Account accountTarget = new Account("login1", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UserLevel userLevelStaff = new Staff();
         accountTarget.addUserLevel(userLevelStaff);
         UserLevel userLevelAdminActor = new Admin();
@@ -933,10 +968,11 @@ public class AccountServiceMockTest {
     void forgetAccountPasswordTestSuccessful() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.setActive(true);
+        Token resetPasswordToken = new Token("TOKEN VALUE", account, Token.TokenType.RESET_PASSWORD);
 
         when(accountMOKFacade.findByEmail(account.getEmail())).thenReturn(Optional.of(account));
         when(tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId())).thenReturn(Optional.empty());
-        when(jwtProvider.generateActionToken(eq(account), anyInt(), eq(ChronoUnit.MINUTES))).thenReturn("TOKEN VALUE");
+        when(tokenProvider.generatePasswordResetToken(eq(account))).thenReturn(resetPasswordToken);
         doNothing().when(tokenFacade).create(any(Token.class));
         doNothing().when(mailProvider).sendPasswordResetEmail(eq(account.getName()), eq(account.getLastname()), eq(account.getEmail()), any(), any());
 
@@ -1108,23 +1144,20 @@ public class AccountServiceMockTest {
     @Test
     @WithMockUser(username = "login")
     void resendEmailConfirmationTestSuccessful() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
-        Field emailChangeConfirmationPeriodLengthHoursField = AccountService.class.getDeclaredField("emailChangeConfirmationPeriodLengthHours");
-        emailChangeConfirmationPeriodLengthHoursField.setAccessible(true);
-        emailChangeConfirmationPeriodLengthHoursField.set(accountService, 24);
-        emailChangeConfirmationPeriodLengthHoursField.setAccessible(false);
-
         String tokenEmail = "token@email.com";
         String newToken = "NEW TOKEN VALUE";
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
-        Token token = new Token("TOKEN VALUE", account, Token.TokenType.CONFIRM_EMAIL);
+        Token tokenObject = new Token("TOKENVALUE", account, Token.TokenType.CONFIRM_EMAIL);
+        Token newTokenObject = new Token(newToken, account, Token.TokenType.CONFIRM_EMAIL);
         account.setAccountLanguage("pl");
 
         when(accountMOKFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
-        when(tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId())).thenReturn(Optional.of(token));
-        when(jwtProvider.extractEmail(token.getTokenValue())).thenReturn(tokenEmail);
-        when(jwtProvider.generateEmailToken(account, tokenEmail, 24)).thenReturn(newToken);
+        when(tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId())).thenReturn(Optional.of(tokenObject));
+        when(jwtProvider.extractEmail(tokenObject.getTokenValue())).thenReturn(tokenEmail);
+        when(tokenProvider.generateEmailChangeToken(account, tokenEmail)).thenReturn(newTokenObject);
         doNothing().when(mailProvider).sendEmailConfirmEmail(eq(account.getName()), eq(account.getLastname()), eq(tokenEmail), anyString(), eq(account.getAccountLanguage()));
-        doNothing().when(tokenFacade).edit(token);
+        doNothing().when(tokenFacade).remove(tokenObject);
+        doNothing().when(tokenFacade).create(newTokenObject);
 
         accountService.resendEmailConfirmation();
         Mockito.verify(mailProvider, Mockito.times(1)).sendEmailConfirmEmail(eq(account.getName()), eq(account.getLastname()), eq(tokenEmail), anyString(), eq(account.getAccountLanguage()));

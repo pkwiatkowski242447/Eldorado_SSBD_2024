@@ -8,11 +8,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.annotation.SecurityTestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAuthenticationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
@@ -23,6 +26,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenAuthFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AuthenticationService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
@@ -48,6 +52,9 @@ public class AuthenticationServiceMockTest {
 
     @Mock
     private TokenAuthFacade tokenFacade;
+
+    @Mock
+    private TokenProvider tokenProvider;
 
     @InjectMocks
     private AuthenticationService authenticationService;
@@ -236,15 +243,19 @@ public class AuthenticationServiceMockTest {
         account.setTwoFactorAuth(false);
         String exampleIpAddress = "ExampleIpAddress";
         String exampleLanguage = "ExampleLanguage";
-        String exampleToken = "ExampleToken";
+        String exampleAccessToken = "ExampleAccessToken";
+        String exampleRefreshToken = "ExampleRefreshToken";
+        Token refreshTokenObject = new Token(exampleRefreshToken, account, Token.TokenType.REFRESH_TOKEN);
         account.setAccountLanguage(exampleLanguage);
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
+        when(tokenProvider.generateRefreshToken(account)).thenReturn(refreshTokenObject);
         doNothing().when(authenticationFacade).edit(account);
-        when(jwtProvider.generateJWTToken(account)).thenReturn(exampleToken);
+        when(jwtProvider.generateJWTToken(account)).thenReturn(exampleAccessToken);
 
-        String token = authenticationService.registerSuccessfulLoginAttempt(account.getLogin(), false, exampleIpAddress, exampleLanguage);
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = authenticationService.registerSuccessfulLoginAttempt(account.getLogin(), false, exampleIpAddress, exampleLanguage);
 
-        assertEquals(token, exampleToken);
+        assertEquals(accessAndRefreshTokensDTO.getAccessToken(), exampleAccessToken);
+        assertEquals(accessAndRefreshTokensDTO.getRefreshToken(), exampleRefreshToken);
     }
 
     @Test
@@ -253,15 +264,19 @@ public class AuthenticationServiceMockTest {
         account.setTwoFactorAuth(false);
         String exampleIpAddress = "ExampleIpAddress";
         String exampleLanguage = "ExampleLanguage";
-        String exampleToken = "ExampleToken";
+        String exampleAccessToken = "ExampleAccessToken";
+        String exampleRefreshToken = "ExampleRefreshToken";
+        Token refreshTokenObject = new Token(exampleRefreshToken, account, Token.TokenType.REFRESH_TOKEN);
         account.setAccountLanguage(exampleLanguage);
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
+        when(tokenProvider.generateRefreshToken(account)).thenReturn(refreshTokenObject);
         doNothing().when(authenticationFacade).edit(account);
-        when(jwtProvider.generateJWTToken(account)).thenReturn(exampleToken);
+        when(jwtProvider.generateJWTToken(account)).thenReturn(exampleAccessToken);
 
-        String token = authenticationService.registerSuccessfulLoginAttempt(account.getLogin(), true, exampleIpAddress, exampleLanguage);
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = authenticationService.registerSuccessfulLoginAttempt(account.getLogin(), true, exampleIpAddress, exampleLanguage);
 
-        assertEquals(token, exampleToken);
+        assertEquals(accessAndRefreshTokensDTO.getAccessToken(), exampleAccessToken);
+        assertEquals(accessAndRefreshTokensDTO.getRefreshToken(), exampleRefreshToken);
     }
 
     @Test
@@ -283,7 +298,73 @@ public class AuthenticationServiceMockTest {
         account.setAccountLanguage(exampleLanguage);
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
 
-        String token = authenticationService.registerSuccessfulLoginAttempt(account.getLogin(), false, exampleIpAddress, exampleLanguage);
-        assertNull(token);
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = authenticationService.registerSuccessfulLoginAttempt(account.getLogin(), false, exampleIpAddress, exampleLanguage);
+        assertNull(accessAndRefreshTokensDTO);
+    }
+
+    @Test
+    public void refreshUserSessionTestPositive() throws ApplicationBaseException {
+        Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
+        String newExampleRefreshTokenValue = "newExampleRefreshTokenNo1";
+        String newExampleAccessTokenValue = "newExampleAccessTokenNo1";
+        Token refreshTokenObject = new Token(exampleRefreshTokenValue, account, Token.TokenType.REFRESH_TOKEN);
+        Token newRefreshTokenObject = new Token(newExampleRefreshTokenValue, account, Token.TokenType.REFRESH_TOKEN);
+
+        when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
+        when(tokenFacade.findByTokenValue(exampleRefreshTokenValue)).thenReturn(Optional.of(refreshTokenObject));
+        when(jwtProvider.isTokenValid(exampleRefreshTokenValue, account)).thenReturn(true);
+        when(tokenProvider.generateRefreshToken(account)).thenReturn(newRefreshTokenObject);
+        when(jwtProvider.generateJWTToken(account)).thenReturn(newExampleAccessTokenValue);
+        doNothing().when(tokenFacade).remove(refreshTokenObject);
+        doNothing().when(tokenFacade).create(newRefreshTokenObject);
+
+        AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = authenticationService.refreshUserSession(exampleRefreshTokenValue, account.getLogin());
+        assertNotNull(accessAndRefreshTokensDTO);
+        assertEquals(newExampleAccessTokenValue, accessAndRefreshTokensDTO.getAccessToken());
+        assertEquals(newExampleRefreshTokenValue, accessAndRefreshTokensDTO.getRefreshToken());
+    }
+
+    @Test
+    public void refreshUserSessionTestNegativeAccountNotFound() {
+        String exampleLogin = "exampleLoginNo1";
+        String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
+        when(authenticationFacade.findByLogin(exampleLogin)).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> authenticationService.refreshUserSession(exampleRefreshTokenValue, exampleLogin));
+    }
+
+    @Test
+    public void refreshUserSessionTestNegativeTokenNotFound() {
+        Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
+        when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
+        when(tokenFacade.findByTokenValue(exampleRefreshTokenValue)).thenReturn(Optional.empty());
+
+        assertThrows(TokenNotFoundException.class, () -> authenticationService.refreshUserSession(exampleRefreshTokenValue, account.getLogin()));
+    }
+
+    @Test
+    public void refreshUserSessionTestNegativeAccountCouldNotAuthenticate() {
+        Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        account.setBlocked(true);
+        String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
+        Token refreshTokenObject = new Token(exampleRefreshTokenValue, account, Token.TokenType.REFRESH_TOKEN);
+        when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
+        when(tokenFacade.findByTokenValue(exampleRefreshTokenValue)).thenReturn(Optional.of(refreshTokenObject));
+
+        assertThrows(AccountAuthenticationException.class, () -> authenticationService.refreshUserSession(exampleRefreshTokenValue, account.getLogin()));
+    }
+
+    @Test
+    public void refreshUserSessionTestNegativeTokenNotValid() {
+        Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
+        Token refreshTokenObject = new Token(exampleRefreshTokenValue, account, Token.TokenType.REFRESH_TOKEN);
+        when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
+        when(tokenFacade.findByTokenValue(exampleRefreshTokenValue)).thenReturn(Optional.of(refreshTokenObject));
+        when(jwtProvider.isTokenValid(exampleRefreshTokenValue, account)).thenReturn(false);
+
+        assertThrows(TokenNotValidException.class, () -> authenticationService.refreshUserSession(exampleRefreshTokenValue, account.getLogin()));
     }
 }

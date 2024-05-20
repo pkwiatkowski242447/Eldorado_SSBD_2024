@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.Token;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.Optional;
@@ -91,6 +91,26 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
                     .setParameter("accountId", accountId);
             return Optional.of(query.getSingleResult());
 
+        } catch (PersistenceException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Retrieves a Token based on its value.
+     *
+     * @param tokenValue Value of the token to be found.
+     * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
+     */
+    @PermitAll
+    public Optional<Token> findByTokenValue(String tokenValue) {
+        try {
+            TypedQuery<Token> query = getEntityManager()
+                    .createNamedQuery("Token.findByTokenValue", Token.class)
+                    .setParameter("tokenValue", tokenValue);
+            Token token = query.getSingleResult();
+            entityManager.refresh(token);
+            return Optional.of(token);
         } catch (PersistenceException e) {
             return Optional.empty();
         }

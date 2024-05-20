@@ -3,7 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AuthenticationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationCodeDTO;
 
 import static org.junit.jupiter.api.Assertions.*;
 
