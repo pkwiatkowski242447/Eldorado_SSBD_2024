@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingEventMessages;
@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = DatabaseConsts.PARKING_EVENT_TABLE)
-@ToString(callSuper = true)
 @NoArgsConstructor
 public class ParkingEvent extends AbstractEntity implements Serializable {
 
@@ -51,8 +50,7 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @NotNull(message = ParkingEventMessages.DATE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_DATE_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter
-    @Setter
+    @Getter @Setter
     private LocalDateTime date;
 
     /**
@@ -61,8 +59,7 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @NotNull(message = ParkingEventMessages.EVENT_TYPE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
-    @Getter
-    @Setter
+    @Getter @Setter
     private EventType type;
 
     /**
@@ -77,5 +74,19 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
         this.reservation = reservation;
         this.date = time;
         this.type = type;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the parking event object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .toString();
     }
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,6 @@ import java.util.UUID;
 /**
  * Data transfer object used in returning account.
  */
-@ToString(callSuper = true)
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -90,5 +90,20 @@ public class AccountOutputDTO extends AccountSignableDTO {
         this.lastname = lastname;
         this.name = name;
         this.email = email;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the AccountOutputDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("Id: ", id)
+                .append(super.toString())
+                .toString();
     }
 }

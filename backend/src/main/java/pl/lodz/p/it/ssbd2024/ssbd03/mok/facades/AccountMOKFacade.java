@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @see Account
  */
-
 @Slf4j
 @Repository
 @TxTracked
@@ -130,7 +129,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -157,7 +155,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -184,7 +181,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -210,7 +206,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -281,7 +276,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -305,7 +299,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -331,7 +324,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -356,7 +348,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -383,7 +374,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -409,7 +399,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -436,7 +425,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -477,7 +465,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -505,7 +492,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
-            log.error(exception.getMessage());
             return new ArrayList<>();
         }
     }

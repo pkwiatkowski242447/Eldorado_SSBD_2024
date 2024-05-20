@@ -7,7 +7,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -33,21 +32,11 @@ public class JWTProvider {
     @Value("${authentication.code.validity.period.length.minutes}")
     private int authenticationCodeValidityLength;
 
+    @Value("${jwt.token.validity.period.length.minutes}")
+    private int jwtTokenValidityLength;
+
     @Value("${secret.key}")
     private String secretKey;
-
-//    /**
-//     * Generates random secret key used for signing tokens.
-//     * New key is after each system boot.
-//     */
-//    @PostConstruct
-//    private void generateSignInKey() {
-//        byte[] keyBytes = new byte[JWTConsts.SECRET_KEY_LENGTH];
-//        for (int i = 0; i < keyBytes.length; i++) {
-//            keyBytes[i] = (byte) Math.floor(Math.random() * 128);
-//        }
-//        this.secretKey = Base64.getEncoder().encodeToString(keyBytes);
-//    }
 
     /**
      * Generates new JSON Web Token used to keep track of user session.
@@ -73,7 +62,7 @@ public class JWTProvider {
                 .withClaim(JWTConsts.ACCOUNT_ID, account.getId().toString())
                 .withClaim(JWTConsts.USER_LEVELS, listOfRoles)
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
+                .withExpiresAt(Instant.now().plus(this.jwtTokenValidityLength, ChronoUnit.MINUTES))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }

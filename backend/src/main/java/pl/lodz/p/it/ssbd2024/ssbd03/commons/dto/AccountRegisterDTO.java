@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Data transfer object used in creating new account.
@@ -35,4 +36,18 @@ public class AccountRegisterDTO {
 
     @Schema(description = "Language used natively in user browser", example = "pl", requiredMode = Schema.RequiredMode.REQUIRED)
     private String language;
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the AccountRegisterDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("Login: ", login)
+                .toString();
+    }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.UUID;
 
@@ -52,5 +53,20 @@ public abstract class UserLevelDTO {
         this.id = id;
         this.version = version;
         this.roleName = roleName;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the UserLevelDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("Id: ", id)
+                .append("Version: ", version)
+                .toString();
     }
 }

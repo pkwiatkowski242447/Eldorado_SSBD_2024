@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
@@ -13,8 +14,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +32,6 @@ import java.util.Set;
 @Table(name = DatabaseConsts.ACCOUNT_TABLE)
 @SecondaryTable(name = DatabaseConsts.PERSONAL_DATA_TABLE)
 @Getter
-@ToString(callSuper = true)
 @NoArgsConstructor
 @NamedQueries({
         // General queries
@@ -205,7 +203,6 @@ public class Account extends AbstractEntity {
     @NotBlank(message = AccountMessages.PASSWORD_BLANK)
     @Size(min = AccountsConsts.PASSWORD_LENGTH, max = AccountsConsts.PASSWORD_LENGTH, message = AccountMessages.PASSWORD_INVALID_LENGTH)
     @Column(name = DatabaseConsts.ACCOUNT_PASSWORD_COLUMN, nullable = false, length = 60)
-    @ToString.Exclude
     @Setter
     private String password;
 
@@ -287,8 +284,7 @@ public class Account extends AbstractEntity {
     @Size(min = AccountsConsts.USER_LEVEL_MIN_SIZE, message = AccountMessages.USER_LEVEL_EMPTY)
     @Size(max = AccountsConsts.USER_LEVEL_MAX_SIZE, message = AccountMessages.USER_LEVEL_FULL)
     @OneToMany(mappedBy = DatabaseConsts.ACCOUNT_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
-    //TODO: Rozwiązanie konfliktu z uprawnieniami przy wykonywaniu operacji Refresh (gdyż jest kasada) + uprawnienia do edycji (i ewentualnie rozwiązanie kwestii kasady Merge)
-    @ToString.Exclude
+    //TODO: Rozwiązanie konfliktu z uprawnieniami przy wykonywaniu operacji Refresh (gdyż jest kaskada) + uprawnienia do edycji (i ewentualnie rozwiązanie kwestii kasady Merge)
     private final Set<UserLevel> userLevels = new HashSet<>();
 
     /**
@@ -313,8 +309,7 @@ public class Account extends AbstractEntity {
     @NotBlank(message = AccountMessages.PHONE_NUMBER_BLANK)
     @Pattern(regexp = AccountsConsts.PHONE_NUMBER_REGEX, message = AccountMessages.PHONE_NUMBER_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_PHONE_NUMBER_COLUMN, nullable = false, length = 32)
-    @Getter
-    @Setter
+    @Getter @Setter
     private String phoneNumber;
 
     /**
@@ -412,5 +407,20 @@ public class Account extends AbstractEntity {
         this.blockedTime = null;
         // Reset unsuccessful login counter
         this.getActivityLog().setUnsuccessfulLoginCounter(0);
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the account object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .append("Login: ", login)
+                .toString();
     }
 }

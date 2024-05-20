@@ -20,6 +20,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Repository used to manage Accounts Entities in the database
+ * for authentication purposes.
+ *
+ * @see Account
+ */
 @Slf4j
 @Repository
 @TxTracked

@@ -1,10 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 
@@ -15,7 +13,6 @@ import java.util.Set;
  */
 @Getter @Setter
 @NoArgsConstructor
-@ToString(callSuper = true)
 public class AccountModifyDTO extends AccountSignableDTO {
     @Schema(description = "First name of the user", example = "Boleslaw", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
@@ -43,5 +40,18 @@ public class AccountModifyDTO extends AccountSignableDTO {
         this.lastname = lastname;
         this.phoneNumber = phoneNumber;
         this.twoFactorAuth = twoFactorAuth;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the AccountModifyDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .toString();
     }
 }

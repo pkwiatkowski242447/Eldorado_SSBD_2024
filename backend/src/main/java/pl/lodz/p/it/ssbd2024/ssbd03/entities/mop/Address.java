@@ -4,9 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.AddressConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.AddressMessages;
@@ -20,9 +19,11 @@ import java.io.Serializable;
  * @see Parking
  */
 @Embeddable
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@EqualsAndHashCode
 public class Address implements Serializable {
 
     /**
@@ -56,4 +57,17 @@ public class Address implements Serializable {
     @Size(max = AddressConsts.STREET_MAX_LENGTH, message = AddressMessages.STREET_NAME_TOO_LONG)
     @Column(name = DatabaseConsts.PARKING_STREET_COLUMN, nullable = false)
     private String street;
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the address object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .toString();
+    }
 }

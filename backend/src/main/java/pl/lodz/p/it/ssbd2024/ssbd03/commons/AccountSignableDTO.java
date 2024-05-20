@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientDTO;
@@ -22,7 +23,6 @@ import java.util.*;
  */
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter @Setter
 public abstract class AccountSignableDTO implements SignableDTO {
     @Schema(description = "String identifier linked with Account", example = "boleslawchrobry", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -68,5 +68,20 @@ public abstract class AccountSignableDTO implements SignableDTO {
         }
 
         return list;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the AccountSignableDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("Login: ", login)
+                .append("Version: ", version)
+                .toString();
     }
 }

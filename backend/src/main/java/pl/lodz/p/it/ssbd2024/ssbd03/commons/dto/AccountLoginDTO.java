@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Data Transfer Object used to authenticate.
@@ -25,4 +26,18 @@ public class AccountLoginDTO {
 
     @Schema(description = "String of characters that specify language setting in the user browser.", example = "pl", requiredMode = Schema.RequiredMode.REQUIRED)
     private String language;
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the AccountLoginDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("login", login)
+                .toString();
+    }
 }

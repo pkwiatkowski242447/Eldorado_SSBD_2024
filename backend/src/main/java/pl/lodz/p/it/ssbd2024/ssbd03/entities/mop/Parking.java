@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.ParkingConsts;
@@ -27,7 +28,6 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 @UniqueConstraint(columnNames = {DatabaseConsts.PARKING_CITY_COLUMN, DatabaseConsts.PARKING_ZIP_CODE_COLUMN, DatabaseConsts.PARKING_STREET_COLUMN})
         }
 )
-@ToString(callSuper = true)
 @NoArgsConstructor
 @NamedQueries({
         @NamedQuery(
@@ -73,8 +73,16 @@ public class Parking extends AbstractEntity {
     @Size(min = ParkingConsts.LIST_OF_SECTORS_MIN_SIZE, message = ParkingMessages.LIST_OF_SECTORS_EMPTY)
     @Size(max = ParkingConsts.LIST_OF_SECTORS_MAX_SIZE, message = ParkingMessages.LIST_OF_SECTORS_FULL)
     @OneToMany(mappedBy = DatabaseConsts.PARKING_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
-    @ToString.Exclude
     private List<Sector> sectors = new ArrayList<>();
+
+    /**
+     * Constructs a new parking
+     *
+     * @param address Parking's address
+     */
+    public Parking(Address address) {
+        this.address = address;
+    }
 
     /**
      * Add a new sector to the Parking. Sector is created and managed by the Parking.
@@ -110,11 +118,16 @@ public class Parking extends AbstractEntity {
     }
 
     /**
-     * Constructs a new parking
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
      *
-     * @param address Parking's address
+     * @return String representation of the parking object.
      */
-    public Parking(Address address) {
-        this.address = address;
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .toString();
     }
 }

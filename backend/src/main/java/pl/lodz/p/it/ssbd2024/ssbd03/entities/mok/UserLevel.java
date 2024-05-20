@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
@@ -25,7 +26,6 @@ import java.io.Serializable;
 )
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = DatabaseConsts.DISCRIMINATOR_COLUMN, discriminatorType = DiscriminatorType.STRING)
-@ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class UserLevel extends AbstractEntity implements Serializable {
 
@@ -46,5 +46,19 @@ public abstract class UserLevel extends AbstractEntity implements Serializable {
 
     public UserLevel(Long version) {
         super(version);
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the user level object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .toString();
     }
 }

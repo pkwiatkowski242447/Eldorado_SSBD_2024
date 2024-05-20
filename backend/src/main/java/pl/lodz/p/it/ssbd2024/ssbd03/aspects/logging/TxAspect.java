@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -30,10 +29,12 @@ public class TxAspect {
     private static final Set<String> transactionIds = new HashSet<>();
 
     /**
-     * Pointcut definition for every method or class with @Transactional annotation (from org.springframework.transaction.annotation)
-     * effectively executing corresponding advice method for every transactional call of any method.
+     * Pointcut definition for every method or class with @TxTracked annotation (from pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging)
+     * effectively executing corresponding advice method for every call of any method annotated with this annotation, thus
+     * logging also transaction state.
      */
-    @Pointcut(value = "@annotation(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked) || @within(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked)")
+    @Pointcut(value = "@annotation(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked) || " +
+            "@within(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked)")
     private void txPointcut() {}
 
     /**
@@ -64,13 +65,14 @@ public class TxAspect {
         StringBuilder message = new StringBuilder("Method call: ");
         message.append(proceedingJoinPoint.getSignature().getName());
         message.append(" | Class: ").append(proceedingJoinPoint.getTarget().getClass().getSimpleName());
-        Object result = new Object();
+        Object result;
         try {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             Class<?> transactionSynchronizationRegistry = contextClassLoader.loadClass("com.atomikos.icatch.jta.TransactionSynchronizationRegistryImp");
 
             Method getTransactionKey = transactionSynchronizationRegistry.getMethod("getTransactionKey", (Class<?>[]) null);
             Transaction transaction = (Transaction) getTransactionKey.invoke(transactionSynchronizationRegistry.getDeclaredConstructor().newInstance());
+
             if (transaction.toString() != null) transactionKey = transaction.toString();
             else transactionKey = "NULL";
 
@@ -82,19 +84,22 @@ public class TxAspect {
 
             try {
                 message.append(" | Transaction key: ").append(transactionKey != null ? transactionKey : "NULL");
-                message.append(" | User: ").append(null != SecurityContextHolder.getContext().getAuthentication() ? SecurityContextHolder.getContext().getAuthentication().getName() : "--ANONYMOUS--");
-            } catch (Exception e) {
-                log.error(" | Unexpected exception within aspect: ", e);
-                throw e;
+                message.append(" | User: ").append(null != SecurityContextHolder.getContext().getAuthentication() ? SecurityContextHolder.getContext().getAuthentication().getName() : "GUEST");
+            } catch (Exception exception) {
+                log.error(" | Unexpected exception: {} within aspect occurred due to: ", exception.getClass().getSimpleName(), exception.getCause());
+                throw exception;
             }
             result = proceedingJoinPoint.proceed();
-        } catch (Throwable e) {
-            message.append(" | Thrown exception: ").append(e);
-            log.error(message.toString(), e);
-            throw e;
+        } catch (Throwable throwable) {
+            message.append(" | Thrown exception: ").append(throwable);
+            log.error(message.toString(), throwable);
+            throw throwable;
         }
 
-        message.append(" | Returned: ").append(result).append(" ");
+        message.append(" | Returned");
+        if (result != null) message.append(": ").append(result).append(".");
+        else message.append("no value.");
+
         log.info(message.toString());
 
         return result;

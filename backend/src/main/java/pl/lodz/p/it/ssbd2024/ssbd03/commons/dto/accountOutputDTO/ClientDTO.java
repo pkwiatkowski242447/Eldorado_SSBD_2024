@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.UUID;
 
@@ -11,7 +12,6 @@ import java.util.UUID;
  * Data transfer object used for representing Client user level.
  */
 @Getter @Setter
-@ToString(callSuper = true)
 public class ClientDTO extends UserLevelDTO {
     @Schema(description = "Type of client", example = "BASIC", requiredMode = Schema.RequiredMode.REQUIRED)
     private String clientType;
@@ -32,5 +32,19 @@ public class ClientDTO extends UserLevelDTO {
     public ClientDTO(UUID id, Long version, String clientType) {
         super(id, version, "CLIENT");
         this.clientType = clientType;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the ClientDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .toString();
     }
 }
