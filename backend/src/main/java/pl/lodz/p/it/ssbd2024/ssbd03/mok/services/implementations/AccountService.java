@@ -27,6 +27,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFound
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.CurrentPasswordAndNewPasswordAreTheSameException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.PasswordPreviouslyUsedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
@@ -144,6 +145,7 @@ public class AccountService implements AccountServiceInterface {
             throws ApplicationBaseException {
         Account newClientAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newClientAccount.setAccountLanguage(language);
+        newClientAccount.getPreviousPasswords().add(newClientAccount.getPassword());
         UserLevel clientLevel = new Client();
         clientLevel.setAccount(newClientAccount);
         newClientAccount.addUserLevel(clientLevel);
@@ -183,6 +185,7 @@ public class AccountService implements AccountServiceInterface {
     public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newStaffAccount.setAccountLanguage(language);
+        newStaffAccount.getPreviousPasswords().add(newStaffAccount.getPassword());
         UserLevel staffUserLevel = new Staff();
         staffUserLevel.setAccount(newStaffAccount);
         newStaffAccount.addUserLevel(staffUserLevel);
@@ -222,6 +225,7 @@ public class AccountService implements AccountServiceInterface {
     public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newAdminAccount.setAccountLanguage(language);
+        newAdminAccount.getPreviousPasswords().add(newAdminAccount.getPassword());
         UserLevel adminUserLevel = new Admin();
         adminUserLevel.setAccount(newAdminAccount);
         newAdminAccount.addUserLevel(adminUserLevel);
@@ -282,11 +286,13 @@ public class AccountService implements AccountServiceInterface {
      *                                  method.
      */
     @RolesAllowed({Roles.ANONYMOUS})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class, noRollbackFor = PasswordPreviouslyUsedException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
-        Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue)
-                .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
+        Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(TokenNotFoundException::new);
+
+        this.tokenFacade.remove(tokenObject);
+
         if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), tokenObject.getAccount()))
             throw new TokenNotValidException(I18n.TOKEN_NOT_VALID_EXCEPTION);
 
@@ -294,10 +300,14 @@ public class AccountService implements AccountServiceInterface {
         if (account.getBlocked()) throw new AccountBlockedException();
         else if (!account.getActive()) throw new AccountNotActivatedException();
 
+        for (String passwordHash : account.getPreviousPasswords()) {
+            if (passwordEncoder.matches(newPassword, passwordHash)) throw new PasswordPreviouslyUsedException();
+        }
+
+        account.getPreviousPasswords().add(newPassword);
+
         account.setPassword(this.passwordEncoder.encode(newPassword));
         this.accountFacade.edit(account);
-
-        this.tokenFacade.remove(tokenObject);
     }
 
     /**
@@ -748,8 +758,10 @@ public class AccountService implements AccountServiceInterface {
             throw new IncorrectPasswordException();
         }
 
-        if (passwordEncoder.matches(newPassword, passwordFromDatabase)) {
-            throw new CurrentPasswordAndNewPasswordAreTheSameException();
+        for (String hashedPassword : account.getPreviousPasswords()) {
+            if (passwordEncoder.matches(newPassword, hashedPassword)) {
+                throw new PasswordPreviouslyUsedException();
+            }
         }
 
         account.setPassword(newPasswordEncoded);

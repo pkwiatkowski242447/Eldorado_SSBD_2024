@@ -208,6 +208,18 @@ public class Account extends AbstractEntity {
     private String password;
 
     /**
+     * Set containing all past password hashes for given user account.
+     */
+    @Column(name = DatabaseConsts.ACCOUNT_PAST_PASSWORD_COLUMN)
+    @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = DatabaseConsts.PAST_PASSWORD_TABLE,
+            joinColumns = @JoinColumn(name = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN)
+            //uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN, DatabaseConsts.PAST_PASSWORD_VALUE_COLUMN})
+    )
+    @Getter
+    private final Set<String> previousPasswords = new HashSet<>();
+
+    /**
      * Variable indicating whether the user account is verified.
      */
     @NotNull(message = AccountMessages.VERIFIED_NULL)
@@ -410,7 +422,12 @@ public class Account extends AbstractEntity {
         this.getActivityLog().setUnsuccessfulLoginCounter(0);
     }
 
-
+    /**
+     * Method used to establish whether user account could be authenticated to.
+     * If it is either blocked or not activated yet, then boolean flag of false is returned.
+     * Otherwise, true is returned.
+     * @return Boolean flag indicating whether account could be authenticated to.
+     */
     public boolean couldAuthenticate() {
         return !this.getBlocked() || this.getActive();
     }
