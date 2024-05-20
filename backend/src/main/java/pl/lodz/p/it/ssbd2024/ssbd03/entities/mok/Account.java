@@ -214,7 +214,6 @@ public class Account extends AbstractEntity {
     @ElementCollection(targetClass = String.class)
     @CollectionTable(name = DatabaseConsts.PAST_PASSWORD_TABLE,
             joinColumns = @JoinColumn(name = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN)
-            //uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN, DatabaseConsts.PAST_PASSWORD_VALUE_COLUMN})
     )
     @Getter
     private final Set<String> previousPasswords = new HashSet<>();
