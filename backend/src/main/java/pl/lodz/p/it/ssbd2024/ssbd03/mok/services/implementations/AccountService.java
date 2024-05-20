@@ -39,8 +39,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterf
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -63,37 +63,39 @@ public class AccountService implements AccountServiceInterface {
     @Value("${mail.account.confirm.email.url}")
     private String accountConfirmEmail;
 
-    @Value("${account.creation.confirmation.period.length.hours}")
-    private int accountCreationConfirmationPeriodLengthHours;
-    @Value("${account.password.reset.period.length.minutes}")
-    private int passwordResetPeriodLengthMinutes;
-    @Value("${email.change.confirmation.period.length.hours}")
-    private int emailChangeConfirmationPeriodLengthHours;
-
     /**
      * AccountFacade used for operations on account entities.
      */
     private final AccountMOKFacade accountFacade;
+
     /**
      * PasswordEncoder used for encoding passwords.
      */
     private final PasswordEncoder passwordEncoder;
+
     /**
      * TokenFacade used for operations on token entities.
      */
     private final TokenFacade tokenFacade;
+
     /**
      * Component used to send e-mail messages to user e-mail address (depending on the actions they perform).
      */
     private final MailProvider mailProvider;
+
     /**
-     * TokenProvider used for operations on TOKENS.
+     * JWTProvider used for operations on TOKENS.
      */
     private final JWTProvider jwtProvider;
-    /**
-     * TokenServiceInterface used for operations on tokens.
-     */
 
+    /**
+     * TokenProvider component used for generating action tokens.
+     */
+    private final TokenProvider tokenProvider;
+
+    /**
+     * Facade component used to manage user levels in the database.
+     */
     private final UserLevelFacade userLevelFacade;
 
     /**
@@ -112,12 +114,14 @@ public class AccountService implements AccountServiceInterface {
                           TokenFacade tokenFacade,
                           MailProvider mailProvider,
                           JWTProvider jwtProvider,
+                          TokenProvider tokenProvider,
                           UserLevelFacade userLevelFacade) {
         this.accountFacade = accountFacade;
         this.passwordEncoder = passwordEncoder;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
         this.jwtProvider = jwtProvider;
+        this.tokenProvider = tokenProvider;
         this.userLevelFacade = userLevelFacade;
     }
 
@@ -146,10 +150,10 @@ public class AccountService implements AccountServiceInterface {
 
         this.accountFacade.create(newClientAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newClientAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
-        tokenFacade.create(new Token(tokenValue, newClientAccount, Token.TokenType.REGISTER));
+        Token accountActivationToken = tokenProvider.generateAccountActivationToken(newClientAccount);
+        tokenFacade.create(accountActivationToken);
 
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(accountActivationToken.getTokenValue().getBytes()));
         String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
         mailProvider.sendRegistrationConfirmEmail(newClientAccount.getName(),
@@ -185,10 +189,10 @@ public class AccountService implements AccountServiceInterface {
 
         accountFacade.create(newStaffAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newStaffAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
-        tokenFacade.create(new Token(tokenValue, newStaffAccount, Token.TokenType.REGISTER));
+        Token accountActivationToken = tokenProvider.generateAccountActivationToken(newStaffAccount);
+        tokenFacade.create(accountActivationToken);
 
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(accountActivationToken.getTokenValue().getBytes()));
         String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
         mailProvider.sendRegistrationConfirmEmail(newStaffAccount.getName(),
@@ -224,10 +228,10 @@ public class AccountService implements AccountServiceInterface {
 
         accountFacade.create(newAdminAccount);
 
-        String tokenValue = jwtProvider.generateActionToken(newAdminAccount, this.accountCreationConfirmationPeriodLengthHours, ChronoUnit.HOURS);
-        tokenFacade.create(new Token(tokenValue, newAdminAccount, Token.TokenType.REGISTER));
+        Token accountActivationToken = tokenProvider.generateAccountActivationToken(newAdminAccount);
+        tokenFacade.create(accountActivationToken);
 
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(accountActivationToken.getTokenValue().getBytes()));
         String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
 
         mailProvider.sendRegistrationConfirmEmail(newAdminAccount.getName(),
@@ -255,11 +259,10 @@ public class AccountService implements AccountServiceInterface {
 
         tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).ifPresent(tokenFacade::remove);
 
-        String tokenValue = this.jwtProvider.generateActionToken(account, this.passwordResetPeriodLengthMinutes, ChronoUnit.MINUTES);
-        Token passwordToken = new Token(tokenValue, account, Token.TokenType.RESET_PASSWORD);
-        this.tokenFacade.create(passwordToken);
+        Token passwordResetToken = tokenProvider.generatePasswordResetToken(account);
+        this.tokenFacade.create(passwordResetToken);
 
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(passwordResetToken.getTokenValue().getBytes()));
         String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
 
         this.mailProvider.sendPasswordResetEmail(account.getName(),
@@ -522,11 +525,10 @@ public class AccountService implements AccountServiceInterface {
 
         tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
 
-        String tokenValue = this.jwtProvider.generateEmailToken(account, newEmail, emailChangeConfirmationPeriodLengthHours);
-        Token emailToken = new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
-        this.tokenFacade.create(emailToken);
+        Token emailChangeToken = tokenProvider.generateEmailChangeToken(account, newEmail);
+        this.tokenFacade.create(emailChangeToken);
 
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(tokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(emailChangeToken.getTokenValue().getBytes()));
         String confirmationURL = accountConfirmEmail + encodedTokenValue;
 
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
@@ -543,22 +545,20 @@ public class AccountService implements AccountServiceInterface {
     @RolesAllowed({Roles.AUTHENTICATED})
     public void resendEmailConfirmation() throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Account account = accountFacade.findByLogin(login)
-                .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
-        Token dbToken = tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId())
-                .orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        Token dbToken = tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow(TokenNotFoundException::new);
 
         String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
-        String newTokenValue = jwtProvider.generateEmailToken(account, newEmail, emailChangeConfirmationPeriodLengthHours);
+        Token emailChangeToken = tokenProvider.generateEmailChangeToken(account, newEmail);
 
-        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(newTokenValue.getBytes()));
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(emailChangeToken.getTokenValue().getBytes()));
         String confirmationURL = accountConfirmEmail + encodedTokenValue;
 
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
 
-        dbToken.setTokenValue(newTokenValue);
-        tokenFacade.edit(dbToken);
+        tokenFacade.remove(dbToken);
+        tokenFacade.create(emailChangeToken);
     }
 
     /**

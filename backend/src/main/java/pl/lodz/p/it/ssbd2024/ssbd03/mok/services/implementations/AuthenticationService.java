@@ -57,7 +57,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     @Value("${account.maximum.failed.login.attempt.counter}")
     private int failedLoginAttemptMaxVal;
 
-
     /**
      * Facade component used for operations on accounts.
      */
@@ -272,7 +271,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         }
 
         String hashedAuthCode = passwordEncoder.encode(authCodeValue);
-        String tokenValue = this.jwtProvider.generateMultiFactorAuthToken(hashedAuthCode);
+        Token multiFactorAuthToken = this.tokenProvider.generateMultiFactorAuthToken(account, hashedAuthCode);
 
         mailProvider.sendTwoFactorAuthCode(account.getName(),
                 account.getLastname(),
@@ -280,7 +279,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
                 account.getEmail(),
                 account.getAccountLanguage());
 
-        Token multiFactorAuthToken = new Token(tokenValue, account, Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE);
         this.tokenFacade.create(multiFactorAuthToken);
     }
 

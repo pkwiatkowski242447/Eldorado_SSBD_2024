@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
@@ -411,6 +413,36 @@ public class Account extends AbstractEntity {
 
     public boolean couldAuthenticate() {
         return !this.getBlocked() || this.getActive();
+    }
+
+    /**
+     * Equals method implementation used for comparing account
+     * objects.
+     *
+     * @param object Object to compare to this object.
+     * @return Boolean flag indicating whether objects are equal (true)
+     * or not (false)
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+
+        if (object == null || getClass() != object.getClass()) return false;
+
+        Account account = (Account) object;
+
+        return new EqualsBuilder().append(login, account.login).isEquals();
+    }
+
+    /**
+     * HashCode implementation fulfilling the equals and hashCode
+     * contract.
+     *
+     * @return HashCode value of this object.
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(login).toHashCode();
     }
 
     /**
