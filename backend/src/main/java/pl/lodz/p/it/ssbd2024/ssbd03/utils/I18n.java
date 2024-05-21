@@ -16,6 +16,7 @@ public class I18n {
     // Account reset own password exceptions
     public static final String SET_NEW_PASSWORD_IS_THE_SAME_AS_CURRENT_ONE = "account.reset.password.same.passwords.exception";
     public static final String INCORRECT_PASSWORD = "account.reset.password.incorrect.current.password";
+    public static final String PASSWORD_PREVIOUSLY_USED = "account.reset.password.password.previously.used.exception";
 
     // Account internationalization keys
     public static final String ACCOUNT_LOGIN_ALREADY_TAKEN = "account.login.already.taken.exception";

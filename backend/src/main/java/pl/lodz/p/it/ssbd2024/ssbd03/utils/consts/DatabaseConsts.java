@@ -19,6 +19,7 @@ public class DatabaseConsts {
 
     public static final String ACCOUNT_LOGIN_COLUMN = "login";
     public static final String ACCOUNT_PASSWORD_COLUMN = "password";
+    public static final String ACCOUNT_PAST_PASSWORD_COLUMN = "past_password";
     public static final String ACCOUNT_VERIFIED_COLUMN = "verified";
     public static final String ACCOUNT_ACTIVE_COLUMN = "active";
     public static final String ACCOUNT_BLOCKED_COLUMN = "blocked";
@@ -34,6 +35,12 @@ public class DatabaseConsts {
     public static final String ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_IP = "last_unsuccessful_login_ip";
 
     public static final String UNSUCCESSFUL_LOGIN_COUNTER = "unsuccessful_login_counter";
+
+    // public.past_password table
+
+    public static final String PAST_PASSWORD_TABLE = "past_password";
+    public static final String PAST_PASSWORD_ACCOUNT_ID_COLUMN = "account_id";
+    public static final String PAST_PASSWORD_VALUE_COLUMN = "password";
 
     // public.personal_data table
 

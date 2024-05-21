@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.annotation.SecurityTestExecutionListeners;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,8 +24,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissin
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.CurrentPasswordAndNewPasswordAreTheSameException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.PasswordPreviouslyUsedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
@@ -41,7 +40,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
 import java.lang.reflect.Field;
-import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -825,6 +823,7 @@ public class AccountServiceMockTest {
         String currentPassword = "CurrentPassword";
         String newPassword = "NewPassword";
         Account account = new Account("login", currentPassword, "firstName", "lastName", "test@email.com", "123123123");
+        account.getPreviousPasswords().add(currentPassword);
 
         when(encoder.encode(newPassword)).thenReturn(newPassword);
         when(accountMOKFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
@@ -868,12 +867,13 @@ public class AccountServiceMockTest {
     void changePasswordSelfTestCurrentPasswordAndNewPasswordAreTheSame() {
         String currentPassword = "CurrentPassword";
         Account account = new Account("login", currentPassword, "firstName", "lastName", "test@email.com", "123123123");
+        account.getPreviousPasswords().add(currentPassword);
 
         when(encoder.encode(currentPassword)).thenReturn(currentPassword);
         when(accountMOKFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
         when(encoder.matches(currentPassword, account.getPassword())).thenReturn(true);
 
-        assertThrows(CurrentPasswordAndNewPasswordAreTheSameException.class,
+        assertThrows(PasswordPreviouslyUsedException.class,
                 () -> accountService.changePasswordSelf(currentPassword, currentPassword, account.getLogin()));
 
         assertEquals(currentPassword, account.getPassword());
