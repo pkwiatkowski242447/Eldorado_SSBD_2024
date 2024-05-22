@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountSignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
@@ -21,7 +20,6 @@ import java.util.UUID;
  * Data transfer object used in returning account.
  */
 @Getter @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class AccountOutputDTO extends AccountSignableDTO {
     @Schema(description = "UUID identifier linked with account", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)

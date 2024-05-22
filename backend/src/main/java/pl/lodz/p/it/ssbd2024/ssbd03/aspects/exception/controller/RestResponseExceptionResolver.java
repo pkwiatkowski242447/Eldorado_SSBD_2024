@@ -34,7 +34,6 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
                 .body(new ExceptionDTO(I18n.PATH_NOT_FOUND_EXCEPTION));
     }
 
-    //TODO zmiana ExceptionDTO
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return ResponseEntity.badRequest()

@@ -2,7 +2,6 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.UUID;
 
@@ -10,7 +9,6 @@ import java.util.UUID;
  * Data transfer object used for representing Staff user level.
  */
 @Getter @Setter
-@ToString(callSuper = true)
 public class StaffDTO extends UserLevelDTO {
 
     /**

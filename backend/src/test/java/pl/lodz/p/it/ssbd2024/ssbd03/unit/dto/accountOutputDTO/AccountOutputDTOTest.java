@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto.accountOutputDTO;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountListDTO;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AccountOutputDTOTest {
 
@@ -223,5 +225,19 @@ public class AccountOutputDTOTest {
         assertEquals(lastnameNo2, accountOutputDTO.getLastname());
         assertEquals(nameNo2, accountOutputDTO.getName());
         assertEquals(emailNo2, accountOutputDTO.getEmail());
+    }
+
+    @Test
+    public void accountOutputDTOToStringPositive() {
+        String superValue = new ToStringBuilder(accountOutputDTO)
+                .append("Login: ", accountOutputDTO.getLogin())
+                .append("Version: ", accountOutputDTO.getVersion())
+                .toString();
+
+        String value = new ToStringBuilder(accountOutputDTO)
+                .append("Id: ", accountOutputDTO.getId())
+                .append(superValue)
+                .toString();
+        assertEquals(value, accountOutputDTO.toString());
     }
 }

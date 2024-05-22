@@ -53,7 +53,7 @@ public class UserLevelMapper {
         return switch (userLevel) {
             case Client client -> new ClientDTO(userLevel.getId(), client.getVersion(), client.getType().toString());
             case Staff staff -> new StaffDTO(userLevel.getId(), staff.getVersion());
-            case Admin admin -> new AdminDTO(userLevel.getId().toString(), admin.getVersion());
+            case Admin admin -> new AdminDTO(userLevel.getId(), admin.getVersion());
             default -> throw new MapperUnexpectedUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         };
     }
