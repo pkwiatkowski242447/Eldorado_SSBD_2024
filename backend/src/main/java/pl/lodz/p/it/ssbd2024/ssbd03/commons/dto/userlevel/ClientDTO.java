@@ -1,9 +1,8 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.UUID;

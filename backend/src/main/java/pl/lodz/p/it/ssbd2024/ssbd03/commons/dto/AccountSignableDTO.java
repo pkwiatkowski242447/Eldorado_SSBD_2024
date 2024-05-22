@@ -1,18 +1,16 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.StaffDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.AdminDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.ClientDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.StaffDTO;
 
 import java.util.*;
 

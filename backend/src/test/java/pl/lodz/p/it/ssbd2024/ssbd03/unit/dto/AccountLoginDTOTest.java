@@ -3,7 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationLoginDTO;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -15,7 +15,7 @@ public class AccountLoginDTOTest {
     private String passwordNo1;
     private String languageNo1;
 
-    private AccountLoginDTO accountLoginDTONo1;
+    private AuthenticationLoginDTO accountLoginDTONo1;
 
     @BeforeEach
     public void init() {
@@ -23,18 +23,18 @@ public class AccountLoginDTOTest {
         passwordNo1 = "examplePasswordNo1";
         languageNo1 = "exampleLanguageNo1";
 
-        accountLoginDTONo1 = new AccountLoginDTO(loginNo1, passwordNo1, languageNo1);
+        accountLoginDTONo1 = new AuthenticationLoginDTO(loginNo1, passwordNo1, languageNo1);
     }
 
     @Test
     public void accountLoginDTONoArgsConstructorTestPositive() {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO();
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO();
         assertNotNull(accountLoginDTO);
     }
 
     @Test
     public void accountLoginDTOAllArgsConstructorAndGettersTestPositive() {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO(loginNo1, passwordNo1, languageNo1);
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO(loginNo1, passwordNo1, languageNo1);
         assertNotNull(accountLoginDTO);
         assertEquals(loginNo1, accountLoginDTO.getLogin());
         assertEquals(passwordNo1, accountLoginDTO.getPassword());

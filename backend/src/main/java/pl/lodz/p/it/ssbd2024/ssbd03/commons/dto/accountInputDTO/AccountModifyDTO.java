@@ -1,10 +1,10 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountSignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
 
 import java.util.Set;
 

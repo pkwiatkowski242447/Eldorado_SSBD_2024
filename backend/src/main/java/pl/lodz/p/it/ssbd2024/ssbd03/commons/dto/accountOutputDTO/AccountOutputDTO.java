@@ -8,10 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountSignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
 
 import java.time.LocalDateTime;
 import java.util.Set;

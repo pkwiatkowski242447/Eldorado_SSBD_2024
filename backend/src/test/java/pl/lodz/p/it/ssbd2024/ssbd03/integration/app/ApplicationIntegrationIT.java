@@ -22,8 +22,8 @@ import org.springframework.http.MediaType;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfigFull;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -33,7 +33,7 @@ import java.util.Base64;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
 import java.util.List;
@@ -70,7 +70,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     public void loginUsingCredentialsEndpointTestPositive() throws Exception {
         RequestSpecification request = RestAssured.given();
 
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jerzybem", "P@ssw0rd!", "pl");
 
         String adminToken = this.login(accountLoginDTO.getLogin(), accountLoginDTO.getPassword(), accountLoginDTO.getLanguage());
 
@@ -121,7 +121,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenLoginIsInvalid() throws Exception {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("iosif_wissarionowicz", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("iosif_wissarionowicz", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
         request.contentType(CONTENT_TYPE);
@@ -143,7 +143,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenPasswordIsInvalid() throws Exception {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!1", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jerzybem", "P@ssw0rd!1", "pl");
         RequestSpecification request = RestAssured.given();
 
         request
@@ -160,7 +160,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenUserIsAlreadyLoggedIn() throws Exception {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jerzybem", "P@ssw0rd!", "pl");
         String previousToken = this.login(accountLoginDTO.getLogin(), accountLoginDTO.getPassword(), accountLoginDTO.getLanguage());
         RequestSpecification request = RestAssured.given();
 
@@ -179,7 +179,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenUserAccountIsNotActive() throws Exception {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jchrystus", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jchrystus", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
         request
@@ -196,7 +196,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenUserIsBlockedByAdmin() throws Exception {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("juleswinnfield", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("juleswinnfield", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
         request
@@ -213,7 +213,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenUserBlockedAccountByLoggingIncorrectlyTooManyTimes() throws Exception {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("vincentvega", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("vincentvega", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
         request
@@ -230,7 +230,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenLanguageIsInvalid() throws Exception {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "SomeStringNotFollowingConstrains");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jerzybem", "P@ssw0rd!", "SomeStringNotFollowingConstrains");
         RequestSpecification request = RestAssured.given();
 
         ExceptionDTO accountConstraintViolationExceptionDTO = request
@@ -486,7 +486,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void getSelfTest() throws JsonProcessingException {
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("jerzybem", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jerzybem", "P@ssw0rd!", "pl");
 
         RequestSpecification request = RestAssured.given();
         request.contentType(CONTENT_TYPE);
@@ -2023,7 +2023,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     private String login(String login, String password, String language) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO(login, password, language);
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO(login, password, language);
 
         RequestSpecification request = RestAssured.given();
         request.contentType(CONTENT_TYPE);
