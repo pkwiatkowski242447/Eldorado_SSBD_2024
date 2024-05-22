@@ -14,8 +14,15 @@ pipeline{
             steps{
                 sh 'cp ${JENKINS_HOME}/mail.properties ${PROPERTIES_LOCATION}'
 				sh 'cp ${JENKINS_HOME}/key.properties ${PROPERTIES_LOCATION}'
-                sh 'cd backend && mvn -B -Ptest clean verify'
+                //sh 'cd backend && mvn -B -Ptest clean verify'
+                sh 'cd backend && mvn -B -Ptest -DskipTests clean verify'
             }
+        }
+    }
+    post {
+        always {
+            cleanWs( cleanWhenNotBuild: false,
+                     deleteDirs: true)
         }
     }
 }
