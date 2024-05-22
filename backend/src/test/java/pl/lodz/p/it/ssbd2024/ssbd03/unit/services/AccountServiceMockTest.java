@@ -216,7 +216,7 @@ public class AccountServiceMockTest {
         when(jwtProvider.isTokenValid(decodedTokenVal, account)).thenReturn(true);
         when(jwtProvider.extractEmail(decodedTokenVal)).thenReturn(null);
 
-        ssertThrows(AccountEmailNullException.class, () -> accountService.confirmEmail(tokenVal));
+        assertThrows(AccountEmailNullException.class, () -> accountService.confirmEmail(tokenVal));
     }
 
     @Test
