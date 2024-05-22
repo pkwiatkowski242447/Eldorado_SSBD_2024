@@ -22,7 +22,13 @@ pipeline{
     post {
         always {
             cleanWs( cleanWhenNotBuilt: false,
+                     cleanWhenFailure: false,
                      deleteDirs: true)
+        }
+        success {
+            dir("${env.WORKSPACE}@tmp") {
+                  deleteDir()
+                }
         }
     }
 }
