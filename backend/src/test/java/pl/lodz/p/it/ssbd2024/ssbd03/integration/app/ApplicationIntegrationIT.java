@@ -25,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfigFull;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
@@ -38,7 +39,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
 import java.util.List;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -233,7 +233,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jerzybem", "P@ssw0rd!", "SomeStringNotFollowingConstrains");
         RequestSpecification request = RestAssured.given();
 
-        ExceptionDTO accountConstraintViolationExceptionDTO = request
+        AccountConstraintViolationExceptionDTO accountConstraintViolationExceptionDTO = request
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mapper.writeValueAsString(accountLoginDTO))
                 .when()
@@ -241,7 +241,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
-                .as(ExceptionDTO.class);
+                .as(AccountConstraintViolationExceptionDTO.class);
 
         assertNotNull(accountConstraintViolationExceptionDTO);
         assertEquals(I18n.ACCOUNT_CONSTRAINT_VIOLATION, accountConstraintViolationExceptionDTO.getMessage());

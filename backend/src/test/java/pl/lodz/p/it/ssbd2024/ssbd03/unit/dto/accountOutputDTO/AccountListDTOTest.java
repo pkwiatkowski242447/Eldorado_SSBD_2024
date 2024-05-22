@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto.accountOutputDTO;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;

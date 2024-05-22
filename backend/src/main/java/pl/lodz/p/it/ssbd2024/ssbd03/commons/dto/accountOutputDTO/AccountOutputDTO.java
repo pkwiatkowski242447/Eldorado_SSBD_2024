@@ -68,11 +68,25 @@ public class AccountOutputDTO extends AccountSignableDTO {
     /***
      * All arguments constructor for AccountOutputDTO - with calling constructor of superclass.
      */
-    public AccountOutputDTO(String login, Long version, Set<UserLevelDTO> userLevelsDto, UUID id, boolean verified,
-                            boolean active, boolean blocked, boolean twoFactorAuth, LocalDateTime blockedTime, LocalDateTime creationDate,
-                            LocalDateTime lastSuccessfulLoginTime, LocalDateTime lastUnsuccessfulLoginTime,
-                            String accountLanguage, String lastSuccessfulLoginIp, String lastUnsuccessfulLoginIp,
-                            String phoneNumber, String lastname, String name, String email) {
+    public AccountOutputDTO(String login,
+                            Long version,
+                            Set<UserLevelDTO> userLevelsDto,
+                            UUID id,
+                            boolean verified,
+                            boolean active,
+                            boolean blocked,
+                            boolean twoFactorAuth,
+                            LocalDateTime blockedTime,
+                            LocalDateTime creationDate,
+                            LocalDateTime lastSuccessfulLoginTime,
+                            LocalDateTime lastUnsuccessfulLoginTime,
+                            String accountLanguage,
+                            String lastSuccessfulLoginIp,
+                            String lastUnsuccessfulLoginIp,
+                            String phoneNumber,
+                            String lastname,
+                            String name,
+                            String email) {
         super(login, version, userLevelsDto);
         this.id = id;
         this.verified = verified;

@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto.authentication;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @Slf4j
-public class AccountLoginDTOTest {
+public class AuthenticationLoginDTOTest {
 
     private String loginNo1;
     private String passwordNo1;
