@@ -21,7 +21,7 @@ pipeline{
     }
     post {
         always {
-            cleanWs( cleanWhenNotBuild: false,
+            cleanWs( cleanWhenNotBuilt: false,
                      deleteDirs: true)
         }
     }
