@@ -29,6 +29,7 @@ public class AccountMessages {
     public static final String EMAIL_TOO_SHORT = "bean.validation.account.email.too.short";
     public static final String EMAIL_TOO_LONG = "bean.validation.account.email.too.long";
 
+    public static final String USER_LEVEL_NULL = "bean.validation.account.user.level.null";
     public static final String USER_LEVEL_EMPTY = "bean.validation.account.user.level.empty";
     public static final String USER_LEVEL_FULL = "bean.validation.account.user.level.full";
 
@@ -37,4 +38,7 @@ public class AccountMessages {
 
     public static final String PHONE_NUMBER_BLANK = "bean.validation.account.phone.number.blank";
     public static final String PHONE_NUMBER_REGEX_NOT_MET = "bean.validation.account.phone.number.regex.not.met";
+
+    public static final String VERSION_NULL = "bean.validation.account.version.null";
+    public static final String VERSION_LESS_THAN_ZERO = "bean.validation.account.version.less.than.zero";
 }

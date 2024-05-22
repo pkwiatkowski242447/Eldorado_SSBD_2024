@@ -74,7 +74,7 @@ public class AccountMapper {
 
         userLevels.forEach(account::addUserLevel);
 
-        account.setTwoFactorAuth(accountModifyDTO.isTwoFactorAuth());
+        account.setTwoFactorAuth(accountModifyDTO.getTwoFactorAuth());
 
         return account;
     }

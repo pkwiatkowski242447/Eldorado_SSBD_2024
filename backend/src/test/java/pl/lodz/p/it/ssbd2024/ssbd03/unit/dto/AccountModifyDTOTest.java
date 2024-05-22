@@ -59,7 +59,7 @@ public class AccountModifyDTOTest {
         assertEquals(nameNo1, accountModifyDTO.getName());
         assertEquals(lastnameNo1, accountModifyDTO.getLastname());
         assertEquals(phoneNumberNo1, accountModifyDTO.getPhoneNumber());
-        assertEquals(twoFactorAuthNo1, accountModifyDTO.isTwoFactorAuth());
+        assertEquals(twoFactorAuthNo1, accountModifyDTO.getTwoFactorAuth());
     }
 
     @Test
@@ -112,12 +112,12 @@ public class AccountModifyDTOTest {
 
     @Test
     public void accountModifyDTOTwoFactorAuthSetterTestPositive() {
-        boolean twoFactorAuthBefore = accountModifyDTONo1.isTwoFactorAuth();
+        boolean twoFactorAuthBefore = accountModifyDTONo1.getTwoFactorAuth();
 
         boolean newTwoFactorAuth = !twoFactorAuthBefore;
         accountModifyDTONo1.setTwoFactorAuth(newTwoFactorAuth);
 
-        boolean twoFactorAuthAfter = accountModifyDTONo1.isTwoFactorAuth();
+        boolean twoFactorAuthAfter = accountModifyDTONo1.getTwoFactorAuth();
 
         assertNotEquals(twoFactorAuthBefore, twoFactorAuthAfter);
         assertNotEquals(twoFactorAuthBefore, newTwoFactorAuth);

@@ -1,15 +1,21 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.*;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.method.MethodValidationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 @Order(3)
@@ -24,10 +30,26 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(I18n.PATH_NOT_FOUND_EXCEPTION));
+    }
+
+    //TODO zmiana ExceptionDTO
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(
+                                new AccountConstraintViolationException(
+                                        ex.getBindingResult()
+                                                .getAllErrors()
+                                                .stream()
+                                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                                .collect(Collectors.toSet())
+                                )
+                        )
+                );
     }
 
     @ExceptionHandler(value = {Exception.class})

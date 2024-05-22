@@ -1221,7 +1221,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                         "violations", Matchers.containsInAnyOrder(
                                 Matchers.equalTo("bean.validation.account.first.name.too.long"),
                                 Matchers.equalTo("bean.validation.account.first.name.regex.not.met")
-
                         )
                 );
 

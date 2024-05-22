@@ -114,7 +114,6 @@ public class AccountController implements AccountControllerInterface {
 
             accountService.blockAccount(UUID.fromString(id));
         } catch (IllegalArgumentException illegalArgumentException) {
-            //TODO check this error handling in other methods after big merging
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
 
@@ -435,7 +434,7 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "409", description = "The account has not been modified due to modification of signed fields.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
     })
     public ResponseEntity<?> modifyAccountSelf(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
-                                               @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
+                                               @Valid @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
         }
@@ -478,7 +477,7 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "409", description = "The account has not been modified due to parallel modification.", content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
     })
     public ResponseEntity<?> modifyUserAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
-                                               @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
+                                               @Valid @RequestBody AccountModifyDTO accountModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
         }

@@ -3,9 +3,13 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.UserLevelMessages;
 
 import java.util.UUID;
 
@@ -21,10 +25,14 @@ import java.util.UUID;
 )
 @Getter @Setter
 public abstract class UserLevelDTO {
+    //TODO validation, certainly...
     @Schema(description = "UUID identifier linked with user level", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID id;
+    @NotNull(message = UserLevelMessages.VERSION_NULL)
+    @Min(value = 0, message = UserLevelMessages.VERSION_LESS_THAN_ZERO)
     @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long version;
+    @NotBlank(message = UserLevelMessages.ROLE_NAME_BLANK)
     @Schema(description = "Name of user level representing by this object", requiredMode = Schema.RequiredMode.REQUIRED)
     private String roleName;
 
