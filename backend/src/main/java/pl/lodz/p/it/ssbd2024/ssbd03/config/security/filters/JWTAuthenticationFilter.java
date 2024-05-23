@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,6 +77,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             } catch (TokenDataExtractionException | TokenNotValidException | AccountNotFoundException exception) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 try (OutputStream outputStream = response.getOutputStream()) {
                     outputStream.write(objectMapper.writeValueAsBytes(new ExceptionDTO(I18n.UNAUTHORIZED_EXCEPTION)));
                 }
