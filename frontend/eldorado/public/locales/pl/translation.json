@@ -47,6 +47,7 @@
   "registerPage.phoneNumberInvalid": "Numer telefonu jest nieprawidłowy",
   "registerPage.hasAccount": "Masz już konto?",
   "registerPage.logIn": "Zaloguj się",
+  "registerPage.passwordInvalid": "Hasło musi zawierać co najmniej jedną wielką literę, jedną małą literę, jedną cyfrę oraz jeden znak specjalny",
 
 
   "forgotPasswordPage.title": "Zapomniałem hasła",
@@ -69,7 +70,8 @@
 
 
   "accountSettings.title": "Zmień ustawienia konta",
-  "accountSettings.authentication": "Uwierzytelnianie",
+  "accountSettings.email": "E-mail",
+  "accountSettings.password": "Hasło",
   "accountSettings.personalInfo": "Dane osobowe",
   "accountSettings.authentication.email": "E-mail",
   "accountSettings.authentication.email.change": "Zmień swój e-mail",
@@ -83,6 +85,18 @@
   "accountSettings.lastNameTooLong": "Nazwisko może mieć maksymalnie 50 znaków",
   "accountSettings.phoneNumberInvalid": "Numer telefonu jest nieprawidłowy",
   "accountSettings.wrongEmail": "Podany adres e-mail jest nieprawidłowy",
+
+  "accountSettings.authentication.oldPassword": "Obecne Hasło",
+  "accountSettings.authentication.newPassword": "Nowe Hasło",
+  "accountSettings.authentication.newPasswordRepeat": "Potwierdź Nowe Hasło",
+  "accountSettings.authentication.password.change": "Zmień Hasło",
+  "accountSettings.passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
+  "accountSettings.passwordTooLong": "Hasło może mieć maksymalnie 60 znaków",
+  "accountSettings.passwordsMustMatch": "Hasła muszą być identyczne",
+  "accountSettings.newPasswordCanNotBeTheSame": "Nowe hasło musi się różnić od starego hasła",
+  "accountSettings.confirmPasswordChange": "Czy na pewno chcesz zmienić hasło?",
+  "accountSettings.popUp.changePasswordOK.title": "Sukces!",
+  "accountSettings.popUp.changePasswordOK.text": "Twoje hasło zostało pomyślnie zmienione.",
 
 
   "accountSettings.users.table.header.login": "Login",

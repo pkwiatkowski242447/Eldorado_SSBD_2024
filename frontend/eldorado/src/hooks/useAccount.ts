@@ -9,7 +9,6 @@ import {RolesEnum} from "@/types/TokenPayload.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
 export const useAccount = () => {
-
     const navigate = useNavigate()
     const {account, setAccount} = useAccountState()
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -39,6 +38,7 @@ export const useAccount = () => {
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('account')
             localStorage.removeItem('etag')
+            setIsAuthenticated(false)
             setAccount(null)
             navigateToMainPage()
         }

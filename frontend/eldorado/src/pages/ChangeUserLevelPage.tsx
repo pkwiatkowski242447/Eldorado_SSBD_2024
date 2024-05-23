@@ -36,6 +36,7 @@ function ChangeUserLevelPage() {
     const {getCurrentAccount} = useAccount();
     const {t} = useTranslation();
 
+    //It has to be that way afaik so ignore the warning and enjoy your day :)
     useEffect(() => {
         getCurrentAccount();
     }, []);

@@ -47,7 +47,7 @@
   "registerPage.phoneNumberInvalid": "Phone number is not valid",
   "registerPage.hasAccount": "Already have an account?",
   "registerPage.logIn": "Log In",
-
+  "registerPage.passwordInvalid": "Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character",
 
   "forgotPasswordPage.title": "Forgot Password",
   "forgotPasswordPage.info": "Enter your email address to reset your password",
@@ -69,7 +69,8 @@
 
 
   "accountSettings.title": "Change your account settings",
-  "accountSettings.authentication": "Authentication",
+  "accountSettings.email": "E-mail",
+  "accountSettings.password": "Password",
   "accountSettings.personalInfo": "Personal Info",
   "accountSettings.authentication.email": "E-mail",
   "accountSettings.authentication.email.change": "Change your email",
@@ -84,6 +85,17 @@
   "accountSettings.phoneNumberInvalid": "Phone number is not valid",
   "accountSettings.wrongEmail": "The email address is not valid",
 
+  "accountSettings.authentication.oldPassword": "Current Password",
+  "accountSettings.authentication.newPassword": "New Password",
+  "accountSettings.authentication.newPasswordRepeat": "Confirm New Password",
+  "accountSettings.authentication.password.change": "Change Password",
+  "accountSettings.passwordTooShort": "Password has to be at least 8 characters long",
+  "accountSettings.passwordTooLong": "Password can be at most 60 characters long",
+  "accountSettings.passwordsMustMatch": "Passwords must match",
+  "accountSettings.newPasswordCanNotBeTheSame": "New password must be different from the old password",
+  "accountSettings.confirmPasswordChange": "Are you sure you want to change your password?",
+  "accountSettings.popUp.changePasswordOK.title": "Success!",
+  "accountSettings.popUp.changePasswordOK.text": "Your password has been successfully changed.",
 
   "accountSettings.users.table.header.login": "Login",
   "accountSettings.users.table.header.name": "Name",

@@ -34,7 +34,7 @@ function ResetPasswordPage() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         // console.table(values)
-        api.resetPassword(decodedToken, values.password)
+        api.resetPasswordByUser(decodedToken, values.password)
             .then(() => {
                 toast({
                     title: t("resetPasswordPage.popUp.resetPasswordOK.title"),

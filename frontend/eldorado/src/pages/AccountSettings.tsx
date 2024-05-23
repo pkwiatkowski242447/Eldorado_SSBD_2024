@@ -26,7 +26,7 @@ import handleApiError from "@/components/HandleApiError.ts";
 
 
 function AccountSettings() {
-    const [activeForm, setActiveForm] = useState('Authentication');
+    const [activeForm, setActiveForm] = useState('E-Mail');
     const {account} = useAccountState();
     const {t} = useTranslation();
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -45,6 +45,24 @@ function AccountSettings() {
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
     });
 
+    const passwordSchema = z.object({
+        oldPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+        newPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+        newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+    }).refine(values => values.newPassword === values.newPasswordRepeat, {
+        message: t("accountSettings.passwordsMustMatch"),
+        path: ["newPasswordRepeat"],
+    }).refine(values => values.oldPassword !== values.newPassword, {
+        message: t("accountSettings.newPasswordCanNotBeTheSame"),
+        path: ["newPassword"],
+    });
+
     const {getCurrentAccount} = useAccount();
 
     //It has to be that way afaik so ignore the warning and enjoy your day :)
@@ -60,6 +78,18 @@ function AccountSettings() {
     const formUserData = useForm({
         resolver: zodResolver(userDataSchema),
     });
+
+    const formPassword = useForm({
+        resolver: zodResolver(passwordSchema),
+    });
+
+    const onSubmitPassword = (values: z.infer<typeof passwordSchema>) => {
+        // @ts-expect-error - fix this
+        setFormValues(values);
+        // @ts-expect-error - fix this
+        setFormType('password');
+        setAlertDialogOpen(true);
+    };
 
     const onSubmitEmail = (values: SetStateAction<null>) => {
         setFormValues(values);
@@ -82,6 +112,9 @@ function AccountSettings() {
         } else if (formType === 'userData') {
             // @ts-expect-error - fix this
             SubmitUserData(formValues);
+        } else if (formType === 'password') {
+            // @ts-expect-error - fix this
+            SubmitPassword(formValues);
         }
         setAlertDialogOpen(false);
     };
@@ -94,6 +127,23 @@ function AccountSettings() {
             toast({
                 title: t("accountSettings.popUp.changeEmailOK.title"),
                 description: t("accountSettings.popUp.changeEmailOK.text"),
+            });
+            setFormType(null);
+            setFormValues(null);
+
+        }).catch((error) => {
+            handleApiError(error);
+        });
+    };
+
+    const SubmitPassword = (values: z.infer<typeof passwordSchema>) => {
+        // console.log(values.email)
+        console.log(values.oldPassword, values.newPassword);
+        api.changePasswordSelf(values.oldPassword, values.newPassword).then(() => {
+            getCurrentAccount();
+            toast({
+                title: t("accountSettings.popUp.changePasswordOK.title"),
+                description: t("accountSettings.popUp.changePasswordOK.text"),
             });
             setFormType(null);
             setFormValues(null);
@@ -139,16 +189,22 @@ function AccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <a href="#" className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Authentication')}>
-                            {t("accountSettings.authentication")}
-                        </a>
-                        <a href="#" className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Personal Info')}>{t("accountSettings.personalInfo")}</a>
+                        <Button variant="link" onClick={() => setActiveForm('E-Mail')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.email")}
+                        </Button>
+                        <Button variant="link" onClick={() => setActiveForm('Password')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.password")}
+                        </Button>
+                        <Button variant="link" onClick={() => setActiveForm('Personal Info')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.personalInfo")}
+                        </Button>
 
                     </nav>
                     <div className="grid gap-6">
-                        {activeForm === 'Authentication' && (
+                        {activeForm === 'E-Mail' && (
                             <div>
                                 <Card className="mx-10 w-auto">
                                     <CardContent>
@@ -187,6 +243,82 @@ function AccountSettings() {
                                         <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                                         <AlertDialogDescription>
                                             {t("accountSettings.confirmEmailChange")}
+                                        </AlertDialogDescription>
+                                        <AlertDialogAction onClick={handleDialogAction}>
+                                            {t("general.ok")}
+                                        </AlertDialogAction>
+                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                        )}
+                        {activeForm === 'Password' && (
+                            <div>
+                                <Card className="mx-10 w-auto">
+                                    <CardContent>
+                                        <Form {...formPassword}>
+                                            {// @ts-expect-error - fix this
+                                                <form onSubmit={formPassword.handleSubmit(onSubmitPassword)}
+                                                      className="space-y-4">
+                                                    <div className="grid gap-4 p-5">
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="oldPassword"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.oldPassword")}</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="newPassword"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.newPassword")}</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="newPasswordRepeat"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.newPasswordRepeat")}</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <Button type="submit" className="w-full pb-2">
+                                                            {t("accountSettings.authentication.password.change")}
+                                                        </Button>
+                                                    </div>
+                                                </form>
+                                            }
+                                        </Form>
+                                    </CardContent>
+                                </Card>
+                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                                    <AlertDialogContent>
+                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            {t("accountSettings.confirmPasswordChange")}
                                         </AlertDialogDescription>
                                         <AlertDialogAction onClick={handleDialogAction}>
                                             {t("general.ok")}

@@ -20,6 +20,13 @@ export const api = {
         return apiWithConfig.post(url);
     },
 
+    changePasswordSelf: (oldPassword: string, newPassword: string) => {
+        return apiWithConfig.patch('/accounts/change-password/self', {
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        })
+    },
+
     registerClient: (login: string, password: string, firstName: string, lastName: string, email: string, phoneNumber: string, language: string) => {
         return apiWithConfig.post('/register/client', {
             login,
@@ -40,8 +47,14 @@ export const api = {
         return apiWithConfig.post(`/accounts/forgot-password`, {email})
     },
 
-    resetPassword: (token: string, password: string) => {
+    resetPasswordByUser: (token: string, password: string) => {
         return apiWithConfig.post(`/accounts/change-password/${token}`, {
+            password
+        })
+    },
+
+    resetPasswordByAdmin: (id: string, password: string) => {
+        return apiWithConfig.post(`/accounts/reset-password/${id}`, {
             password
         })
     },

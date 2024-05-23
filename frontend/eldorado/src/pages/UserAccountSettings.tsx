@@ -30,7 +30,7 @@ import handleApiError from "@/components/HandleApiError.ts";
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
 function UserAccountSettings() {
-    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'UserLevel');
+    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'Authentication');
     const [managedUser, setManagedUser] = useState<UserType | null>(null);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
@@ -179,7 +179,6 @@ function UserAccountSettings() {
                         break;
                 }
                 setAlertDialogOpen(false);
-                location.reload()
                 setLevelToChange(null);
             }
         }
@@ -252,14 +251,15 @@ function UserAccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <a className="font-semibold text-primary"
-                           onClick={() => setActiveForm('UserLevels')}>{t("accountSettings.users.table.settings.account.userLevels")}</a>
-                        <a className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Authentication')}>
+                        <Button variant="link" onClick={() => setActiveForm('UserLevels')} className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.users.table.settings.account.userLevels")}
+                        </Button>
+                        <Button variant="link"  onClick={() => setActiveForm('Authentication')} className="text-muted-foreground transition-colors hover:text-foreground">
                             {t("accountSettings.users.table.settings.account.authentication")}
-                        </a>
-                        <a className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Personal Info')}>{t("accountSettings.users.table.settings.account.personalInfo")}</a>
+                        </Button>
+                        <Button variant="link"  onClick={() => setActiveForm('Personal Info')} className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.users.table.settings.account.personalInfo")}
+                        </Button>
 
                     </nav>
                     <div className="grid gap-6">
