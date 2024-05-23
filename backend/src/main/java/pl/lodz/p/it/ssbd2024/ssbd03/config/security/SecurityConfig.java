@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTAuthenticationFilter;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTRequiredFilter;
 
 import java.util.List;
 
@@ -29,14 +30,18 @@ import java.util.List;
 public class SecurityConfig {
     @Value("${base.app.url}")
     private String app_url;
+
     private final AuthenticationProvider authenticationProvider;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final JWTRequiredFilter jwtRequiredFilter;
 
     @Autowired
     public SecurityConfig(AuthenticationProvider authenticationProvider,
-                          JWTAuthenticationFilter jwtAuthenticationFilter) {
+                          JWTAuthenticationFilter jwtAuthenticationFilter,
+                          JWTRequiredFilter jwtRequiredFilter) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtRequiredFilter = jwtRequiredFilter;
     }
 
     @Bean
@@ -46,6 +51,7 @@ public class SecurityConfig {
                 .cors(cors -> corsConfigurationSource())
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtRequiredFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
                           .requestMatchers("/**").permitAll()
