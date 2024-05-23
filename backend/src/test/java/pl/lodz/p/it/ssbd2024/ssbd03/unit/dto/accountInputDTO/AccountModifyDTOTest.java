@@ -1,13 +1,13 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto.accountInputDTO;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.StaffDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.AdminDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.ClientDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.StaffDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -59,7 +59,7 @@ public class AccountModifyDTOTest {
         assertEquals(nameNo1, accountModifyDTO.getName());
         assertEquals(lastnameNo1, accountModifyDTO.getLastname());
         assertEquals(phoneNumberNo1, accountModifyDTO.getPhoneNumber());
-        assertEquals(twoFactorAuthNo1, accountModifyDTO.isTwoFactorAuth());
+        assertEquals(twoFactorAuthNo1, accountModifyDTO.getTwoFactorAuth());
     }
 
     @Test
@@ -112,12 +112,12 @@ public class AccountModifyDTOTest {
 
     @Test
     public void accountModifyDTOTwoFactorAuthSetterTestPositive() {
-        boolean twoFactorAuthBefore = accountModifyDTONo1.isTwoFactorAuth();
+        boolean twoFactorAuthBefore = accountModifyDTONo1.getTwoFactorAuth();
 
         boolean newTwoFactorAuth = !twoFactorAuthBefore;
         accountModifyDTONo1.setTwoFactorAuth(newTwoFactorAuth);
 
-        boolean twoFactorAuthAfter = accountModifyDTONo1.isTwoFactorAuth();
+        boolean twoFactorAuthAfter = accountModifyDTONo1.getTwoFactorAuth();
 
         assertNotEquals(twoFactorAuthBefore, twoFactorAuthAfter);
         assertNotEquals(twoFactorAuthBefore, newTwoFactorAuth);

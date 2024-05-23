@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

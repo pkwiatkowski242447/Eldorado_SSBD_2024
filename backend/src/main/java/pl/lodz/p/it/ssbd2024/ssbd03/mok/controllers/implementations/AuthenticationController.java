@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.RefreshTokenDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
@@ -106,7 +106,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
     public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                   @RequestBody AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
+                                                   @RequestBody AuthenticationLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
             Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),

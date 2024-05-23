@@ -1,6 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 
 

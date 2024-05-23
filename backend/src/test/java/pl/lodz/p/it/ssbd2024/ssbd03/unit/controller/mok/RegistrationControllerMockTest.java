@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.AccountExceptionResolver;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.GenericExceptionResolver;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;

@@ -16,7 +16,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountLoginDTO {
+public class AuthenticationLoginDTO {
 
     @Schema(description = "String identifier used to authenticate to the application", example = "boleslawchrobry", requiredMode = Schema.RequiredMode.REQUIRED)
     private String login;

@@ -1,8 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
@@ -74,7 +74,7 @@ public class AccountMapper {
 
         userLevels.forEach(account::addUserLevel);
 
-        account.setTwoFactorAuth(accountModifyDTO.isTwoFactorAuth());
+        account.setTwoFactorAuth(accountModifyDTO.getTwoFactorAuth());
 
         return account;
     }

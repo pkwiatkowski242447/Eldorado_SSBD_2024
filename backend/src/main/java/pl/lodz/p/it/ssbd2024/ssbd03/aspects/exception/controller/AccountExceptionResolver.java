@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
@@ -35,7 +36,7 @@ public class AccountExceptionResolver {
     public ResponseEntity<?> handleAccountConstraintViolationException(AccountConstraintViolationException accountConstraintViolationException) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ExceptionDTO(accountConstraintViolationException));
+                .body(new AccountConstraintViolationExceptionDTO(accountConstraintViolationException));
     }
 
     /**

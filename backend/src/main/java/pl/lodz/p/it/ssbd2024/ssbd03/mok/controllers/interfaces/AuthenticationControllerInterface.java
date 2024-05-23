@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationCodeDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.RefreshTokenDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -27,7 +27,7 @@ public interface AuthenticationControllerInterface {
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
      *                                  layer of facade and service components in the application.
      */
-    ResponseEntity<?> loginUsingCredentials(String proxyChain, AccountLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException;
+    ResponseEntity<?> loginUsingCredentials(String proxyChain, AuthenticationLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException;
 
     /**
      * Allows an unauthenticated user to perform the second step in multifactor authentication,

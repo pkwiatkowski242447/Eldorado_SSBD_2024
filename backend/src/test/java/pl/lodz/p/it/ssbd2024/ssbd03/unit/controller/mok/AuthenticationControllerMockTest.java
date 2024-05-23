@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.AccountExceptionResolver;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.GenericExceptionResolver;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AccountLoginDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token.AccessAndRefreshTokensDTO;
@@ -81,7 +81,7 @@ public class AuthenticationControllerMockTest {
                 eq(false),
                 anyString(),
                 eq("pl"))).thenReturn(accessAndRefreshTokensDTO);
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
@@ -106,7 +106,7 @@ public class AuthenticationControllerMockTest {
                 eq(false),
                 anyString(),
                 eq("pl"))).thenReturn(accessAndRefreshTokensDTO);
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .header("X-Forwarded-For", "192.168.0.2, 1050:0000:0000:0000:0005:0600:300c:326b, 10.10.10.10")
@@ -131,7 +131,7 @@ public class AuthenticationControllerMockTest {
                 eq(false),
                 anyString(),
                 eq("pl"))).thenReturn(null);
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
@@ -151,7 +151,7 @@ public class AuthenticationControllerMockTest {
         doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithIncrement(
                 eq("johann13"),
                 anyString());
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
@@ -179,7 +179,7 @@ public class AuthenticationControllerMockTest {
         doNothing().when(authenticationService).registerUnsuccessfulLoginAttemptWithoutIncrement(
                 eq("johann13"),
                 anyString());
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
@@ -212,7 +212,7 @@ public class AuthenticationControllerMockTest {
         account.blockAccount(true);
 
         when(authenticationService.findByLogin("johann13")).thenReturn(Optional.of(account));
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
@@ -245,7 +245,7 @@ public class AuthenticationControllerMockTest {
         account.blockAccount(false);
 
         when(authenticationService.findByLogin("johann13")).thenReturn(Optional.of(account));
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
@@ -271,7 +271,7 @@ public class AuthenticationControllerMockTest {
     public void loginUsingCredentialsFailedAuthenticationException() throws Exception {
         when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(UsernameNotFoundException.class);
 
-        AccountLoginDTO accountLoginDTO = new AccountLoginDTO("johann13", "H@selk0!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("johann13", "H@selk0!", "pl");
 
         mockMvc.perform(post("/api/v1/auth/login-credentials")
                         .contentType(CONTENT_TYPE)
