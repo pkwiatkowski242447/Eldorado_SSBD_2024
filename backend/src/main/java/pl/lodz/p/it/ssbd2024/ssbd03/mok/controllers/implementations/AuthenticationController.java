@@ -7,6 +7,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -106,7 +107,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
     public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                   @RequestBody AuthenticationLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
+                                                   @Valid @RequestBody AuthenticationLoginDTO accountLoginDTO, HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
             Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
@@ -217,7 +218,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
     public ResponseEntity<?> refreshUserSession(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                @RequestBody RefreshTokenDTO refreshTokenDTO, HttpServletRequest request) throws ApplicationBaseException {
+                                                @Valid @RequestBody RefreshTokenDTO refreshTokenDTO, HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
         AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = this.authenticationService.refreshUserSession(refreshTokenDTO.getRefreshToken(), userLogin);

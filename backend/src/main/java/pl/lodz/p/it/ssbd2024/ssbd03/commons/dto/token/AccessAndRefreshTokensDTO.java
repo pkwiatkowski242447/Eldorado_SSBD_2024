@@ -15,6 +15,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccessAndRefreshTokensDTO {
+
     private String accessToken;
     private String refreshToken;
 
