@@ -21,7 +21,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountLoginDTO {
+public class AuthenticationLoginDTO {
 
     @NotBlank(message = DTOMessages.LOGIN_BLANK)
     @Pattern(regexp = DTOConsts.LOGIN_REGEX, message = DTOMessages.LOGIN_REGEX_NOT_MET)

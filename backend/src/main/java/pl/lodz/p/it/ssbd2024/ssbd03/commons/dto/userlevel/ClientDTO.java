@@ -1,10 +1,10 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.ClientMessages;
 
 import java.util.UUID;
 
@@ -13,6 +13,7 @@ import java.util.UUID;
  */
 @Getter @Setter
 public class ClientDTO extends UserLevelDTO {
+    @NotNull(message = ClientMessages.CLIENT_TYPE_NULL)
     @Schema(description = "Type of client", example = "BASIC", requiredMode = Schema.RequiredMode.REQUIRED)
     private String clientType;
 
@@ -32,19 +33,5 @@ public class ClientDTO extends UserLevelDTO {
     public ClientDTO(UUID id, Long version, String clientType) {
         super(id, version, "CLIENT");
         this.clientType = clientType;
-    }
-
-    /**
-     * Custom toString() method implementation that
-     * does not return any information relating to the business
-     * data.
-     *
-     * @return String representation of the ClientDTO object.
-     */
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append(super.toString())
-                .toString();
     }
 }

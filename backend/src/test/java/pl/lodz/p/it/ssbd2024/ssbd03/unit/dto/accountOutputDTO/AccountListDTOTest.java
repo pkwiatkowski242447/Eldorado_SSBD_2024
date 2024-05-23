@@ -1,9 +1,9 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto.accountOutputDTO;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountListDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;

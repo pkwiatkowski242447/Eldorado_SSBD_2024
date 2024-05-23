@@ -1,9 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AdminDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.ClientDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.StaffDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.AdminDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.ClientDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.StaffDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
@@ -53,7 +53,7 @@ public class UserLevelMapper {
         return switch (userLevel) {
             case Client client -> new ClientDTO(userLevel.getId(), client.getVersion(), client.getType().toString());
             case Staff staff -> new StaffDTO(userLevel.getId(), staff.getVersion());
-            case Admin admin -> new AdminDTO(userLevel.getId().toString(), admin.getVersion());
+            case Admin admin -> new AdminDTO(userLevel.getId(), admin.getVersion());
             default -> throw new MapperUnexpectedUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         };
     }

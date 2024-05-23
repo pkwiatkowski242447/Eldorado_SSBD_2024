@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.SignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenDataExtractionException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;

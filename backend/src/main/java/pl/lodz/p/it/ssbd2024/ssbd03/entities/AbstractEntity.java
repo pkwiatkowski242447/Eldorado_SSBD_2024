@@ -22,6 +22,8 @@ import java.util.UUID;
 @Getter @ToString
 @NoArgsConstructor
 public class AbstractEntity {
+
+    //TODO validation?
     /**
      * The unique identifier (ID) of the entity.
      */
@@ -30,6 +32,7 @@ public class AbstractEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    //TODO validation?
     /**
      * The version of the entity used for optimistic locking.
      */

@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

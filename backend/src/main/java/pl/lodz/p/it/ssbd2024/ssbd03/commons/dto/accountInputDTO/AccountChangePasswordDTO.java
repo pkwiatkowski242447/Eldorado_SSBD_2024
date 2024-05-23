@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,17 +8,18 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class AccountPasswordDTO {
-    private String password;
+@NoArgsConstructor
+public class AccountChangePasswordDTO {
+    private String oldPassword;
+    private String newPassword;
 
     /**
      * Custom toString() method implementation that
      * does not return any information relating to the business
      * data.
      *
-     * @return String representation of the AccountPasswordDTO object.
+     * @return String representation of the AccountChangePasswordDTO object.
      */
     @Override
     public String toString() {

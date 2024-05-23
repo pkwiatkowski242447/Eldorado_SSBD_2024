@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountRegisterDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;

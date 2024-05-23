@@ -8,10 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.AccountSignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountSignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -21,7 +20,6 @@ import java.util.UUID;
  * Data transfer object used in returning account.
  */
 @Getter @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class AccountOutputDTO extends AccountSignableDTO {
     @Schema(description = "UUID identifier linked with account", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -68,11 +66,25 @@ public class AccountOutputDTO extends AccountSignableDTO {
     /***
      * All arguments constructor for AccountOutputDTO - with calling constructor of superclass.
      */
-    public AccountOutputDTO(String login, Long version, Set<UserLevelDTO> userLevelsDto, UUID id, boolean verified,
-                            boolean active, boolean blocked, boolean twoFactorAuth, LocalDateTime blockedTime, LocalDateTime creationDate,
-                            LocalDateTime lastSuccessfulLoginTime, LocalDateTime lastUnsuccessfulLoginTime,
-                            String accountLanguage, String lastSuccessfulLoginIp, String lastUnsuccessfulLoginIp,
-                            String phoneNumber, String lastname, String name, String email) {
+    public AccountOutputDTO(String login,
+                            Long version,
+                            Set<UserLevelDTO> userLevelsDto,
+                            UUID id,
+                            boolean verified,
+                            boolean active,
+                            boolean blocked,
+                            boolean twoFactorAuth,
+                            LocalDateTime blockedTime,
+                            LocalDateTime creationDate,
+                            LocalDateTime lastSuccessfulLoginTime,
+                            LocalDateTime lastUnsuccessfulLoginTime,
+                            String accountLanguage,
+                            String lastSuccessfulLoginIp,
+                            String lastUnsuccessfulLoginIp,
+                            String phoneNumber,
+                            String lastname,
+                            String name,
+                            String email) {
         super(login, version, userLevelsDto);
         this.id = id;
         this.verified = verified;
