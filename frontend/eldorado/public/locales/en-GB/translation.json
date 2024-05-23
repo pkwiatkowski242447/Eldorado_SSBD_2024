@@ -357,5 +357,9 @@
   "breadcrumb.manageUsers": "User management",
   "breadcrumb.changeUserlevel": "Change access level",
   "breadcrumb.myAccount": "My account",
-  "breadcrumb.userAccount": "Edit user account"
+  "breadcrumb.userAccount": "Edit user account",
+
+  "notFound.title": "Page not found",
+    "notFound.description": "The page you are looking for does not exist",
+    "notFound.home": "Go to the home page"
 }

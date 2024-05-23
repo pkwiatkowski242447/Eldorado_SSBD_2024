@@ -5,6 +5,7 @@ import PublicLayout from "../../components/layouts/PublicLayout";
 // import ClientLayout from "../../components/layouts/ClientLayout";
 import {useEffect} from "react";
 import {PublicRoutes} from "../routes";
+import NotFoundPage from "@/pages/NotFoundPage.tsx";
 // import PageNotFound from "../../pages/PageNotFound";
 // import ResourceAdminLayout from "../../components/layouts/ResourceAdminLayout";
 
@@ -22,6 +23,11 @@ export const RoutesComponents = () => {
                     </PublicLayout>}/>
             ))}
 
+            <Route path="*" element={
+                <PublicLayout>
+                    <NotFoundPage/>
+                </PublicLayout>
+            }/>
             {/*{isAuthenticated && accountType===AccountTypeEnum.ADMIN && AdminRoutes.map(({path, Component}) => (*/}
             {/*    <Route key={path} path={path} element={*/}
             {/*        <AdminLayout>*/}

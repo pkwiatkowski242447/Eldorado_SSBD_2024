@@ -12,9 +12,6 @@ const NotFoundPage = () => {
             <Link to="/" className="mb-4">
                 <Button>{t("notFound.home")}</Button>
             </Link>
-            <Link to="/contact" className="text-blue-500">
-                {t("notFound.contact")}
-            </Link>
         </div>
     );
 };

@@ -351,6 +351,9 @@
   "breadcrumb.manageUsers": "Zarządzanie użytkownikami",
   "breadcrumb.changeUserlevel": "Zmień poziom dostępu",
   "breadcrumb.myAccount": "Moje konto",
-  "breadcrumb.userAccount": "Edytuj konto"
+  "breadcrumb.userAccount": "Edytuj konto",
 
+  "notFound.title": "Strona nie znaleziona",
+  "notFound.description": "Strona, której szukasz, nie istnieje",
+  "notFound.home": "Przejdź do strony głównej"
 }
