@@ -18,7 +18,7 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {useNavigate} from "react-router-dom";
-import {FiSettings} from 'react-icons/fi';
+import {FiCheck, FiSettings, FiX} from 'react-icons/fi';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -27,9 +27,17 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
+} from '@/components/ui/breadcrumb.tsx';
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
+import {Slash} from "lucide-react";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
@@ -54,7 +62,7 @@ function UserManagementPage() {
         if (selectedUser) {
             if (selectedUser.blocked) {
                 api.unblockAccount(selectedUser.id).then(() => {
-                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=5`).then(response => {
+                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
                         if (response.status === 204) {
                             setUsers([]);
                         } else {
@@ -96,6 +104,19 @@ function UserManagementPage() {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
+            <Breadcrumb className={"p-5"}>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink>{t("breadcrumb.manageUsers")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <Table className="p-10">
                 <TableHeader>
                     <TableRow className={"text-center p-10"}>
@@ -111,25 +132,31 @@ function UserManagementPage() {
                 </TableHeader>
                 <TableBody className={"text-center"}>
                     {users.map(user => (
-                        <TableRow key={user.id}>
+                        <TableRow key={user.id} className="text-center">
                             <TableCell>{user.login}</TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.lastName}</TableCell>
-                            <TableCell>{user.active.toString()}</TableCell>
-                            <TableCell>{user.blocked.toString()}</TableCell>
-                            <TableCell>{user.verified.toString()}</TableCell>
+                            <TableCell className="text-center">
+                                {user.active ? <FiCheck color="green" /> : <FiX color="red" />}
+                            </TableCell>
+                            <TableCell className="text-center">
+                                {user.blocked ? <FiCheck color="green" /> : <FiX color="red" />}
+                            </TableCell>
+                            <TableCell>
+                                {user.verified ? <FiCheck color="green" /> : <FiX color="red" />}
+                            </TableCell>
                             <TableCell>
                                 {user.userLevels.map(level => {
                                     let color;
                                     switch (level) {
                                         case 'Admin':
-                                            color = 'red';
+                                            color = 'black';
                                             break;
                                         case 'Staff':
-                                            color = 'blue';
+                                            color = 'black';
                                             break;
                                         case 'Client':
-                                            color = 'green';
+                                            color = 'black';
                                             break;
                                         default:
                                             color = 'black';

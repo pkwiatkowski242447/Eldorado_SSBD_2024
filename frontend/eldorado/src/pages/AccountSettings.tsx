@@ -23,6 +23,14 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import handleApiError from "@/components/HandleApiError.ts";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
+import {Slash} from "lucide-react";
 
 
 function AccountSettings() {
@@ -179,6 +187,19 @@ function AccountSettings() {
     return (
         <div>
             <SiteHeader/>
+            <Breadcrumb className={"p-5"}>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink>{t("breadcrumb.myAccount")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">

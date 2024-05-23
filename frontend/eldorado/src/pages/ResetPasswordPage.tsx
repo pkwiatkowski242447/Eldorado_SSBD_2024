@@ -22,7 +22,8 @@ function ResetPasswordPage() {
 
     const formSchema = z.object({
         password: z.string().min(8, {message: t("resetPasswordPage.passwordTooShort")})
-            .max(60, {message: t("resetPasswordPage.passwordTooLong")}),
+            .max(60, {message: t("resetPasswordPage.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
     })
 
     const form = useForm<z.infer<typeof formSchema>>({

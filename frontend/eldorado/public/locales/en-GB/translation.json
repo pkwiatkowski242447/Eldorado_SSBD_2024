@@ -153,6 +153,7 @@
   "resetPasswordPage.passwordTooLong": "Password can be at most 60 characters long",
   "resetPasswordPage.password": "Password",
   "resetPasswordPage.button": "Change Password",
+  "resetPasswordPage.resetPassword": "Are you sure you want to reset the password?",
 
 
   "activateAccountPage.title": "Almost there!",
@@ -341,5 +342,20 @@
   "mail.reset.password.action_description" : "Reset your password",
   "mail.reset.password.note_title" : "Note",
 
-  "mail.auto.generate.message.note" : "This is an auto-generated message. Please do not reply."
+  "mail.auto.generate.message.note" : "This is an auto-generated message. Please do not reply.",
+
+  "bean.validation.account.login.dto.login.blank" : "Login cannot be blank",
+  "bean.validation.account.login.dto.login.regex.not.met" : "Login does not meet format requirements",
+  "bean.validation.account.login.dto.login.too.short" : "Login is too short",
+  "bean.validation.account.login.dto.login.too.long" : "Login is too long",
+  "bean.validation.account.login.dto.password.blank" : "Password cannot be blank",
+  "bean.validation.account.login.dto.password.regex.not.met" : "Password does not meet format requirements",
+  "bean.validation.account.login.dto.password.too.short" : "Password is too short",
+  "bean.validation.account.login.dto.password.too.long" : "Password is too long",
+
+  "breadcrumb.home": "Home",
+  "breadcrumb.manageUsers": "User management",
+  "breadcrumb.changeUserlevel": "Change access level",
+  "breadcrumb.myAccount": "My account",
+  "breadcrumb.userAccount": "Edit user account"
 }

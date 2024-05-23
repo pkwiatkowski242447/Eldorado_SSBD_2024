@@ -14,6 +14,14 @@ import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
+import {Slash} from "lucide-react";
 
 const FormSchema = z.object({
     type: z.any()
@@ -67,6 +75,19 @@ function ChangeUserLevelPage() {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
+            <Breadcrumb className={"p-5"}>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink>{t("breadcrumb.changeUserlevel")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <div className="flex justify-center items-center mx-auto p-10">
                 <Card>
                     <CardHeader className="p-3 font-bold">

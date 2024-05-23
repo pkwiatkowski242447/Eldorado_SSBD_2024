@@ -78,7 +78,7 @@ export function RegisterForm() {
                 }
             });
     }
-
+    
     return (
         <Card className="mx-auto max-w-2xl">
             <CardHeader>
@@ -128,6 +128,7 @@ export function RegisterForm() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
+
                                     <FormField
                                         control={form.control}
                                         name="phoneNumber"
@@ -136,17 +137,20 @@ export function RegisterForm() {
                                                 <FormLabel
                                                     className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                 <FormControl className="w-full">
+
                                                     <Controller
                                                         name="phoneNumber"
                                                         control={form.control}
                                                         render={({field}) => (
+                                                            //ts-expect-error - PhoneInput is not typed
                                                             <PhoneInput
                                                                 {...field}
-                                                                value={field.value || ""}
+                                                                value={field.value as never|| ""}
                                                                 onChange={field.onChange}
                                                                 countries={['PL']}
-                                                                defaultCountry="PL" // Adjust as necessary
-                                                            />
+                                                                defaultCountry="PL"
+                                                            >
+                                                            </PhoneInput>
                                                         )}
                                                     />
                                                 </FormControl>

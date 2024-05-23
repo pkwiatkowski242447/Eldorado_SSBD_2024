@@ -155,6 +155,9 @@
   "resetPasswordPage.passwordTooLong": "Hasło może mieć maksymalnie 60 znaków",
   "resetPasswordPage.password": "Hasło",
   "resetPasswordPage.button": "Zmień Hasło",
+  "resetPasswordPage.resetPassword": "Czy na pewno chcesz zresetować hasło?",
+
+
 
   "activateAccountPage.title": "Już prawie gotowe!",
   "activateAccountPage.info": "Aktywuj swoje konto Eldorado, naciskając przycisk poniżej.",
@@ -333,5 +336,21 @@
   "mail.reset.password.action_description" : "Zresetuj swoje hasło",
   "mail.reset.password.note_title" : "Uwaga",
 
-  "mail.auto.generate.message.note" : "To jest automatycznie wygenerowana wiadomość. Proszę nie odpowiadać."
+  "mail.auto.generate.message.note" : "To jest automatycznie wygenerowana wiadomość. Proszę nie odpowiadać.",
+
+  "bean.validation.account.login.dto.login.blank": "Login nie może być pusty",
+  "bean.validation.account.login.dto.login.regex.not.met": "Login nie spełnia wymagań dotyczących formatu",
+  "bean.validation.account.login.dto.login.too.short": "Login jest za krótki",
+  "bean.validation.account.login.dto.login.too.long": "Login jest za długi",
+  "bean.validation.account.login.dto.password.blank": "Hasło nie może być puste",
+  "bean.validation.account.login.dto.password.regex.not.met": "Hasło nie spełnia wymagań dotyczących formatu",
+  "bean.validation.account.login.dto.password.too.short": "Hasło jest za krótkie",
+  "bean.validation.account.login.dto.password.too.long": "Hasło jest za długie",
+
+  "breadcrumb.home": "Strona główna",
+  "breadcrumb.manageUsers": "Zarządzanie użytkownikami",
+  "breadcrumb.changeUserlevel": "Zmień poziom dostępu",
+  "breadcrumb.myAccount": "Moje konto",
+  "breadcrumb.userAccount": "Edytuj konto"
+
 }

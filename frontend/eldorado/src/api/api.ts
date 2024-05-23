@@ -53,10 +53,8 @@ export const api = {
         })
     },
 
-    resetPasswordByAdmin: (id: string, password: string) => {
-        return apiWithConfig.post(`/accounts/reset-password/${id}`, {
-            password
-        })
+    resetPasswordByAdmin: (id: string) => {
+        return apiWithConfig.post(`/accounts/reset-password/${id}`)
     },
 
     modifyAccountSelf: (login: string, version: number, userLevelsDto: UserLevelType[], name: string,
