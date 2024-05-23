@@ -263,7 +263,12 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void logoutAsUnauthenticatedUser() {
-        RestAssured.given().when().post(BASE_URL + "/auth/logout").then().assertThat().statusCode(HttpStatus.FORBIDDEN.value());
+        RestAssured.given()
+                .when()
+                .post(BASE_URL + "/auth/logout")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -358,7 +363,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @Test
-    public void getAllUsersAsUnauthenticatedUserForbidden() {
+    public void getAllUsersAsUnauthenticatedUser() {
         RestAssured
                 .given()
                 .param("pageNumber", 0)
@@ -366,7 +371,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .get(BASE_URL + "/accounts")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -463,8 +468,11 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @Test
-    public void invalidPathUnauthorized() {
+    public void invalidPathTestNegative() throws Exception {
+        String token = this.login("jerzybem", "P@ssw0rd!", "pl");
+
         RestAssured.given()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .when()
                 .post(BASE_URL + "/not/a/real/path")
                 .then()
@@ -584,9 +592,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/block", userId))
                 .then()
-                .statusCode(HttpStatus.FORBIDDEN.value())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .body(
-                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                        "message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION)
                 );
     }
 
@@ -725,9 +733,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .when()
                 .post(BASE_URL + String.format("/accounts/%s/unblock", userId))
                 .then()
-                .statusCode(HttpStatus.FORBIDDEN.value())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .body(
-                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                        "message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION)
                 );
     }
 
@@ -818,9 +826,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/accounts/{id}/add-level-{level}", id, newUserLevel)
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.FORBIDDEN.value())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .body(
-                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                        "message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION)
                 );
     }
 
@@ -988,9 +996,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts/self")
                 .then()
-                .statusCode(HttpStatus.FORBIDDEN.value())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .body(
-                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                        "message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION)
                 );
     }
 
@@ -1329,9 +1337,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body(accountModifyDTO)
                 .put(BASE_URL + "/accounts")
                 .then()
-                .statusCode(HttpStatus.FORBIDDEN.value())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .body(
-                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                        "message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION)
                 );
     }
 
@@ -1709,9 +1717,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/accounts/{id}/remove-level-{level}", id, oldUserLevel)
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.FORBIDDEN.value())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .body(
-                        "message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION)
+                        "message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION)
                 );
     }
 

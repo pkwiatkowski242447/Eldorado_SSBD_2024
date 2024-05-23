@@ -38,28 +38,17 @@ public class I18n {
     // General exception messages
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "application.optimistic.lock.exception";
     public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";
+    public static final String UNAUTHORIZED_EXCEPTION = "application.unauthorized.exception";
     public static final String ACCESS_DENIED_EXCEPTION = "application.access.denied.exception";
     public static final String UNEXPECTED_DATABASE_EXCEPTION = "application.database.server.exception";
     public static final String PATH_NOT_FOUND_EXCEPTION = "application.path.not.found.exception";
 
-    // Authentication service
-    public static final String AUTH_CREDENTIALS_INVALID_EXCEPTION = "authentication.service.account.credentials.not.valid.exception";
-    public static final String AUTH_ACCOUNT_LOGIN_NOT_FOUND_EXCEPTION = "authentication.service.account.login.not.found.exception";
-    public static final String AUTH_ACTIVITY_LOG_UPDATE_EXCEPTION = "authentication.service.activity.log.update.exception";
-
     // Account service
-    public static final String STAFF_ACCOUNT_CREATION_EXCEPTION = "account.service.staff.account.not.created.exception";
-    public static final String ADMIN_ACCOUNT_CREATION_EXCEPTION = "account.service.admin.account.not.created.exception";
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
     public static final String NO_SUCH_USER_LEVEL_EXCEPTION = "user_level.no.such.user.level.exception";
     public static final String ONE_USER_LEVEL = "user_level.one.user.level";
     public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
     public static final String USER_LEVEL_DUPLICATED = "user_level.type.duplicated.exception";
-
-    // Authentication controller
-    public static final String AUTH_CONTROLLER_ACCOUNT_NOT_ACTIVE = "authentication.controller.account.not.active";
-    public static final String AUTH_CONTROLLER_ACCOUNT_BLOCKED = "authentication.controller.account.blocked";
-    public static final String AUTH_CONTROLLER_ACCOUNT_LOGOUT = "authentication.controller.account.logout";
 
     // Account service
     public static final String INVALID_LOGIN_ATTEMPT_EXCEPTION = "account.service.invalid.login.attempt.exception";

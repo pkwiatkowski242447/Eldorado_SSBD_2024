@@ -114,7 +114,7 @@ public class JWTProvider {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
             DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
             return UUID.fromString(decodedJWT.getClaim(JWTConsts.ACCOUNT_ID).asString());
-        } catch (SignatureVerificationException exception) {
+        } catch (JWTVerificationException exception) {
             throw new TokenDataExtractionException();
         }
     }
@@ -130,7 +130,7 @@ public class JWTProvider {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
             DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
             return decodedJWT.getSubject();
-        } catch (SignatureVerificationException exception) {
+        } catch (JWTVerificationException exception) {
             throw new TokenDataExtractionException();
         }
     }
@@ -146,7 +146,7 @@ public class JWTProvider {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
             DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
             return decodedJWT.getClaim(JWTConsts.EMAIL).asString();
-        } catch (SignatureVerificationException exception) {
+        } catch (JWTVerificationException exception) {
             throw new TokenDataExtractionException();
         }
     }
