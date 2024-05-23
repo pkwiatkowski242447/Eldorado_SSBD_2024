@@ -10,6 +10,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Input} from "@/components/ui/input.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
 
 
 function ResetPasswordPage() {
@@ -50,22 +51,7 @@ function ResetPasswordPage() {
                 });
             })
             .catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
     }
 

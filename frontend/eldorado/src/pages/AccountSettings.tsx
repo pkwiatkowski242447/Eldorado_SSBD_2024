@@ -4,13 +4,12 @@ import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
 import {useAccountState} from "@/context/AccountContext.tsx";
-import {parsePhoneNumber} from "react-phone-number-input";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
@@ -23,14 +22,13 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import handleApiError from "@/components/HandleApiError.ts";
 
 
 function AccountSettings() {
     const [activeForm, setActiveForm] = useState('Authentication');
     const {account} = useAccountState();
     const {t} = useTranslation();
-    const phoneNumber = parsePhoneNumber(account?.phone || '')
-    const e164Number = phoneNumber?.format('E.164')
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
@@ -101,22 +99,7 @@ function AccountSettings() {
             setFormValues(null);
 
         }).catch((error) => {
-            if (error.response && error.response.data) {
-                const {message, violations} = error.response.data;
-                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                toast({
-                    variant: "destructive",
-                    title: t(message),
-                    description: violationMessages,
-                });
-            } else {
-                toast({
-                    variant: "destructive",
-                    description: "Error",
-                });
-            }
-            // console.log(error.response ? error.response.data : error);
+            handleApiError(error);
         });
     };
 
@@ -136,22 +119,7 @@ function AccountSettings() {
                     setFormValues(null);
 
                 }).catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
         } else {
             console.log('Account or account language is not defined');
@@ -275,13 +243,25 @@ function AccountSettings() {
                                                             <FormField
                                                                 control={formUserData.control}
                                                                 name="phoneNumber"
-                                                                render={({field}) => (
+                                                                render={() => (
                                                                     <FormItem className="items-start">
                                                                         <FormLabel
-                                                                            className="text-black text-center">{t("accountSettings.personalInfo.phoneNumber")}</FormLabel>
+                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                                         <FormControl className="w-full">
-                                                                            <PhoneInput //TODO fix this
-                                                                                placeholder={e164Number} {...field}/>
+                                                                            <Controller
+                                                                                name="phoneNumber"
+                                                                                control={formUserData.control}
+                                                                                render={({field}) => (
+                                                                                    <PhoneInput
+                                                                                        {...field}
+                                                                                        value={field.value || ""}
+                                                                                        placeholder={account?.phone}
+                                                                                        onChange={field.onChange}
+                                                                                        countries={['PL']}
+                                                                                        defaultCountry="PL"
+                                                                                    />
+                                                                                )}
+                                                                            />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>

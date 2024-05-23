@@ -1,3 +1,5 @@
+"use client"
+
 import eldoLogo from "@/assets/eldorado.png";
 import {
     DropdownMenu,
@@ -16,24 +18,23 @@ import {useNavigate} from "react-router-dom";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
 
-
 const SiteHeader = () => {
     const {account} = useAccountState();
-    const navigator = useNavigate();
+    const navigate = useNavigate();
     const {t} = useTranslation();
 
     const {logOut} = useAccount();
 
     function onClickLogout() {
-        logOut()
+        logOut();
     }
 
     function onClickSettings() {
-        navigator(Pathnames.public.accountSettings);
+        navigate(Pathnames.public.accountSettings);
     }
 
     function onClickChangeUserLevel() {
-        navigator(Pathnames.public.changeUserLevel);
+        navigate(Pathnames.public.changeUserLevel);
     }
 
     let headerColor = 'bg-gray-200 border-gray-200';
@@ -55,66 +56,46 @@ const SiteHeader = () => {
     }
 
     return (
-        <header
-            className={`sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
-            <nav
-                className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-                <a
-                    href="/home"
-                    className="flex items-center gap-2 text-lg font-semibold md:text-base"
-                >
-                    <img src={eldoLogo} alt="Eldorado" className="h-3/4 w-3/4 p-10 pr-8"/>
+        <header className={`sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
+            <nav className="flex items-center gap-4">
+                <a href="/home" className="flex items-center">
+                    <img src={eldoLogo} alt="Eldorado" className="h-25 w-8/12" />
                     <span className="sr-only">Eldorado</span>
                 </a>
                 {account?.activeUserLevel.roleName === RolesEnum.ADMIN && (
-                    <a
-                        href="/manage-users"
-                        className="text-muted-foreground transition-colors hover:text-foreground"
-                    >
+                    <Button variant="link" onClick={() => navigate("/manage-users")} className="text-muted-foreground transition-colors hover:text-foreground">
                         {t("siteHeader.users")}
-                    </a>
+                    </Button>
                 )}
-                <a
-                    href=""
-                    className="text-muted-foreground transition-colors hover:text-foreground"
-                >
+                <Button variant="link" onClick={() => navigate("/home")} className="text-muted-foreground transition-colors hover:text-foreground">
                     {t("siteHeader.parkings")}
-                </a>
-
+                </Button>
             </nav>
-            <div className="flex w-full items-right gap-4 md:ml-auto md:gap-2 lg:gap-4 justify-end">
-                <div className="flex items-center w-full gap-4 md:ml-auto md:gap-2 lg:gap-4 justify-end">
-                    <small className="text-sm font-medium leading-none">{t("siteHeader.hello")}{account?.login}</small>
-
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="icon" className="rounded-full">
-                                <CircleUser className="h-5 w-5"/>
-                                <span className="sr-only">Toggle user menu</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{t("siteHeader.myAccount")}</DropdownMenuLabel>
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                onClick={onClickSettings}>
-                                {t("siteHeader.settings")}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                onClick={onClickChangeUserLevel}>
-                                {t("siteHeader.changeLevel")}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                className="font-bold"
-                                onClick={onClickLogout}>
-                                {t("siteHeader.logout")}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                </div>
+            <div className="flex w-full items-center gap-4 justify-end">
+                <small className="text-sm font-medium leading-none">{t("siteHeader.hello")}{account?.login}</small>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="secondary" size="icon" className="rounded-full">
+                            <CircleUser className="h-5 w-5" />
+                            <span className="sr-only">Toggle user menu</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>{t("siteHeader.myAccount")}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={onClickSettings}>
+                            {t("siteHeader.settings")}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={onClickChangeUserLevel}>
+                            {t("siteHeader.changeLevel")}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="font-bold" onClick={onClickLogout}>
+                            {t("siteHeader.logout")}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </header>
     );

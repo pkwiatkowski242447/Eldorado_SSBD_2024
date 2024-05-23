@@ -2,7 +2,7 @@ import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {z} from "zod";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {api} from "@/api/api.ts";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
@@ -20,8 +20,10 @@ export function RegisterForm() {
             .email(t("registerPage.wrongEmail")),
         login: z.string().min(3, {message: t("registerPage.loginTooShort")})
             .max(50, {message: t("registerPage.loginTooLong")}),
-        password: z.string().min(8, {message: t("registerPage.passwordTooShort")})
-            .max(60, {message: t("registerPage.passwordTooLong")}),
+        password: z.string()
+            .min(8, {message: t("registerPage.passwordTooShort")})
+            .max(60, {message: t("registerPage.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
         firstName: z.string().min(2, {message: t("registerPage.firstNameTooShort")})
             .max(50, {message: t("registerPage.firstNameTooLong")}),
         lastName: z.string().min(2, {message: t("registerPage.lastNameTooShort")})
@@ -42,7 +44,7 @@ export function RegisterForm() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        // console.table(values);
+        console.table(values)
         api.registerClient(
             values.login,
             values.password,
@@ -74,7 +76,6 @@ export function RegisterForm() {
                         description: "Error",
                     });
                 }
-                // console.log(error.response ? error.response.data : error);
             });
     }
 
@@ -124,19 +125,30 @@ export function RegisterForm() {
                                     />
                                 </div>
                             </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <FormField
                                         control={form.control}
                                         name="phoneNumber"
-                                        render={({field}) => (
+                                        render={() => (
                                             <FormItem className="items-start">
                                                 <FormLabel
                                                     className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                 <FormControl className="w-full">
-                                                    {// @ts-expect-error - fix this maybe
-                                                        <PhoneInput //TODO fix this
-                                                            placeholder="" {...field}/>}
+                                                    <Controller
+                                                        name="phoneNumber"
+                                                        control={form.control}
+                                                        render={({field}) => (
+                                                            <PhoneInput
+                                                                {...field}
+                                                                value={field.value || ""}
+                                                                onChange={field.onChange}
+                                                                countries={['PL']}
+                                                                defaultCountry="PL" // Adjust as necessary
+                                                            />
+                                                        )}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>

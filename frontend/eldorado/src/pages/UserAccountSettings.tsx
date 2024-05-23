@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
 
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
@@ -115,22 +116,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.STAFF:
@@ -141,22 +127,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.CLIENT:
@@ -167,22 +138,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                 }
@@ -196,22 +152,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.STAFF:
@@ -222,22 +163,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.CLIENT:
@@ -248,22 +174,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                 }
@@ -299,22 +210,7 @@ function UserAccountSettings() {
                 setFormValues(null);
 
             }).catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
         }
     };
@@ -336,22 +232,7 @@ function UserAccountSettings() {
                     setFormValues(null);
 
                 }).catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
         } else {
             console.log('Account or account language is not defined');

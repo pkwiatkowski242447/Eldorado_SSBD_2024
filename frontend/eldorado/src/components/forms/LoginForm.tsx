@@ -31,7 +31,7 @@ function LoginForm() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         logIn(values.login, values.password).catch((error) => {
-            console.log(error.response.data)
+            console.log(error)
         });
     }
 

@@ -27,9 +27,9 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {toast} from "@/components/ui/use-toast.ts";
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
@@ -54,7 +54,7 @@ function UserManagementPage() {
         if (selectedUser) {
             if (selectedUser.blocked) {
                 api.unblockAccount(selectedUser.id).then(() => {
-                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
+                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=5`).then(response => {
                         if (response.status === 204) {
                             setUsers([]);
                         } else {
@@ -63,22 +63,7 @@ function UserManagementPage() {
                     });
                     setAlertDialogOpen(false)
                 }).catch((error) => {
-                    if (error.response && error.response.data) {
-                        const {message, violations} = error.response.data;
-                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                        toast({
-                            variant: "destructive",
-                            title: t(message),
-                            description: violationMessages,
-                        });
-                    } else {
-                        toast({
-                            variant: "destructive",
-                            description: "Error",
-                        });
-                    }
-                    // console.log(error.response ? error.response.data : error);
+                    handleApiError(error);
                 });
             } else {
                 api.blockAccount(selectedUser.id).then(() => {
@@ -91,22 +76,7 @@ function UserManagementPage() {
                     });
                     setAlertDialogOpen(false);
                 }).catch((error) => {
-                    if (error.response && error.response.data) {
-                        const {message, violations} = error.response.data;
-                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                        toast({
-                            variant: "destructive",
-                            title: t(message),
-                            description: violationMessages,
-                        });
-                    } else {
-                        toast({
-                            variant: "destructive",
-                            description: "Error",
-                        });
-                    }
-                    // console.log(error.response ? error.response.data : error);
+                    handleApiError(error);
                 });
             }
         }
@@ -128,18 +98,18 @@ function UserManagementPage() {
             <SiteHeader/>
             <Table className="p-10">
                 <TableHeader>
-                    <TableRow>
-                        <TableHead>{t("accountSettings.users.table.header.login")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.name")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.lastName")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.active")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.blocked")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.verified")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.userLevels")}</TableHead>
-                        <TableHead></TableHead>
+                    <TableRow className={"text-center p-10"}>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.login")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.name")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.lastName")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.active")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.blocked")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.verified")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.userLevels")}</TableHead>
+                        <TableHead className="text-center"></TableHead>
                     </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className={"text-center"}>
                     {users.map(user => (
                         <TableRow key={user.id}>
                             <TableCell>{user.login}</TableCell>
