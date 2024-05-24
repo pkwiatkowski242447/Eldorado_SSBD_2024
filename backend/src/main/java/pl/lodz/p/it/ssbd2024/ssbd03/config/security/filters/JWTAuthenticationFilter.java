@@ -22,12 +22,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenDataExtractionException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.utils.JWTMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.io.IOException;
@@ -55,6 +54,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws IOException, ServletException {
         log.debug("Started JWT Authentication Filter execution...");
+        ObjectMapper objectMapper = new ObjectMapper();
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith(SecurityConstants.BEARER_PREFIX)) {
@@ -75,8 +75,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account.getLogin(), account.getPassword(), listOfRoles);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } catch (ApplicationDatabaseException exception) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                try (OutputStream outputStream = response.getOutputStream()) {
+                    outputStream.write(objectMapper.writeValueAsBytes(new ExceptionDTO(I18n.UNEXPECTED_DATABASE_EXCEPTION)));
+                }
+                response.getWriter().flush();
+                SecurityContextHolder.clearContext();
             } catch (ApplicationBaseException exception) {
-                ObjectMapper objectMapper = new ObjectMapper();
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 try (OutputStream outputStream = response.getOutputStream()) {
