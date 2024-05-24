@@ -18,7 +18,7 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {useNavigate} from "react-router-dom";
-import {FiSettings} from 'react-icons/fi';
+import {FiCheck, FiSettings, FiX} from 'react-icons/fi';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -27,9 +27,17 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {toast} from "@/components/ui/use-toast.ts";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
+} from '@/components/ui/breadcrumb.tsx';
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
+import {Slash} from "lucide-react";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
@@ -63,22 +71,7 @@ function UserManagementPage() {
                     });
                     setAlertDialogOpen(false)
                 }).catch((error) => {
-                    if (error.response && error.response.data) {
-                        const {message, violations} = error.response.data;
-                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                        toast({
-                            variant: "destructive",
-                            title: t(message),
-                            description: violationMessages,
-                        });
-                    } else {
-                        toast({
-                            variant: "destructive",
-                            description: "Error",
-                        });
-                    }
-                    // console.log(error.response ? error.response.data : error);
+                    handleApiError(error);
                 });
             } else {
                 api.blockAccount(selectedUser.id).then(() => {
@@ -91,22 +84,7 @@ function UserManagementPage() {
                     });
                     setAlertDialogOpen(false);
                 }).catch((error) => {
-                    if (error.response && error.response.data) {
-                        const {message, violations} = error.response.data;
-                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                        toast({
-                            variant: "destructive",
-                            title: t(message),
-                            description: violationMessages,
-                        });
-                    } else {
-                        toast({
-                            variant: "destructive",
-                            description: "Error",
-                        });
-                    }
-                    // console.log(error.response ? error.response.data : error);
+                    handleApiError(error);
                 });
             }
         }
@@ -126,40 +104,59 @@ function UserManagementPage() {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
+            <Breadcrumb className={"p-5"}>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink>{t("breadcrumb.manageUsers")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <Table className="p-10">
                 <TableHeader>
-                    <TableRow>
-                        <TableHead>{t("accountSettings.users.table.header.login")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.name")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.lastName")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.active")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.blocked")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.verified")}</TableHead>
-                        <TableHead>{t("accountSettings.users.table.header.userLevels")}</TableHead>
-                        <TableHead></TableHead>
+                    <TableRow className={"text-center p-10"}>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.login")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.name")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.lastName")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.active")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.blocked")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.verified")}</TableHead>
+                        <TableHead className="text-center">{t("accountSettings.users.table.header.userLevels")}</TableHead>
+                        <TableHead className="text-center"></TableHead>
                     </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className={"text-center"}>
                     {users.map(user => (
-                        <TableRow key={user.id}>
+                        <TableRow key={user.id} className="text-center">
                             <TableCell>{user.login}</TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.lastName}</TableCell>
-                            <TableCell>{user.active.toString()}</TableCell>
-                            <TableCell>{user.blocked.toString()}</TableCell>
-                            <TableCell>{user.verified.toString()}</TableCell>
+                            <TableCell className="text-center">
+                                {user.active ? <FiCheck color="green" /> : <FiX color="red" />}
+                            </TableCell>
+                            <TableCell className="text-center">
+                                {user.blocked ? <FiCheck color="green" /> : <FiX color="red" />}
+                            </TableCell>
+                            <TableCell>
+                                {user.verified ? <FiCheck color="green" /> : <FiX color="red" />}
+                            </TableCell>
                             <TableCell>
                                 {user.userLevels.map(level => {
                                     let color;
                                     switch (level) {
                                         case 'Admin':
-                                            color = 'red';
+                                            color = 'black';
                                             break;
                                         case 'Staff':
-                                            color = 'blue';
+                                            color = 'black';
                                             break;
                                         case 'Client':
-                                            color = 'green';
+                                            color = 'black';
                                             break;
                                         default:
                                             color = 'black';

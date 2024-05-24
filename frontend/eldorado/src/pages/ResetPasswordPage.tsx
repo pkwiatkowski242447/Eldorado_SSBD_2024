@@ -10,6 +10,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Input} from "@/components/ui/input.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
 
 
 function ResetPasswordPage() {
@@ -21,7 +22,8 @@ function ResetPasswordPage() {
 
     const formSchema = z.object({
         password: z.string().min(8, {message: t("resetPasswordPage.passwordTooShort")})
-            .max(60, {message: t("resetPasswordPage.passwordTooLong")}),
+            .max(60, {message: t("resetPasswordPage.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -33,7 +35,7 @@ function ResetPasswordPage() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         // console.table(values)
-        api.resetPassword(decodedToken, values.password)
+        api.resetPasswordByUser(decodedToken, values.password)
             .then(() => {
                 toast({
                     title: t("resetPasswordPage.popUp.resetPasswordOK.title"),
@@ -50,22 +52,7 @@ function ResetPasswordPage() {
                 });
             })
             .catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
     }
 

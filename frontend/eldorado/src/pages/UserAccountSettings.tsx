@@ -4,12 +4,11 @@ import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
-import {parsePhoneNumber} from "react-phone-number-input";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
@@ -23,19 +22,26 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
+import {Slash} from "lucide-react";
 
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
 function UserAccountSettings() {
-    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'UserLevel');
+    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'E-Mail');
     const [managedUser, setManagedUser] = useState<UserType | null>(null);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
     const {id} = useParams<{ id: string }>();
-    const phoneNumber = parsePhoneNumber(managedUser?.phone || '')
-    const e164Number = phoneNumber?.format('E.164')
     const {t} = useTranslation();
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
@@ -57,8 +63,6 @@ function UserAccountSettings() {
             localStorage.setItem('activeForm', activeForm);
             api.getAccountById(id).then(response => {
                 setManagedUser(response.data);
-                // console.log(response.data)
-                // console.log(response.headers['etag'])
                 window.localStorage.setItem('etag', response.headers['etag']);
             });
         }
@@ -73,6 +77,8 @@ function UserAccountSettings() {
         } else if (formType === 'userData') {
             // @ts-expect-error - fix this
             SubmitUserData(formValues);
+        } else {
+            SubmitPassword();
         }
         setAlertDialogOpen(false);
     };
@@ -101,6 +107,10 @@ function UserAccountSettings() {
         setAlertDialogOpen(true);
     };
 
+    const onSubmitPassword = () => {
+        setAlertDialogOpen(true);
+    };
+
     //TODO you have to manually refresh the page to see the changes
     //TODO gray out the admin button for the admin that is editing his own account
     const confirmChangeUserLevel = () => {
@@ -115,22 +125,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.STAFF:
@@ -141,22 +136,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.CLIENT:
@@ -167,22 +147,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                 }
@@ -196,22 +161,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.STAFF:
@@ -222,22 +172,7 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                     case RolesEnum.CLIENT:
@@ -248,27 +183,11 @@ function UserAccountSettings() {
                                 description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
                             })
                         }).catch((error) => {
-                            if (error.response && error.response.data) {
-                                const {message, violations} = error.response.data;
-                                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                                toast({
-                                    variant: "destructive",
-                                    title: t(message),
-                                    description: violationMessages,
-                                });
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    description: "Error",
-                                });
-                            }
-                            // console.log(error.response ? error.response.data : error);
+                            handleApiError(error);
                         });
                         break;
                 }
                 setAlertDialogOpen(false);
-                location.reload()
                 setLevelToChange(null);
             }
         }
@@ -292,42 +211,24 @@ function UserAccountSettings() {
                 if (managedUser?.id) {
                     api.getAccountById(managedUser?.id).then(response => {
                         setManagedUser(response.data);
-                        // console.log(response.data)
                     });
                 }
                 setFormType(null);
                 setFormValues(null);
 
             }).catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
         }
     };
 
     const SubmitUserData = (values: z.infer<typeof userDataSchema>) => {
         const etag = window.localStorage.getItem('etag');
-        // console.log(managedUser?.version)
         if (managedUser && managedUser.accountLanguage && etag !== null) {
             api.modifyAccountUser(managedUser.login, managedUser.version, managedUser.userLevelsDto,
                 values.name, values.lastName, values.phoneNumber, false, etag)
                 .then(() => {
                     getCurrentAccount();
-                    // window.location.reload()
                     toast({
                         title: "Success!",
                         description: "The account info has been successfully changed.",
@@ -336,31 +237,54 @@ function UserAccountSettings() {
                     setFormValues(null);
 
                 }).catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
         } else {
             console.log('Account or account language is not defined');
         }
     };
 
+    const SubmitPassword = () => {
+        if (id) {
+            console.log(id);
+            api.resetPasswordByAdmin(id).then(() => {
+                getCurrentAccount();
+                toast({
+                    title: t("accountSettings.popUp.changePasswordOK.title"),
+                    description: t("accountSettings.popUp.changePasswordOK.text"),
+                });
+                setFormType(null);
+                setFormValues(null);
+
+            }).catch((error) => {
+                handleApiError(error);
+            });
+        }
+
+    };
+
     return (
         <div>
             <SiteHeader/>
+            <Breadcrumb className={"p-5"}>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/manage-users">{t("breadcrumb.manageUsers")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink>{t("breadcrumb.userAccount")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">
@@ -371,14 +295,22 @@ function UserAccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <a className="font-semibold text-primary"
-                           onClick={() => setActiveForm('UserLevels')}>{t("accountSettings.users.table.settings.account.userLevels")}</a>
-                        <a className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Authentication')}>
-                            {t("accountSettings.users.table.settings.account.authentication")}
-                        </a>
-                        <a className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Personal Info')}>{t("accountSettings.users.table.settings.account.personalInfo")}</a>
+                        <Button variant="link" onClick={() => setActiveForm('UserLevels')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.users.table.settings.account.userLevels")}
+                        </Button>
+                        <Button variant="link" onClick={() => setActiveForm('E-Mail')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.email")}
+                        </Button>
+                        <Button variant="link" onClick={() => setActiveForm('Password')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.password")}
+                        </Button>
+                        <Button variant="link" onClick={() => setActiveForm('Personal Info')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.users.table.settings.account.personalInfo")}
+                        </Button>
 
                     </nav>
                     <div className="grid gap-6">
@@ -425,7 +357,7 @@ function UserAccountSettings() {
                                 )}
                             </div>
                         )}
-                        {activeForm === 'Authentication' && (
+                        {activeForm === 'E-Mail' && (
                             <div>
                                 <Card className="mx-10 w-auto">
                                     <CardContent>
@@ -464,6 +396,29 @@ function UserAccountSettings() {
                                         <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                                         <AlertDialogDescription>
                                             {t("accountSettings.confirmEmailChange")}
+                                        </AlertDialogDescription>
+                                        <AlertDialogAction onClick={handleDialogAction}>
+                                            {t("general.ok")}
+                                        </AlertDialogAction>
+                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                        )}
+                        {activeForm === 'Password' && (
+                            <div>
+                                <Card className="mx-10 w-auto p-10">
+                                    <CardContent>
+                                        <Button onClick={onSubmitPassword} className="w-full">
+                                            {t("resetPasswordPage.title")}
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                                    <AlertDialogContent>
+                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            {t("resetPasswordPage.resetPassword")}
                                         </AlertDialogDescription>
                                         <AlertDialogAction onClick={handleDialogAction}>
                                             {t("general.ok")}
@@ -520,13 +475,25 @@ function UserAccountSettings() {
                                                             <FormField
                                                                 control={formUserData.control}
                                                                 name="phoneNumber"
-                                                                render={({field}) => (
+                                                                render={() => (
                                                                     <FormItem className="items-start">
                                                                         <FormLabel
-                                                                            className="text-black text-center">{t("accountSettings.users.table.settings.account.personalInfo.phoneNumber")}</FormLabel>
+                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                                         <FormControl className="w-full">
-                                                                            <PhoneInput //TODO fix this
-                                                                                placeholder={e164Number} {...field}/>
+                                                                            <Controller
+                                                                                name="phoneNumber"
+                                                                                control={formUserData.control}
+                                                                                render={({field}) => (
+                                                                                    <PhoneInput
+                                                                                        {...field}
+                                                                                        value={field.value || ""}
+                                                                                        placeholder={managedUser?.phone}
+                                                                                        onChange={field.onChange}
+                                                                                        countries={['PL']}
+                                                                                        defaultCountry="PL"
+                                                                                    />
+                                                                                )}
+                                                                            />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>

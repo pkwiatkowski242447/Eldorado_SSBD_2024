@@ -4,13 +4,12 @@ import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
 import {useAccountState} from "@/context/AccountContext.tsx";
-import {parsePhoneNumber} from "react-phone-number-input";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
@@ -23,14 +22,21 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import handleApiError from "@/components/HandleApiError.ts";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
+import {Slash} from "lucide-react";
 
 
 function AccountSettings() {
-    const [activeForm, setActiveForm] = useState('Authentication');
+    const [activeForm, setActiveForm] = useState('E-Mail');
     const {account} = useAccountState();
     const {t} = useTranslation();
-    const phoneNumber = parsePhoneNumber(account?.phone || '')
-    const e164Number = phoneNumber?.format('E.164')
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
@@ -45,6 +51,24 @@ function AccountSettings() {
         lastName: z.string().min(2, {message: t("accountSettings.lastNameTooShort")})
             .max(50, {message: t("accountSettings.lastNameTooLong")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
+    });
+
+    const passwordSchema = z.object({
+        oldPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+        newPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+        newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+    }).refine(values => values.newPassword === values.newPasswordRepeat, {
+        message: t("accountSettings.passwordsMustMatch"),
+        path: ["newPasswordRepeat"],
+    }).refine(values => values.oldPassword !== values.newPassword, {
+        message: t("accountSettings.newPasswordCanNotBeTheSame"),
+        path: ["newPassword"],
     });
 
     const {getCurrentAccount} = useAccount();
@@ -62,6 +86,18 @@ function AccountSettings() {
     const formUserData = useForm({
         resolver: zodResolver(userDataSchema),
     });
+
+    const formPassword = useForm({
+        resolver: zodResolver(passwordSchema),
+    });
+
+    const onSubmitPassword = (values: z.infer<typeof passwordSchema>) => {
+        // @ts-expect-error - fix this
+        setFormValues(values);
+        // @ts-expect-error - fix this
+        setFormType('password');
+        setAlertDialogOpen(true);
+    };
 
     const onSubmitEmail = (values: SetStateAction<null>) => {
         setFormValues(values);
@@ -84,6 +120,9 @@ function AccountSettings() {
         } else if (formType === 'userData') {
             // @ts-expect-error - fix this
             SubmitUserData(formValues);
+        } else if (formType === 'password') {
+            // @ts-expect-error - fix this
+            SubmitPassword(formValues);
         }
         setAlertDialogOpen(false);
     };
@@ -101,22 +140,24 @@ function AccountSettings() {
             setFormValues(null);
 
         }).catch((error) => {
-            if (error.response && error.response.data) {
-                const {message, violations} = error.response.data;
-                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+            handleApiError(error);
+        });
+    };
 
-                toast({
-                    variant: "destructive",
-                    title: t(message),
-                    description: violationMessages,
-                });
-            } else {
-                toast({
-                    variant: "destructive",
-                    description: "Error",
-                });
-            }
-            // console.log(error.response ? error.response.data : error);
+    const SubmitPassword = (values: z.infer<typeof passwordSchema>) => {
+        // console.log(values.email)
+        console.log(values.oldPassword, values.newPassword);
+        api.changePasswordSelf(values.oldPassword, values.newPassword).then(() => {
+            getCurrentAccount();
+            toast({
+                title: t("accountSettings.popUp.changePasswordOK.title"),
+                description: t("accountSettings.popUp.changePasswordOK.text"),
+            });
+            setFormType(null);
+            setFormValues(null);
+
+        }).catch((error) => {
+            handleApiError(error);
         });
     };
 
@@ -136,22 +177,7 @@ function AccountSettings() {
                     setFormValues(null);
 
                 }).catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
         } else {
             console.log('Account or account language is not defined');
@@ -161,6 +187,19 @@ function AccountSettings() {
     return (
         <div>
             <SiteHeader/>
+            <Breadcrumb className={"p-5"}>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink>{t("breadcrumb.myAccount")}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">
@@ -171,16 +210,22 @@ function AccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <a href="#" className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Authentication')}>
-                            {t("accountSettings.authentication")}
-                        </a>
-                        <a href="#" className="font-semibold text-primary"
-                           onClick={() => setActiveForm('Personal Info')}>{t("accountSettings.personalInfo")}</a>
+                        <Button variant="link" onClick={() => setActiveForm('E-Mail')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.email")}
+                        </Button>
+                        <Button variant="link" onClick={() => setActiveForm('Password')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.password")}
+                        </Button>
+                        <Button variant="link" onClick={() => setActiveForm('Personal Info')}
+                                className="text-muted-foreground transition-colors hover:text-foreground">
+                            {t("accountSettings.personalInfo")}
+                        </Button>
 
                     </nav>
                     <div className="grid gap-6">
-                        {activeForm === 'Authentication' && (
+                        {activeForm === 'E-Mail' && (
                             <div>
                                 <Card className="mx-10 w-auto">
                                     <CardContent>
@@ -219,6 +264,82 @@ function AccountSettings() {
                                         <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                                         <AlertDialogDescription>
                                             {t("accountSettings.confirmEmailChange")}
+                                        </AlertDialogDescription>
+                                        <AlertDialogAction onClick={handleDialogAction}>
+                                            {t("general.ok")}
+                                        </AlertDialogAction>
+                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                        )}
+                        {activeForm === 'Password' && (
+                            <div>
+                                <Card className="mx-10 w-auto">
+                                    <CardContent>
+                                        <Form {...formPassword}>
+                                            {// @ts-expect-error - fix this
+                                                <form onSubmit={formPassword.handleSubmit(onSubmitPassword)}
+                                                      className="space-y-4">
+                                                    <div className="grid gap-4 p-5">
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="oldPassword"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.oldPassword")}</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="newPassword"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.newPassword")}</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="newPasswordRepeat"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.newPasswordRepeat")}</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <Button type="submit" className="w-full pb-2">
+                                                            {t("accountSettings.authentication.password.change")}
+                                                        </Button>
+                                                    </div>
+                                                </form>
+                                            }
+                                        </Form>
+                                    </CardContent>
+                                </Card>
+                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                                    <AlertDialogContent>
+                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            {t("accountSettings.confirmPasswordChange")}
                                         </AlertDialogDescription>
                                         <AlertDialogAction onClick={handleDialogAction}>
                                             {t("general.ok")}
@@ -275,13 +396,25 @@ function AccountSettings() {
                                                             <FormField
                                                                 control={formUserData.control}
                                                                 name="phoneNumber"
-                                                                render={({field}) => (
+                                                                render={() => (
                                                                     <FormItem className="items-start">
                                                                         <FormLabel
-                                                                            className="text-black text-center">{t("accountSettings.personalInfo.phoneNumber")}</FormLabel>
+                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                                         <FormControl className="w-full">
-                                                                            <PhoneInput //TODO fix this
-                                                                                placeholder={e164Number} {...field}/>
+                                                                            <Controller
+                                                                                name="phoneNumber"
+                                                                                control={formUserData.control}
+                                                                                render={({field}) => (
+                                                                                    <PhoneInput
+                                                                                        {...field}
+                                                                                        value={field.value || ""}
+                                                                                        placeholder={account?.phone}
+                                                                                        onChange={field.onChange}
+                                                                                        countries={['PL']}
+                                                                                        defaultCountry="PL"
+                                                                                    />
+                                                                                )}
+                                                                            />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>

@@ -9,6 +9,7 @@ import {api} from "@/api/api.ts";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
 
 function ForgotPasswordPage() {
     const {toast} = useToast()
@@ -36,28 +37,13 @@ function ForgotPasswordPage() {
                 });
             })
             .catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-                // console.log(error.response ? error.response.data : error);
+                handleApiError(error);
             });
     }
 
     return (
-        <div>
-            <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2"/>
+        <div className="flex flex-col items-center justify-center">
+            <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2 mb-8"/>
             <Card className="mx-auto max-w-2xl">
                 <CardHeader>
                     <CardTitle>{t("forgotPasswordPage.title")}</CardTitle>

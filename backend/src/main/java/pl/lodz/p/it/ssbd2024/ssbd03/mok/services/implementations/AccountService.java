@@ -253,7 +253,7 @@ public class AccountService implements AccountServiceInterface {
      * @param userEmail Email address that will be used to search for the existing account, and then used for sending
      *                  e-mail message with password change URL.
      */
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPassword(String userEmail) throws ApplicationBaseException {
         Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
@@ -366,7 +366,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
      */
     @Override
-    @RolesAllowed({ Roles.AUTHENTICATED })
+    @RolesAllowed({Roles.AUTHENTICATED})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
         Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
