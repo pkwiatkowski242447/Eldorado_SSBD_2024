@@ -6,6 +6,7 @@ import eldoLogo from "@/assets/eldorado.png";
 import {Card, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card"
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
 
 function ConfirmEmailChangePage() {
     const {token} = useParams<{ token: string }>();
@@ -73,22 +74,7 @@ function ConfirmEmailChangePage() {
                     });
                 })
                 .catch((error) => {
-                    if (error.response && error.response.data) {
-                        const {message, violations} = error.response.data;
-                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                        toast({
-                            variant: "destructive",
-                            title: t(message),
-                            description: violationMessages,
-                        });
-                    } else {
-                        toast({
-                            variant: "destructive",
-                            description: "Error",
-                        });
-                    }
-                    // console.log(error.response ? error.response.data : error);
+                    handleApiError(error);
                 });
         }
     }

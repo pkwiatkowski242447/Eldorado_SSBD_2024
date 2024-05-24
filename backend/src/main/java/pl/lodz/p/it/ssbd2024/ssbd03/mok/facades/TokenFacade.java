@@ -84,7 +84,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param entity Token to be removed from the database.
      */
     @Override
-    @RolesAllowed(Roles.ANONYMOUS)
+    @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     public void remove(Token entity) throws ApplicationBaseException {
         super.remove(entity);
     }

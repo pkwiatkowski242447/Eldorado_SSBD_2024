@@ -47,6 +47,7 @@
   "registerPage.phoneNumberInvalid": "Numer telefonu jest nieprawidłowy",
   "registerPage.hasAccount": "Masz już konto?",
   "registerPage.logIn": "Zaloguj się",
+  "registerPage.passwordInvalid": "Hasło musi zawierać co najmniej jedną wielką literę, jedną małą literę, jedną cyfrę oraz jeden znak specjalny",
 
 
   "forgotPasswordPage.title": "Zapomniałem hasła",
@@ -69,7 +70,8 @@
 
 
   "accountSettings.title": "Zmień ustawienia konta",
-  "accountSettings.authentication": "Uwierzytelnianie",
+  "accountSettings.email": "E-mail",
+  "accountSettings.password": "Hasło",
   "accountSettings.personalInfo": "Dane osobowe",
   "accountSettings.authentication.email": "E-mail",
   "accountSettings.authentication.email.change": "Zmień swój e-mail",
@@ -83,6 +85,18 @@
   "accountSettings.lastNameTooLong": "Nazwisko może mieć maksymalnie 50 znaków",
   "accountSettings.phoneNumberInvalid": "Numer telefonu jest nieprawidłowy",
   "accountSettings.wrongEmail": "Podany adres e-mail jest nieprawidłowy",
+
+  "accountSettings.authentication.oldPassword": "Obecne Hasło",
+  "accountSettings.authentication.newPassword": "Nowe Hasło",
+  "accountSettings.authentication.newPasswordRepeat": "Potwierdź Nowe Hasło",
+  "accountSettings.authentication.password.change": "Zmień Hasło",
+  "accountSettings.passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
+  "accountSettings.passwordTooLong": "Hasło może mieć maksymalnie 60 znaków",
+  "accountSettings.passwordsMustMatch": "Hasła muszą być identyczne",
+  "accountSettings.newPasswordCanNotBeTheSame": "Nowe hasło musi się różnić od starego hasła",
+  "accountSettings.confirmPasswordChange": "Czy na pewno chcesz zmienić hasło?",
+  "accountSettings.popUp.changePasswordOK.title": "Sukces!",
+  "accountSettings.popUp.changePasswordOK.text": "Twoje hasło zostało pomyślnie zmienione.",
 
 
   "accountSettings.users.table.header.login": "Login",
@@ -141,6 +155,9 @@
   "resetPasswordPage.passwordTooLong": "Hasło może mieć maksymalnie 60 znaków",
   "resetPasswordPage.password": "Hasło",
   "resetPasswordPage.button": "Zmień Hasło",
+  "resetPasswordPage.resetPassword": "Czy na pewno chcesz zresetować hasło?",
+
+
 
   "activateAccountPage.title": "Już prawie gotowe!",
   "activateAccountPage.info": "Aktywuj swoje konto Eldorado, naciskając przycisk poniżej.",
@@ -319,5 +336,24 @@
   "mail.reset.password.action_description" : "Zresetuj swoje hasło",
   "mail.reset.password.note_title" : "Uwaga",
 
-  "mail.auto.generate.message.note" : "To jest automatycznie wygenerowana wiadomość. Proszę nie odpowiadać."
+  "mail.auto.generate.message.note" : "To jest automatycznie wygenerowana wiadomość. Proszę nie odpowiadać.",
+
+  "bean.validation.account.login.dto.login.blank": "Login nie może być pusty",
+  "bean.validation.account.login.dto.login.regex.not.met": "Login nie spełnia wymagań dotyczących formatu",
+  "bean.validation.account.login.dto.login.too.short": "Login jest za krótki",
+  "bean.validation.account.login.dto.login.too.long": "Login jest za długi",
+  "bean.validation.account.login.dto.password.blank": "Hasło nie może być puste",
+  "bean.validation.account.login.dto.password.regex.not.met": "Hasło nie spełnia wymagań dotyczących formatu",
+  "bean.validation.account.login.dto.password.too.short": "Hasło jest za krótkie",
+  "bean.validation.account.login.dto.password.too.long": "Hasło jest za długie",
+
+  "breadcrumb.home": "Strona główna",
+  "breadcrumb.manageUsers": "Zarządzanie użytkownikami",
+  "breadcrumb.changeUserlevel": "Zmień poziom dostępu",
+  "breadcrumb.myAccount": "Moje konto",
+  "breadcrumb.userAccount": "Edytuj konto",
+
+  "notFound.title": "Strona nie znaleziona",
+  "notFound.description": "Strona, której szukasz, nie istnieje",
+  "notFound.home": "Przejdź do strony głównej"
 }

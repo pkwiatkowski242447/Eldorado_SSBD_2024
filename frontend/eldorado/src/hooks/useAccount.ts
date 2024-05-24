@@ -1,4 +1,3 @@
-import {UserType} from "../types/Users";
 import {useAccountState} from "../context/AccountContext";
 import {useNavigate} from "react-router-dom";
 import {api} from "../api/api";
@@ -7,15 +6,13 @@ import {usersApi} from "@/api/userApi.ts";
 import {useEffect, useState} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
-import {useTranslation} from "react-i18next";
+import handleApiError from "@/components/HandleApiError.ts";
 
 export const useAccount = () => {
-
     const navigate = useNavigate()
     const {account, setAccount} = useAccountState()
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const {toast} = useToast()
-    const {t} = useTranslation();
 
     useEffect(() => {
         const storedAccount = localStorage.getItem('account');
@@ -38,8 +35,10 @@ export const useAccount = () => {
             console.log(e)
         } finally {
             localStorage.removeItem('token')
+            localStorage.removeItem('refreshToken')
             localStorage.removeItem('account')
             localStorage.removeItem('etag')
+            setIsAuthenticated(false)
             setAccount(null)
             navigateToMainPage()
         }
@@ -48,8 +47,10 @@ export const useAccount = () => {
         try {
             const response = await api.logIn(login, password);
             if (response.status === 200) {
-                const token = response.data;
-                localStorage.setItem('token', token);
+                const accessToken = response.data.accessToken;
+                const refreshToken = response.data.refreshToken;
+                localStorage.setItem('token', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
                 await getCurrentAccount()
                 setIsAuthenticated(true);
                 navigate(Pathnames.public.home)
@@ -57,22 +58,8 @@ export const useAccount = () => {
                 navigate(`/login/2fa/${login}`);
             }
         } catch (error) {
-            //@ts-expect-error works tho
-            if (error.response && error.response.data) {
-                //@ts-expect-error works tho
-                const {message, violations} = error.response.data;
-                const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-                toast({
-                    variant: "destructive",
-                    title: t(message),
-                    description: violationMessages,
-                });
-            } else {
-                toast({
-                    variant: "destructive",
-                    description: "Error",
-                });
-            }
+            //@ts-expect-error idk
+            handleApiError(error);
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
@@ -82,8 +69,12 @@ export const useAccount = () => {
         try {
             const response = await api.logIn2fa(userLogin, authCodeValue);
             if (response.status === 200) {
-                const token = response.data;
-                localStorage.setItem('token', token);
+                const accessToken = response.data.accessToken;
+                const refreshToken = response.data.refreshToken;
+                localStorage.setItem('token', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+                console.log(accessToken)
+                console.log(refreshToken)
                 await getCurrentAccount()
                 setIsAuthenticated(true);
                 navigate(Pathnames.public.home)
@@ -106,26 +97,19 @@ export const useAccount = () => {
                 const token = await usersApi.getSelf();
                 window.localStorage.setItem('etag', token.headers['etag']);
                 let activeUserLevel = token.data.userLevelsDto[0];
-                if (account?.activeUserLevel == null) {
-                    for (const i in token.data.userLevelsDto.length) {
-                        if (token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
-                            if (token.data.userLevelsDto[i].roleName === RolesEnum.ADMIN) {
-                                activeUserLevel = token.data.userLevelsDto[i];
-                                // console.log(activeUserLevel)
-                                break;
-                            }
-                        } else if (token.data.userLevelsDto.contains(RolesEnum.STAFF) && !token.data.userLevelsDto.contains(RolesEnum.ADMIN)) {
-                            if (token.data.userLevelsDto[i].roleName === RolesEnum.STAFF) {
-                                activeUserLevel = token.data.userLevelsDto[i];
-                                // console.log(activeUserLevel)
-                                break;
-                            }
+                if (!account?.activeUserLevel) {
+                    for (const userLevel of token.data.userLevelsDto) {
+                        if (userLevel.roleName === RolesEnum.ADMIN) {
+                            activeUserLevel = userLevel;
+                            break;
+                        } else if (userLevel.roleName === RolesEnum.STAFF) {
+                            activeUserLevel = userLevel;
                         }
                     }
                 } else {
                     activeUserLevel = account.activeUserLevel;
                 }
-                const user: UserType = {
+                const user = {
                     accountLanguage: token.data.accountLanguage,
                     active: token.data.active,
                     blocked: token.data.blocked,
@@ -143,7 +127,7 @@ export const useAccount = () => {
                     version: token.data.version,
                     twoFactorAuth: token.data.twoFactorAuth,
                 };
-                setAccount(user)
+                setAccount(user);
                 localStorage.setItem('account', JSON.stringify(user));
             }
         } catch (e) {
@@ -151,9 +135,9 @@ export const useAccount = () => {
                 alert('Unable to get current account!');
                 await logOut();
             }
-        } finally { /* empty */
         }
-    }
+    };
+
     return {
         account,
         isAuthenticated,

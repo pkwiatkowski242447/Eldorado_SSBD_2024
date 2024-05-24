@@ -9,7 +9,7 @@ i18n
     .use(initReactI18next) // pass the i18n instance to react-i18next.
     .init({
         fallbackLng: 'en-GB', // use en if detected lng is not available
-        debug: true,
+        debug: false,
 
         interpolation: {
             escapeValue: false, // react already safes from xss
