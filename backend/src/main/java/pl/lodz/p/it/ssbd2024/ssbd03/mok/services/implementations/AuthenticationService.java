@@ -186,7 +186,8 @@ public class AuthenticationService implements AuthenticationServiceInterface {
             this.generateAndSendEmailMessageWithAuthenticationCode(account);
             return null;
         }
-        tokenFacade.findByTypeAndAccount(Token.TokenType.REFRESH_TOKEN, account.getId()).ifPresent(tokenFacade::remove);
+        tokenFacade.removeByTypeAndAccount(Token.TokenType.REFRESH_TOKEN, account.getId());
+
         String accessToken = jwtProvider.generateJWTToken(account);
         Token refreshTokenObject = tokenProvider.generateRefreshToken(account);
         tokenFacade.create(refreshTokenObject);
@@ -261,7 +262,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     @RolesAllowed({Roles.ANONYMOUS})
     private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
-        tokenFacade.findByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId()).ifPresent(tokenFacade::remove);
+        tokenFacade.removeByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId());
 
         String authCodeValue;
         try {
@@ -326,10 +327,12 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      *
      * @param login Login of the Account to be retrieved.
      * @return Returns Account with the specified login.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     *                                  on facade components.
      */
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
-    public Optional<Account> findByLogin(String login) {
+    public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         return this.authenticationFacade.findByLogin(login);
     }
 }

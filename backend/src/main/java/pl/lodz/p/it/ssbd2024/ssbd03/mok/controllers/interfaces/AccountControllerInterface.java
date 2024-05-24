@@ -91,8 +91,10 @@ public interface AccountControllerInterface {
      * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
      * @note. This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
      * login alphabetically.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
-    ResponseEntity<?> getAllUsers(int pageNumber, int pageSize);
+    ResponseEntity<?> getAllUsers(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * This method is used to retrieve user accounts that match specified criteria.
@@ -105,8 +107,12 @@ public interface AccountControllerInterface {
      * @param pageSize   Number of the users per page.
      * @return This method returns 200 OK response, with list of users in the response body, converted to JSON.
      * If the list is empty, then 204 NO CONTENT is returned.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
      */
-    ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize);
+    ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(
+            String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
     /**
      * This method is used to activate user account, after it was successfully.

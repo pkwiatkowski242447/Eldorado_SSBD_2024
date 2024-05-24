@@ -748,10 +748,8 @@ public class AccountControllerMockTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(header().string("ETag", "\"SIGNATURE\""))
-                .andExpect(result -> {
-                            assertEquals(mapper.writeValueAsString(AccountMapper.toAccountOutputDto(testAccount)),
-                                    result.getResponse().getContentAsString());
-                        }
+                .andExpect(result -> assertEquals(mapper.writeValueAsString(AccountMapper.toAccountOutputDto(testAccount)),
+                        result.getResponse().getContentAsString())
                 );
     }
 
@@ -796,10 +794,8 @@ public class AccountControllerMockTest {
                                 .content(mapper.writeValueAsString(accountModifyDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(result -> {
-                            assertEquals(mapper.writeValueAsString(accountOutputDTO),
-                                    result.getResponse().getContentAsString());
-                        }
+                .andExpect(result -> assertEquals(mapper.writeValueAsString(accountOutputDTO),
+                        result.getResponse().getContentAsString())
                 );
 
         // Verify
@@ -900,10 +896,8 @@ public class AccountControllerMockTest {
                                 .content(mapper.writeValueAsString(accountModifyDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(result -> {
-                            assertEquals(mapper.writeValueAsString(accountOutputDTO),
-                                    result.getResponse().getContentAsString());
-                        }
+                .andExpect(result -> assertEquals(mapper.writeValueAsString(accountOutputDTO),
+                        result.getResponse().getContentAsString())
                 );
 
         // Verify

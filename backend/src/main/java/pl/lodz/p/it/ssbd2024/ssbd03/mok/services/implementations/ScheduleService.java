@@ -17,8 +17,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.ScheduleServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.ScheduleLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +50,11 @@ public class ScheduleService implements ScheduleServiceInterface {
     private final MailProvider mailProvider;
 
     /**
+     * TokenProvider component used for automatic generation of action tokens.
+     */
+    private TokenProvider tokenProvider;
+
+    /**
      * String value that specifies time after which deletion will occur.
      * Deletion time is specified by <code>scheduler.not_verified_account_delete_time</code> property.
      */
@@ -70,47 +77,54 @@ public class ScheduleService implements ScheduleServiceInterface {
      *
      * @param accountMOKFacade Facade used for managing user accounts.
      * @param tokenFacade      Facade used for managing tokens used for many account related activities.
+     * @param tokenProvider    Component used for automatic generation of action tokens.
+     * @param mailProvider     Component used for sending e-mail messages to e-mail addresses connected to certain
+     *                         user accounts.
      */
     @Autowired
-    public ScheduleService(AccountMOKFacade accountMOKFacade, TokenFacade tokenFacade, MailProvider mailProvider) {
+    public ScheduleService(AccountMOKFacade accountMOKFacade,
+                           TokenFacade tokenFacade,
+                           MailProvider mailProvider,
+                           TokenProvider tokenProvider) {
         this.accountMOKFacade = accountMOKFacade;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
+        this.tokenProvider = tokenProvider;
     }
 
     /**
      * Removes Accounts which have not finished registration.
      * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
-     *
-     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void deleteNotVerifiedAccount() throws ScheduleBadPropertiesException {
-        log.info(ScheduleLogMessages.INVOKING_DELETE_ACCOUNTS_MESS);
+    public void deleteNotVerifiedAccount() {
+        log.info("Method: deleteNotVerifiedAccount(), used for removing not activated accounts, was invoked.");
 
-        // Find not verified accounts
-        List<Account> inactiveAccounts;
+        List<Account> inactiveAccounts = new ArrayList<>();
         try {
-            inactiveAccounts =
-                    accountMOKFacade.findAllAccountsMarkedForDeletion(Long.parseLong(deleteTime), TimeUnit.HOURS);
-        } catch (NumberFormatException e) {
-            log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
-            throw new ScheduleBadPropertiesException(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("not_verified_account_delete_time"));
+            inactiveAccounts = accountMOKFacade.findAllAccountsMarkedForDeletion(Long.parseLong(deleteTime), TimeUnit.HOURS);
+        } catch (NumberFormatException | ApplicationBaseException exception) {
+            log.error("Exception: {} occurred while searching for accounts to be removed. Cause: {}.",
+                    exception.getClass().getSimpleName(), exception.getMessage());
         }
 
         if (inactiveAccounts.isEmpty()) {
-            log.info(ScheduleLogMessages.NO_ACCOUNTS_TO_DELETE_MESS);
+            log.info("No accounts to be removed were found.");
             return;
         }
 
-        log.info(ScheduleLogMessages.LIST_ACCOUNTS_TO_DELETE_IDS, inactiveAccounts.stream().map(Account::getId).toList());
+        log.info("List of identifiers of accounts to be removed: {}", inactiveAccounts.stream().map(Account::getId).toList());
 
-        // Delete accounts and linked tokens
-        inactiveAccounts.forEach(a -> {
-            tokenFacade.removeByAccount(a.getId());
-            accountMOKFacade.remove(a);
-        });
+        for (Account account : inactiveAccounts) {
+            try {
+                tokenFacade.removeByAccount(account.getId());
+                accountMOKFacade.remove(account);
+            } catch (ApplicationBaseException exception) {
+                log.error("Exception: {} occurred while removing account with id: {}. Cause: {}.",
+                        exception.getClass().getSimpleName(), account.getId(), exception.getMessage());
+            }
+        }
     }
 
     /**
@@ -120,55 +134,63 @@ public class ScheduleService implements ScheduleServiceInterface {
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void resendConfirmationEmail() {
-        log.info(ScheduleLogMessages.INVOKING_RESEND_CONFIRMATION_EMAIL);
+        log.info("Method: resendConfirmationEmail(), used for sending account activation message, was invoked.");
 
-        // Find all tokens of type REGISTER
-        List<Token> registerTokens = tokenFacade.findByTokenType(Token.TokenType.REGISTER);
+        List<Token> registerTokens = new ArrayList<>();
+        try {
+            registerTokens = tokenFacade.findByTokenType(Token.TokenType.REGISTER);
+        } catch (ApplicationBaseException exception) {
+            log.error("Exception: {} occurred while searching for account needing activation. Cause: {}.",
+                    exception.getClass().getSimpleName(), exception.getMessage());
+        }
 
-        registerTokens.forEach(token -> {
-            Account account = token.getAccount();
-            if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(resendRegistrationConfirmationEmailAfterHours))) {
-                String confirmationURL = accountCreationConfirmationUrl + token.getTokenValue();
+        for (Token token : registerTokens) {
+            try {
+                Account account = token.getAccount();
+                if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(resendRegistrationConfirmationEmailAfterHours))) {
+                    tokenFacade.removeByTypeAndAccount(Token.TokenType.REGISTER, account.getId());
+                    Token tokenObject = tokenProvider.generateAccountActivationToken(account);
+                    tokenFacade.create(tokenObject);
 
-                mailProvider.sendRegistrationConfirmEmail(account.getName(),
-                        account.getLastname(),
-                        account.getEmail(),
-                        confirmationURL,
-                        account.getAccountLanguage());
-                tokenFacade.removeByTypeAndAccount(Token.TokenType.REGISTER, account.getId());
+                    String confirmationURL = accountCreationConfirmationUrl + tokenObject.getTokenValue();
+
+                    mailProvider.sendRegistrationConfirmEmail(account.getName(),
+                            account.getLastname(),
+                            account.getEmail(),
+                            confirmationURL,
+                            account.getAccountLanguage());
+                }
+            } catch (ApplicationBaseException exception) {
+                log.error("Exception: {} occurred while swapping activation token for account with id: {}. Cause: {}.",
+                        exception.getClass().getSimpleName(), token.getAccount().getId(), exception.getMessage());
             }
-        });
+        }
     }
 
     /**
      * Unblock Accounts which have been blocked by login incorrectly certain amount of time.
      * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
-     *
-     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void unblockAccount() throws ScheduleBadPropertiesException {
-        log.info(ScheduleLogMessages.INVOKING_UNBLOCK_ACCOUNTS_MESS);
+    public void unblockAccount() {
+        log.info("Method: unblockAccount(), used for unblocking accounts blocked by incorrect login attempts, was invoked.");
 
-        // Find blocked accounts
-        List<Account> blockedAccounts;
+        List<Account> blockedAccounts = new ArrayList<>();
         try {
-            blockedAccounts = accountMOKFacade
-                    .findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.HOURS);
-        } catch (NumberFormatException e) {
-            log.error(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
-            throw new ScheduleBadPropertiesException(ScheduleLogMessages.BAD_PROP_FORMAT.formatted("scheduler.blocked_account_unblock_time"));
+            blockedAccounts = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(Long.parseLong(unblockTime), TimeUnit.HOURS);
+        } catch (NumberFormatException | ApplicationBaseException exception) {
+            log.error("Exception: {} occurred while searching for accounts to be unblocked. Cause: {}.",
+                    exception.getClass().getSimpleName(), exception.getMessage());
         }
 
         if (blockedAccounts.isEmpty()) {
-            log.info(ScheduleLogMessages.NO_ACCOUNTS_TO_UNBLOCK_MESS);
+            log.info("There are no account to be unblocked right now.");
             return;
         }
 
-        log.info(ScheduleLogMessages.LIST_ACCOUNTS_TO_UNBLOCK_IDS, blockedAccounts.stream().map(Account::getId).toList());
+        log.info("List of identifiers of accounts to be unblocked: {}", blockedAccounts.stream().map(Account::getId).toList());
 
-        // Unblock accounts
         blockedAccounts.forEach((account -> {
             account.unblockAccount();
             try {
@@ -178,7 +200,6 @@ public class ScheduleService implements ScheduleServiceInterface {
                         exception.getClass().getSimpleName(), account.getLogin(), this.deleteTime);
             }
 
-            // Send notification mail
             mailProvider.sendUnblockAccountInfoEmail(account.getName(),
                     account.getLastname(),
                     account.getEmail(),

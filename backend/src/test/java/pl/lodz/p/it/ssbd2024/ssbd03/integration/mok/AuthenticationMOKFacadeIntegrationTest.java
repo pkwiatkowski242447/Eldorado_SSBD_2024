@@ -65,7 +65,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
-    public void findAndRefreshTestPositive() {
+    public void findAndRefreshTestPositive() throws Exception {
         Optional<Account> account = authenticationFacade.findAndRefresh(accountIdNo1);
 
         assertTrue(account.isPresent());
@@ -82,7 +82,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
-    public void findTestPositive() {
+    public void findTestPositive() throws Exception {
         Optional<Account> account = authenticationFacade.find(accountIdNo1);
 
         assertTrue(account.isPresent());
@@ -98,7 +98,7 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findByLoginTestPositive() {
+    public void findByLoginTestPositive() throws Exception {
         Optional<Account> account = authenticationFacade.findByLogin(accountLoginNo2);
 
         assertTrue(account.isPresent());

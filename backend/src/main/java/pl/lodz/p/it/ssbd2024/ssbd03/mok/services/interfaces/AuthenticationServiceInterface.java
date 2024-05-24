@@ -81,7 +81,9 @@ public interface AuthenticationServiceInterface {
      * Retrieves an Account with given login.
      *
      * @param login Login of the Account to be retrieved.
-     * @return Returns optional containing Account object with the specified login.
+     * @return Returns Account with the specified login.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
+     *                                  on facade components.
      */
-    Optional<Account> findByLogin(String login);
+    Optional<Account> findByLogin(String login) throws ApplicationBaseException;
 }

@@ -59,11 +59,11 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
 
     @BeforeEach
     public void setup() {
-        address = new Address("dd","casc","wqc");
+        address = new Address("dd", "casc", "wqc");
         parking = new Parking(address);
-        sector = new Sector(parking,"dd", Sector.SectorType.COVERED,23,11);
+        sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11);
         reservation = new Reservation(sector);
-        parkingEvent = new ParkingEvent(reservation,LocalDateTime.now(),ParkingEvent.EventType.ENTRY);
+        parkingEvent = new ParkingEvent(reservation, LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
         assertNotNull(parkingEvent);
         parkingEventFacade.create(parkingEvent);
 
-        assertEquals("dd",parkingEvent.getReservation().getSector().getName());
+        assertEquals("dd", parkingEvent.getReservation().getSector().getName());
     }
 
     @Test
@@ -137,13 +137,13 @@ public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
         assertNotNull(retrievedParkingEvent);
 
         parkingEventFacade.remove(parkingEvent);
-        Optional <ParkingEvent> deleted = parkingEventFacade.find(parkingEvent.getId());
+        Optional<ParkingEvent> deleted = parkingEventFacade.find(parkingEvent.getId());
         assertTrue(deleted.isEmpty());
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void parkingFacadeFindAllParkingEventsTest() {
+    public void parkingFacadeFindAllParkingEventsTest() throws Exception {
         List<ParkingEvent> listOfParkingEvents = parkingEventFacade.findAll();
         assertNotNull(listOfParkingEvents);
         assertFalse(listOfParkingEvents.isEmpty());

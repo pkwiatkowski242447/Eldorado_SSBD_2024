@@ -68,7 +68,7 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      */
     @Transactional
     @Override
-    public Optional<Account> findAndRefresh(UUID id) {
+    public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -79,7 +79,7 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      * @return If Account with the given login was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Transactional
-    public Optional<Account> findByLogin(String login) {
+    public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
             findAccountByLogin.setParameter("login", login);

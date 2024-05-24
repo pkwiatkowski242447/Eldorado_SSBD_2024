@@ -60,7 +60,7 @@ public abstract class AbstractFacade<T> {
      *
      * @param entity Entity to be removed from the database.
      */
-    protected void remove(T entity) {
+    protected void remove(T entity) throws ApplicationBaseException {
         getEntityManager().remove(getEntityManager().merge(entity));
         getEntityManager().flush();
     }
@@ -81,7 +81,7 @@ public abstract class AbstractFacade<T> {
      * @param id ID of the entity to be retrieved.
      * @return If an entity with the given ID was found returns an Optional containing the entity, otherwise returns an empty Optional.
      */
-    protected Optional<T> findAndRefresh(UUID id) {
+    protected Optional<T> findAndRefresh(UUID id) throws ApplicationBaseException {
         Optional<T> optEntity = Optional.ofNullable(this.getEntityManager().find(entityClass, id));
         optEntity.ifPresent(t -> getEntityManager().refresh(t));
         return optEntity;
@@ -92,7 +92,7 @@ public abstract class AbstractFacade<T> {
      *
      * @return List containing all entities.
      */
-    protected List<T> findAll() {
+    protected List<T> findAll() throws ApplicationBaseException {
         CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
         List<T> list = getEntityManager().createQuery(cq).getResultList();
@@ -105,7 +105,7 @@ public abstract class AbstractFacade<T> {
      *
      * @param list List of the entities to be refreshed.
      */
-    protected void refreshAll(List<T> list) {
+    protected void refreshAll(List<T> list) throws ApplicationBaseException {
         if (list != null && !list.isEmpty()) {
             list.forEach(getEntityManager()::refresh);
         }
@@ -116,7 +116,7 @@ public abstract class AbstractFacade<T> {
      *
      * @return Number of entities in the database.
      */
-    protected int count() {
+    protected int count() throws ApplicationBaseException {
         CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         Root<T> rt = cq.from(entityClass);
         cq.select(getEntityManager().getCriteriaBuilder().count(rt));

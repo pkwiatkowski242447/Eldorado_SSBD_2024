@@ -20,6 +20,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
+
 import java.util.concurrent.TimeUnit;
 
 import java.lang.reflect.Field;
@@ -125,7 +126,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.AUTHENTICATED)
-    public void findByLoginReturnExistingAccountPositiveTest() {
+    public void findByLoginReturnExistingAccountPositiveTest() throws Exception {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo2);
 
         assertTrue(account.isPresent());
@@ -142,7 +143,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.AUTHENTICATED)
-    public void findByLoginReturnNullAccountTestPositive() {
+    public void findByLoginReturnNullAccountTestPositive() throws Exception {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo1);
 
         assertTrue(account.isEmpty());
@@ -150,7 +151,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findAndRefreshReturnExistingAccountPositiveTest() {
+    public void findAndRefreshReturnExistingAccountPositiveTest() throws Exception {
         Optional<Account> account = accountMOKFacade.findAndRefresh(accountIdNo1);
 
         assertTrue(account.isPresent());
@@ -176,7 +177,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.ADMIN)
-    public void findAllTestPositive() {
+    public void findAllTestPositive() throws Exception {
         List<Account> accounts = accountMOKFacade.findAll();
 
         assertEquals(7, accounts.size());
@@ -185,7 +186,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.ADMIN)
-    public void findAllWithPaginationTestPositive() {
+    public void findAllWithPaginationTestPositive() throws Exception {
         List<Account> accountsNo1 = accountMOKFacade.findAllAccountsWithPagination(0, 4);
         List<Account> accountsNo2 = accountMOKFacade.findAllAccountsWithPagination(1, 3);
         List<Account> accountsNo3 = accountMOKFacade.findAllAccountsWithPagination(1, 4);
@@ -198,7 +199,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.ADMIN)
-    public void findAllActiveAccountsWithPaginationTestPositive() {
+    public void findAllActiveAccountsWithPaginationTestPositive() throws Exception {
         List<Account> accountsNo1 = accountMOKFacade.findAllActiveAccountsWithPagination(0, 4);
         List<Account> accountsNo2 = accountMOKFacade.findAllActiveAccountsWithPagination(1, 3);
         List<Account> accountsNo3 = accountMOKFacade.findAllActiveAccountsWithPagination(1, 4);
@@ -210,7 +211,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findByEmailReturnExistingAccountPositiveTest() {
+    public void findByEmailReturnExistingAccountPositiveTest() throws Exception {
         Optional<Account> account = accountMOKFacade.findByEmail(accountEmailNo2);
 
         assertTrue(account.isPresent());
@@ -226,7 +227,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findByEmailReturnNullAccountTestPositive() {
+    public void findByEmailReturnNullAccountTestPositive() throws Exception {
         Optional<Account> account = accountMOKFacade.findByEmail(accountEmailNo1);
 
         assertTrue(account.isEmpty());
@@ -235,7 +236,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.AUTHENTICATED)
-    public void findByLoginAndRefreshReturnExistingAccountTestPositive() {
+    public void findByLoginAndRefreshReturnExistingAccountTestPositive() throws Exception {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo2);
 
         assertTrue(account.isPresent());
@@ -252,7 +253,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.AUTHENTICATED)
-    public void findByLoginAndRefreshReturnNullTestPositive() {
+    public void findByLoginAndRefreshReturnNullTestPositive() throws Exception {
         Optional<Account> account = accountMOKFacade.findByLogin(accountLoginNo1);
 
         assertTrue(account.isEmpty());
@@ -329,7 +330,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = Roles.ADMIN)
-    public void findAllActiveAccountsWithGivenUserLevelWithPaginationPositiveTest() {
+    public void findAllActiveAccountsWithGivenUserLevelWithPaginationPositiveTest() throws Exception {
         List<Account> accounts0 = accountMOKFacade.findAll();
         assertEquals(7, accounts0.size());
         List<Account> accounts1 = accountMOKFacade.findAllActiveAccountsWithGivenUserLevelWithPagination(Client.class, 0, 20);
@@ -434,11 +435,9 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         //Two unverified accounts - now we use reflection to change their creation time
         Field creationDateField = Account.class.getDeclaredField("creationDate");
         creationDateField.setAccessible(true);
-        //creationDateField.set(accountToEdit1.get(), LocalDateTime.now().minus(Long.parseLong("5"), TimeUnit.HOURS));
-        //creationDateField.set(accountToEdit2.get(), LocalDateTime.now().minus(Long.parseLong("5"), TimeUnit.HOURS));
 
         List<Account> accounts0 = accountMOKFacade.findAllAccountsMarkedForDeletion(2, TimeUnit.HOURS);
-        assertEquals(0,accounts0.size());
+        assertEquals(0, accounts0.size());
 
     }
 
@@ -532,10 +531,10 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.edit(account1Find.get());
         accountMOKFacade.edit(account2Find.get());
 
-        List<Account> accounts0 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(0,2);
-        List<Account> accounts1 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(0,1);
-        List<Account> accounts2 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(1,1);
-        List<Account> accounts3 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(0,10);
+        List<Account> accounts0 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(0, 2);
+        List<Account> accounts1 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(0, 1);
+        List<Account> accounts2 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(1, 1);
+        List<Account> accounts3 = accountMOKFacade.findAllBlockedAccountsThatWereBlockedByAdminWithPagination(0, 10);
 
         assertEquals(2, accounts0.size());
         assertEquals(1, accounts1.size());
@@ -549,7 +548,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
-    public void findAllActiveAccountsWithUnverifiedEmailWithPaginationTestPositive() {
+    public void findAllActiveAccountsWithUnverifiedEmailWithPaginationTestPositive() throws Exception {
         List<Account> accounts0 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 10);
         List<Account> accounts1 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 2);
         List<Account> accounts2 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 1);
@@ -608,7 +607,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
 
-        List<Account> accounts0 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true,true, 0, 10);
+        List<Account> accounts0 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, true, 0, 10);
         List<Account> accounts1 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, false, 0, 10);
         List<Account> accounts2 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, false, 0, 2);
         List<Account> accounts3 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, false, 1, 1);
@@ -742,9 +741,6 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         blockedField.set(accountFind1, true);
         blockedTimeField.set(accountFind2, LocalDateTime.of(2018, 5, 8, 15, 30));
         blockedField.set(accountFind2, true);
-
-        //accountFind1.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2017, 5, 8, 15, 30));
-        //accountFind2.getActivityLog().setLastSuccessfulLoginTime(LocalDateTime.of(2018, 5, 8, 15, 30));
 
         accountMOKFacade.edit(accountFind1);
         accountMOKFacade.edit(accountFind2);

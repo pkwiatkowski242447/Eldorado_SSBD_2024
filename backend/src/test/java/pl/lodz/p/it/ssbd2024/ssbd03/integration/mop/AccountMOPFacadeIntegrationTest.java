@@ -70,7 +70,7 @@ public class AccountMOPFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void accountMOPFacadeFindAccountByLoginTest() {
+    public void accountMOPFacadeFindAccountByLoginTest() throws Exception {
         Account account = new Account("login", "haslo", "imie", "nazwisko", "email", "123456789");
 
         Optional<Account> optionalAccount = accountMOPFacade.findByLogin("login");

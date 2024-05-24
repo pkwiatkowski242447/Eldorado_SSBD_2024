@@ -64,7 +64,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     @PermitAll
-    public Optional<Account> find(UUID id) {
+    public Optional<Account> find(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -87,7 +87,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public Optional<Account> findAndRefresh(UUID id) {
+    public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -100,7 +100,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      */
     @PermitAll
     @Transactional(propagation = Propagation.REQUIRED)
-    public Optional<Account> findByLogin(String login) {
+    public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
             TypedQuery<Account> tq = getEntityManager().createNamedQuery("Account.findByLogin", Account.class);
             tq.setParameter("login", login);

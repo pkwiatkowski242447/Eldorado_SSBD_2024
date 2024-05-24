@@ -70,14 +70,14 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findByTokenValue() {
+    public void findByTokenValue() throws Exception {
         Optional<Token> token = tokenFacade.findByTokenValue(tokenValueNo1);
 
         assertNotNull(token.orElseThrow(NoSuchElementException::new));
 
         assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        assertEquals(userUuidNo1 ,token.get().getAccount().getId());
-        assertEquals(tokenValueNo1 ,token.get().getTokenValue());
+        assertEquals(userUuidNo1, token.get().getAccount().getId());
+        assertEquals(tokenValueNo1, token.get().getTokenValue());
     }
 
     @Test
@@ -110,14 +110,14 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
         assertFalse(token.isEmpty());
 
         assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        assertEquals(userUuidNo1 ,token.get().getAccount().getId());
-        assertEquals(tokenValueNo1 ,token.get().getTokenValue());
+        assertEquals(userUuidNo1, token.get().getAccount().getId());
+        assertEquals(tokenValueNo1, token.get().getTokenValue());
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
-    public void findAllPositiveTest() {
+    public void findAllPositiveTest() throws Exception {
         List<Token> tokenList = tokenFacade.findAll();
 
         assertEquals(6, tokenList.size());
@@ -126,7 +126,7 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
-    public void countPositiveTest() {
+    public void countPositiveTest() throws Exception {
         int count = tokenFacade.count();
 
         assertEquals(6, count);
@@ -134,19 +134,19 @@ public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findByTypeAndAccountTest() {
+    public void findByTypeAndAccountTest() throws Exception {
         Optional<Token> token = tokenFacade.findByTypeAndAccount(tokenTypeConfirmEmail, UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692"));
 
         assertFalse(token.isEmpty());
 
         assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        assertEquals(UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692") ,token.get().getAccount().getId());
-        assertEquals("TEST_VALUE93" ,token.get().getTokenValue());
+        assertEquals(UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692"), token.get().getAccount().getId());
+        assertEquals("TEST_VALUE93", token.get().getTokenValue());
     }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void findByTokenTypeTest() {
+    public void findByTokenTypeTest() throws Exception {
         List<Token> tokens = tokenFacade.findByTokenType(tokenTypeConfirmEmail);
 
         assertEquals(4, tokens.size());

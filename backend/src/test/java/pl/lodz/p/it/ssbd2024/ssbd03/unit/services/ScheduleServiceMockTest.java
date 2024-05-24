@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.ScheduleService;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -32,6 +34,9 @@ public class ScheduleServiceMockTest {
     private TokenFacade tokenFacade;
     @Mock
     private AccountMOKFacade accountMOKFacade;
+    @Mock
+    private TokenProvider tokenProvider;
+
     @InjectMocks
     private ScheduleService scheduleService;
 
@@ -54,7 +59,7 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void deleteNotVerifiedTestSuccessful() throws ScheduleBadPropertiesException {
+    void deleteNotVerifiedTestSuccessful() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         List<Account> accountList = List.of(account, account1);
@@ -70,14 +75,14 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void deleteNotVerifiedTestUnsuccessful() {
+    void deleteNotVerifiedTestUnsuccessful() throws Exception {
         when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenThrow(NumberFormatException.class);
 
-        assertThrows(ScheduleBadPropertiesException.class, () -> scheduleService.deleteNotVerifiedAccount());
+        assertDoesNotThrow(() -> scheduleService.deleteNotVerifiedAccount());
     }
 
     @Test
-    void deleteNotVerifiedTestEmpty() throws ScheduleBadPropertiesException {
+    void deleteNotVerifiedTestEmpty() throws Exception {
         List<Account> accountList = new ArrayList<>();
 
         when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenReturn(accountList);
@@ -88,7 +93,7 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void resendEmailConfirmationEmailTestSuccessful() throws NoSuchFieldException, IllegalAccessException {
+    void resendEmailConfirmationEmailTestSuccessful() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         account.setAccountLanguage("pl");
@@ -97,6 +102,9 @@ public class ScheduleServiceMockTest {
         Token token1 = new Token("TEST VALUE", account1, Token.TokenType.REGISTER);
         List<Token> tokenList = List.of(token, token1);
 
+        Token newToken = new Token("NewTokenValue", account, Token.TokenType.REGISTER);
+        Token newToken1 = new Token("NewTokenValue1", account1, Token.TokenType.REGISTER);
+
         Field creationDateField = Account.class.getDeclaredField("creationDate");
         creationDateField.setAccessible(true);
         creationDateField.set(account, LocalDateTime.now().minusHours(13));
@@ -104,8 +112,12 @@ public class ScheduleServiceMockTest {
         creationDateField.setAccessible(false);
 
         when(tokenFacade.findByTokenType(Token.TokenType.REGISTER)).thenReturn(tokenList);
-        doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
         doNothing().when(tokenFacade).removeByTypeAndAccount(Token.TokenType.REGISTER, null);
+        doReturn(newToken).when(tokenProvider).generateAccountActivationToken(account);
+        doReturn(newToken1).when(tokenProvider).generateAccountActivationToken(account1);
+        doNothing().when(tokenFacade).create(newToken);
+        doNothing().when(tokenFacade).create(newToken1);
+        doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(String.class), any(String.class), any(String.class), any(String.class), any(String.class));
 
         scheduleService.resendConfirmationEmail();
 
@@ -113,7 +125,7 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void resendEmailConfirmationEmailTestEmpty() throws NoSuchFieldException, IllegalAccessException {
+    void resendEmailConfirmationEmailTestEmpty() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         account.setAccountLanguage("pl");
@@ -160,15 +172,15 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void unblockAccountTestUnsuccessful() {
+    void unblockAccountTestUnsuccessful() throws Exception {
         when(accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(2L, TimeUnit.HOURS))
                 .thenThrow(NumberFormatException.class);
 
-        assertThrows(ScheduleBadPropertiesException.class, () -> scheduleService.unblockAccount());
+        assertDoesNotThrow(() -> scheduleService.unblockAccount());
     }
 
     @Test
-    void unblockAccountTestEmpty() throws ScheduleBadPropertiesException {
+    void unblockAccountTestEmpty() throws Exception {
         List<Account> accountList = new ArrayList<>();
 
         when(accountMOKFacade.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(2L, TimeUnit.HOURS))

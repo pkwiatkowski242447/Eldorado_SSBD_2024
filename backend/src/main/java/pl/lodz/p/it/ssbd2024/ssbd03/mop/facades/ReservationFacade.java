@@ -62,7 +62,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public void edit(Reservation entity) throws ApplicationBaseException{
+    public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 
@@ -72,7 +72,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public void remove(Reservation entity) {
+    public void remove(Reservation entity) throws ApplicationBaseException {
         super.remove(entity);
     }
 
@@ -94,7 +94,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public Optional<Reservation> findAndRefresh(UUID id) {
+    public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -104,7 +104,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public List<Reservation> findAll() {
+    public List<Reservation> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
 
@@ -115,7 +115,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @return All Reservation entities from selected page
      */
     @Transactional
-    public List<Reservation> findAllWithPagination(int page, int pageSize) {
+    public List<Reservation> findAllWithPagination(int page, int pageSize) throws ApplicationBaseException {
         var list = getEntityManager()
                 .createNamedQuery("Reservation.findAll", Reservation.class)
                 .setFirstResult(page * pageSize)
@@ -132,7 +132,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @return All active Reservation entities from selected page
      */
     @Transactional
-    public List<Reservation> findActiveReservationsWithPagination(UUID clientId, int page, int pageSize) {
+    public List<Reservation> findActiveReservationsWithPagination(UUID clientId, int page, int pageSize)
+            throws ApplicationBaseException {
         var list = getEntityManager()
                 .createNamedQuery("Reservation.findActiveReservations", Reservation.class)
                 .setParameter("clientId", clientId)
@@ -150,7 +151,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @return All historical Reservation entities from selected page
      */
     @Transactional
-    public List<Reservation> findHistoricalReservationsWithPagination(UUID clientId, int page, int pageSize) {
+    public List<Reservation> findHistoricalReservationsWithPagination(UUID clientId, int page, int pageSize)
+            throws ApplicationBaseException {
         var list = getEntityManager()
                 .createNamedQuery("Reservation.findHistoricalReservations", Reservation.class)
                 .setParameter("clientId", clientId)
@@ -170,7 +172,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @return All Reservation entities for selected Sector and page
      */
     @Transactional
-    public List<Reservation> findSectorReservationsWithPagination(UUID sectorId, int page, int pageSize) {
+    public List<Reservation> findSectorReservationsWithPagination(UUID sectorId, int page, int pageSize)
+            throws ApplicationBaseException {
         var list = getEntityManager()
                 .createNamedQuery("Reservation.findSectorReservations", Reservation.class)
                 .setParameter("sectorId", sectorId)
@@ -187,7 +190,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      */
     @Transactional
     @Override
-    public int count() {
+    public int count() throws ApplicationBaseException {
         return super.count();
     }
 }
