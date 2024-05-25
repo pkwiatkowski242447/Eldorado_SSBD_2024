@@ -30,7 +30,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override

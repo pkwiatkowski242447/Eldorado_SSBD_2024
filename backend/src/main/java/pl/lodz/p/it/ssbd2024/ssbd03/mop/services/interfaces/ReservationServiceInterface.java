@@ -17,4 +17,10 @@ public interface ReservationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     void makeReservation(String clientLogin, UUID sectorId) throws ApplicationBaseException;
+
+    /**
+     * Cancel reservation by its identifier.
+     * @param reservationId Identifier of the reservation to be cancelled.
+     */
+    void cancelReservation(UUID reservationId) throws ApplicationBaseException;
 }

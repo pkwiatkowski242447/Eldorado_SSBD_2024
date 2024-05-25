@@ -49,7 +49,6 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
             try (OutputStream outputStream = response.getOutputStream()) {
                 outputStream.write(objectMapper.writeValueAsBytes(new ExceptionDTO(I18n.UNAUTHORIZED_EXCEPTION)));
             }
-            response.getWriter().flush();
             SecurityContextHolder.clearContext();
             return;
         }

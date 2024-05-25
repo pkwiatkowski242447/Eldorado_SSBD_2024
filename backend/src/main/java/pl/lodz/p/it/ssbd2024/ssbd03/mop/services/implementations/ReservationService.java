@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.UUID;
 
@@ -29,6 +30,12 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed(Roles.CLIENT)
     public void makeReservation(String clientLogin, UUID sectorId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.CLIENT, Roles.STAFF})
+    public void cancelReservation(UUID reservationId) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }
