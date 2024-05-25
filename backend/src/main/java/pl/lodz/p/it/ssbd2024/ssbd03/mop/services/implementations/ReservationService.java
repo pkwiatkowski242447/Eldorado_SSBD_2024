@@ -31,4 +31,10 @@ public class ReservationService implements ReservationServiceInterface {
     public void makeReservation(String clientLogin, UUID sectorId) throws ApplicationBaseException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    @RolesAllowed({Roles.CLIENT, Roles.STAFF})
+    public void cancelReservation(UUID reservationId) throws ApplicationBaseException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
