@@ -64,7 +64,8 @@ public class AccountMOPFacadeIntegrationTest extends TestcontainersConfig {
         parking = new Parking(address);
         sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11);
         reservation = new Reservation(sector);
-        parkingEvent = new ParkingEvent(reservation, LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
+        parkingEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
+        parkingEvent.setReservation(reservation);
         account = new Account("login", "haslo", "imie", "nazwisko", "email", "123456789");
     }
 

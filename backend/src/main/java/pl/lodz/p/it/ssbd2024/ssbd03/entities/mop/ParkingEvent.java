@@ -42,36 +42,35 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
     @Getter
+    @Setter
     private Reservation reservation;
 
     /**
      * The date and time of the parking event.
      */
     @NotNull(message = ParkingEventMessages.DATE_NULL)
-    @Column(name = DatabaseConsts.PARKING_EVENT_DATE_COLUMN)
+    @Column(name = DatabaseConsts.PARKING_EVENT_DATE_COLUMN, nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter @Setter
+    @Getter
     private LocalDateTime date;
 
     /**
      * The type of the parking event (ENTRY or EXIT).
      */
     @NotNull(message = ParkingEventMessages.EVENT_TYPE_NULL)
-    @Column(name = DatabaseConsts.PARKING_EVENT_TYPE_COLUMN, nullable = false)
+    @Column(name = DatabaseConsts.PARKING_EVENT_TYPE_COLUMN, nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    @Getter @Setter
+    @Getter
     private EventType type;
 
     /**
      *
      * Constructs a new parkingEvent.
      *
-     * @param reservation ParkingEvent's reservation
      * @param time ParkingEvent's time
      * @param type ParkingEvent's type
      */
-    public ParkingEvent(Reservation reservation, LocalDateTime time, EventType type) {
-        this.reservation = reservation;
+    public ParkingEvent(LocalDateTime time, EventType type) {
         this.date = time;
         this.type = type;
     }

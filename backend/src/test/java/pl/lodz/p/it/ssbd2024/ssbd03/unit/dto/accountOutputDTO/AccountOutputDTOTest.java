@@ -3,7 +3,6 @@ package pl.lodz.p.it.ssbd2024.ssbd03.unit.dto.accountOutputDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.AdminDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.ClientDTO;

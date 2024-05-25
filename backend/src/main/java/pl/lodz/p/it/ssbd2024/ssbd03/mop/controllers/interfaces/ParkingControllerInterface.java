@@ -1,6 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -17,5 +20,6 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    ResponseEntity<?> getSectorById(String id) throws ApplicationBaseException;
+    @GetMapping(value = "/sectors/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 }
