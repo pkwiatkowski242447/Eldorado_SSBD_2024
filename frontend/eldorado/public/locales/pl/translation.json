@@ -101,7 +101,7 @@
 
   "accountSettings.users.table.header.login": "Login",
   "accountSettings.users.table.header.name": "Imię",
-  "accountSettings.users.table.header.lastName": "E-mail",
+  "accountSettings.users.table.header.lastName": "Nazwisko",
   "accountSettings.users.table.header.active": "Aktywny",
   "accountSettings.users.table.header.blocked": "Zablokowany",
   "accountSettings.users.table.header.verified": "Zweryfikowany",

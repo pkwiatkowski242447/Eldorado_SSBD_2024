@@ -10,10 +10,14 @@ import {useToast} from "@/components/ui/use-toast.ts";
 import {isValidPhoneNumber} from "react-phone-number-input";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
 import {useTranslation} from "react-i18next";
+import {Loader2} from "lucide-react";
+import {useState} from "react";
+import handleApiError from "@/components/HandleApiError.ts";
 
 export function RegisterForm() {
     const {toast} = useToast()
     const {t} = useTranslation();
+    const [isLoading, setIsLoading] = useState(false);
 
     const formSchema = z.object({
         email: z.string().min(1, {message: t("registerPage.emptyEmail")})
@@ -44,7 +48,7 @@ export function RegisterForm() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.table(values)
+        setIsLoading(true);
         api.registerClient(
             values.login,
             values.password,
@@ -61,22 +65,10 @@ export function RegisterForm() {
                 });
             })
             .catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-            });
+                handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
+        });
     }
     
     return (
@@ -205,8 +197,14 @@ export function RegisterForm() {
                                     )}
                                 />
                             </div>
-                            <Button type="submit" className="w-full">
-                                {t("registerPage.submit")}
+                            <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                    </>
+                                ) : (
+                                    t("registerPage.submit")
+                                )}
                             </Button>
                         </div>
                         <div className="mt-4 text-center text-sm">

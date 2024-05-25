@@ -105,6 +105,7 @@ export const useAccount = () => {
                     if (chosenLevel) {
                         activeUserLevel = chosenLevel;
                     }
+
                 } else if (!account?.activeUserLevel) {
                     for (const userLevel of token.data.userLevelsDto) {
                         if (userLevel.roleName === RolesEnum.ADMIN) {

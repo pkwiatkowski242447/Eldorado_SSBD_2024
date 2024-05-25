@@ -1,9 +1,6 @@
-"use client"
-
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
-
 import {Button} from "@/components/ui/button";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
@@ -71,10 +68,6 @@ function ChangeUserLevelPage() {
         }
     }
 
-    if (!account || !account.userLevelsDto) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
@@ -92,6 +85,7 @@ function ChangeUserLevelPage() {
                 </BreadcrumbList>
             </Breadcrumb>
             <div className="flex justify-center items-center mx-auto p-10">
+
                 <Card>
                     <CardHeader className="p-3 font-bold">
                         {t("siteHeader.changeLevel.select")}

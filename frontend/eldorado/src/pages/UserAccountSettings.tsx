@@ -32,7 +32,7 @@ import {
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
-import {Slash} from "lucide-react";
+import {Loader2, Slash} from "lucide-react";
 
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
@@ -45,6 +45,7 @@ function UserAccountSettings() {
     const {t} = useTranslation();
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -203,6 +204,7 @@ function UserAccountSettings() {
 
     const SubmitEmail = (values: z.infer<typeof emailSchema>) => {
         if (managedUser) {
+            setIsLoading(true)
             api.changeEmailUser(managedUser.id, values.email).then(() => {
                 toast({
                     title: t("accountSettings.popUp.changeUserDataOK.title"),
@@ -218,6 +220,8 @@ function UserAccountSettings() {
 
             }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
     };
@@ -225,6 +229,7 @@ function UserAccountSettings() {
     const SubmitUserData = (values: z.infer<typeof userDataSchema>) => {
         const etag = window.localStorage.getItem('etag');
         if (managedUser && managedUser.accountLanguage && etag !== null) {
+            setIsLoading(true)
             api.modifyAccountUser(managedUser.login, managedUser.version, managedUser.userLevelsDto,
                 values.name, values.lastName, values.phoneNumber, false, etag)
                 .then(() => {
@@ -238,6 +243,8 @@ function UserAccountSettings() {
 
                 }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
             });
         } else {
             console.log('Account or account language is not defined');
@@ -246,7 +253,7 @@ function UserAccountSettings() {
 
     const SubmitPassword = () => {
         if (id) {
-            console.log(id);
+            setIsLoading(true)
             api.resetPasswordByAdmin(id).then(() => {
                 getCurrentAccount();
                 toast({
@@ -258,6 +265,8 @@ function UserAccountSettings() {
 
             }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
 
@@ -272,13 +281,13 @@ function UserAccountSettings() {
                         <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator>
-                        <Slash />
+                        <Slash/>
                     </BreadcrumbSeparator>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/manage-users">{t("breadcrumb.manageUsers")}</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator>
-                        <Slash />
+                        <Slash/>
                     </BreadcrumbSeparator>
                     <BreadcrumbItem>
                         <BreadcrumbLink>{t("breadcrumb.userAccount")}</BreadcrumbLink>
@@ -382,8 +391,15 @@ function UserAccountSettings() {
                                                                     </FormItem>
                                                                 )}/>
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.users.table.settings.account.authentication.email.change")}
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.users.table.settings.account.authentication.email.change")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -500,8 +516,15 @@ function UserAccountSettings() {
                                                                 )}
                                                             />
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.users.table.settings.account.personalInfo.saveChanges")}
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.users.table.settings.account.personalInfo.saveChanges")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>

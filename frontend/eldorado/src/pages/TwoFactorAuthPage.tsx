@@ -9,9 +9,12 @@ import {useAccount} from "@/hooks/useAccount.ts";
 import {useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
+import {Loader2} from "lucide-react";
+import {useState} from "react";
 
 function TwoFactorAuthPage() {
     const {t} = useTranslation();
+    const [isLoading, setIsLoading] = useState(false);
 
     const FormSchema = z.object({
         pin: z.string().min(8, {
@@ -31,11 +34,12 @@ function TwoFactorAuthPage() {
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
         if (login) {
+            setIsLoading(true);
             logIn2fa(login, data.pin).then(() => {
-                // console.log(login);
-                // console.log(data.pin);
             }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
     }
@@ -54,8 +58,8 @@ function TwoFactorAuthPage() {
                                 <FormControl>
                                     <InputOTP maxLength={8} {...field} className="justify-center">
                                         <InputOTPGroup className="flex justify-center">
-                                            {Array.from({ length: 8 }).map((_, index) => (
-                                                <InputOTPSlot key={index} index={index} />
+                                            {Array.from({length: 8}).map((_, index) => (
+                                                <InputOTPSlot key={index} index={index}/>
                                             ))}
                                         </InputOTPGroup>
                                     </InputOTP>
@@ -63,11 +67,20 @@ function TwoFactorAuthPage() {
                                 <FormDescription className="text-center">
                                     {t("twoFactorAuthPage.info")}
                                 </FormDescription>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" className="w-full">{t("twoFactorAuthPage.submit")}</Button>
+                    <Button type="submit" className="w-full pb-2"
+                            disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                            </>
+                        ) : (
+                            t("twoFactorAuthPage.submit")
+                        )}
+                    </Button>
                 </form>
             </Form>
         </div>

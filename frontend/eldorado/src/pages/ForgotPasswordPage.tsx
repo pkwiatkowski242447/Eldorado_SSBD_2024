@@ -10,10 +10,13 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Input} from "@/components/ui/input.tsx";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
+import {useState} from "react";
+import {Loader2} from "lucide-react";
 
 function ForgotPasswordPage() {
     const {toast} = useToast()
     const {t} = useTranslation();
+    const [isLoading, setIsLoading] = useState(false);
 
     const formSchema = z.object({
         email: z.string().min(1, {message: t("forgotPasswordPage.emptyEmail")})
@@ -28,7 +31,7 @@ function ForgotPasswordPage() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        // console.table(values)
+        setIsLoading(true)
         api.forgotPassword(values.email)
             .then(() => {
                 toast({
@@ -38,7 +41,9 @@ function ForgotPasswordPage() {
             })
             .catch((error) => {
                 handleApiError(error);
-            });
+            }).finally(() => {
+                setIsLoading(false)
+        });
     }
 
     return (
@@ -69,7 +74,15 @@ function ForgotPasswordPage() {
                                         )}
                                     />
                                 </div>
-                                <Button type="submit">{t("forgotPasswordPage.submit")}</Button>
+                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                        </>
+                                    ) : (
+                                        t("forgotPasswordPage.submit")
+                                    )}
+                                </Button>
                             </div>
                         </form>
                     </Form>

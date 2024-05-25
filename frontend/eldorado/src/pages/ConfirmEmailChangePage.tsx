@@ -7,6 +7,8 @@ import {Card, CardDescription, CardHeader, CardTitle,} from "@/components/ui/car
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
+import {useState} from "react";
+import {Loader2} from "lucide-react";
 
 function ConfirmEmailChangePage() {
     const {token} = useParams<{ token: string }>();
@@ -14,12 +16,12 @@ function ConfirmEmailChangePage() {
     const {toast} = useToast();
     const navigate = useNavigate();
     const {t} = useTranslation();
-
+    const [isLoading, setIsLoading] = useState(false);
     const {getCurrentAccount} = useAccount();
 
     function onClickButton() {
-        // console.log(decodedToken)
-        if (localStorage.getItem('token')!==null) {
+        if (localStorage.getItem('token') !== null) {
+            setIsLoading(true)
             api.confirmEmail(decodedToken!)
                 .then(() => {
                     toast({
@@ -38,24 +40,12 @@ function ConfirmEmailChangePage() {
                     });
                 })
                 .catch((error) => {
-                    if (error.response && error.response.data) {
-                        const {message, violations} = error.response.data;
-                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                        toast({
-                            variant: "destructive",
-                            title: t(message),
-                            description: violationMessages,
-                        });
-                    } else {
-                        toast({
-                            variant: "destructive",
-                            description: "Error",
-                        });
-                    }
-                    // console.log(error.response ? error.response.data : error);
-                });
+                    handleApiError(error);
+                }).finally(() => {
+                setIsLoading(false)
+            });
         } else {
+            setIsLoading(true)
             api.confirmEmail(decodedToken!)
                 .then(() => {
                     toast({
@@ -75,7 +65,9 @@ function ConfirmEmailChangePage() {
                 })
                 .catch((error) => {
                     handleApiError(error);
-                });
+                }).finally(() => {
+                setIsLoading(false)
+            });
         }
     }
 
@@ -86,7 +78,16 @@ function ConfirmEmailChangePage() {
                 <CardHeader>
                     <CardTitle>{t("confirmEmailPage.title")}</CardTitle>
                     <CardDescription>{t("confirmEmailPage.info")}</CardDescription>
-                    <Button onClick={onClickButton} className='mx-auto h-auto w-auto'>{t("confirmEmailPage.button")}</Button>
+                    <Button onClick={onClickButton}
+                            className='mx-auto h-auto w-auto' disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                            </>
+                        ) : (
+                            t("confirmEmailPage.button")
+                        )}
+                    </Button>
                 </CardHeader>
             </Card>
         </div>

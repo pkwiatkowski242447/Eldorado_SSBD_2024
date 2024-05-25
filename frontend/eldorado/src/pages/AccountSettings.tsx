@@ -30,7 +30,7 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
-import {Slash} from "lucide-react";
+import {Loader2, Slash} from "lucide-react";
 
 
 function AccountSettings() {
@@ -40,6 +40,8 @@ function AccountSettings() {
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
+    const {getCurrentAccount} = useAccount();
+    const [isLoading, setIsLoading] = useState(false);
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -71,13 +73,9 @@ function AccountSettings() {
         path: ["newPassword"],
     });
 
-    const {getCurrentAccount} = useAccount();
-
-    //It has to be that way afaik so ignore the warning and enjoy your day :)
     useEffect(() => {
         getCurrentAccount();
     }, []);
-
 
     const formEmail = useForm({
         resolver: zodResolver(emailSchema),
@@ -128,7 +126,7 @@ function AccountSettings() {
     };
 
     const SubmitEmail = (values: z.infer<typeof emailSchema>) => {
-        // console.log(values.email)
+        setIsLoading(true)
         api.changeEmailSelf(values.email).then(() => {
             getCurrentAccount();
 
@@ -141,12 +139,13 @@ function AccountSettings() {
 
         }).catch((error) => {
             handleApiError(error);
+        }).finally(() => {
+            setIsLoading(false)
         });
     };
 
     const SubmitPassword = (values: z.infer<typeof passwordSchema>) => {
-        // console.log(values.email)
-        console.log(values.oldPassword, values.newPassword);
+        setIsLoading(true)
         api.changePasswordSelf(values.oldPassword, values.newPassword).then(() => {
             getCurrentAccount();
             toast({
@@ -158,17 +157,19 @@ function AccountSettings() {
 
         }).catch((error) => {
             handleApiError(error);
+        }).finally(() => {
+            setIsLoading(false)
         });
     };
 
     const SubmitUserData = (values: z.infer<typeof userDataSchema>) => {
+        setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
         if (account && account.accountLanguage && etag !== null) {
             api.modifyAccountSelf(account.login, account.version, account.userLevelsDto,
                 values.name, values.lastName, values.phoneNumber, false, etag)
                 .then(() => {
                     getCurrentAccount();
-                    // window.location.reload()
                     toast({
                         title: t("accountSettings.popUp.changeUserDataOK.title"),
                         description: t("accountSettings.popUp.changeUserDataOK.text"),
@@ -178,6 +179,8 @@ function AccountSettings() {
 
                 }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false)
             });
         } else {
             console.log('Account or account language is not defined');
@@ -193,7 +196,7 @@ function AccountSettings() {
                         <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator>
-                        <Slash />
+                        <Slash/>
                     </BreadcrumbSeparator>
                     <BreadcrumbItem>
                         <BreadcrumbLink>{t("breadcrumb.myAccount")}</BreadcrumbLink>
@@ -250,8 +253,15 @@ function AccountSettings() {
                                                                     </FormItem>
                                                                 )}/>
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.authentication.email.change")}
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.authentication.email.change")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -326,8 +336,15 @@ function AccountSettings() {
                                                                 )}
                                                             />
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.authentication.password.change")}
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.authentication.password.change")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -421,8 +438,15 @@ function AccountSettings() {
                                                                 )}
                                                             />
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.personalInfo.saveChanges")}
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.personalInfo.saveChanges")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>

@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import SiteHeader from "@/components/SiteHeader.tsx";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
 import {
     Pagination,
     PaginationContent,
@@ -9,16 +9,16 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
-import {api} from "@/api/api.ts";
-import {ManagedUserType} from "@/types/Users.ts";
+import { api } from "@/api/api.ts";
+import { ManagedUserType } from "@/types/Users.ts";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {useNavigate} from "react-router-dom";
-import {FiCheck, FiSettings, FiX} from 'react-icons/fi';
+import { useNavigate } from "react-router-dom";
+import { FiCheck, FiSettings, FiX } from 'react-icons/fi';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -34,18 +34,18 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator
 } from '@/components/ui/breadcrumb.tsx';
-import {useAccountState} from "@/context/AccountContext.tsx";
-import {useTranslation} from "react-i18next";
+import { useAccountState } from "@/context/AccountContext.tsx";
+import { useTranslation } from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
-import {Slash} from "lucide-react";
+import { Slash } from "lucide-react";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [users, setUsers] = useState<ManagedUserType[]>([]);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<ManagedUserType | null>(null);
-    const {t} = useTranslation();
-    const {account} = useAccountState();
+    const { t } = useTranslation();
+    const { account } = useAccountState();
 
     const navigator = useNavigate();
 
@@ -60,38 +60,18 @@ function UserManagementPage() {
 
     const handleConfirmBlockUnblock = () => {
         if (selectedUser) {
-            if (selectedUser.blocked) {
-                api.unblockAccount(selectedUser.id).then(() => {
-                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
-                        if (response.status === 204) {
-                            setUsers([]);
-                        } else {
-                            setUsers(response.data);
-                        }
-                    });
-                    setAlertDialogOpen(false)
-                }).catch((error) => {
-                    handleApiError(error);
-                });
-            } else {
-                api.blockAccount(selectedUser.id).then(() => {
-                    api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
-                        if (response.status === 204) {
-                            setUsers([]);
-                        } else {
-                            setUsers(response.data);
-                        }
-                    });
-                    setAlertDialogOpen(false);
-                }).catch((error) => {
-                    handleApiError(error);
-                });
-            }
+            const apiCall = selectedUser.blocked ? api.unblockAccount : api.blockAccount;
+            apiCall(selectedUser.id).then(() => {
+                fetchUsers();
+                setAlertDialogOpen(false);
+            }).catch((error) => {
+                handleApiError(error);
+            });
         }
         setAlertDialogOpen(false);
     };
 
-    useEffect(() => {
+    const fetchUsers = () => {
         api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
             if (response.status === 204) {
                 setUsers([]);
@@ -99,11 +79,15 @@ function UserManagementPage() {
                 setUsers(response.data);
             }
         });
+    };
+
+    useEffect(() => {
+        fetchUsers();
     }, [currentPage]);
 
     return (
         <div className="flex min-h-screen w-full flex-col">
-            <SiteHeader/>
+            <SiteHeader />
             <Breadcrumb className={"p-5"}>
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -117,16 +101,19 @@ function UserManagementPage() {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-            <Table className="p-10">
+            <Table className="p-10 flex-grow">
                 <TableHeader>
                     <TableRow className={"text-center p-10"}>
                         <TableHead className="text-center">{t("accountSettings.users.table.header.login")}</TableHead>
                         <TableHead className="text-center">{t("accountSettings.users.table.header.name")}</TableHead>
-                        <TableHead className="text-center">{t("accountSettings.users.table.header.lastName")}</TableHead>
+                        <TableHead
+                            className="text-center">{t("accountSettings.users.table.header.lastName")}</TableHead>
                         <TableHead className="text-center">{t("accountSettings.users.table.header.active")}</TableHead>
                         <TableHead className="text-center">{t("accountSettings.users.table.header.blocked")}</TableHead>
-                        <TableHead className="text-center">{t("accountSettings.users.table.header.verified")}</TableHead>
-                        <TableHead className="text-center">{t("accountSettings.users.table.header.userLevels")}</TableHead>
+                        <TableHead
+                            className="text-center">{t("accountSettings.users.table.header.verified")}</TableHead>
+                        <TableHead
+                            className="text-center">{t("accountSettings.users.table.header.userLevels")}</TableHead>
                         <TableHead className="text-center"></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -161,13 +148,13 @@ function UserManagementPage() {
                                         default:
                                             color = 'black';
                                     }
-                                    return <span style={{color}}>{level} </span>;
+                                    return <span style={{ color }}>{level} </span>;
                                 })}
                             </TableCell>
                             <TableCell>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger>
-                                        <FiSettings/>
+                                        <FiSettings />
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuItem onClick={() => handleSettingsClick(user.id)}>
@@ -198,20 +185,24 @@ function UserManagementPage() {
                     </AlertDialogContent>
                 </AlertDialog>
             </Table>
-            <Pagination>
+            <Pagination className="sticky bottom-0 w-full bg-white p-4">
                 <PaginationContent>
                     <PaginationItem>
-                        <PaginationPrevious onClick={() => {
-                            if (currentPage > 0) setCurrentPage(currentPage - 1)
-                        }}/>
+                        <PaginationPrevious
+                            onClick={() => {
+                                if (currentPage > 0) setCurrentPage(currentPage - 1)
+                            }}
+                        />
                     </PaginationItem>
                     <PaginationItem>
                         <PaginationLink>{currentPage + 1}</PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
-                        <PaginationNext onClick={() => {
-                            if (users.length > 0) setCurrentPage(currentPage + 1)
-                        }}/>
+                        <PaginationNext
+                            onClick={() => {
+                                if (users.length > 0) setCurrentPage(currentPage + 1)
+                            }}
+                        />
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>

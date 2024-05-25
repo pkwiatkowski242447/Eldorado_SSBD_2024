@@ -99,7 +99,7 @@
 
   "accountSettings.users.table.header.login": "Login",
   "accountSettings.users.table.header.name": "Name",
-  "accountSettings.users.table.header.lastName": "E-mail",
+  "accountSettings.users.table.header.lastName": "Last Name",
   "accountSettings.users.table.header.active": "Active",
   "accountSettings.users.table.header.blocked": "Blocked",
   "accountSettings.users.table.header.verified": "Verfied",
