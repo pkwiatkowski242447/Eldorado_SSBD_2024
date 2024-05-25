@@ -271,17 +271,47 @@ public class MailProvider {
             String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
                     .replace("$firstname", firstName)
                     .replace("$lastname", lastName)
-                    .replace("$greeting_message", I18n.getMessage(I18n.NEW_ACCESS_LEVEL_GREETING_MESSAGE, language))
-                    .replace("$result_message", I18n.getMessage(I18n.NEW_ACCESS_LEVEL_RESULT_MESSAGE, language))
+                    .replace("$greeting_message", I18n.getMessage(I18n.ACCESS_LEVEL_GRANTED_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.ACCESS_LEVEL_GRANTED_RESULT_MESSAGE, language))
                     .replace("$USER_LEVEL", I18n.getMessage(userLevel, language))
-                    .replace("$action_description", I18n.getMessage(I18n.NEW_ACCESS_LEVEL_ACTION_DESCRIPTION, language))
-                    .replace("$note_title", I18n.getMessage(I18n.NEW_ACCESS_LEVEL_NOTE_TITLE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.ACCESS_LEVEL_GRANTED_ACTION_DESCRIPTION, language))
+                    .replace("$note_title", I18n.getMessage(I18n.ACCESS_LEVEL_GRANTED_NOTE_TITLE, language))
                     .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
                     .replace("$eldorado_logo", "data:image/png;base64," + logo);
-            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.NEW_ACCESS_LEVEL_MESSAGE_SUBJECT, language));
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.ACCESS_LEVEL_GRANTED_MESSAGE_SUBJECT, language));
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
             log.error("Exception of type: {} was throw while sending e-mail notification message about granted user level, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
+        }
+    }
+
+    /**
+     * This method is used to send e-mail notification about revoked user level connected to user account.
+     *
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param userLevel     Internationalization key indicating the user level connected to the account that was revoked.
+     * @param language      Language of the message.
+     */
+    public void sendEmailNotificationAboutRevokedUserLevel(String firstName, String lastName, String emailReceiver, String userLevel, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.ACCESS_LEVEL_REVOKED_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.ACCESS_LEVEL_REVOKED_RESULT_MESSAGE, language))
+                    .replace("$USER_LEVEL", I18n.getMessage(userLevel, language))
+                    .replace("$action_description", I18n.getMessage(I18n.ACCESS_LEVEL_REVOKED_ACTION_DESCRIPTION, language))
+                    .replace("$note_title", I18n.getMessage(I18n.ACCESS_LEVEL_REVOKED_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.ACCESS_LEVEL_REVOKED_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending e-mail notification message about revoked user level, due to the exception: {} being thrown. Reason: {}",
                     exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }

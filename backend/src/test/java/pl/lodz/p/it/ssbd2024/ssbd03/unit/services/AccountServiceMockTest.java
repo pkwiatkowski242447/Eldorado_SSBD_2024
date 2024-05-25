@@ -224,11 +224,16 @@ public class AccountServiceMockTest {
         a.setAccountLanguage("pl");
         String newEmail = "new@email.com";
         Token emailChangeToken = new Token("TOKEN VALUE", a, Token.TokenType.CONFIRM_EMAIL);
+        Token newEmailChangeToken = new Token("NEW TOKEN VALUE", a, Token.TokenType.CONFIRM_EMAIL);
 
         when(accountMOKFacade.find(any())).thenReturn(Optional.of(a));
-        when(tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, a.getId())).thenReturn(Optional.empty());
+        doNothing().when(tokenFacade).removeByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, a.getId());
+        when(tokenProvider.generateEmailChangeToken(a, newEmail)).thenReturn(newEmailChangeToken);
+        doNothing().when(tokenFacade).create(newEmailChangeToken);
+        doNothing().when(mailProvider).sendEmailConfirmEmail(anyString(), anyString(), anyString(), anyString(), anyString());
 
-        assertThrows(TokenNotFoundException.class, () -> accountService.changeEmail(UUID.randomUUID(), newEmail));
+        assertDoesNotThrow(() -> accountService.changeEmail(UUID.randomUUID(), newEmail));
+        verify(mailProvider, times(1)).sendEmailConfirmEmail(anyString(), anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -963,12 +968,18 @@ public class AccountServiceMockTest {
     void forgetAccountPasswordTestSuccessful() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.setActive(true);
+        account.setAccountLanguage("PL");
         Token resetPasswordToken = new Token("TOKEN VALUE", account, Token.TokenType.RESET_PASSWORD);
+        Token newResetPasswordToken = new Token("NEW TOKEN VALUE", account, Token.TokenType.RESET_PASSWORD);
 
         when(accountMOKFacade.findByEmail(account.getEmail())).thenReturn(Optional.of(account));
-        when(tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId())).thenReturn(Optional.empty());
+        doNothing().when(tokenFacade).removeByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId());
+        when(tokenProvider.generatePasswordResetToken(account)).thenReturn(newResetPasswordToken);
+        doNothing().when(tokenFacade).create(newResetPasswordToken);
+        doNothing().when(mailProvider).sendPasswordResetEmail(anyString(), anyString(), anyString(), anyString(), anyString());
 
-        assertThrows(TokenNotFoundException.class, () -> accountService.forgetAccountPassword(account.getEmail()));
+        assertDoesNotThrow(() -> accountService.forgetAccountPassword(account.getEmail()));
+        verify(mailProvider, times(1)).sendPasswordResetEmail(anyString(), anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
