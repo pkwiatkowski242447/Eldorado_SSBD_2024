@@ -129,7 +129,6 @@ function AccountSettings() {
         setIsLoading(true)
         api.changeEmailSelf(values.email).then(() => {
             getCurrentAccount();
-
             toast({
                 title: t("accountSettings.popUp.changeEmailOK.title"),
                 description: t("accountSettings.popUp.changeEmailOK.text"),

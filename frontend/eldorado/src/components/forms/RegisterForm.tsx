@@ -33,6 +33,12 @@ export function RegisterForm() {
         lastName: z.string().min(2, {message: t("registerPage.lastNameTooShort")})
             .max(50, {message: t("registerPage.lastNameTooLong")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("registerPage.phoneNumberInvalid")}),
+        newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+    }).refine(values => values.password === values.newPasswordRepeat, {
+        message: t("accountSettings.passwordsMustMatch"),
+        path: ["newPasswordRepeat"],
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -67,10 +73,10 @@ export function RegisterForm() {
             .catch((error) => {
                 handleApiError(error);
             }).finally(() => {
-                setIsLoading(false);
+            setIsLoading(false);
         });
     }
-    
+
     return (
         <Card className="mx-auto max-w-2xl">
             <CardHeader>
@@ -91,7 +97,7 @@ export function RegisterForm() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel
-                                                    className="text-black">{t("registerPage.firstName")}</FormLabel>
+                                                    className="text-black">{t("registerPage.firstName")} *</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="" {...field}/>
                                                 </FormControl>
@@ -107,7 +113,7 @@ export function RegisterForm() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel
-                                                    className="text-black">{t("registerPage.lastName")}</FormLabel>
+                                                    className="text-black">{t("registerPage.lastName")} *</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="" {...field}/>
                                                 </FormControl>
@@ -127,7 +133,7 @@ export function RegisterForm() {
                                         render={() => (
                                             <FormItem className="items-start">
                                                 <FormLabel
-                                                    className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
+                                                    className="text-black text-center">{t("registerPage.phoneNumber")} *</FormLabel>
                                                 <FormControl className="w-full">
 
                                                     <Controller
@@ -137,7 +143,7 @@ export function RegisterForm() {
                                                             //ts-expect-error - PhoneInput is not typed
                                                             <PhoneInput
                                                                 {...field}
-                                                                value={field.value as never|| ""}
+                                                                value={field.value as never || ""}
                                                                 onChange={field.onChange}
                                                                 countries={['PL']}
                                                                 defaultCountry="PL"
@@ -157,7 +163,8 @@ export function RegisterForm() {
                                         name="email"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel className="text-black">{t("registerPage.email")}</FormLabel>
+                                                <FormLabel
+                                                    className="text-black">{t("registerPage.email")} *</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="mail@example.com" {...field}/>
                                                 </FormControl>
@@ -173,7 +180,7 @@ export function RegisterForm() {
                                     name="login"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel className="text-black">{t("registerPage.login")}</FormLabel>
+                                            <FormLabel className="text-black">{t("registerPage.login")} *</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="" {...field}/>
                                             </FormControl>
@@ -188,9 +195,23 @@ export function RegisterForm() {
                                     name="password"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel className="text-black">{t("registerPage.password")}</FormLabel>
+                                            <FormLabel className="text-black">{t("registerPage.password")} *</FormLabel>
                                             <FormControl>
                                                 <Input type="password" {...field}/>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="newPasswordRepeat"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel
+                                                className="text-black">{t("accountSettings.authentication.newPasswordRepeat")} *</FormLabel>
+                                            <FormControl>
+                                                <Input type="password" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
