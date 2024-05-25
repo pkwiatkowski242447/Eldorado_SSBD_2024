@@ -30,11 +30,15 @@ const SiteHeader = () => {
     }
 
     function onClickSettings() {
-        navigate(Pathnames.public.accountSettings);
+        if (account){
+            navigate(Pathnames.loggedIn.accountSettings);
+        }
     }
 
     function onClickChangeUserLevel() {
-        navigate(Pathnames.public.changeUserLevel);
+        if (account){
+            navigate(Pathnames.loggedIn.changeUserLevel);
+        }
     }
 
     let headerColor = 'bg-gray-200 border-gray-200';
@@ -56,18 +60,21 @@ const SiteHeader = () => {
     }
 
     return (
-        <header className={`sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
+        <header
+            className={`sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
             <nav className="flex items-center gap-4">
                 <a href="/home" className="flex items-center">
-                    <img src={eldoLogo} alt="Eldorado" className="h-25 w-8/12" />
+                    <img src={eldoLogo} alt="Eldorado" className="h-25 w-8/12"/>
                     <span className="sr-only">Eldorado</span>
                 </a>
                 {account?.activeUserLevel.roleName === RolesEnum.ADMIN && (
-                    <Button variant="link" onClick={() => navigate("/manage-users")} className="text-muted-foreground transition-colors hover:text-foreground">
+                    <Button variant="link" onClick={() => navigate("/manage-users")}
+                            className="text-muted-foreground transition-colors hover:text-foreground">
                         {t("siteHeader.users")}
                     </Button>
                 )}
-                <Button variant="link" onClick={() => navigate("/home")} className="text-muted-foreground transition-colors hover:text-foreground">
+                <Button variant="link" onClick={() => navigate("/home")}
+                        className="text-muted-foreground transition-colors hover:text-foreground">
                     {t("siteHeader.parkings")}
                 </Button>
             </nav>
@@ -76,21 +83,21 @@ const SiteHeader = () => {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="secondary" size="icon" className="rounded-full">
-                            <CircleUser className="h-5 w-5" />
+                            <CircleUser className="h-5 w-5"/>
                             <span className="sr-only">Toggle user menu</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{t("siteHeader.myAccount")}</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator/>
                         <DropdownMenuItem onClick={onClickSettings}>
                             {t("siteHeader.settings")}
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator/>
                         <DropdownMenuItem onClick={onClickChangeUserLevel}>
                             {t("siteHeader.changeLevel")}
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator/>
                         <DropdownMenuItem className="font-bold" onClick={onClickLogout}>
                             {t("siteHeader.logout")}
                         </DropdownMenuItem>

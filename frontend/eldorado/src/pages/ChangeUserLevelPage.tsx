@@ -22,6 +22,7 @@ import {
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import {Slash} from "lucide-react";
+import {Pathnames} from "@/router/pathnames.ts";
 
 const FormSchema = z.object({
     type: z.any()
@@ -36,15 +37,15 @@ const roleNames = {
 const roleOrder = ["ADMIN", "STAFF", "CLIENT"];
 
 function ChangeUserLevelPage() {
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-    });
     const navigate = useNavigate();
     const {account} = useAccountState();
     const {getCurrentAccount} = useAccount();
     const {t} = useTranslation();
 
-    //It has to be that way afaik so ignore the warning and enjoy your day :)
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+    });
+
     useEffect(() => {
         getCurrentAccount();
     }, []);
@@ -56,13 +57,15 @@ function ChangeUserLevelPage() {
     function onSubmit(data: z.infer<typeof FormSchema>) {
         try {
             if (account) {
-                const newActiveUserLevel = account.userLevelsDto.find((userLevel) => userLevel.roleName === data.type);
+                const newActiveUserLevel
+                    = account.userLevelsDto.find((userLevel) => userLevel.roleName === data.type);
                 if (newActiveUserLevel) {
                     account.activeUserLevel = newActiveUserLevel;
                     localStorage.setItem('account', JSON.stringify(account));
+                    localStorage.setItem('chosenUserLevel', newActiveUserLevel.roleName);
                 }
             }
-            navigate("/home");
+            navigate(Pathnames.loggedIn.home);
         } catch (e) {
             console.log(e);
         }
@@ -81,7 +84,7 @@ function ChangeUserLevelPage() {
                         <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator>
-                        <Slash />
+                        <Slash/>
                     </BreadcrumbSeparator>
                     <BreadcrumbItem>
                         <BreadcrumbLink>{t("breadcrumb.changeUserlevel")}</BreadcrumbLink>

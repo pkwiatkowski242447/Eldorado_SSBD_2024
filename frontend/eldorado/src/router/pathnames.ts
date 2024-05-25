@@ -2,38 +2,27 @@ export const Pathnames = {
     public: {
         landingPage: '/',
         login: '/login',
+        twoFactorAuth: '/login/2fa/:login',
         register: '/register',
         home: '/home',
         activateAccount: '/activate-account/:token',
         forgotPassword: '/forgot-password/',
         resetPassword: '/reset-password/:token',
+        confirmEmailChange: '/confirm-email/:token',
+    },
+    admin: {
         userManagement: '/manage-users',
+        userAccountSettings: '/manage-users/:id',
+    },
+    staff: {
+
+    },
+    client: {
+
+    },
+    loggedIn: {
+        home: '/home',
         accountSettings: '/account-settings',
         changeUserLevel: '/change-user-level',
-        confirmEmailChange: '/confirm-email/:token',
-        userAccountSettings: '/manage-users/:id',
-        twoFactorAuth: '/login/2fa/:login',
-    },
-    // admin: {
-    //     home: '/',
-    //     users: '/users',
-    //     clients: '/clients',
-    //     'add user': '/addUser',
-    //     'change password': '/changePassword'
-    //
-    // },
-    // staff: {
-    //     home: '/',
-    //     clients: '/clients',
-    //     courts: '/courts',
-    //     reservations: '/reservations',
-    //     'change password': '/changePassword'
-    // },
-    // client: {
-    //     home: '/',
-    //     courts: '/courts',
-    //     reservations: '/reservations',
-    //     'change password': '/changePassword',
-    //     'change details': '/changeDetails'
-    // },
+    }
 }

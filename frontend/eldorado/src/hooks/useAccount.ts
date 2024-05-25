@@ -3,15 +3,17 @@ import {useNavigate} from "react-router-dom";
 import {api} from "../api/api";
 import {Pathnames} from "../router/pathnames";
 import {usersApi} from "@/api/userApi.ts";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
 export const useAccount = () => {
-    const navigate = useNavigate()
+
     const {account, setAccount} = useAccountState()
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const isAuthenticated = !!account
+
+    const navigate = useNavigate()
     const {toast} = useToast()
 
     useEffect(() => {
@@ -38,7 +40,6 @@ export const useAccount = () => {
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('account')
             localStorage.removeItem('etag')
-            setIsAuthenticated(false)
             setAccount(null)
             navigateToMainPage()
         }
@@ -52,7 +53,6 @@ export const useAccount = () => {
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
                 await getCurrentAccount()
-                setIsAuthenticated(true);
                 navigate(Pathnames.public.home)
             } else if (response.status === 204) {
                 navigate(`/login/2fa/${login}`);
@@ -69,6 +69,7 @@ export const useAccount = () => {
         try {
             const response = await api.logIn2fa(userLogin, authCodeValue);
             if (response.status === 200) {
+                console.log(isAuthenticated)
                 const accessToken = response.data.accessToken;
                 const refreshToken = response.data.refreshToken;
                 localStorage.setItem('token', accessToken);
@@ -76,7 +77,6 @@ export const useAccount = () => {
                 console.log(accessToken)
                 console.log(refreshToken)
                 await getCurrentAccount()
-                setIsAuthenticated(true);
                 navigate(Pathnames.public.home)
             }
         } catch (e) {
@@ -84,7 +84,6 @@ export const useAccount = () => {
                 variant: "destructive",
                 description: "Something went wrong. Please try again later.",
             })
-            // console.log(e);
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
@@ -97,7 +96,16 @@ export const useAccount = () => {
                 const token = await usersApi.getSelf();
                 window.localStorage.setItem('etag', token.headers['etag']);
                 let activeUserLevel = token.data.userLevelsDto[0];
-                if (!account?.activeUserLevel) {
+                const storedUserLevel = localStorage.getItem('chosenUserLevel');
+
+                if (storedUserLevel) {
+                    const chosenLevel = token.data.userLevelsDto.find((userLevel: {
+                        roleName: string;
+                    }) => userLevel.roleName === storedUserLevel);
+                    if (chosenLevel) {
+                        activeUserLevel = chosenLevel;
+                    }
+                } else if (!account?.activeUserLevel) {
                     for (const userLevel of token.data.userLevelsDto) {
                         if (userLevel.roleName === RolesEnum.ADMIN) {
                             activeUserLevel = userLevel;

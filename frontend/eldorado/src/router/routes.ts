@@ -33,6 +33,10 @@ export const PublicRoutes: RouteType[] = [
         Component: RegisterPage
     },
     {
+        path: Pathnames.public.home,
+        Component: HomePage
+    },
+    {
         path: Pathnames.public.activateAccount,
         Component: ActivateAccountPage
     },
@@ -45,62 +49,62 @@ export const PublicRoutes: RouteType[] = [
         Component: ResetPasswordPage
     },
     {
+        path: Pathnames.public.confirmEmailChange,
+        Component: ConfirmEmailChangePage
+    },
+
+
+]
+
+export const AdminRoutes: RouteType[] = [
+    {
         path: Pathnames.public.home,
         Component: HomePage
     },
     {
-        path: Pathnames.public.userManagement,
-        Component: UserManagementPage
-    },
-    {
-        path: Pathnames.public.changeUserLevel,
-        Component: ChangeUserLevelPage
-    },
-    {
-
-        path: Pathnames.public.accountSettings,
+        path: Pathnames.loggedIn.accountSettings,
         Component: AccountSettings
     },
     {
-        path: Pathnames.public.confirmEmailChange,
-        Component: ConfirmEmailChangePage
+        path: Pathnames.loggedIn.changeUserLevel,
+        Component: ChangeUserLevelPage
     },
     {
-        path: Pathnames.public.userAccountSettings,
+        path: Pathnames.admin.userManagement,
+        Component: UserManagementPage
+    },
+    {
+        path: Pathnames.admin.userAccountSettings,
         Component: UserAccountSettings
     }
-
 ]
 
-// export const AdminRoutes: RouteType[] = [
-//     {
-//         path: Pathnames.public.home,
-//         Component: HomePage
-//     },
-//     // {
-//     //     path: Pathnames.admin.main,
-//     //     Component: AdminMainPage
-//     // },
-// ]
+export const StaffRoutes: RouteType[] = [
+    {
+        path: Pathnames.public.home,
+        Component: HomePage
+    },
+    {
+        path: Pathnames.loggedIn.accountSettings,
+        Component: AccountSettings
+    },
+    {
+        path: Pathnames.loggedIn.changeUserLevel,
+        Component: ChangeUserLevelPage
+    },
+]
 
-// export const StaffRoutes: RouteType[] = [
-//     {
-//         path: Pathnames.public.home,
-//         Component: HomePage
-//     },
-//     {
-//         path: Pathnames.staff.main,
-//         Component: StaffMainPage
-//     },
-// ]
-//
-// export const ClientRoutes: RouteType[] = [
-//     {
-//         path: Pathnames.public.home,
-//         Component: HomePage
-//     },
-//     {
-//         path: Pathnames.client.main,
-//         Component: ClientMainPage
-//     },
-// ]
+export const ClientRoutes: RouteType[] = [
+    {
+        path: Pathnames.public.home,
+        Component: HomePage
+    },
+    {
+        path: Pathnames.loggedIn.accountSettings,
+        Component: AccountSettings
+    },
+    {
+        path: Pathnames.loggedIn.changeUserLevel,
+        Component: ChangeUserLevelPage
+    },
+]
