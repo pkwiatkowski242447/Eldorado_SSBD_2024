@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Service managing execution of scheduled tasks.
- * Configuration concerning tasks is set in application.properties.
+ * Configuration concerning tasks is set in consts.properties.
  */
 @Slf4j
 @Service
@@ -52,7 +52,7 @@ public class ScheduleService implements ScheduleServiceInterface {
     /**
      * TokenProvider component used for automatic generation of action tokens.
      */
-    private TokenProvider tokenProvider;
+    private final TokenProvider tokenProvider;
 
     /**
      * String value that specifies time after which deletion will occur.
