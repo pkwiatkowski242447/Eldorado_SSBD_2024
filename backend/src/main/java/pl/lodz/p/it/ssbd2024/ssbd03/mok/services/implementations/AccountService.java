@@ -286,7 +286,7 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public void blockAccount(UUID id) throws ApplicationBaseException, AccountNotFoundException, AccountAlreadyBlockedException {
+    public void blockAccount(UUID id) throws ApplicationBaseException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException();
@@ -395,6 +395,13 @@ public class AccountService implements AccountServiceInterface {
         return false;
     }
 
+    /**
+     * Changes the e-mail of the specified Account.
+     *
+     * @param accountId ID of the account which the e-mail will be changed.
+     * @param newEmail  New e-mail address.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
+     */
     @Override
     @RolesAllowed({Roles.AUTHENTICATED})
     @Transactional(propagation = Propagation.REQUIRED)
