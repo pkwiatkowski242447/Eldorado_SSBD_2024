@@ -15,7 +15,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesExc
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.ScheduleServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.log.ScheduleLogMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
@@ -26,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Service managing execution of scheduled tasks.
- * Configuration concerning tasks is set in application.properties.
+ * Configuration concerning tasks is set in consts.properties.
  */
 @Slf4j
 @Service
