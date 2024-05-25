@@ -125,18 +125,8 @@ public class AccountService implements AccountServiceInterface {
         this.userLevelFacade = userLevelFacade;
     }
 
-    /**
-     * Create new account, which will have default user level of Client.
-     *
-     * @param login       User login, used in order to authenticate to the application.
-     * @param password    User password, used in combination with login to authenticate to the application.
-     * @param firstName   First name of the user.
-     * @param lastName    Last name of the user.
-     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber Phone number of the user.
-     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser value constant but could be set).
-     * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
-     */
+    // Register user account methods - Client, Staff, Admin
+
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
@@ -145,9 +135,9 @@ public class AccountService implements AccountServiceInterface {
         Account newClientAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newClientAccount.setAccountLanguage(language);
         newClientAccount.getPreviousPasswords().add(newClientAccount.getPassword());
-        UserLevel clientLevel = new Client();
-        clientLevel.setAccount(newClientAccount);
-        newClientAccount.addUserLevel(clientLevel);
+        UserLevel clientUserLevel = new Client();
+        clientUserLevel.setAccount(newClientAccount);
+        newClientAccount.addUserLevel(clientUserLevel);
 
         this.accountFacade.create(newClientAccount);
 
@@ -164,20 +154,6 @@ public class AccountService implements AccountServiceInterface {
                 newClientAccount.getAccountLanguage());
     }
 
-    /**
-     * This method is used to create new account, which will have default user level of Staff, create
-     * appropriate register token, save it to the database, and at the - send the account activation
-     * email to the given email address.
-     *
-     * @param login       User login, used in order to authenticate to the application.
-     * @param password    User password, used in combination with login to authenticate to the application.
-     * @param firstName   First name of the user.
-     * @param lastName    Last name of the user.
-     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber Phone number of the user.
-     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
-     */
     @Override
     @RolesAllowed({Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
@@ -204,20 +180,6 @@ public class AccountService implements AccountServiceInterface {
                 newStaffAccount.getAccountLanguage());
     }
 
-    /**
-     * This method is used to create new account, which will have default user level of Admin, create
-     * appropriate register token, save it to the database, and at the - send the account activation
-     * email to the given email address.
-     *
-     * @param login       User login, used in order to authenticate to the application.
-     * @param password    User password, used in combination with login to authenticate to the application.
-     * @param firstName   First name of the user.
-     * @param lastName    Last name of the user.
-     * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
-     * @param phoneNumber Phone number of the user.
-     * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
-     * @throws ApplicationBaseException This exception will be thrown if any Persistence exception occurs.
-     */
     @Override
     @RolesAllowed({Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
@@ -244,14 +206,8 @@ public class AccountService implements AccountServiceInterface {
                 newAdminAccount.getAccountLanguage());
     }
 
-    /**
-     * This method is used to initiate process of resetting current user account password. This method basically
-     * generates a token of type CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
-     * specified by the user in the form and send to the application with the usage of DTO object.
-     *
-     * @param userEmail Email address that will be used to search for the existing account, and then used for sending
-     *                  e-mail message with password change URL.
-     */
+    // Password change methods
+
     @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPassword(String userEmail) throws ApplicationBaseException {
@@ -276,15 +232,6 @@ public class AccountService implements AccountServiceInterface {
                 account.getAccountLanguage());
     }
 
-    /**
-     * This method is used to change password of the user. This method does read RESET PASSWORD token with
-     * specified token value, and then
-     *
-     * @param token       Value of the token, that will be used to find RESET PASSWORD token in the database.
-     * @param newPassword New password, transferred to the web application by data transfer object.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
-     *                                  method.
-     */
     @RolesAllowed({Roles.ANONYMOUS})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class, noRollbackFor = PasswordPreviouslyUsedException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
@@ -310,16 +257,36 @@ public class AccountService implements AccountServiceInterface {
         this.accountFacade.edit(account);
     }
 
-    /**
-     * Method for blocking an account by its UUID.
-     *
-     * @param id Account identifier
-     * @throws AccountNotFoundException       Threw when there is no account with given login.
-     * @throws AccountAlreadyBlockedException Threw when the account is already blocked.
-     */
+    @Override
+    @RolesAllowed({Roles.AUTHENTICATED})
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationBaseException.class)
+    public void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException {
+
+        String newPasswordEncoded = passwordEncoder.encode(newPassword);
+
+        Account account = accountFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        String passwordFromDatabase = account.getPassword();
+
+        if (!passwordEncoder.matches(oldPassword, passwordFromDatabase)) {
+            throw new IncorrectPasswordException();
+        }
+
+        for (String hashedPassword : account.getPreviousPasswords()) {
+            if (passwordEncoder.matches(newPassword, hashedPassword)) {
+                throw new PasswordPreviouslyUsedException();
+            }
+        }
+
+        account.setPassword(newPasswordEncoded);
+        accountFacade.edit(account);
+    }
+
+    // Block & unblock account method
+
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public void blockAccount(UUID id) throws ApplicationBaseException, AccountNotFoundException, AccountAlreadyBlockedException {
+    public void blockAccount(UUID id) throws ApplicationBaseException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
             throw new AccountAlreadyBlockedException();
@@ -333,13 +300,6 @@ public class AccountService implements AccountServiceInterface {
                 account.getEmail(), account.getAccountLanguage(), true);
     }
 
-    /**
-     * Method for unblocking an account by its UUID.
-     *
-     * @param id Account identifier
-     * @throws AccountNotFoundException         Threw when there is no account with given login.
-     * @throws AccountAlreadyUnblockedException Threw when the account is already unblocked.
-     */
     @Override
     @RolesAllowed({Roles.ADMIN})
     public void unblockAccount(UUID id) throws ApplicationBaseException {
@@ -356,15 +316,8 @@ public class AccountService implements AccountServiceInterface {
                 account.getEmail(), account.getAccountLanguage());
     }
 
-    /**
-     * This method is used to modify user personal data.
-     *
-     * @param modifiedAccount Account with potentially modified properties: name, lastname, phoneNumber.
-     * @param userLogin       Login associated with the modified account.
-     * @return Account object with applied modifications
-     * @throws AccountNotFoundException           Threw if the account with passed login property does not exist.
-     * @throws ApplicationOptimisticLockException Threw while editing the account, a parallel editing action occurred.
-     */
+    // Modify account methods
+
     @Override
     @RolesAllowed({Roles.AUTHENTICATED})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
@@ -395,13 +348,8 @@ public class AccountService implements AccountServiceInterface {
         return foundAccount;
     }
 
-    /**
-     * Activate account with a token from activation URL, sent to user e-mail address, specified during registration.
-     *
-     * @param token Last part of the activation URL sent in a message to users e-mail address.
-     * @return Boolean value indicating whether activation of the account was successful or not.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
-     */
+    // Activate account method
+
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
@@ -424,15 +372,8 @@ public class AccountService implements AccountServiceInterface {
         return false;
     }
 
-    /**
-     * Confirm e-mail change with a token from confirmation URL, sent to the new e-mail address.
-     *
-     * @param token Last part of the confirmation URL sent in a message to user's e-mail address.
-     * @return Returns true if the e-mail confirmation was successful. Returns false if the token is expired or invalid.
-     * @throws AccountNotFoundException  Threw if the account connected to the token does not exist.
-     * @throws TokenNotFoundException    Threw if the token does not exist in the database.
-     * @throws AccountEmailNullException Threw if the email extracted from the token was for some strange reason null.
-     */
+    // E-mail change methods
+
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
@@ -452,71 +393,6 @@ public class AccountService implements AccountServiceInterface {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Retrieve Account that match the parameters, in a given order.
-     *
-     * @param login      Account's login. A phrase is sought in the logins.
-     * @param firstName  Account's owner first name. A phrase is sought in the names.
-     * @param lastName   Account's owner last name. A phrase is sought in the last names.
-     * @param order      Ordering in which user accounts should be returned.
-     * @param pageNumber Number of the page with searched users accounts.
-     * @param pageSize   Number of the users accounts per page.
-     * @return List of user accounts that match the given parameters.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
-     */
-    @Override
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
-                                                                        String firstName,
-                                                                        String lastName,
-                                                                        boolean active,
-                                                                        boolean order,
-                                                                        int pageNumber,
-                                                                        int pageSize) throws ApplicationBaseException {
-        return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize);
-    }
-
-    /**
-     * Retrieve all accounts in the system.
-     *
-     * @param pageNumber The page number of the results to return.
-     * @param pageSize   The number of results to return per page.
-     * @return A list of all accounts in the system, ordered by account login, with pagination applied.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
-     */
-    @Override
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException {
-        return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
-    }
-
-    /**
-     * Retrieves an Account by the login.
-     *
-     * @param login Login of the searched user account.
-     * @return If Account with the given login was found returns Account, otherwise throws AccountNotFoundException.
-     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
-     */
-    @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
-    @Transactional(propagation = Propagation.REQUIRED)
-    public Account getAccountByLogin(String login) throws ApplicationBaseException {
-        return accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-    }
-
-    /**
-     * Retrieves from the database account by id.
-     *
-     * @param id Account's id.
-     * @return If Account with the given id was found returns Account, otherwise throws AccountNotFoundException.
-     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
-     */
-    @Override
-    @RolesAllowed({Roles.ADMIN})
-    public Account getAccountById(UUID id) throws ApplicationBaseException {
-        return accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
     }
 
     /**
@@ -548,13 +424,6 @@ public class AccountService implements AccountServiceInterface {
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
     }
 
-    /**
-     * Creates a new JWT related to changing of an account's e-mail,
-     * replaces old JWT in the Token in database and sends new confirmation e-mail.
-     *
-     * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
-     * @throws TokenNotFoundException   Thrown when there is no e-mail confirmation token related to the given account in the database.
-     */
     @Override
     @RolesAllowed({Roles.AUTHENTICATED})
     public void resendEmailConfirmation() throws ApplicationBaseException {
@@ -575,13 +444,89 @@ public class AccountService implements AccountServiceInterface {
         tokenFacade.create(emailChangeToken);
     }
 
-    /**
-     * Removes the Client user level from the account.
-     *
-     * @param id ID of the account from which the Client user level will be removed.
-     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
-     * @throws AccountUserLevelException Threw when the account has no Client user level or has only one user level.
-     */
+    // Read methods
+
+    @Override
+    @RolesAllowed({Roles.ADMIN})
+    public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
+                                                                        String firstName,
+                                                                        String lastName,
+                                                                        boolean active,
+                                                                        boolean order,
+                                                                        int pageNumber,
+                                                                        int pageSize) throws ApplicationBaseException {
+        return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(
+                login, firstName, lastName, active, order, pageNumber, pageSize);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ADMIN})
+    public List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException {
+        return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
+    }
+
+    @Override
+    @RolesAllowed({Roles.AUTHENTICATED})
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Account getAccountByLogin(String login) throws ApplicationBaseException {
+        return accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @Override
+    public Account getAccountById(UUID id) throws ApplicationBaseException {
+        return accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
+    }
+
+    // Add user level methods - Client, Staff, Admin
+
+    @Override
+    @RolesAllowed({Roles.ADMIN})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void addClientUserLevel(String id) throws ApplicationBaseException {
+
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
+            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
+        }
+        UserLevel clientUserLevel = new Client();
+        account.addUserLevel(clientUserLevel);
+        userLevelFacade.create(clientUserLevel);
+        accountFacade.edit(account);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ADMIN})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void addStaffUserLevel(String id) throws ApplicationBaseException {
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
+            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
+        }
+        UserLevel staffUserLevel = new Staff();
+        account.addUserLevel(staffUserLevel);
+        userLevelFacade.create(staffUserLevel);
+        accountFacade.edit(account);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ADMIN})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void addAdminUserLevel(String id) throws ApplicationBaseException {
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Admin)) {
+            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
+        }
+        UserLevel adminUserLevel = new Admin();
+        account.addUserLevel(adminUserLevel);
+        userLevelFacade.create(adminUserLevel);
+        accountFacade.edit(account);
+    }
+
+    // Remove user level methods - Client, Staff, Admin
 
     @Override
     @RolesAllowed({Roles.ADMIN})
@@ -604,14 +549,6 @@ public class AccountService implements AccountServiceInterface {
         userLevelFacade.remove(clientUserLevel);
     }
 
-    /**
-     * Removes the Staff user level from the account.
-     *
-     * @param id Identifier of the account from which the Staff user level will be removed.
-     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
-     * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
-     */
-
     @Override
     @RolesAllowed({Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -632,14 +569,6 @@ public class AccountService implements AccountServiceInterface {
 
         userLevelFacade.remove(staffUserLevel);
     }
-
-    /**
-     * Removes the Admin user level from the account.
-     *
-     * @param id Identifier of the account from which the Staff user level will be removed.
-     * @throws AccountNotFoundException  Threw when the account with the given ID was not found.
-     * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
-     */
 
     @Override
     @RolesAllowed({Roles.ADMIN})
@@ -668,107 +597,5 @@ public class AccountService implements AccountServiceInterface {
         accountFacade.edit(account);
 
         userLevelFacade.remove(adminUserLevel);
-    }
-
-    /**
-     * Adds the Client user level to the account.
-     *
-     * @param id Identifier of the account to which the Client user level will be added.
-     * @throws ApplicationBaseException AccountNotFoundException - when account is not found
-     *                                  AccountUserLevelException - when account already has this user level
-     */
-    @Override
-    @RolesAllowed({Roles.ADMIN})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void addClientUserLevel(String id) throws ApplicationBaseException {
-
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-
-        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
-            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
-        }
-        UserLevel clientUserLevel = new Client();
-        account.addUserLevel(clientUserLevel);
-        userLevelFacade.create(clientUserLevel);
-        accountFacade.edit(account);
-    }
-
-    /**
-     * Adds the Staff user level to the account.
-     *
-     * @param id Identifier of the account to which the Staff user level will be added.
-     * @throws ApplicationBaseException AccountNotFoundException - when account is not found
-     *                                  AccountUserLevelException - when account already has this user level
-     */
-    @Override
-    @RolesAllowed({Roles.ADMIN})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void addStaffUserLevel(String id) throws ApplicationBaseException {
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-
-        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
-            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
-        }
-        UserLevel staffUserLevel = new Staff();
-        account.addUserLevel(staffUserLevel);
-        userLevelFacade.create(staffUserLevel);
-        accountFacade.edit(account);
-    }
-
-    /**
-     * Adds the Admin user level to the account.
-     *
-     * @param id Identifier of the account to which the Admin user level will be added.
-     * @throws ApplicationBaseException AccountNotFoundException - when account is not found
-     *                                  AccountUserLevelException - when account already has this user level
-     */
-    @Override
-    @RolesAllowed({Roles.ADMIN})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void addAdminUserLevel(String id) throws ApplicationBaseException {
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-
-        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Admin)) {
-            throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
-        }
-        UserLevel adminUserLevel = new Admin();
-        account.addUserLevel(adminUserLevel);
-        userLevelFacade.create(adminUserLevel);
-        accountFacade.edit(account);
-    }
-
-    /***
-     * This method is used to change own password.
-     *
-     * @param oldPassword The OldPassword is the old password that the user must provide for authentication.
-     * @param newPassword The new password is the password that the user wants to set.
-     * @param login The login retrieved from the security context.
-     * @throws ApplicationBaseException - IncorrectPasswordException (when oldPassword parameter and password in database
-     * are not equal), CurrentPasswordAndNewPasswordAreTheSameException (when newPassword parameter and password in database
-     * are not equal). AccountNotFoundException (when account not found).
-     */
-    @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationBaseException.class)
-    public void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException {
-
-        String newPasswordEncoded = passwordEncoder.encode(newPassword);
-
-        Account account = accountFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-
-        String passwordFromDatabase = account.getPassword();
-
-        if (!passwordEncoder.matches(oldPassword, passwordFromDatabase)) {
-            throw new IncorrectPasswordException();
-        }
-
-        for (String hashedPassword : account.getPreviousPasswords()) {
-            if (passwordEncoder.matches(newPassword, hashedPassword)) {
-                throw new PasswordPreviouslyUsedException();
-            }
-        }
-
-        account.setPassword(newPasswordEncoded);
-        accountFacade.edit(account);
     }
 }
