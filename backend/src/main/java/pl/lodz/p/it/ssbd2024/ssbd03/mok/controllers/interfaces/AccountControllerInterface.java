@@ -24,6 +24,8 @@ import java.util.UUID;
  */
 public interface AccountControllerInterface {
 
+    // Block & unblock account methods
+
     /**
      * This endpoint allows user with administrative user level to block a user account by its UUID. After that
      * the user account is blocked and could not authenticate to the application.
@@ -69,6 +71,8 @@ public interface AccountControllerInterface {
     })
     ResponseEntity<?> unblockAccount(@PathVariable("id") String id)
             throws ApplicationBaseException;
+
+    // Password change methods
 
     /**
      * This endpoint is used to "forget" password for an unauthenticated user. It does generate RESET PASSWORD token, write
@@ -137,6 +141,28 @@ public interface AccountControllerInterface {
             throws ApplicationBaseException;
 
     /**
+     * This method is used to change own password.
+     *
+     * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
+     * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
+     * is the same as current password returns 400 BAD REQUEST HTTP response. 500 INTERNAL SERVER ERROR is returned
+     * when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @PatchMapping(value = "/change-password/self", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Change own password", description = "The endpoint is used to change password, used to authenticate to the currently logged in account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 ", description = "Account's password was changed successfully."),
+            @ApiResponse(responseCode = "400", description = "Given past password is not the same as the old one, new password is the same as the old one or account, which the password is change for could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO)
+            throws ApplicationBaseException;
+
+    // Read methods
+
+    /**
      * This method retrieves user accounts from the system. In order to avoid sending huge amounts of user data
      * it used pagination, so that user accounts from a particular page, of a particular size can be retrieved.
      * This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
@@ -193,6 +219,48 @@ public interface AccountControllerInterface {
             throws ApplicationBaseException;
 
     /**
+     * This method is used to find user account of currently logged-in user.
+     *
+     * @return If user account is found for currently logged user then 200 OK with user account in the response
+     * body is returned, otherwise 400 BAD REQUEST is returned, since user account could not be found.
+     * 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get your account details", description = "The endpoint is used to get user's own account details, and sign them using JWS, where the signature is placed in ETag header.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User's accounts details were found successfully."),
+            @ApiResponse(responseCode = "400", description = "Account of the currently logged in user could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getSelf()
+            throws ApplicationBaseException;
+
+    /**
+     * This method is used to find user account by id.
+     *
+     * @param id Identifier of account to find.
+     * @return It returns HTTP response 200 OK with user information if account exists. If account with id doesn't exist
+     * returns 404. When uuid is invalid returns 400. 500 INTERNAL SERVER ERROR is returned when other
+     * unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Find user account by id", description = "The endpoint is used retrieve user account details by its identifier.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User's account details were found successfully."),
+            @ApiResponse(responseCode = "400", description = "User account's identifier is invalid."),
+            @ApiResponse(responseCode = "404", description = "User account could not be found in the database."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getUserById(@PathVariable("id") String id)
+            throws ApplicationBaseException;
+
+    // Activate account method
+
+    /**
      * This method is used to activate user account, after it was successfully
      * registered either by user itself or by user with administrative privileges.
      *
@@ -212,6 +280,54 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     ResponseEntity<?> activateAccount(@PathVariable("token") String token)
+            throws ApplicationBaseException;
+
+    // E-mail change methods
+
+    /**
+     * This method allows user to change their e-mail address, which later could be used to send
+     * messages about user actions in the application (e.g. messages containing confirmation links).
+     *
+     * @param accountEmailDTO Data transfer object containing new e-mail address.
+     * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore e-mail address could not be changed) then 400 BAD REQUEST is returned. If account
+     * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
+     * explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Change own e-mail address", description = "The endpoint is used change e-mail address, attached to own user's account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
+            @ApiResponse(responseCode = "400", description = "Given e-mail address is already set, is already taken by other user or user account could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> changeEmailSelf(@Valid @RequestBody AccountEmailDTO accountEmailDTO)
+            throws ApplicationBaseException;
+
+    /**
+     * This method is used to change users e-mail address, which later could be used to send
+     * messages about user actions in the application (e.g. messages containing confirmation links).
+     *
+     * @param id              Identifier of the user account, whose e-mail will be changed by this method.
+     * @param accountEmailDTO Data transfer object containing new e-mail address.
+     * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore e-mail address could not be changed) then 400 BAD REQUEST is returned. If account
+     * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
+     * explaining why the error occurred).
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Change other user's e-mail address", description = "The endpoint is used change e-mail address, attached to certain user's account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
+            @ApiResponse(responseCode = "400", description = "Given e-mail address is already set, is already taken by other user or user account could not be found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> changeEmail(@PathVariable("id") UUID id,
+                                  @Valid @RequestBody AccountEmailDTO accountEmailDTO)
             throws ApplicationBaseException;
 
     /**
@@ -237,23 +353,27 @@ public interface AccountControllerInterface {
             throws ApplicationBaseException;
 
     /**
-     * This method is used to find user account of currently logged-in user.
+     * This method is used to resend confirmation e-mail message.
+     * It generates a new token used in a confirmation.
      *
-     * @return If user account is found for currently logged user then 200 OK with user account in the response
-     * body is returned, otherwise 400 BAD REQUEST is returned, since user account could not be found.
-     * 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
+     * Otherwise, 400 BAD REQUEST is sent when there is no token for e-mail change connected to given account
+     * or account with given e-mail address does not exist. 500 INTERNAL SERVER ERROR is returned when other
+     * unexpected exception occurs.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get your account details", description = "The endpoint is used to get user's own account details, and sign them using JWS, where the signature is placed in ETag header.")
+    @PostMapping(value = "/resend-email-confirmation")
+    @Operation(summary = "Resend e-mail confirmation message", description = "The endpoint is used resend e-mail confirmation message, that would be used to change e-mail address attached to user's account.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User's accounts details were found successfully."),
-            @ApiResponse(responseCode = "400", description = "Account of the currently logged in user could not be found."),
+            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message is sent successfully."),
+            @ApiResponse(responseCode = "400", description = "There is no token for account's e-mail change or the account, which the e-mail is change for, could not be found."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> getSelf()
+    ResponseEntity<?> resendEmailConfirmation()
             throws ApplicationBaseException;
+
+    // Modify account methods
 
     /**
      * This method is used to modify personal data of currently logged-in user.
@@ -304,156 +424,7 @@ public interface AccountControllerInterface {
                                         @Valid @RequestBody AccountModifyDTO accountModifyDTO)
             throws ApplicationBaseException;
 
-    /**
-     * This method is used to find user account by id.
-     *
-     * @param id Identifier of account to find.
-     * @return It returns HTTP response 200 OK with user information if account exists. If account with id doesn't exist
-     * returns 404. When uuid is invalid returns 400. 500 INTERNAL SERVER ERROR is returned when other
-     * unexpected exception occurs.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *                                  exception handling aspects from facade and service layers below.
-     */
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Find user account by id", description = "The endpoint is used retrieve user account details by its identifier.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User's account details were found successfully."),
-            @ApiResponse(responseCode = "400", description = "User account's identifier is invalid."),
-            @ApiResponse(responseCode = "404", description = "User account could not be found in the database."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
-    ResponseEntity<?> getUserById(@PathVariable("id") String id)
-            throws ApplicationBaseException;
-
-    /**
-     * This method is used to change users e-mail address, which later could be used to send
-     * messages about user actions in the application (e.g. messages containing confirmation links).
-     *
-     * @param id              Identifier of the user account, whose e-mail will be changed by this method.
-     * @param accountEmailDTO Data transfer object containing new e-mail address.
-     * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore e-mail address could not be changed) then 400 BAD REQUEST is returned. If account
-     * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
-     * explaining why the error occurred).
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *                                  exception handling aspects from facade and service layers below.
-     */
-    @PatchMapping(value = "/{id}/change-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Change other user's e-mail address", description = "The endpoint is used change e-mail address, attached to certain user's account.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
-            @ApiResponse(responseCode = "400", description = "Given e-mail address is already set, is already taken by other user or user account could not be found."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
-    ResponseEntity<?> changeEmail(@PathVariable("id") UUID id,
-                                  @Valid @RequestBody AccountEmailDTO accountEmailDTO)
-            throws ApplicationBaseException;
-
-    /**
-     * This method allows user to change their e-mail address, which later could be used to send
-     * messages about user actions in the application (e.g. messages containing confirmation links).
-     *
-     * @param accountEmailDTO Data transfer object containing new e-mail address.
-     * @return If changing e-mail address is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore e-mail address could not be changed) then 400 BAD REQUEST is returned. If account
-     * is found but new e-mail does not follow constraints, then 500 INTERNAL SERVER ERROR is returned (with a message
-     * explaining why the error occurred).
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *                                  exception handling aspects from facade and service layers below.
-     */
-    @PatchMapping(value = "/change-email-self", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Change own e-mail address", description = "The endpoint is used change e-mail address, attached to own user's account.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message was successfully sent to the current e-mail address attached to the user's account."),
-            @ApiResponse(responseCode = "400", description = "Given e-mail address is already set, is already taken by other user or user account could not be found."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
-    ResponseEntity<?> changeEmailSelf(@Valid @RequestBody AccountEmailDTO accountEmailDTO)
-            throws ApplicationBaseException;
-
-    /**
-     * This method is used to resend confirmation e-mail message.
-     * It generates a new token used in a confirmation.
-     *
-     * @return This method returns 200 OK if the mail with new e-mail confirmation message was successfully sent.
-     * Otherwise, 400 BAD REQUEST is sent when there is no token for e-mail change connected to given account
-     * or account with given e-mail address does not exist. 500 INTERNAL SERVER ERROR is returned when other
-     * unexpected exception occurs.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *                                  exception handling aspects from facade and service layers below.
-     */
-    @PostMapping(value = "/resend-email-confirmation")
-    @Operation(summary = "Resend e-mail confirmation message", description = "The endpoint is used resend e-mail confirmation message, that would be used to change e-mail address attached to user's account.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204 ", description = "E-mail change confirmation message is sent successfully."),
-            @ApiResponse(responseCode = "400", description = "There is no token for account's e-mail change or the account, which the e-mail is change for, could not be found."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
-    ResponseEntity<?> resendEmailConfirmation()
-            throws ApplicationBaseException;
-
-    /**
-     * This method is used to remove client user level from account.
-     *
-     * @param id Identifier of the user account, whose user level will be changed by this method.
-     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
-     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
-     * explaining why the error occurred). 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *                                  exception handling aspects from facade and service layers below.
-     */
-    @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Remove client user level", description = "The endpoint is used to remove client user level from account with given identifier, if the account contains such a user level.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204 ", description = "Client user level was removed successfully."),
-            @ApiResponse(responseCode = "400", description = "Account with given id does not have client user level, or it is the only user level that account has."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
-    ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id)
-            throws ApplicationBaseException;
-
-    /**
-     * This method is used to remove staff user level from account.
-     *
-     * @param id Identifier of the user account, whose user level will be changed by this method.
-     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
-     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
-     * explaining why the error occurred). 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *                                  exception handling aspects from facade and service layers below.
-     */
-    @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Remove staff user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204 ", description = "Staff user level was removed successfully."),
-            @ApiResponse(responseCode = "400", description = "Account with given id does not have staff user level, or it is the only user level that account has."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
-    ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id)
-            throws ApplicationBaseException;
-
-    /**
-     * This method is used to remove admin user level from account.
-     *
-     * @param id Identifier of the user account, whose user level will be changed by this method.
-     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
-     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
-     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
-     * explaining why the error occurred). 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *                                  exception handling aspects from facade and service layers below.
-     */
-    @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Remove admin user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204 ", description = "Admin user level was removed successfully."),
-            @ApiResponse(responseCode = "400", description = "Account with given id does not have admin user level, or it is the only user level that account has, or it is the user level of the currently logged in user."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
-    ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id)
-            throws ApplicationBaseException;
+    // Add user level methods - Client, Staff, Admin
 
     /**
      * This method is used to client user level to the user account with given identifier which
@@ -524,23 +495,68 @@ public interface AccountControllerInterface {
     ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id)
             throws ApplicationBaseException;
 
+    // Remove user level methods - Client, Staff, Admin
+
     /**
-     * This method is used to change own password.
+     * This method is used to remove client user level from account.
      *
-     * @param accountChangePasswordDTO Data transfer object containing old Password and new password.
-     * @return If password successfully changed returns 200 OK Http response. If old password is incorrect or new password
-     * is the same as current password returns 400 BAD REQUEST HTTP response. 500 INTERNAL SERVER ERROR is returned
-     * when other unexpected exception occurs.
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred). 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @PatchMapping(value = "/change-password/self", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Change own password", description = "The endpoint is used to change password, used to authenticate to the currently logged in account.")
+    @PostMapping(value = "/{id}/remove-level-client", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Remove client user level", description = "The endpoint is used to remove client user level from account with given identifier, if the account contains such a user level.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200 ", description = "Account's password was changed successfully."),
-            @ApiResponse(responseCode = "400", description = "Given past password is not the same as the old one, new password is the same as the old one or account, which the password is change for could not be found."),
+            @ApiResponse(responseCode = "204 ", description = "Client user level was removed successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does not have client user level, or it is the only user level that account has."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO)
+    ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id)
+            throws ApplicationBaseException;
+
+    /**
+     * This method is used to remove staff user level from account.
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred). 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/{id}/remove-level-staff", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Remove staff user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Staff user level was removed successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does not have staff user level, or it is the only user level that account has."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id)
+            throws ApplicationBaseException;
+
+    /**
+     * This method is used to remove admin user level from account.
+     *
+     * @param id Identifier of the user account, whose user level will be changed by this method.
+     * @return If removing user level is successful, then 204 NO CONTENT is returned. Otherwise, if user account
+     * could not be found (and therefore user level could not be changed) then 400 BAD REQUEST is returned.
+     * If account is found but user level does not follow constraints, then 400 BAD REQUEST is returned (with a message
+     * explaining why the error occurred). 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/{id}/remove-level-admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Remove admin user level", description = "The endpoint is used to remove staff user level from account with given identifier, if the account contains such a user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 ", description = "Admin user level was removed successfully."),
+            @ApiResponse(responseCode = "400", description = "Account with given id does not have admin user level, or it is the only user level that account has, or it is the user level of the currently logged in user."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id)
             throws ApplicationBaseException;
 }

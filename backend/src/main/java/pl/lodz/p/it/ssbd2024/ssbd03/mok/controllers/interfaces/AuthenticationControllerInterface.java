@@ -21,6 +21,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
  */
 public interface AuthenticationControllerInterface {
 
+    // Login methods
+
     /**
      * Allows an unauthenticated user to perform the first step in the multifactor authentication,
      * which is to provide credentials to check users identity and for generating the code, which is sent
@@ -73,6 +75,8 @@ public interface AuthenticationControllerInterface {
                                                    HttpServletRequest request)
             throws ApplicationBaseException;
 
+    // Refresh user session method
+
     /**
      * Allows authenticated user to refresh session in the application, after authentication, performed while logging in.
      * After refreshing session new access token and refresh token are generated.
@@ -97,6 +101,8 @@ public interface AuthenticationControllerInterface {
                                          @Valid @RequestBody RefreshTokenDTO refreshTokenDTO,
                                          HttpServletRequest request)
             throws ApplicationBaseException;
+
+    // Logout method
 
     /**
      * This method is used to log out from the application, in a situation

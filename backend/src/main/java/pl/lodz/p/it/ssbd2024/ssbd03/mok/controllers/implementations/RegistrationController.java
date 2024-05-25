@@ -45,6 +45,8 @@ public class RegistrationController implements RegistrationControllerInterface {
         this.accountService = accountService;
     }
 
+    // Register methods - Client, Staff, Admin
+
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {

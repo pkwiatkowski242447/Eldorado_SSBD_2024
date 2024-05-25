@@ -128,6 +128,8 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         key = keyGenerator.generateKey();
     }
 
+    // Login methods
+
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
@@ -153,6 +155,8 @@ public class AuthenticationService implements AuthenticationServiceInterface {
             throw new TokenNotValidException();
         this.tokenFacade.remove(token);
     }
+
+    // Register successful & unsuccessful login attempt methods
 
     @Override
     @RolesAllowed({Roles.CLIENT, Roles.STAFF, Roles.ADMIN, Roles.ANONYMOUS})
@@ -209,6 +213,45 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         authenticationFacade.edit(account);
     }
 
+    // Refresh user session method
+
+    @RolesAllowed({Roles.AUTHENTICATED})
+    public AccessAndRefreshTokensDTO refreshUserSession(String refreshToken, String userLogin) throws ApplicationBaseException {
+        // Retrieve user account and token object from database
+        Account foundAccount = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+        Token refreshTokenObject = this.tokenFacade.findByTokenValue(refreshToken).orElseThrow(TokenNotFoundException::new);
+
+        // If account is blocked or inactive - then throw exception
+        if (!foundAccount.couldAuthenticate()) {
+            throw new AccountAuthenticationException();
+        }
+
+        // If token is not valid - then throw exception
+        if (!jwtProvider.isTokenValid(refreshTokenObject.getTokenValue(), foundAccount)) {
+            throw new TokenNotValidException();
+        }
+
+        // Generate a new pair of access token and refresh token.
+        Token newRefreshTokenObject = this.tokenProvider.generateRefreshToken(foundAccount);
+        String newAccessToken = this.jwtProvider.generateJWTToken(foundAccount);
+
+        // Remove old refresh token from database and add new refresh token to database.
+        tokenFacade.remove(refreshTokenObject);
+        tokenFacade.create(newRefreshTokenObject);
+
+        return new AccessAndRefreshTokensDTO(newAccessToken, newRefreshTokenObject.getTokenValue());
+    }
+
+    // Read methods
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS})
+    public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
+        return this.authenticationFacade.findByLogin(login);
+    }
+
+    // Other private methods
+
     /**
      * This method is used to generate authentication code for multifactor authentication, and sends it via
      * e-mail message to the e-mail address connected to the account, which user try to authenticate to.
@@ -238,38 +281,5 @@ public class AuthenticationService implements AuthenticationServiceInterface {
                 account.getAccountLanguage());
 
         this.tokenFacade.create(multiFactorAuthToken);
-    }
-
-    @RolesAllowed({Roles.AUTHENTICATED})
-    public AccessAndRefreshTokensDTO refreshUserSession(String refreshToken, String userLogin) throws ApplicationBaseException {
-        // Retrieve user account and token object from database
-        Account foundAccount = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
-        Token refreshTokenObject = this.tokenFacade.findByTokenValue(refreshToken).orElseThrow(TokenNotFoundException::new);
-
-        // If account is blocked or inactive - then throw exception
-        if (!foundAccount.couldAuthenticate()) {
-            throw new AccountAuthenticationException();
-        }
-
-        // If token is not valid - then throw exception
-        if (!jwtProvider.isTokenValid(refreshTokenObject.getTokenValue(), foundAccount)) {
-            throw new TokenNotValidException();
-        }
-
-        // Generate a new pair of access token and refresh token.
-        Token newRefreshTokenObject = this.tokenProvider.generateRefreshToken(foundAccount);
-        String newAccessToken = this.jwtProvider.generateJWTToken(foundAccount);
-
-        // Remove old refresh token from database and add new refresh token to database.
-        tokenFacade.remove(refreshTokenObject);
-        tokenFacade.create(newRefreshTokenObject);
-
-        return new AccessAndRefreshTokensDTO(newAccessToken, newRefreshTokenObject.getTokenValue());
-    }
-
-    @Override
-    @RolesAllowed({Roles.ANONYMOUS})
-    public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
-        return this.authenticationFacade.findByLogin(login);
     }
 }

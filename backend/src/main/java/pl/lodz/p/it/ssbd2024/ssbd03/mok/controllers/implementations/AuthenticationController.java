@@ -75,6 +75,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         this.authenticationManager = authenticationManager;
     }
 
+    // Login methods
+
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     @TxTracked
@@ -151,6 +153,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(accessAndRefreshTokensDTO);
     }
 
+    // Refresh user session method
+
     @Override
     @RolesAllowed({Roles.AUTHENTICATED})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -165,6 +169,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(accessAndRefreshTokensDTO);
     }
 
+    // Logout method
+
     @Override
     @RolesAllowed({Roles.AUTHENTICATED})
     public ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
@@ -177,6 +183,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
                 userName, LocalDateTime.now(), sourceAddress);
         return ResponseEntity.noContent().build();
     }
+
+    // Other private methods
 
     /**
      * This method is used to extract "real" IP address of the user from the HttpServletRequest object.

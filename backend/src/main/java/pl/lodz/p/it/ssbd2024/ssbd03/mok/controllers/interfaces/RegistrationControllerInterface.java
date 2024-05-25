@@ -15,6 +15,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
  */
 public interface RegistrationControllerInterface {
 
+    // Register methods - Client, Staff, Admin
+
     /**
      * This endpoint allows both user with administrative user level and with anonymous access to create new account with client user level. After
      * the account has been created, the activation link is sent to the e-mail address, specified in the accountRegisterDTO.
