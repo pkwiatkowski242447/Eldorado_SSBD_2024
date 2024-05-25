@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

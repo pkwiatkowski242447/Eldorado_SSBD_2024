@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,10 +13,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.AdminDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.ClientDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.StaffDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.AdminDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.ClientDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.StaffDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
@@ -44,7 +45,7 @@ public abstract class AccountSignableDTO implements SignableDTO {
     @NotNull(message = AccountMessages.USER_LEVEL_NULL)
     @Size(min = AccountsConsts.USER_LEVEL_MIN_SIZE, message = AccountMessages.USER_LEVEL_EMPTY)
     @Schema(description = "Set of account user levels", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Set<pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO> userLevelsDto;
+    private Set<UserLevelDTO> userLevelsDto;
 
     /**
      * This method returns Account DTO properties (names and values) that should be signed.
@@ -65,7 +66,7 @@ public abstract class AccountSignableDTO implements SignableDTO {
      * @param levels Signing Account dto user levels.
      * @return Signing properties for each passed user level.
      */
-    private List<Map<String, Object>> getUserLevelsDetailsAsMap(List<pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO> levels) {
+    private List<Map<String, Object>> getUserLevelsDetailsAsMap(List<UserLevelDTO> levels) {
         levels.sort(Comparator.comparing(UserLevelDTO::getRoleName, String::compareToIgnoreCase));
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < levels.size(); i++) {

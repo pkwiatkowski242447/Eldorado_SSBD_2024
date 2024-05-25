@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

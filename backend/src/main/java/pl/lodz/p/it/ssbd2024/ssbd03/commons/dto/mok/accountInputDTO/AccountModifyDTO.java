@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -7,8 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountSignableDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.AccountSignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 

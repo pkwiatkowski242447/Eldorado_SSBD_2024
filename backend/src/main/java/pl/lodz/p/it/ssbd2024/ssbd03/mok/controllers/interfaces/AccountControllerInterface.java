@@ -1,10 +1,10 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces;
 
 import org.springframework.http.ResponseEntity;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountChangePasswordDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountEmailDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountPasswordDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountChangePasswordDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountEmailDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountPasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.UUID;

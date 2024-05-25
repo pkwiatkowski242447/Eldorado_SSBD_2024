@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.token;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

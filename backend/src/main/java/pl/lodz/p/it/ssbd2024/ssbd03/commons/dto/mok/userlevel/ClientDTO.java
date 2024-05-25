@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
