@@ -11,7 +11,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.ScheduleServiceInterface;
@@ -51,7 +50,7 @@ public class ScheduleService implements ScheduleServiceInterface {
     /**
      * TokenProvider component used for automatic generation of action tokens.
      */
-    private TokenProvider tokenProvider;
+    private final TokenProvider tokenProvider;
 
     /**
      * String value that specifies time after which deletion will occur.
@@ -62,12 +61,22 @@ public class ScheduleService implements ScheduleServiceInterface {
 
     /**
      * String value that specifies time after which blocked accounts will be unblocked.
-     * Unblock time is specified by <code>scheduler.blocked_account_unblock_time</code> property/
+     * Unblock time is specified by <code>scheduler.blocked_account_unblock_time</code> property.
      */
     @Value("${scheduler.blocked_account_unblock_time}")
     private String unblockTime;
+
+    /**
+     * String value representing activation URL sent in the activation e-mail message
+     * used to activate newly created user account.
+     */
     @Value("${mail.account.creation.confirmation.url}")
     private String accountCreationConfirmationUrl;
+
+    /**
+     * Integer value representing number of hours, which the activation e-mail
+     * message should be sent after.
+     */
     @Value("${account.resend.creation.confirmation.after.hours}")
     private int resendRegistrationConfirmationEmailAfterHours;
 
@@ -91,10 +100,6 @@ public class ScheduleService implements ScheduleServiceInterface {
         this.tokenProvider = tokenProvider;
     }
 
-    /**
-     * Removes Accounts which have not finished registration.
-     * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
-     */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void deleteNotVerifiedAccount() {
@@ -126,10 +131,6 @@ public class ScheduleService implements ScheduleServiceInterface {
         }
     }
 
-    /**
-     * This method will be invoked every hour in order to check if half the time to active registered account has passed.
-     * If so then new registration token will be generated, and new message for activating user account will be sent to specified e-mail address.
-     */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void resendConfirmationEmail() {
@@ -141,6 +142,11 @@ public class ScheduleService implements ScheduleServiceInterface {
         } catch (ApplicationBaseException exception) {
             log.error("Exception: {} occurred while searching for account needing activation. Cause: {}.",
                     exception.getClass().getSimpleName(), exception.getMessage());
+        }
+
+        if (registerTokens.isEmpty()) {
+            log.info("There are no activation e-mail messages to be sent right now.");
+            return;
         }
 
         for (Token token : registerTokens) {
@@ -166,10 +172,6 @@ public class ScheduleService implements ScheduleServiceInterface {
         }
     }
 
-    /**
-     * Unblock Accounts which have been blocked by login incorrectly certain amount of time.
-     * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
-     */
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void unblockAccount() {

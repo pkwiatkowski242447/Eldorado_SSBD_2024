@@ -11,6 +11,8 @@ import java.util.Optional;
  */
 public interface AuthenticationServiceInterface {
 
+    // Login methods
+
     /**
      * This method is used to perform the second step in multifactor authentication, that is
      * to provide authentication code, used for authenticating user in the application.
@@ -22,6 +24,8 @@ public interface AuthenticationServiceInterface {
      *                                  on facade and service layer components.
      */
     void loginUsingAuthenticationCode(String code, String language) throws ApplicationBaseException;
+
+    // Register successful & unsuccessful login attempt methods
 
     /**
      * This method is used to register successful login attempt made by the user - if first step of authentication is
@@ -63,6 +67,8 @@ public interface AuthenticationServiceInterface {
      */
     void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException;
 
+    // Refresh user session method
+
     /**
      * This method is used to refresh user session in the application using refreshToken sent to the
      * client while logging in.
@@ -76,6 +82,8 @@ public interface AuthenticationServiceInterface {
      *                                  on facade components.
      */
     AccessAndRefreshTokensDTO refreshUserSession(String refreshToken, String userLogin) throws ApplicationBaseException;
+
+    // Read methods
 
     /**
      * Retrieves an Account with given login.
