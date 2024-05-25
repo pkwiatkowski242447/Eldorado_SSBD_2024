@@ -490,10 +490,17 @@ public class AccountService implements AccountServiceInterface {
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
         }
+
         UserLevel clientUserLevel = new Client();
         account.addUserLevel(clientUserLevel);
         userLevelFacade.create(clientUserLevel);
         accountFacade.edit(account);
+
+        mailProvider.sendEmailNotificationAboutGrantedUserLevel(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
+                I18n.CLIENT_USER_LEVEL,
+                account.getAccountLanguage());
     }
 
     @Override
@@ -505,10 +512,17 @@ public class AccountService implements AccountServiceInterface {
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
         }
+
         UserLevel staffUserLevel = new Staff();
         account.addUserLevel(staffUserLevel);
         userLevelFacade.create(staffUserLevel);
         accountFacade.edit(account);
+
+        mailProvider.sendEmailNotificationAboutGrantedUserLevel(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
+                I18n.STAFF_USER_LEVEL,
+                account.getAccountLanguage());
     }
 
     @Override
@@ -520,10 +534,17 @@ public class AccountService implements AccountServiceInterface {
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Admin)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
         }
+
         UserLevel adminUserLevel = new Admin();
         account.addUserLevel(adminUserLevel);
         userLevelFacade.create(adminUserLevel);
         accountFacade.edit(account);
+
+        mailProvider.sendEmailNotificationAboutGrantedUserLevel(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
+                I18n.ADMIN_USER_LEVEL,
+                account.getAccountLanguage());
     }
 
     // Remove user level methods - Client, Staff, Admin

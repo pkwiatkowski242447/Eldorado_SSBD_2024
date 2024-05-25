@@ -59,7 +59,7 @@ INSERT INTO public.user_level (id, level, account_id, version) VALUES ('69507c7f
 INSERT INTO public.client_data (id, type) VALUES ('69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'BASIC');
 
 -- Second Client
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'jakubkoza', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000001', current_timestamp, 0, false);
+INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'jakubkoza', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'EN', '000000001', current_timestamp, 0, false);
 INSERT INTO public.past_password(account_id, past_password) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa');
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'Jakub', 'Koza', 'jakubkoza@adresik.net');
 

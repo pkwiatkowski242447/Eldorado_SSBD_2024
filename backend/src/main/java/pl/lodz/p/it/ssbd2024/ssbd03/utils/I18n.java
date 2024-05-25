@@ -97,7 +97,6 @@ public class I18n {
     public static final String CONFIRM_EMAIL_RESULT_MESSAGE = "mail.confirm.email.result_message";
     public static final String CONFIRM_EMAIL_ACTION_DESCRIPTION = "mail.confirm.email.action_description";
     public static final String CONFIRM_EMAIL_NOTE_TITLE = "mail.confirm.email.note_title";
-    public static final String ACCOUNT_NOT_FOUND_ACCOUNT_CONTROLLER = "account.controller.account.not.found";
 
     public static final String BLOCK_ACCOUNT_GREETING_MESSAGE = "mail.block.account.greeting.message";
     public static final String BLOCK_ACCOUNT_MESSAGE_SUBJECT = "mail.block.account.message.subject";
@@ -113,6 +112,12 @@ public class I18n {
     public static final String UNBLOCK_ACCOUNT_ACTION_DESCRIPTION = "mail.unblock.account.action_description";
     public static final String UNBLOCK_ACCOUNT_NOTE_TITLE = "mail.unblock.account.note_title";
 
+    public static final String NEW_ACCESS_LEVEL_GREETING_MESSAGE = "mail.granted.user.level.greeting.message";
+    public static final String NEW_ACCESS_LEVEL_MESSAGE_SUBJECT = "mail.granted.user.level.message.subject";
+    public static final String NEW_ACCESS_LEVEL_RESULT_MESSAGE = "mail.granted.user.level.result_message";
+    public static final String NEW_ACCESS_LEVEL_ACTION_DESCRIPTION = "mail.granted.user.level.action_description";
+    public static final String NEW_ACCESS_LEVEL_NOTE_TITLE = "mail.granted.user.level.note_title";
+
     public static final String PASSWORD_RESET_GREETING_MESSAGE = "mail.reset.password.greeting.message";
     public static final String PASSWORD_RESET_MESSAGE_SUBJECT = "mail.reset.password.message.subject";
     public static final String PASSWORD_RESET_RESULT_MESSAGE = "mail.reset.password.result_message";
@@ -120,6 +125,10 @@ public class I18n {
     public static final String PASSWORD_RESET_NOTE_TITLE = "mail.reset.password.note_title";
 
     public static final String AUTO_GENERATED_MESSAGE_NOTE = "mail.auto.generate.message.note";
+
+    public static final String CLIENT_USER_LEVEL = "user.level.client";
+    public static final String STAFF_USER_LEVEL = "user.level.staff";
+    public static final String ADMIN_USER_LEVEL = "user.level.admin";
 
     public static String getMessage(String messageKey, String language) {
         Locale locale = new Locale.Builder().setLanguage(language).build();
