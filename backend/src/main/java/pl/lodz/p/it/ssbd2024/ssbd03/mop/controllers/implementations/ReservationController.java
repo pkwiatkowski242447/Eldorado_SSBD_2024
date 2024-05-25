@@ -22,12 +22,12 @@ public class ReservationController implements ReservationControllerInterface {
     @Override
     @RolesAllowed(Roles.CLIENT)
     public ResponseEntity<?> makeReservation(MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.NOT_SUPPORTED_OPERATION);
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
     @RolesAllowed({Roles.CLIENT, Roles.STAFF})
     public ResponseEntity<?> cancelReservation(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.NOT_SUPPORTED_OPERATION);
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }

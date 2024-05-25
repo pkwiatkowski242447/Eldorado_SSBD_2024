@@ -30,6 +30,12 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.NOT_SUPPORTED_OPERATION);
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
+    public void removeParkingById(UUID id) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }

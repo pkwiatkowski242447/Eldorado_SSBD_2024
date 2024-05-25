@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -22,4 +23,17 @@ public interface ParkingControllerInterface {
      */
     @GetMapping(value = "/sectors/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
+     * This method is used to remove parking, that is identified with the given identifier.
+     *
+     * @param id Identifier of the parking to be removed.
+     * @return This method returns 204 NO CONTENT if the parking is removed successfully. Otherwise, if the parking
+     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * when other unexpected exception is encountered while processing the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @DeleteMapping(value = "/parking/{id}")
+    ResponseEntity<?> removeParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 }

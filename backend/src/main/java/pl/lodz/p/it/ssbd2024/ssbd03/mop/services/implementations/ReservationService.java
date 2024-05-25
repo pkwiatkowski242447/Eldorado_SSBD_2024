@@ -30,12 +30,12 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed(Roles.CLIENT)
     public void makeReservation(String clientLogin, UUID sectorId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.NOT_SUPPORTED_OPERATION);
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
     @RolesAllowed({Roles.CLIENT, Roles.STAFF})
     public void cancelReservation(UUID reservationId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.NOT_SUPPORTED_OPERATION);
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }
