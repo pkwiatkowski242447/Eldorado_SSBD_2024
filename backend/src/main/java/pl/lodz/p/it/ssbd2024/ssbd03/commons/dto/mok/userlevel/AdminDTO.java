@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,16 +6,16 @@ import lombok.Setter;
 import java.util.UUID;
 
 /**
- * Data transfer object used for representing Staff user level.
+ * Data transfer object used for representing Admin user level.
  */
 @Getter @Setter
-public class StaffDTO extends UserLevelDTO {
+public class AdminDTO extends UserLevelDTO {
 
     /**
      * Construct object with setting superclass roleName property.
      */
-    public StaffDTO() {
-        super("STAFF");
+    public AdminDTO() {
+        super("ADMIN");
     }
 
     /**
@@ -23,7 +23,8 @@ public class StaffDTO extends UserLevelDTO {
      * @param id UUID identifier linked with user level.
      * @param version Number of object version.
      */
-    public StaffDTO(UUID id, Long version) {
-        super(id, version, "STAFF");
+    public AdminDTO(UUID id, Long version) {
+        super(id, version, "ADMIN");
     }
+
 }

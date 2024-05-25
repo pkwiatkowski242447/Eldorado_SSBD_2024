@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -9,8 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.AccountSignableDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.AccountSignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.UserLevelDTO;
 
 import java.time.LocalDateTime;
 import java.util.Set;

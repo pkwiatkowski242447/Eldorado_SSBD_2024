@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

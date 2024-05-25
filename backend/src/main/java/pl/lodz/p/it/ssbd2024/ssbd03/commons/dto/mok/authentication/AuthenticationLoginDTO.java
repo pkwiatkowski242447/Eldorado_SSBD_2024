@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.authentication;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

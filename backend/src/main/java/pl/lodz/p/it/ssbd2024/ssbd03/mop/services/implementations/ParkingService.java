@@ -26,13 +26,6 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ParkingService implements ParkingServiceInterface {
 
-    /**
-     * Retrieves from the database sector by id.
-     *
-     * @param id Sector's id.
-     * @return If Sector with the given id was found returns Sector.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
-     */
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public Sector getSectorById(UUID id) throws ApplicationBaseException {

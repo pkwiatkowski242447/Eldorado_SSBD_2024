@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

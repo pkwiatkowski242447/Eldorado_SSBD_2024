@@ -15,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
@@ -118,7 +117,7 @@ public class Reservation extends AbstractEntity implements Serializable {
     @NotNull(message = ReservationMessages.LIST_OF_PARKING_EVENTS_NULL)
     @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @Getter
-    private final List<ParkingEvent> parkingEvents = new ArrayList<>();
+    private List<ParkingEvent> parkingEvents = new ArrayList<>();
 
     /**
      * Constructs a new reservation for a non-anonymous client.
@@ -136,6 +135,16 @@ public class Reservation extends AbstractEntity implements Serializable {
      */
     public Reservation(Sector sector) {
         this(null, sector);
+    }
+
+    /**
+     * Adds new parking event to the reservation.
+     *
+     * @param parkingEvent Parking event to be added to the reservation.
+     */
+    public void addParkingEvent(ParkingEvent parkingEvent) {
+        this.parkingEvents.add(parkingEvent);
+        parkingEvent.setReservation(this);
     }
 
     /**

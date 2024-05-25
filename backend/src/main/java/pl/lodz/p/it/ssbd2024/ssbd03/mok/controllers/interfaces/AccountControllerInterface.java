@@ -9,12 +9,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountChangePasswordDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountEmailDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountPasswordDTO;
 import org.springframework.web.bind.annotation.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountChangePasswordDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountEmailDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountInputDTO.AccountPasswordDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.UUID;

@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 

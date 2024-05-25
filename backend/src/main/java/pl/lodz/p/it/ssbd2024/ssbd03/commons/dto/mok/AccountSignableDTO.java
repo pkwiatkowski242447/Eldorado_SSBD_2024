@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,10 +12,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.UserLevelDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.AdminDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.ClientDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.userlevel.StaffDTO;
+
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.AdminDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.ClientDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.StaffDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 

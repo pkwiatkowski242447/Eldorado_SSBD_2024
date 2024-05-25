@@ -19,7 +19,8 @@ public class ParkingEventUnitTest {
     public void setUp() {
         reservation = new Reservation();
         date = LocalDateTime.of(2024, 5, 1, 10, 0);
-        parkingEvent = new ParkingEvent(reservation, date, ParkingEvent.EventType.ENTRY);
+        parkingEvent = new ParkingEvent(date, ParkingEvent.EventType.ENTRY);
+        parkingEvent.setReservation(reservation);
     }
 
     @Test
@@ -40,22 +41,8 @@ public class ParkingEventUnitTest {
     }
 
     @Test
-    public void dateSetterTest() {
-        LocalDateTime newDate = LocalDateTime.of(2024, 5, 1, 12, 0);
-        parkingEvent.setDate(newDate);
-        assertEquals(newDate, parkingEvent.getDate());
-    }
-
-    @Test
     public void eventTypeGetterTest() {
         assertEquals(ParkingEvent.EventType.ENTRY, parkingEvent.getType());
-    }
-
-    @Test
-    public void eventTypeSetterTest() {
-        ParkingEvent.EventType newType = ParkingEvent.EventType.EXIT;
-        parkingEvent.setType(newType);
-        assertEquals(newType, parkingEvent.getType());
     }
 
     @Test
