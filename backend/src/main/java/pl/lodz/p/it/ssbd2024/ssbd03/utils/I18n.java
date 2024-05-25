@@ -42,6 +42,7 @@ public class I18n {
     public static final String ACCESS_DENIED_EXCEPTION = "application.access.denied.exception";
     public static final String UNEXPECTED_DATABASE_EXCEPTION = "application.database.server.exception";
     public static final String PATH_NOT_FOUND_EXCEPTION = "application.path.not.found.exception";
+    public static final String UNSUPPORTED_OPERATION_EXCEPTION = "application.unsupported.operation.exception";
 
     // Account service
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
@@ -71,7 +72,6 @@ public class I18n {
 
     // Util
     public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
-
 
     // Mail provider
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";

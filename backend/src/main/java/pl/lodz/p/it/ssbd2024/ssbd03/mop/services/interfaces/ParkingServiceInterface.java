@@ -18,4 +18,12 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     Sector getSectorById(UUID id) throws ApplicationBaseException;
+
+    /**
+     * Removes parking from the database by its id.
+     *
+     * @param id Identifier of the parking to be removed.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void removeParkingById(UUID id) throws ApplicationBaseException;
 }
