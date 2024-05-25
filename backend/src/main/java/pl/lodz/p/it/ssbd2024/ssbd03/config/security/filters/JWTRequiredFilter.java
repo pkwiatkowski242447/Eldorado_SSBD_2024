@@ -39,15 +39,6 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         "/swagger-ui.html",
     };
 
-    private static final String[] PATHS = {
-        "/api/v1/auth/refresh-session",
-        "/api/v1/auth/logout",
-        "/api/v1/register/staff",
-        "/api/v1/register/admin",
-        "/api/v1/accounts/admin",
-        "/api/v1/accounts/admin",
-    };
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);

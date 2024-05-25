@@ -64,7 +64,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
     public void findTestPositive() throws ApplicationBaseException {
-        Optional<UserLevel> userLevel =  userLevelFacade.find(uuidClientLevelUuid);
+        Optional<UserLevel> userLevel = userLevelFacade.find(uuidClientLevelUuid);
 
         Assertions.assertFalse(userLevel.isEmpty());
         Assertions.assertEquals(uuidClientLevelUuid, userLevel.get().getId());
@@ -74,8 +74,8 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
-    public void findAndRefreshTestPositive() {
-        Optional<UserLevel> userLevel =  userLevelFacade.findAndRefresh(uuidClientLevelUuid);
+    public void findAndRefreshTestPositive() throws Exception {
+        Optional<UserLevel> userLevel = userLevelFacade.findAndRefresh(uuidClientLevelUuid);
 
         Assertions.assertFalse(userLevel.isEmpty());
         Assertions.assertEquals(uuidClientLevelUuid, userLevel.get().getId());
@@ -85,7 +85,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
-    public void findAllTestPositive() {
+    public void findAllTestPositive() throws Exception {
         List<UserLevel> list = userLevelFacade.findAll();
 
         Assertions.assertNotNull(list);
@@ -95,7 +95,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.ADMIN})
-    public void countTestPositive() {
+    public void countTestPositive() throws Exception {
         teardown();
 
         int count = userLevelFacade.count();
@@ -175,7 +175,7 @@ public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
         userLevelBeforeEdit.setType(pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client.ClientType.PREMIUM);
         userLevelFacade.edit(userLevelBeforeEdit);
         Client userLevelAfterEdit = (Client) userLevelFacade.findAndRefresh(userLevelToEdit).orElseThrow(NoSuchElementException::new);
-        Assertions.assertEquals(pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client.ClientType.PREMIUM,userLevelAfterEdit.getType());
+        Assertions.assertEquals(pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client.ClientType.PREMIUM, userLevelAfterEdit.getType());
 
         userLevelFacade.remove(userLevelAfterEdit);
     }

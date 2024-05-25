@@ -79,7 +79,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @Override
     @PermitAll
-    public Optional<Account> find(UUID id) throws ApplicationBaseException{
+    public Optional<Account> find(UUID id) throws ApplicationBaseException {
         Optional<Account> optionalAccount = super.find(id);
         optionalAccount.ifPresent(entity -> entityManager.refresh(entity));
         return optionalAccount;
@@ -93,7 +93,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @Override
     @PermitAll
-    public Optional<Account> findAndRefresh(UUID id) {
+    public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -104,7 +104,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAll() {
+    public List<Account> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
 
@@ -113,14 +113,13 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @param pageNumber Number of the page with user accounts to be retrieved.
      * @param pageSize   Number of user accounts per page.
-     *
      * @return List of all user accounts from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
-     *
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize) {
+    public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize)
+            throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccounts", Account.class);
             findAllAccounts.setFirstResult(pageNumber * pageSize);
@@ -138,14 +137,13 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @param pageNumber Number of the page with active user accounts to be retrieved.
      * @param pageSize   Number of active user accounts per page.
-     *
      * @return List of all active user accounts from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
-     *
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllActiveAccountsWithPagination(int pageNumber, int pageSize) {
+    public List<Account> findAllActiveAccountsWithPagination(int pageNumber, int pageSize)
+            throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccountsByActive", Account.class);
             findAllAccounts.setFirstResult(pageNumber * pageSize);
@@ -164,14 +162,13 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @param pageNumber Number of the page with inactive user accounts to be retrieved.
      * @param pageSize   Number of inactive user accounts per page.
-     *
      * @return List of all inactive user accounts from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
-     *
      * @note. counts are be default ordered (in the returned list) by the login.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllInactiveAccountsWithPagination(int pageNumber, int pageSize) {
+    public List<Account> findAllInactiveAccountsWithPagination(int pageNumber, int pageSize)
+            throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccountsByActive", Account.class);
             findAllAccounts.setFirstResult(pageNumber * pageSize);
@@ -188,15 +185,15 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     /**
      * This method is used to find all user accounts with specified user level access.
      *
-     * @param userLevel     Class reference to the user level, which is searched among users accounts.
-     * @param pageNumber    Number of the page with user accounts to be retrieved.
-     * @param pageSize      Number of user accounts per page.
-     *
+     * @param userLevel  Class reference to the user level, which is searched among users accounts.
+     * @param pageNumber Number of the page with user accounts to be retrieved.
+     * @param pageSize   Number of user accounts per page.
      * @return List containing user accounts with specified user level. If no accounts with given user level are found or
      * persistence exception is thrown, then empty list is returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllActiveAccountsWithGivenUserLevelWithPagination( Class<? extends UserLevel> userLevel, int pageNumber, int pageSize) {
+    public List<Account> findAllActiveAccountsWithGivenUserLevelWithPagination(
+            Class<? extends UserLevel> userLevel, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllActiveAccountsByUserLevelQuery = entityManager.createNamedQuery("Account.findAccountsByUserLevelAndActive", Account.class);
             findAllActiveAccountsByUserLevelQuery.setFirstResult(pageNumber * pageSize);
@@ -214,12 +211,11 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to find user account by username. As username needs to be unique, it returns a single result.
      *
      * @param login Login of the searched user account.
-     *
      * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
     @RolesAllowed({Roles.AUTHENTICATED})
-    public Optional<Account> findByLogin(String login) {
+    public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
             findAccountByLogin.setParameter("login", login);
@@ -235,12 +231,11 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to find user account by e-mail address. As e-mail address needs to be unique, it returns a single result.
      *
      * @param email E-mail address of the searched user account.
-     *
      * @return If there is user account with given e-mail address in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
     @PermitAll
-    public Optional<Account> findByEmail(String email) {
+    public Optional<Account> findByEmail(String email) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByEmail = entityManager.createNamedQuery("Account.findAccountByEmail", Account.class);
             findAccountByEmail.setParameter("email", email);
@@ -256,16 +251,16 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to retrieve all user accounts, where login matches (contains) given phrase.
      * It does not take size of the phrase characters into consideration.
      *
-     * @param login         Phrase searched insider login of an account.
-     * @param active        Boolean value indication whether account is active or not.
-     * @param pageNumber    Number of the page with user accounts to be retrieved.
-     * @param pageSize      Number of user accounts per page.
-     *
+     * @param login      Phrase searched insider login of an account.
+     * @param active     Boolean value indication whether account is active or not.
+     * @param pageNumber Number of the page with user accounts to be retrieved.
+     * @param pageSize   Number of user accounts per page.
      * @return List of accounts, which login matches given phrase. If there are no accounts, which login matches given
      * phrase or persistence exception is thrown, then empty list is returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsMatchingLoginWithPagination(String login, boolean active, int pageNumber, int pageSize) {
+    public List<Account> findAllAccountsMatchingLoginWithPagination(
+            String login, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMatchingLogin = entityManager.createNamedQuery("Account.findAllAccountsMatchingGivenLogin", Account.class);
             findAllAccountsMatchingLogin.setFirstResult(pageNumber * pageSize);
@@ -284,14 +279,13 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to find all accounts, that were not activated within specified time window
      * since creating them.
      *
-     * @param amount    Length of the specified time window, used to activate newly registered account.
-     * @param timeUnit  Time unit, indicating size of the account activation time window.
-     *
+     * @param amount   Length of the specified time window, used to activate newly registered account.
+     * @param timeUnit Time unit, indicating size of the account activation time window.
      * @return List of accounts that were not activated in time (and therefore could not be activated). In case of
      * persistence exception, empty list is returned.
      */
     @PermitAll
-    public List<Account> findAllAccountsMarkedForDeletion(long amount, TimeUnit timeUnit) {
+    public List<Account> findAllAccountsMarkedForDeletion(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
             findAllAccountsMarkedForDeletion.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
@@ -306,15 +300,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     /**
      * This method is used to find a list of all users accounts by their blocked status.
      *
-     * @param blocked       Blocked status of an account. True means that account is in fact blocked, and false means that account is not blocked.
-     * @param pageNumber    Number of the page with user accounts to be retrieved.
-     * @param pageSize      Number of user accounts per page.
-     *
+     * @param blocked    Blocked status of an account. True means that account is in fact blocked, and false means that account is not blocked.
+     * @param pageNumber Number of the page with user accounts to be retrieved.
+     * @param pageSize   Number of user accounts per page.
      * @return List of all accounts with the specified value of blocked status. In case of persistence exception
      * empty list will be returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsByBlocked(boolean blocked, int pageNumber, int pageSize) {
+    public List<Account> findAllAccountsByBlocked(boolean blocked, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllBlockedAccounts = entityManager.createNamedQuery("Account.findAllAccountsByBlockedInAscOrder", Account.class);
             findAllBlockedAccounts.setFirstResult(pageNumber * pageSize);
@@ -332,14 +325,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to find all users accounts that were blocked by the admin (so basically status of the account was
      * changed to blocked and blocked time is not set).
      *
-     * @param pageNumber    Number of the page with user accounts to be retrieved.
-     * @param pageSize      Number of user accounts per page.
-     *
+     * @param pageNumber Number of the page with user accounts to be retrieved.
+     * @param pageSize   Number of user accounts per page.
      * @return List of all users accounts that were blocked by the admin. If persistence exception is thrown, then
      * empty list will be returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllBlockedAccountsThatWereBlockedByAdminWithPagination(int pageNumber, int pageSize) {
+    public List<Account> findAllBlockedAccountsThatWereBlockedByAdminWithPagination(int pageNumber, int pageSize)
+            throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsBlockedByAdminQuery = entityManager.createNamedQuery("Account.findAllBlockedAccountsThatWereBlockedByAdmin", Account.class);
             findAllAccountsBlockedByAdminQuery.setFirstResult(pageNumber * pageSize);
@@ -356,15 +349,15 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to find all users accounts that were blocked by logging incorrectly certain amount of times
      * (so basically status of the account was changed to blocked and blocked time is set).
      *
-     * @param amount Length of the specified time window, used to unblock accounts, blocked by logging incorrectly
-     *               certain amount of times.
+     * @param amount   Length of the specified time window, used to unblock accounts, blocked by logging incorrectly
+     *                 certain amount of times.
      * @param timeUnit Time unit, indicating size of the account blockade time window.
-     *
      * @return List of all users accounts that were blocked by the logging incorrectly certain amount of time.
      * If persistence exception is thrown, then empty list will be returned.
      */
     @PermitAll
-    public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(long amount, TimeUnit timeUnit) {
+    public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(
+            long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsBlockedByLoginIncorrectlyCertainAmountOfTimesQuery = entityManager
                     .createNamedQuery("Account.findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes", Account.class);
@@ -381,14 +374,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     /**
      * This method is used to find all active users accounts with unverified email address after setting a new one.
      *
-     * @param pageNumber    Number of the page with user accounts to be retrieved.
-     * @param pageSize      Number of user accounts per page.
-     *
+     * @param pageNumber Number of the page with user accounts to be retrieved.
+     * @param pageSize   Number of user accounts per page.
      * @return List of all active users accounts with unverified email address. If persistence exception is thrown, then
      * empty list will be returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllActiveAccountsWithUnverifiedEmailWithPagination(int pageNumber, int pageSize) {
+    public List<Account> findAllActiveAccountsWithUnverifiedEmailWithPagination(
+            int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
             findAllAccountsWithUnverifiedEmailQuery.setFirstResult(pageNumber * pageSize);
@@ -407,14 +400,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to find all inactive users accounts with unverified email address. This could happen after user
      * account is created and yet not activated.
      *
-     * @param pageNumber    Number of the page with user accounts to be retrieved.
-     * @param pageSize      Number of user accounts per page.
-     *
+     * @param pageNumber Number of the page with user accounts to be retrieved.
+     * @param pageSize   Number of user accounts per page.
      * @return List of all active users accounts with unverified email address. If persistence exception is thrown, then
      * empty list will be returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllInactiveAccountsWithUnverifiedEmailWithPagination(int pageNumber, int pageSize) {
+    public List<Account> findAllInactiveAccountsWithUnverifiedEmailWithPagination(
+            int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
             findAllAccountsWithUnverifiedEmailQuery.setFirstResult(pageNumber * pageSize);
@@ -447,7 +440,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
                                                                                                       boolean active,
                                                                                                       boolean order,
                                                                                                       int pageNumber,
-                                                                                                      int pageSize) {
+                                                                                                      int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMatchingCriteriaQuery;
             if (order) {
@@ -473,15 +466,15 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * This method is used to find all user accounts without any recent activity, which is understood as logging
      * into the application.
      *
-     * @param lastSuccessfulLogin   Date and time, which account activity is checked from. If there are no successful
-     *                              login attempts from that date and time, then account is considered without recent activity.
-     * @param pageNumber            Number of the page to retrieve.
-     * @param pageSize              Number of results per page.
-     *
+     * @param lastSuccessfulLogin Date and time, which account activity is checked from. If there are no successful
+     *                            login attempts from that date and time, then account is considered without recent activity.
+     * @param pageNumber          Number of the page to retrieve.
+     * @param pageSize            Number of results per page.
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsWithoutRecentActivityWithPagination(LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) {
+    public List<Account> findAllAccountsWithoutRecentActivityWithPagination(
+            LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.findAccountsWithoutAnyActivityFrom", Account.class);
             findAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
@@ -499,16 +492,16 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     /**
      * This method is used to count all users accounts without any recent activity.
      *
-     * @param lastSuccessfulLogin   Date and time, which account activity is checked from. If there are no successful
-     *                              login attempts from that date and time, then account is considered without recent activity.
-     * @param pageNumber            Number of the page to retrieve.
-     * @param pageSize              Number of results per page.
-     *
+     * @param lastSuccessfulLogin Date and time, which account activity is checked from. If there are no successful
+     *                            login attempts from that date and time, then account is considered without recent activity.
+     * @param pageNumber          Number of the page to retrieve.
+     * @param pageSize            Number of results per page.
      * @return Optional containing a number of inactive users accounts in the system. In case of persistence exception
      * empty optional is returned.
      */
     @RolesAllowed({Roles.ADMIN})
-    public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) {
+    public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(
+            LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Long> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Long.class);
             countAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
@@ -543,7 +536,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @Override
     @PermitAll
-    public void remove(Account account) {
+    public void remove(Account account) throws ApplicationBaseException {
         super.remove(account);
     }
 }

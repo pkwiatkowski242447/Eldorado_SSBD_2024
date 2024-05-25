@@ -150,8 +150,11 @@ public interface AccountServiceInterface {
      * @param pageNumber Number of the page with searched users accounts.
      * @param pageSize   Number of the users accounts per page.
      * @return List of user accounts that match the given parameters.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize);
+    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(
+            String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
     /**
      * Retrieve all accounts in the system.
@@ -159,8 +162,9 @@ public interface AccountServiceInterface {
      * @param pageNumber The page number of the results to return.
      * @param pageSize   The number of results to return per page.
      * @return A list of all accounts in the system, ordered by account login, with pagination applied.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Account> getAllAccounts(int pageNumber, int pageSize);
+    List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Retrieves an Account by the login.

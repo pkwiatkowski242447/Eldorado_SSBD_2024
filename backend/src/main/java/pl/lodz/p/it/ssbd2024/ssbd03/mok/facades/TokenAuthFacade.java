@@ -83,7 +83,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
     @PermitAll
-    public Optional<Token> findByTypeAndAccount(Token.TokenType tokenType, UUID accountId) {
+    public Optional<Token> findByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
                     .createNamedQuery("Token.findByTypeAndAccount", Token.class)
@@ -103,7 +103,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
     @PermitAll
-    public Optional<Token> findByTokenValue(String tokenValue) {
+    public Optional<Token> findByTokenValue(String tokenValue) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
                     .createNamedQuery("Token.findByTokenValue", Token.class)
@@ -117,13 +117,27 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
     }
 
     /**
+     * Removes all Tokens with a given Type associated with an Account.
+     *
+     * @param tokenType Type of Tokens to be removed.
+     * @param accountId ID of the Account which Tokens are to be removed.
+     */
+    @PermitAll
+    public void removeByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
+        getEntityManager().createNamedQuery("Token.removeByTypeAndAccount")
+                .setParameter("tokenType", tokenType)
+                .setParameter("accountId", accountId)
+                .executeUpdate();
+    }
+
+    /**
      * Removes a Token from the database.
      *
      * @param entity Token to be removed from the database.
      */
     @Override
     @PermitAll
-    public void remove(Token entity) {
+    public void remove(Token entity) throws ApplicationBaseException {
         super.remove(entity);
     }
 }

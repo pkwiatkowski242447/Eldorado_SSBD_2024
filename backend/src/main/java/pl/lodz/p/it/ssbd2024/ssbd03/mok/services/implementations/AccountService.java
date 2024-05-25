@@ -25,7 +25,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmail
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.CurrentPasswordAndNewPasswordAreTheSameException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.PasswordPreviouslyUsedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
@@ -261,7 +260,8 @@ public class AccountService implements AccountServiceInterface {
         if (account.getBlocked()) throw new AccountBlockedException();
         else if (!account.getActive()) throw new AccountNotActivatedException();
 
-        tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).ifPresent(tokenFacade::remove);
+        Token tokenObject = tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).orElseThrow(TokenNotFoundException::new);
+        tokenFacade.remove(tokenObject);
 
         Token passwordResetToken = tokenProvider.generatePasswordResetToken(account);
         this.tokenFacade.create(passwordResetToken);
@@ -464,6 +464,7 @@ public class AccountService implements AccountServiceInterface {
      * @param pageNumber Number of the page with searched users accounts.
      * @param pageSize   Number of the users accounts per page.
      * @return List of user accounts that match the given parameters.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
@@ -473,7 +474,7 @@ public class AccountService implements AccountServiceInterface {
                                                                         boolean active,
                                                                         boolean order,
                                                                         int pageNumber,
-                                                                        int pageSize) {
+                                                                        int pageSize) throws ApplicationBaseException {
         return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize);
     }
 
@@ -483,10 +484,11 @@ public class AccountService implements AccountServiceInterface {
      * @param pageNumber The page number of the results to return.
      * @param pageSize   The number of results to return per page.
      * @return A list of all accounts in the system, ordered by account login, with pagination applied.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> getAllAccounts(int pageNumber, int pageSize) {
+    public List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
 
@@ -533,7 +535,8 @@ public class AccountService implements AccountServiceInterface {
         if (accountFacade.findByEmail(newEmail).isPresent())
             throw new AccountEmailAlreadyTakenException();
 
-        tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).ifPresent(tokenFacade::remove);
+        Token tokenObject = tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow(TokenNotFoundException::new);
+        tokenFacade.remove(tokenObject);
 
         Token emailChangeToken = tokenProvider.generateEmailChangeToken(account, newEmail);
         this.tokenFacade.create(emailChangeToken);

@@ -72,7 +72,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @param entity ParkingEvent to be removed from the database.
      */
     @Override
-    public void remove(ParkingEvent entity) {
+    public void remove(ParkingEvent entity) throws ApplicationBaseException {
         super.remove(entity);
     }
 
@@ -94,7 +94,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return If a ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
      */
     @Override
-    public Optional<ParkingEvent> findAndRefresh(UUID id) {
+    public Optional<ParkingEvent> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -104,7 +104,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return List containing all ParkingEvents.
      */
     @Override
-    public List<ParkingEvent> findAll() {
+    public List<ParkingEvent> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
 
@@ -114,7 +114,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return Number of ParkingEvents in the database.
      */
     @Override
-    public int count() {
+    public int count() throws ApplicationBaseException {
         return super.count();
     }
 }

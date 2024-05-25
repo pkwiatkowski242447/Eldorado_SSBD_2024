@@ -256,6 +256,8 @@ public class AccountController implements AccountControllerInterface {
      * @param pageSize   Number of user accounts per page.
      * @return This method returns 200 OK as a response, where in response body a list of user accounts is located, is a JSON format.
      * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
      * @note. This method retrieves all users accounts, not taking into consideration their role. The results are ordered by
      * login alphabetically.
      */
@@ -270,7 +272,8 @@ public class AccountController implements AccountControllerInterface {
             @ApiResponse(responseCode = "204", description = "List of accounts returned from given page of given size is empty."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    public ResponseEntity<?> getAllUsers(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize) {
+    public ResponseEntity<?> getAllUsers(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize)
+            throws ApplicationBaseException {
         List<AccountListDTO> accountList = accountService.getAllAccounts(pageNumber, pageSize)
                 .stream()
                 .map(AccountListMapper::toAccountListDTO)
@@ -290,6 +293,8 @@ public class AccountController implements AccountControllerInterface {
      * @param pageSize   Number of the users per page.
      * @return This method returns 200 OK response, with list of users in the response body, converted to JSON.
      * If the list is empty, then 204 NO CONTENT is returned.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
      */
     @Override
     @GetMapping(value = "/match-login-firstname-and-lastname", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -308,7 +313,7 @@ public class AccountController implements AccountControllerInterface {
                                                                             @RequestParam(name = "active", defaultValue = "true") boolean active,
                                                                             @RequestParam(name = "order", defaultValue = "true") boolean order,
                                                                             @RequestParam(name = "pageNumber") int pageNumber,
-                                                                            @RequestParam(name = "pageSize") int pageSize) {
+                                                                            @RequestParam(name = "pageSize") int pageSize) throws ApplicationBaseException {
         List<AccountListDTO> accountList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName,
                         lastName, active, order, pageNumber, pageSize)
                 .stream()

@@ -74,7 +74,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    public Optional<Parking> findAndRefresh(UUID id) {
+    public Optional<Parking> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -97,12 +97,12 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    public List<Parking> findAll() {
+    public List<Parking> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
 
     @Transactional
-    public List<Parking> findAllWithPagination(int page, int pageSize, boolean showOnlyActive){
+    public List<Parking> findAllWithPagination(int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Parking.findAll", Parking.class)
                 .setFirstResult(page * pageSize)
                 .setParameter("showOnlyActive", showOnlyActive)
@@ -113,7 +113,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     @Transactional
-    public List<Parking> findParkingsBySectorTypes(List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive){
+    public List<Parking> findParkingsBySectorTypes(
+            List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
         var list = getEntityManager().
                 createNamedQuery("Parking.findBySectorTypes", Parking.class)
                 .setParameter("sectorTypes", sectorTypes)
@@ -126,7 +127,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     @Transactional
-    public List<Parking> findParkingWithAvailablePlaces( int page, int pageSize, boolean showOnlyActive){
+    public List<Parking> findParkingWithAvailablePlaces( int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
         var list = getEntityManager().
                 createNamedQuery("Parking.findWithAvailablePlaces", Parking.class)
                 .setParameter("showOnlyActive", showOnlyActive)
@@ -144,7 +145,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    public void remove(Parking entity) {
+    public void remove(Parking entity) throws ApplicationBaseException {
         super.remove(entity);
     }
 
@@ -155,7 +156,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @Override
     @Transactional
-    public int count() {
+    public int count() throws ApplicationBaseException {
         return super.count();
     }
 
@@ -169,7 +170,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @return If a Sector with the given ID was found returns an Optional containing the Sector, otherwise returns an empty Optional.
      */
     @Transactional
-    protected Optional<Sector> findSectorById(UUID id){
+    protected Optional<Sector> findSectorById(UUID id) throws ApplicationBaseException {
         return Optional.ofNullable(getEntityManager().find(Sector.class, id));
     }
 
@@ -180,14 +181,15 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @return If a Sector with the given ID was found returns an Optional containing the Sector, otherwise returns an empty Optional.
      */
     @Transactional
-    protected Optional<Sector> findAndRefreshSectorById(UUID id) {
+    protected Optional<Sector> findAndRefreshSectorById(UUID id) throws ApplicationBaseException {
         Optional<Sector> optEntity = findSectorById(id);
         optEntity.ifPresent(t -> getEntityManager().refresh(t));
         return optEntity;
     }
 
     @Transactional
-    public List<Sector> findSectorsInParkingWithPagination(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
+    public List<Sector> findSectorsInParkingWithPagination(UUID parkingId,int page, int pageSize, boolean showOnlyActive)
+            throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("showOnlyActive", showOnlyActive)
@@ -199,7 +201,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     @Transactional
-    public List<Sector> findSectorInParkingWithAvailablePlaces(UUID parkingId,int page, int pageSize, boolean showOnlyActive){
+    public List<Sector> findSectorInParkingWithAvailablePlaces(UUID parkingId,int page, int pageSize, boolean showOnlyActive)
+            throws ApplicationBaseException {
         var list =  getEntityManager().createNamedQuery("Sector.findWithAvailablePlaces", Sector.class)
                 .setParameter("parkingId",parkingId)
                 .setParameter("showOnlyActive", showOnlyActive)
@@ -211,7 +214,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     @Transactional
-    public List<Sector> findSectorInParkingBySectorTypes(UUID parkingId, List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive){
+    public List<Sector> findSectorInParkingBySectorTypes(
+            UUID parkingId, List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Sector.findBySectorTypes", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("sectorTypes", sectorTypes)
@@ -231,7 +235,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @param sector Sector to be removed from the database.
      */
     @Transactional
-    public void removeSector(Sector sector){
+    public void removeSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().remove(sector);
         getEntityManager().flush();
     }
@@ -242,7 +246,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @param sector Sector to be modified.
      */
     @Transactional
-    public void editSector(Sector sector){
+    public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
         getEntityManager().flush();
     }
@@ -253,7 +257,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @param list List of the Sectors to be refreshed.
      */
     @Transactional
-    protected void refreshAllSectors(List<Sector> list) {
+    protected void refreshAllSectors(List<Sector> list) throws ApplicationBaseException {
         if (list != null && !list.isEmpty()) {
             list.forEach(getEntityManager()::refresh);
         }

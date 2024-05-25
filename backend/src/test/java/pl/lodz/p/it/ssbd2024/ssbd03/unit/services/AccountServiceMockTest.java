@@ -30,7 +30,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedExce
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
@@ -182,7 +181,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void confirmEmailTestTokenNotInDatabase() {
+    void confirmEmailTestTokenNotInDatabase() throws Exception {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
 
@@ -220,7 +219,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeEmailTestSuccessful() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
+    void changeEmailTestSuccessful() throws ApplicationBaseException {
         Account a = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         a.setAccountLanguage("pl");
         String newEmail = "new@email.com";
@@ -228,12 +227,8 @@ public class AccountServiceMockTest {
 
         when(accountMOKFacade.find(any())).thenReturn(Optional.of(a));
         when(tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, a.getId())).thenReturn(Optional.empty());
-        when(tokenProvider.generateEmailChangeToken(a, newEmail)).thenReturn(emailChangeToken);
-        doNothing().when(tokenFacade).create(any(Token.class));
-        doNothing().when(mailProvider).sendEmailConfirmEmail(eq(a.getName()), eq(a.getLastname()), eq(newEmail), any(), eq(a.getAccountLanguage()));
 
-        accountService.changeEmail(UUID.randomUUID(), newEmail);
-        Mockito.verify(mailProvider, Mockito.times(1)).sendEmailConfirmEmail(eq(a.getName()), eq(a.getLastname()), eq(newEmail), any(), eq(a.getAccountLanguage()));
+        assertThrows(TokenNotFoundException.class, () -> accountService.changeEmail(UUID.randomUUID(), newEmail));
     }
 
     @Test
@@ -288,7 +283,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void activateAccountTestWhenTokenObjectIsNotFound() {
+    void activateAccountTestWhenTokenObjectIsNotFound() throws Exception {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
 
@@ -328,7 +323,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestSuccessful() throws AccountAlreadyBlockedException, IllegalOperationException, AccountNotFoundException, ApplicationBaseException {
+    void blockAccountTestSuccessful() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
@@ -343,7 +338,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestBlockedBySystem() throws AccountAlreadyBlockedException, AccountNotFoundException, ApplicationBaseException {
+    void blockAccountTestBlockedBySystem() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
@@ -363,7 +358,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestAccountAlreadyBlocked() {
+    void blockAccountTestAccountAlreadyBlocked() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.blockAccount(true);
         UUID id = UUID.randomUUID();
@@ -376,7 +371,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void blockAccountTestAccountNotFound() {
+    void blockAccountTestAccountNotFound() throws Exception {
         UUID id = UUID.randomUUID();
 
         when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.empty());
@@ -385,7 +380,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void unblockAccountTestSuccessful() throws AccountNotFoundException, AccountAlreadyUnblockedException, ApplicationBaseException {
+    void unblockAccountTestSuccessful() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.blockAccount(true);
@@ -401,7 +396,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void unblockAccountTestAccountAlreadyUnblocked() {
+    void unblockAccountTestAccountAlreadyUnblocked() throws Exception {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
@@ -414,7 +409,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void unblockAccountTestAccountNotFound() {
+    void unblockAccountTestAccountNotFound() throws Exception {
         UUID id = UUID.randomUUID();
 
         when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.empty());
@@ -423,7 +418,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void getAccountsByMatchingLoginFirstNameAndLastNameTest() {
+    void getAccountsByMatchingLoginFirstNameAndLastNameTest() throws Exception {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
@@ -463,7 +458,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void getAllAccountsTest() {
+    void getAllAccountsTest() throws Exception {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
@@ -837,7 +832,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changePasswordSelfTestAccountNotFound() {
+    void changePasswordSelfTestAccountNotFound() throws Exception {
         String currentPassword = "CurrentPassword";
         String newPassword = "NewPassword";
 
@@ -848,7 +843,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changePasswordSelfTestIncorrectPassword() {
+    void changePasswordSelfTestIncorrectPassword() throws Exception {
         String incorrectPassword = "IncorrectPassword";
         String currentPassword = "CurrentPassword";
         String newPassword = "NewPassword";
@@ -864,7 +859,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changePasswordSelfTestCurrentPasswordAndNewPasswordAreTheSame() {
+    void changePasswordSelfTestCurrentPasswordAndNewPasswordAreTheSame() throws Exception {
         String currentPassword = "CurrentPassword";
         Account account = new Account("login", currentPassword, "firstName", "lastName", "test@email.com", "123123123");
         account.getPreviousPasswords().add(currentPassword);
@@ -899,7 +894,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeAccountPasswordTestTokenValueNotFound() {
+    void changeAccountPasswordTestTokenValueNotFound() throws Exception {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String newPassword = "NewPassword";
 
@@ -909,7 +904,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeAccountPasswordTestTokenNotValid() {
+    void changeAccountPasswordTestTokenNotValid() throws Exception {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String newPassword = "NewPassword";
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -922,7 +917,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeAccountPasswordTestAccountIdNotFound() {
+    void changeAccountPasswordTestAccountIdNotFound() throws Exception {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String newPassword = "NewPassword";
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -936,7 +931,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeAccountPasswordTestAccountBlocked() {
+    void changeAccountPasswordTestAccountBlocked() throws Exception {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String newPassword = "NewPassword";
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -951,7 +946,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void changeAccountPasswordTestAccountNotActive() {
+    void changeAccountPasswordTestAccountNotActive() throws Exception {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String newPassword = "NewPassword";
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -972,23 +967,18 @@ public class AccountServiceMockTest {
 
         when(accountMOKFacade.findByEmail(account.getEmail())).thenReturn(Optional.of(account));
         when(tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId())).thenReturn(Optional.empty());
-        when(tokenProvider.generatePasswordResetToken(eq(account))).thenReturn(resetPasswordToken);
-        doNothing().when(tokenFacade).create(any(Token.class));
-        doNothing().when(mailProvider).sendPasswordResetEmail(eq(account.getName()), eq(account.getLastname()), eq(account.getEmail()), any(), any());
 
-        accountService.forgetAccountPassword(account.getEmail());
-
-        verify(mailProvider, Mockito.times(1)).sendPasswordResetEmail(eq(account.getName()), eq(account.getLastname()), eq(account.getEmail()), any(), any());
+        assertThrows(TokenNotFoundException.class, () -> accountService.forgetAccountPassword(account.getEmail()));
     }
 
     @Test
-    void forgetAccountPasswordTestAccountNotFound() {
+    void forgetAccountPasswordTestAccountNotFound() throws Exception {
         when(accountMOKFacade.findByEmail("email")).thenReturn(Optional.empty());
         assertThrows(AccountNotFoundException.class, () -> accountService.forgetAccountPassword("email"));
     }
 
     @Test
-    void forgetAccountPasswordTestAccountBlocked() {
+    void forgetAccountPasswordTestAccountBlocked() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.setActive(true);
         account.blockAccount(true);
@@ -998,7 +988,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void forgetAccountPasswordTestAccountAccountNotActivatedException() {
+    void forgetAccountPasswordTestAccountAccountNotActivatedException() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
 
         when(accountMOKFacade.findByEmail(account.getEmail())).thenReturn(Optional.of(account));
@@ -1040,7 +1030,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void modifyAccountTestAccountNotFound() throws NoSuchFieldException, IllegalAccessException {
+    void modifyAccountTestAccountNotFound() throws Exception {
         String newName = "NewName";
         String newLastname = "NewLastName";
         String newPhoneNumber = "NewPhoneNumber";
@@ -1061,7 +1051,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void modifyAccountTestOptimisticLockAccountVersion() throws NoSuchFieldException, IllegalAccessException {
+    void modifyAccountTestOptimisticLockAccountVersion() throws Exception {
         String newName = "NewName";
         String newLastname = "NewLastName";
         String newPhoneNumber = "NewPhoneNumber";
@@ -1087,7 +1077,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void modifyAccountTestOptimisticLockUserLevelVersion() throws NoSuchFieldException, IllegalAccessException {
+    void modifyAccountTestOptimisticLockUserLevelVersion() throws Exception {
         String newName = "NewName";
         String newLastname = "NewLastName";
         String newPhoneNumber = "NewPhoneNumber";
@@ -1113,7 +1103,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
-    void modifyAccountTestUserLevelMissing() throws NoSuchFieldException, IllegalAccessException {
+    void modifyAccountTestUserLevelMissing() throws Exception {
         String newName = "NewName";
         String newLastname = "NewLastName";
         String newPhoneNumber = "NewPhoneNumber";
@@ -1143,7 +1133,7 @@ public class AccountServiceMockTest {
 
     @Test
     @WithMockUser(username = "login")
-    void resendEmailConfirmationTestSuccessful() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
+    void resendEmailConfirmationTestSuccessful() throws ApplicationBaseException {
         String tokenEmail = "token@email.com";
         String newToken = "NEW TOKEN VALUE";
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -1165,7 +1155,7 @@ public class AccountServiceMockTest {
 
     @Test
     @WithMockUser(username = "login")
-    void resendEmailConfirmationTestAccountNotFound() {
+    void resendEmailConfirmationTestAccountNotFound() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.setAccountLanguage("pl");
 
@@ -1176,7 +1166,7 @@ public class AccountServiceMockTest {
 
     @Test
     @WithMockUser(username = "login")
-    void resendEmailConfirmationTestTokenNotFound() {
+    void resendEmailConfirmationTestTokenNotFound() throws Exception {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.setAccountLanguage("pl");

@@ -84,7 +84,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      */
     @Override
     @RolesAllowed(Roles.ADMIN)
-    public void remove(UserLevel userLevel) {
+    public void remove(UserLevel userLevel) throws ApplicationBaseException {
         super.remove(userLevel);
     }
 
@@ -108,7 +108,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public Optional<UserLevel> findAndRefresh(UUID id) {
+    public Optional<UserLevel> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -119,7 +119,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public List<UserLevel> findAll() {
+    public List<UserLevel> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
 
@@ -130,7 +130,7 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public int count() {
+    public int count() throws ApplicationBaseException {
         return super.count();
     }
 }

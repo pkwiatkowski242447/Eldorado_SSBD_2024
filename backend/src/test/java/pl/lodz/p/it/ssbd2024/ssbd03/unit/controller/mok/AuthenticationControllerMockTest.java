@@ -365,9 +365,8 @@ public class AuthenticationControllerMockTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RefreshTokenDTO(exampleRefreshToken))))
                 .andExpect(status().isOk())
-                .andExpect(result -> {
-                    assertEquals(objectMapper.writeValueAsString(accessAndRefreshTokensDTO),
-                            result.getResponse().getContentAsString());
-                });
+                .andExpect(result -> assertEquals(objectMapper.writeValueAsString(accessAndRefreshTokensDTO),
+                        result.getResponse().getContentAsString())
+                );
     }
 }

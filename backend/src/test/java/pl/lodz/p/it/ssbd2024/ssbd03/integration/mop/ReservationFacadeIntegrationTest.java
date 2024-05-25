@@ -146,7 +146,7 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void reservationFacadeFindAllReservationsTest() {
+    public void reservationFacadeFindAllReservationsTest() throws Exception {
         List<Reservation> reservations = reservationFacade.findAll();
 
         assertNotNull(reservations);
@@ -165,13 +165,6 @@ public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
         List<Reservation> reservations = reservationFacade.findAllWithPagination(0,8);
         assertNotNull(reservations);
         assertEquals(4, reservations.size());
-//
-//        page = 1;
-//        List<Reservation> reservationsPage2 = reservationFacade.findAllWithPagination(page, pageSize);
-//        assertNotNull(reservationsPage2);
-//        assertEquals(totalReservations - pageSize, reservationsPage2.size());
-//
-//        assertNotEquals(reservationsPage1, reservationsPage2);
     }
 
     @Test

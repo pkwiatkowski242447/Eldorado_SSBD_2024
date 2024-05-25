@@ -60,7 +60,7 @@ public class AuthenticationServiceMockTest {
     private AuthenticationService authenticationService;
 
     @Test
-    public void loginUsingAuthenticationCodeTestNegativeAccountNotFound() {
+    public void loginUsingAuthenticationCodeTestNegativeAccountNotFound() throws Exception {
         String exampleLogin = "ExampleLogin";
         String exampleCode = "ExampleCode";
         when(authenticationFacade.findByLogin(exampleLogin)).thenReturn(Optional.empty());
@@ -68,7 +68,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void loginUsingAuthenticationCodeTestNegativeAccountNotActive() {
+    public void loginUsingAuthenticationCodeTestNegativeAccountNotActive() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleCode = "ExampleCode";
         account.setActive(false);
@@ -77,7 +77,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void loginUsingAuthenticationCodeTestNegativeAccountBlockedByAdmin() {
+    public void loginUsingAuthenticationCodeTestNegativeAccountBlockedByAdmin() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         account.setActive(true);
         String exampleCode = "ExampleCode";
@@ -87,7 +87,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void loginUsingAuthenticationCodeTestNegativeAccountBlockedByLoggingIncorrectlyTooMuchTimes() {
+    public void loginUsingAuthenticationCodeTestNegativeAccountBlockedByLoggingIncorrectlyTooMuchTimes() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         account.setActive(true);
         String exampleCode = "ExampleCode";
@@ -97,7 +97,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void loginUsingAuthenticationCodeTestNegativeTokenWithAuthCodeNotFound() {
+    public void loginUsingAuthenticationCodeTestNegativeTokenWithAuthCodeNotFound() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         account.setActive(true);
         String exampleCode = "ExampleCode";
@@ -107,7 +107,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void loginUsingAuthenticationCodeTestNegativeTokenInvalid() {
+    public void loginUsingAuthenticationCodeTestNegativeTokenInvalid() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleCode = "ExampleCode";
         Token token = new Token(exampleCode, account, Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE);
@@ -150,7 +150,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void findByLoginTestPositive() {
+    public void findByLoginTestPositive() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
 
@@ -161,7 +161,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void registerUnsuccessfulLoginAttemptWithoutIncrementTestNegativeAccountNotFound() {
+    public void registerUnsuccessfulLoginAttemptWithoutIncrementTestNegativeAccountNotFound() throws Exception {
         String exampleLogin = "ExampleLogin";
         String exampleIpAddress = "ExampleIpAddress";
         when(authenticationFacade.findByLogin(exampleLogin)).thenReturn(Optional.empty());
@@ -182,7 +182,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void registerUnsuccessfulLoginAttemptWithIncrementTestNegativeAccountNotFound() {
+    public void registerUnsuccessfulLoginAttemptWithIncrementTestNegativeAccountNotFound() throws Exception {
         String exampleLogin = "ExampleLogin";
         String exampleIpAddress = "ExampleIpAddress";
         when(authenticationFacade.findByLogin(exampleLogin)).thenReturn(Optional.empty());
@@ -228,7 +228,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void registerSuccessfulLoginAttemptFor1FATestNegativeAccountNotFound() {
+    public void registerSuccessfulLoginAttemptFor1FATestNegativeAccountNotFound() throws Exception {
         String exampleLogin = "ExampleLogin";
         String exampleIpAddress = "ExampleIpAddress";
         String exampleLanguage = "ExampleLanguage";
@@ -280,7 +280,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void registerSuccessfulLoginAttemptFor2FATestNegativeAccountNotFound() {
+    public void registerSuccessfulLoginAttemptFor2FATestNegativeAccountNotFound() throws Exception {
         String exampleLogin = "ExampleLogin";
         String exampleIpAddress = "ExampleIpAddress";
         String exampleLanguage = "ExampleLanguage";
@@ -326,7 +326,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void refreshUserSessionTestNegativeAccountNotFound() {
+    public void refreshUserSessionTestNegativeAccountNotFound() throws Exception {
         String exampleLogin = "exampleLoginNo1";
         String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
         when(authenticationFacade.findByLogin(exampleLogin)).thenReturn(Optional.empty());
@@ -335,7 +335,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void refreshUserSessionTestNegativeTokenNotFound() {
+    public void refreshUserSessionTestNegativeTokenNotFound() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
@@ -345,7 +345,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void refreshUserSessionTestNegativeAccountCouldNotAuthenticate() {
+    public void refreshUserSessionTestNegativeAccountCouldNotAuthenticate() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         account.setBlocked(true);
         String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
@@ -357,7 +357,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void refreshUserSessionTestNegativeTokenNotValid() {
+    public void refreshUserSessionTestNegativeTokenNotValid() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
         Token refreshTokenObject = new Token(exampleRefreshTokenValue, account, Token.TokenType.REFRESH_TOKEN);

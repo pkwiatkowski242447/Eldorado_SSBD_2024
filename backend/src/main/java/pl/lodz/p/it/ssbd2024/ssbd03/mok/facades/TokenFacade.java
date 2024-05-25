@@ -85,7 +85,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
-    public void remove(Token entity) {
+    public void remove(Token entity) throws ApplicationBaseException {
         super.remove(entity);
     }
 
@@ -108,7 +108,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public List<Token> findAll() {
+    public List<Token> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
 
@@ -119,7 +119,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @Override
     @RolesAllowed({Roles.ADMIN})
-    public int count() {
+    public int count() throws ApplicationBaseException {
         return super.count();
     }
 
@@ -131,7 +131,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
     @PermitAll
-    public Optional<Token> findByTypeAndAccount(Token.TokenType tokenType, UUID accountId) {
+    public Optional<Token> findByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
                     .createNamedQuery("Token.findByTypeAndAccount", Token.class)
@@ -151,7 +151,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
     @PermitAll
-    public Optional<Token> findByTokenValue(String tokenValue) {
+    public Optional<Token> findByTokenValue(String tokenValue) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
                     .createNamedQuery("Token.findByTokenValue", Token.class)
@@ -172,7 +172,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @return List of tokens of the specified token type.
      */
     @PermitAll
-    public List<Token> findByTokenType(Token.TokenType tokenType) {
+    public List<Token> findByTokenType(Token.TokenType tokenType) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
                 .createNamedQuery("Token.findByTokenType", Token.class)
@@ -191,7 +191,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param accountId ID of the Account which Token are to be removed.
      */
     @PermitAll
-    public void removeByAccount(UUID accountId) {
+    public void removeByAccount(UUID accountId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Token.removeByAccount")
                 .setParameter("accountId", accountId)
                 .executeUpdate();
@@ -204,7 +204,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      * @param accountId ID of the Account which Tokens are to be removed.
      */
     @PermitAll
-    public void removeByTypeAndAccount(Token.TokenType tokenType, UUID accountId) {
+    public void removeByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Token.removeByTypeAndAccount")
                 .setParameter("tokenType", tokenType)
                 .setParameter("accountId", accountId)

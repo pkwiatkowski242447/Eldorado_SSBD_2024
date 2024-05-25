@@ -8,7 +8,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.postgresql.util.PSQLException;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
@@ -18,6 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlre
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountLoginAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,7 +56,7 @@ public class AccountFacadeAspect {
             return proceedingJoinPoint.proceed();
         } catch (OptimisticLockException optimisticLockException) {
             throw optimisticLockException;
-        } catch (PersistenceException | PSQLException exception) {
+        } catch (PersistenceException | SQLException exception) {
             Throwable exceptionCopy = exception;
             do {
                 if (exceptionCopy.getMessage().contains("account_login_key")) {
