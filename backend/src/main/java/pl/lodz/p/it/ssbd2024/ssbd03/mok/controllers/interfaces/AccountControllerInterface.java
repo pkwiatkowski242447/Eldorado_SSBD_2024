@@ -178,11 +178,11 @@ public interface AccountControllerInterface {
     ResponseEntity<?> modifyUserAccount(String ifMatch, AccountModifyDTO accountModifyDTO) throws ApplicationBaseException;
 
     /**
-     * This method is used to modify personal data of currently logged-in user.
+     * This method is used to find user account by id.
      *
      * @param id Identifier of account to find.
-     * @return It returns HTTP response 200 OK with user information if account exists. If Account with id doesn't exist
-     * returns 400. When uuid is invalid returns 400.
+     * @return It returns HTTP response 200 OK with user information if account exists. If account with id doesn't exist
+     * returns 404. When uuid is invalid returns 400.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */

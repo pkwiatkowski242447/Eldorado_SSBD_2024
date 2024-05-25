@@ -514,6 +514,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws AccountNotFoundException Thrown when account from security context can't be found in the database.
      */
     @Override
+    @RolesAllowed({Roles.ADMIN})
     public Account getAccountById(UUID id) throws ApplicationBaseException {
         return accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
     }
