@@ -128,15 +128,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         key = keyGenerator.generateKey();
     }
 
-    /**
-     * This method is used to perform the second step in multifactor authentication, that is
-     * to verify the provided authentication code, used for authenticating user in the application.
-     *
-     * @param login Login of the Account.
-     * @param code  8 character long string value, which is the authentication code sent to the users e-mail address.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     *                                  on facade components.
-     */
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
@@ -163,21 +154,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         this.tokenFacade.remove(token);
     }
 
-    /**
-     * This method is used to register successful login attempt made by the user - if first step of authentication is
-     * completed then e-mail message with authentication code is sent to the user. If second step of authentication is
-     * completed then JWT token is generated and sent to the user.
-     *
-     * @param userLogin Login of the user that is trying to authenticate in the application.
-     * @param confirmed Boolean flag indicating whether user identity is confirmed - used to send e-mail when first step of multifactor authentication is completed.
-     * @param ipAddress Logical IPv4 address, which the user is authenticating from.
-     * @param language  Language constant, read as a setting in the user's browser.
-     * @return Data transfer object containing a JWT token is returned if user identity is confirmed, that is after the authentication code
-     * is entered and validated, and refresh token used to refresh user session. Otherwise, it sends e-mail message containing the
-     * authentication code.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     *                                  on facade components.
-     */
     @Override
     @RolesAllowed({Roles.CLIENT, Roles.STAFF, Roles.ADMIN, Roles.ANONYMOUS})
     public AccessAndRefreshTokensDTO registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
@@ -203,15 +179,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         return new AccessAndRefreshTokensDTO(accessToken, refreshTokenObject.getTokenValue());
     }
 
-    /**
-     * This method is used to register unsuccessful login attempt made by the user - specifically when credentials
-     * entered by the user are invalid (that causes the unsuccessfulLoginCounter to increment, hence the name of the method).
-     *
-     * @param userLogin Login of the user that is trying to authenticate in the application.
-     * @param ipAddress Logical IPv4 address, which the user is authenticating from.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     *                                  on facade components.
-     */
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     public void registerUnsuccessfulLoginAttemptWithIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
@@ -231,16 +198,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         authenticationFacade.edit(account);
     }
 
-    /**
-     * This method is used to register unsuccessful login attempt made by the user - specifically when user account
-     * could not be authenticated to other reasons, such as the account being not active or blocked. That should not
-     * increase the unsuccessfulLoginCounter as authentication could not be performed.
-     *
-     * @param userLogin Login of the user that is trying to authenticate in the application.
-     * @param ipAddress Logical IPv4 address, which the user is authenticating from.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     *                                  on facade components.
-     */
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     public void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
@@ -283,18 +240,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         this.tokenFacade.create(multiFactorAuthToken);
     }
 
-    /**
-     * This method is used to refresh user session in the application using refreshToken sent to the
-     * client while logging in.
-     *
-     * @param refreshToken String identified as refreshToken, used to refresh user session in the application,
-     *                     sent to the client during logging in.
-     * @param userLogin    Login of the currently authenticated in the application user.
-     * @return Data transfer object containing new access token (used for authentication purposes) and refresh token
-     * (used for refreshing user session).
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     *                                  on facade components.
-     */
     @RolesAllowed({Roles.AUTHENTICATED})
     public AccessAndRefreshTokensDTO refreshUserSession(String refreshToken, String userLogin) throws ApplicationBaseException {
         // Retrieve user account and token object from database
@@ -322,14 +267,6 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         return new AccessAndRefreshTokensDTO(newAccessToken, newRefreshTokenObject.getTokenValue());
     }
 
-    /**
-     * Retrieves an Account with given login.
-     *
-     * @param login Login of the Account to be retrieved.
-     * @return Returns Account with the specified login.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
-     *                                  on facade components.
-     */
     @Override
     @RolesAllowed({Roles.ANONYMOUS})
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
