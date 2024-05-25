@@ -216,8 +216,7 @@ public class AccountService implements AccountServiceInterface {
         if (account.getBlocked()) throw new AccountBlockedException();
         else if (!account.getActive()) throw new AccountNotActivatedException();
 
-        Token tokenObject = tokenFacade.findByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId()).orElseThrow(TokenNotFoundException::new);
-        tokenFacade.remove(tokenObject);
+        tokenFacade.removeByTypeAndAccount(Token.TokenType.RESET_PASSWORD, account.getId());
 
         Token passwordResetToken = tokenProvider.generatePasswordResetToken(account);
         this.tokenFacade.create(passwordResetToken);
@@ -412,8 +411,7 @@ public class AccountService implements AccountServiceInterface {
         if (accountFacade.findByEmail(newEmail).isPresent())
             throw new AccountEmailAlreadyTakenException();
 
-        Token tokenObject = tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow(TokenNotFoundException::new);
-        tokenFacade.remove(tokenObject);
+        tokenFacade.removeByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId());
 
         Token emailChangeToken = tokenProvider.generateEmailChangeToken(account, newEmail);
         this.tokenFacade.create(emailChangeToken);
@@ -558,6 +556,7 @@ public class AccountService implements AccountServiceInterface {
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Client)) {
             throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
+
         if (account.getUserLevels().size() == 1) {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
@@ -568,6 +567,12 @@ public class AccountService implements AccountServiceInterface {
         accountFacade.edit(account);
 
         userLevelFacade.remove(clientUserLevel);
+
+        mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
+                I18n.CLIENT_USER_LEVEL,
+                account.getAccountLanguage());
     }
 
     @Override
@@ -579,6 +584,7 @@ public class AccountService implements AccountServiceInterface {
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Staff)) {
             throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
+
         if (account.getUserLevels().size() == 1) {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
@@ -589,6 +595,12 @@ public class AccountService implements AccountServiceInterface {
         accountFacade.edit(account);
 
         userLevelFacade.remove(staffUserLevel);
+
+        mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
+                I18n.STAFF_USER_LEVEL,
+                account.getAccountLanguage());
     }
 
     @Override
@@ -608,6 +620,7 @@ public class AccountService implements AccountServiceInterface {
         if (account.getUserLevels().stream().noneMatch(userLevel -> userLevel instanceof Admin)) {
             throw new AccountUserLevelException(I18n.NO_SUCH_USER_LEVEL_EXCEPTION);
         }
+
         if (account.getUserLevels().size() == 1) {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
@@ -618,5 +631,11 @@ public class AccountService implements AccountServiceInterface {
         accountFacade.edit(account);
 
         userLevelFacade.remove(adminUserLevel);
+
+        mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
+                I18n.ADMIN_USER_LEVEL,
+                account.getAccountLanguage());
     }
 }

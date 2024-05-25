@@ -112,11 +112,17 @@ public class I18n {
     public static final String UNBLOCK_ACCOUNT_ACTION_DESCRIPTION = "mail.unblock.account.action_description";
     public static final String UNBLOCK_ACCOUNT_NOTE_TITLE = "mail.unblock.account.note_title";
 
-    public static final String NEW_ACCESS_LEVEL_GREETING_MESSAGE = "mail.granted.user.level.greeting.message";
-    public static final String NEW_ACCESS_LEVEL_MESSAGE_SUBJECT = "mail.granted.user.level.message.subject";
-    public static final String NEW_ACCESS_LEVEL_RESULT_MESSAGE = "mail.granted.user.level.result_message";
-    public static final String NEW_ACCESS_LEVEL_ACTION_DESCRIPTION = "mail.granted.user.level.action_description";
-    public static final String NEW_ACCESS_LEVEL_NOTE_TITLE = "mail.granted.user.level.note_title";
+    public static final String ACCESS_LEVEL_GRANTED_GREETING_MESSAGE = "mail.granted.user.level.greeting.message";
+    public static final String ACCESS_LEVEL_GRANTED_MESSAGE_SUBJECT = "mail.granted.user.level.message.subject";
+    public static final String ACCESS_LEVEL_GRANTED_RESULT_MESSAGE = "mail.granted.user.level.result_message";
+    public static final String ACCESS_LEVEL_GRANTED_ACTION_DESCRIPTION = "mail.granted.user.level.action_description";
+    public static final String ACCESS_LEVEL_GRANTED_NOTE_TITLE = "mail.granted.user.level.note_title";
+
+    public static final String ACCESS_LEVEL_REVOKED_GREETING_MESSAGE = "mail.revoked.user.level.greeting.message";
+    public static final String ACCESS_LEVEL_REVOKED_MESSAGE_SUBJECT = "mail.revoked.user.level.message.subject";
+    public static final String ACCESS_LEVEL_REVOKED_RESULT_MESSAGE = "mail.revoked.user.level.result_message";
+    public static final String ACCESS_LEVEL_REVOKED_ACTION_DESCRIPTION = "mail.revoked.user.level.action_description";
+    public static final String ACCESS_LEVEL_REVOKED_NOTE_TITLE = "mail.revoked.user.level.note_title";
 
     public static final String PASSWORD_RESET_GREETING_MESSAGE = "mail.reset.password.greeting.message";
     public static final String PASSWORD_RESET_MESSAGE_SUBJECT = "mail.reset.password.message.subject";
