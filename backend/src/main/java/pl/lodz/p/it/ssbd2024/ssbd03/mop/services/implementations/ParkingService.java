@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.UUID;
 
@@ -30,5 +31,11 @@ public class ParkingService implements ParkingServiceInterface {
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
+    public void removeParkingById(UUID id) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }

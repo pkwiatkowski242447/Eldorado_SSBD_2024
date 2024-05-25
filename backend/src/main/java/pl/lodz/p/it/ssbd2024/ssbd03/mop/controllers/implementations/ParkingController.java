@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+
+import javax.naming.OperationNotSupportedException;
 
 /**
  * Controller used for manipulating parking in the system.
@@ -22,5 +25,11 @@ public class ParkingController implements ParkingControllerInterface {
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public ResponseEntity<?> getSectorById(@PathVariable("id") String id) throws ApplicationBaseException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
+    public ResponseEntity<?> removeParkingById(String id) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }
