@@ -52,6 +52,12 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<?> handleUnknownException(Exception ex, WebRequest request) {
+        if (ex instanceof UnsupportedOperationException unsupportedOperationException) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ExceptionDTO(unsupportedOperationException.getMessage()));
+        }
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(I18n.INTERNAL_SERVER_ERROR));

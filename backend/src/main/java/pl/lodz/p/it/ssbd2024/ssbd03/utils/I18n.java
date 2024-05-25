@@ -72,6 +72,8 @@ public class I18n {
     // Util
     public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
 
+    public static final String NOT_SUPPORTED_OPERATION = "unsupported.operation.exception";
+
 
     // Mail provider
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";

@@ -9,6 +9,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ReservationControllerInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 /**
  * Controller used for manipulating reservations and parking events in the system.
@@ -21,12 +22,12 @@ public class ReservationController implements ReservationControllerInterface {
     @Override
     @RolesAllowed(Roles.CLIENT)
     public ResponseEntity<?> makeReservation(MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(I18n.NOT_SUPPORTED_OPERATION);
     }
 
     @Override
     @RolesAllowed({Roles.CLIENT, Roles.STAFF})
     public ResponseEntity<?> cancelReservation(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(I18n.NOT_SUPPORTED_OPERATION);
     }
 }
