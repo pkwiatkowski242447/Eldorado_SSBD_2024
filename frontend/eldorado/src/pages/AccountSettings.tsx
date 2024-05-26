@@ -31,6 +31,7 @@ import {
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import {Loader2, Slash} from "lucide-react";
+import {Switch} from "@/components/ui/switch.tsx";
 
 
 function AccountSettings() {
@@ -53,6 +54,7 @@ function AccountSettings() {
         lastName: z.string().min(2, {message: t("accountSettings.lastNameTooShort")})
             .max(50, {message: t("accountSettings.lastNameTooLong")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
+        twoFactorAuth: z.boolean().optional().default(account?.twoFactorAuth || false),
     });
 
     const passwordSchema = z.object({
@@ -165,8 +167,11 @@ function AccountSettings() {
         setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
         if (account && account.accountLanguage && etag !== null) {
+            if (values.twoFactorAuth === undefined) {
+                values.twoFactorAuth = false;
+            }
             api.modifyAccountSelf(account.login, account.version, account.userLevelsDto,
-                values.name, values.lastName, values.phoneNumber, false, etag)
+                values.name, values.lastName, values.phoneNumber, values.twoFactorAuth, etag)
                 .then(() => {
                     getCurrentAccount();
                     toast({
@@ -189,7 +194,7 @@ function AccountSettings() {
     return (
         <div>
             <SiteHeader/>
-            <Breadcrumb className={"p-5"}>
+            <Breadcrumb className={"pt-5 pl-2"}>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
@@ -243,7 +248,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.email")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.authentication.email")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={account?.email} {...field} />
@@ -298,7 +303,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.oldPassword")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.authentication.oldPassword")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input type="password" {...field} />
                                                                         </FormControl>
@@ -306,13 +311,15 @@ function AccountSettings() {
                                                                     </FormItem>
                                                                 )}
                                                             />
+                                                        </div>
+                                                        <div className="grid gap-2">
                                                             <FormField
                                                                 control={formPassword.control}
                                                                 name="newPassword"
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.newPassword")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.authentication.newPassword")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input type="password" {...field} />
                                                                         </FormControl>
@@ -320,13 +327,15 @@ function AccountSettings() {
                                                                     </FormItem>
                                                                 )}
                                                             />
+                                                        </div>
+                                                        <div className="grid gap-2">
                                                             <FormField
                                                                 control={formPassword.control}
                                                                 name="newPasswordRepeat"
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.newPasswordRepeat")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.authentication.newPasswordRepeat")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input type="password" {...field} />
                                                                         </FormControl>
@@ -367,13 +376,13 @@ function AccountSettings() {
                         )}
                         {activeForm === 'Personal Info' && (
                             <div>
-                                <Card className="mx-auto">
+                                <Card className="mx-10 w-auto">
                                     <CardContent>
                                         <Form {...formUserData}>
                                             {// @ts-expect-error - fix this
                                                 <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
                                                       className="space-y-4">
-                                                    <div className="grid gap-4 p-10">
+                                                    <div className="grid gap-4 p-5">
                                                         <div className="grid gap-2">
                                                             <FormField
                                                                 control={formUserData.control}
@@ -381,7 +390,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.personalInfo.firstName")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.personalInfo.firstName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={account?.name} {...field}/>
@@ -398,7 +407,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.personalInfo.lastName")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.personalInfo.lastName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={account?.lastname} {...field}/>
@@ -415,7 +424,7 @@ function AccountSettings() {
                                                                 render={() => (
                                                                     <FormItem className="items-start">
                                                                         <FormLabel
-                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
+                                                                            className="text-black text-center">{t("registerPage.phoneNumber")} *</FormLabel>
                                                                         <FormControl className="w-full">
                                                                             <Controller
                                                                                 name="phoneNumber"
@@ -434,6 +443,38 @@ function AccountSettings() {
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formUserData.control}
+                                                                name="twoFactorAuth"
+                                                                render={() => (
+                                                                    <FormField
+                                                                        control={formUserData.control}
+                                                                        name="twoFactorAuth"
+                                                                        render={({field}) => (
+                                                                            <FormItem>
+                                                                                <div className="flex flex-col">
+                                                                                    <FormLabel className="text-black">
+                                                                                        {t("accountSettings.twoFactorAuth")}
+                                                                                    </FormLabel>
+                                                                                    <FormControl>
+                                                                                        <div
+                                                                                            className={"justify-center pt-5"}>
+                                                                                            <Switch {...field}
+                                                                                                    defaultChecked={account?.twoFactorAuth}
+                                                                                                    checked={field.value}
+                                                                                                    onCheckedChange={field.onChange}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </FormControl>
+                                                                                </div>
+                                                                                <FormMessage/>
+                                                                            </FormItem>
+                                                                        )}
+                                                                    />
                                                                 )}
                                                             />
                                                         </div>

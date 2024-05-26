@@ -9,7 +9,7 @@ function HomePage() {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
-            <Breadcrumb className={"p-5"}>
+            <Breadcrumb className={"pt-5 pl-2"}>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink>{t("breadcrumb.home")}</BreadcrumbLink>

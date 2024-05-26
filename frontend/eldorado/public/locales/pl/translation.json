@@ -115,6 +115,8 @@
   "accountSettings.users.table.settings.unblock2": "odblokować",
   "accountSettings.confirmUserDataChange": "Czy na pewno chcesz zmienić dane użytkownika?",
   "accountSettings.confirmEmailChange": "Czy na pewno chcesz zmienić adres e-mail?",
+  "accountSettings.twoFactorAuth": "Uwierzytelnianie dwuskładnikowe",
+
 
   "accountSettings.users.table.settings.account.title": "Modyfikuj konto - ",
   "accountSettings.users.table.settings.account.userLevels": "Poziomy użytkownika",
@@ -182,7 +184,7 @@
   "accountSettings.popUp.changeUserDataOK.text": "Twoje dane osobowe zostały pomyślnie zmienione.",
   "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "Poziom użytkownika został pomyślnie usunięty.",
   "accountSettings.popUp.changeUserDataOK.userLevelAdded": "Poziom użytkownika został pomyślnie dodany.",
-
+  "accountSettings.popUp.changeOtherUserDataOK.text": "Dane użytkownika zostały pomyślnie zmienione.",
 
   "confirmEmailPage.popUp.confirmEmailOK.title": "Sukces!",
   "confirmEmailPage.popUp.confirmEmailOK.loggedIn.text": "Twój adres e-mail został pomyślnie zmieniony.",

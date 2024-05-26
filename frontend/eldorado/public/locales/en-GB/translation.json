@@ -84,6 +84,8 @@
   "accountSettings.lastNameTooLong": "Last name can be at most 50 characters long",
   "accountSettings.phoneNumberInvalid": "Phone number is not valid",
   "accountSettings.wrongEmail": "The email address is not valid",
+  "accountSettings.twoFactorAuth": "Two-factor authentication",
+
 
   "accountSettings.authentication.oldPassword": "Current Password",
   "accountSettings.authentication.newPassword": "New Password",
@@ -179,7 +181,7 @@
   "accountSettings.popUp.changeUserDataOK.text": "Your personal data has been successfully changed.",
   "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "User level has been removed successfully.",
   "accountSettings.popUp.changeUserDataOK.userLevelAdded": "User level has been added successfully.",
-
+  "accountSettings.popUp.changeOtherUserDataOK.text": "The user's personal data has been successfully changed.",
 
   "confirmEmailPage.popUp.confirmEmailOK.title": "Success!",
   "confirmEmailPage.popUp.confirmEmailOK.loggedIn.text": "Your email has been successfully changed.",

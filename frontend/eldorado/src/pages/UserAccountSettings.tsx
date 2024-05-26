@@ -33,11 +33,12 @@ import {RolesEnum} from "@/types/TokenPayload.ts";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Loader2, Slash} from "lucide-react";
+import {Switch} from "@/components/ui/switch.tsx";
 
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
 function UserAccountSettings() {
-    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'E-Mail');
+    const [activeForm, setActiveForm] = useState('UserLevels');
     const [managedUser, setManagedUser] = useState<UserType | null>(null);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
@@ -57,17 +58,17 @@ function UserAccountSettings() {
         lastName: z.string().min(2, {message: t("accountSettings.lastNameTooShort")})
             .max(50, {message: t("accountSettings.lastNameTooLong")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
+        twoFactorAuth: z.boolean().optional().default(managedUser?.twoFactorAuth || false),
     });
 
     useEffect(() => {
         if (id) {
-            localStorage.setItem('activeForm', activeForm);
             api.getAccountById(id).then(response => {
                 setManagedUser(response.data);
                 window.localStorage.setItem('etag', response.headers['etag']);
             });
         }
-    }, [activeForm, id]);
+    }, [id]);
 
     const {getCurrentAccount} = useAccount();
 
@@ -227,16 +228,19 @@ function UserAccountSettings() {
     };
 
     const SubmitUserData = (values: z.infer<typeof userDataSchema>) => {
+        setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
         if (managedUser && managedUser.accountLanguage && etag !== null) {
-            setIsLoading(true)
+            if (values.twoFactorAuth === undefined) {
+                values.twoFactorAuth = false;
+            }
             api.modifyAccountUser(managedUser.login, managedUser.version, managedUser.userLevelsDto,
-                values.name, values.lastName, values.phoneNumber, false, etag)
+                values.name, values.lastName, values.phoneNumber, values.twoFactorAuth, etag)
                 .then(() => {
                     getCurrentAccount();
                     toast({
-                        title: "Success!",
-                        description: "The account info has been successfully changed.",
+                        title: t("accountSettings.popUp.changeUserDataOK.title"),
+                        description: t("accountSettings.popUp.changeOtherUserDataOK.text"),
                     });
                     setFormType(null);
                     setFormValues(null);
@@ -275,7 +279,7 @@ function UserAccountSettings() {
     return (
         <div>
             <SiteHeader/>
-            <Breadcrumb className={"p-5"}>
+            <Breadcrumb className={"pt-5 pl-2"}>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
@@ -382,7 +386,7 @@ function UserAccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.authentication.email")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.users.table.settings.account.authentication.email")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={managedUser?.email} {...field} />
@@ -423,9 +427,9 @@ function UserAccountSettings() {
                         )}
                         {activeForm === 'Password' && (
                             <div>
-                                <Card className="mx-10 w-auto p-10">
-                                    <CardContent>
-                                        <Button onClick={onSubmitPassword} className="w-full">
+                                <Card className="mx-10 w-auto">
+                                    <CardContent className={"flex items-center justify-center pt-5"}>
+                                        <Button onClick={onSubmitPassword} className="w-full pb-2">
                                             {t("resetPasswordPage.title")}
                                         </Button>
                                     </CardContent>
@@ -446,13 +450,13 @@ function UserAccountSettings() {
                         )}
                         {activeForm === 'Personal Info' && (
                             <div>
-                                <Card className="mx-auto">
+                                <Card className="mx-10 w-auto">
                                     <CardContent>
                                         <Form {...formUserData}>
                                             {// @ts-expect-error - fix this maybe
                                                 <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
                                                       className="space-y-4">
-                                                    <div className="grid gap-4 p-10">
+                                                    <div className="grid gap-4 p-5">
                                                         <div className="grid gap-2">
                                                             <FormField
                                                                 control={formUserData.control}
@@ -460,7 +464,7 @@ function UserAccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.firstName")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.firstName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={managedUser?.name} {...field}/>
@@ -477,7 +481,7 @@ function UserAccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.lastName")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.lastName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={managedUser?.lastname} {...field}/>
@@ -494,7 +498,7 @@ function UserAccountSettings() {
                                                                 render={() => (
                                                                     <FormItem className="items-start">
                                                                         <FormLabel
-                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
+                                                                            className="text-black text-center">{t("registerPage.phoneNumber")} *</FormLabel>
                                                                         <FormControl className="w-full">
                                                                             <Controller
                                                                                 name="phoneNumber"
@@ -513,6 +517,38 @@ function UserAccountSettings() {
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formUserData.control}
+                                                                name="twoFactorAuth"
+                                                                render={() => (
+                                                                    <FormField
+                                                                        control={formUserData.control}
+                                                                        name="twoFactorAuth"
+                                                                        render={({field}) => (
+                                                                            <FormItem>
+                                                                                <div className="flex flex-col">
+                                                                                    <FormLabel className="text-black">
+                                                                                        {t("accountSettings.twoFactorAuth")}
+                                                                                    </FormLabel>
+                                                                                    <FormControl>
+                                                                                        <div
+                                                                                            className={"justify-center pt-5"}>
+                                                                                            <Switch {...field}
+                                                                                                    defaultChecked={managedUser?.twoFactorAuth}
+                                                                                                    checked={field.value}
+                                                                                                    onCheckedChange={field.onChange}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </FormControl>
+                                                                                </div>
+                                                                                <FormMessage/>
+                                                                            </FormItem>
+                                                                        )}
+                                                                    />
                                                                 )}
                                                             />
                                                         </div>
