@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -36,4 +37,20 @@ public interface ParkingControllerInterface {
      */
     @DeleteMapping(value = "/parking/{id}")
     ResponseEntity<?> removeParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
+     * This method is used to begin parking spot allocation. Basically, it generates a parking event for entry,
+     * which marks the start of the allocation, and then generates the exit code, which will be needed to end the
+     * allocation.
+     *
+     * @param reservationId Identifier of the reservation, which the client wants to use.
+     * @return 200 OK response is returned if the allocation is started successfully, and the code if returned in the
+     * response body. Otherwise, if there is no such reservation, user account does not exist or reservation could not
+     * be started, then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned when other unexpected
+     * exception occurs during processing of the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/reservation/{id}/enter")
+    ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 }
