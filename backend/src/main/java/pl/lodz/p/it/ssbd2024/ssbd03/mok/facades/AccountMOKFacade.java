@@ -468,17 +468,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @param lastSuccessfulLogin Date and time, which account activity is checked from. If there are no successful
      *                            login attempts from that date and time, then account is considered without recent activity.
-     * @param pageNumber          Number of the page to retrieve.
-     * @param pageSize            Number of results per page.
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsWithoutRecentActivityWithPagination(
-            LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
+    //FIXME
+//    @RolesAllowed({Roles.ADMIN})
+    public List<Account> findAllAccountsWithoutRecentActivity(
+            LocalDateTime lastSuccessfulLogin, boolean active) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.findAccountsWithoutAnyActivityFrom", Account.class);
-            findAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);
             findAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
             findAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
             List<Account> list = findAllAccountsWithoutRecentActivityQuery.getResultList();
@@ -503,6 +500,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(
             LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
+            //FIXME wie bitte XD co to za stronicowanie wariacie?
             TypedQuery<Long> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Long.class);
             countAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
             countAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);

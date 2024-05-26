@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
+
 /**
  * Interface used for managing execution of scheduled tasks.
  */
@@ -22,4 +24,11 @@ public interface ScheduleServiceInterface {
      * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
      */
     void unblockAccount();
+
+    /**
+     * Block Accounts without authentication for the last N days, where N is specified in the file consts.properties.
+     *
+     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
+     */
+    void blockAccountWithoutAuthenticationForSpecifiedTime() throws ScheduleBadPropertiesException;
 }

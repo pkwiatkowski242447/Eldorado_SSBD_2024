@@ -81,6 +81,13 @@ public class ScheduleService implements ScheduleServiceInterface {
     private int resendRegistrationConfirmationEmailAfterHours;
 
     /**
+     * String value that specifies the number of days after which the account will be blocked.
+     * Number of days is specified by <code>scheduler.max_days_without_authentication</code> property.
+     */
+    @Value("${scheduler.max_days_without_authentication}")
+    private String maxDaysWithoutAuthentication;
+
+    /**
      * Autowired constructor for the service.
      *
      * @param accountMOKFacade Facade used for managing user accounts.
@@ -197,6 +204,8 @@ public class ScheduleService implements ScheduleServiceInterface {
             try {
                 accountMOKFacade.edit(account);
             } catch (ApplicationBaseException exception) {
+                //FIXME hmmm? jaki delete time?
+
                 log.error("Exception of type: {} was throw while activating user: {} after it was blocked for {} hours.",
                         exception.getClass().getSimpleName(), account.getLogin(), this.deleteTime);
             }
@@ -205,6 +214,47 @@ public class ScheduleService implements ScheduleServiceInterface {
                     account.getLastname(),
                     account.getEmail(),
                     account.getAccountLanguage());
+        }));
+    }
+
+    @Override
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = 1L)
+    public void blockAccountWithoutAuthenticationForSpecifiedTime() {
+        //FIXME co z tymi logami xD?
+        log.info("Method: blockAccountWithoutAuthenticationForSpecifiedTime() was invoked.");
+
+        List<Account> accountsToBlock = new ArrayList<>();
+        try {
+            //FIXME o co chodzi z flagą active xd?
+            //FIXME co dla kont z czasem ostatniego logowania jako NULL
+            accountsToBlock = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.now().minus(Long.parseLong(maxDaysWithoutAuthentication), TimeUnit.MINUTES.toChronoUnit()), true);
+        } catch (NumberFormatException | ApplicationBaseException exception) {
+            log.error("Exception: {} occurred while searching for accounts to be blocked. Cause: {}.",
+                    exception.getClass().getSimpleName(), exception.getMessage());
+        }
+
+        if (accountsToBlock.isEmpty()) {
+            log.info("There are no account to be blocked right now.");
+            return;
+        }
+
+        log.info("List of identifiers of accounts to be blocked: {}", accountsToBlock.stream().map(Account::getId).toList());
+
+        accountsToBlock.forEach((account -> {
+            account.setActive(false);
+            try {
+                accountMOKFacade.edit(account);
+            } catch (ApplicationBaseException exception) {
+                log.error("Exception of type: {} was throw while blocking user: {}.",
+                        exception.getClass().getSimpleName(), account.getLogin());
+            }
+
+            //FIXME teraz wysyła się jako blokowanie przez admina a powinno być zcustomizowane raczej
+            mailProvider.sendBlockAccountInfoEmail(account.getName(),
+                    account.getLastname(),
+                    account.getEmail(),
+                    account.getAccountLanguage(),
+                    true);
         }));
     }
 }
