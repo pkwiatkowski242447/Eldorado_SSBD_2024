@@ -66,7 +66,7 @@ public interface AuthenticationControllerInterface {
     @Operation(summary = "Enter authentication code", description = "This endpoint is used to perform second step in multifactor authentication in the application.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Full authentication process was successful."),
-            @ApiResponse(responseCode = "400", description = "User account is blocked, and therefore could not be used authenticated."),
+            @ApiResponse(responseCode = "400", description = "User account is blocked, not active or suspended and therefore could not be used authenticated."),
             @ApiResponse(responseCode = "401", description = "Given credentials were invalid."),
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })

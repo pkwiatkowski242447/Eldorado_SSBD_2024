@@ -24,8 +24,8 @@ import java.util.UUID;
 public class AccountOutputDTO extends AccountSignableDTO {
     @Schema(description = "UUID identifier linked with account", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID id;
-    @Schema(description = "Flag indicating if account is verified", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
-    private boolean verified;
+    @Schema(description = "Flag indicating if account is suspended", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
+    private boolean suspended;
     @Schema(description = "Flag indicating if account is active", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     private boolean active;
     @Schema(description = "Flag indicating if account is blocked", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -70,7 +70,7 @@ public class AccountOutputDTO extends AccountSignableDTO {
                             Long version,
                             Set<UserLevelDTO> userLevelsDto,
                             UUID id,
-                            boolean verified,
+                            boolean suspended,
                             boolean active,
                             boolean blocked,
                             boolean twoFactorAuth,
@@ -87,7 +87,7 @@ public class AccountOutputDTO extends AccountSignableDTO {
                             String email) {
         super(login, version, userLevelsDto);
         this.id = id;
-        this.verified = verified;
+        this.suspended = suspended;
         this.active = active;
         this.blocked = blocked;
         this.twoFactorAuth = twoFactorAuth;

@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AccountOutputDTOTest {
 
@@ -23,7 +22,7 @@ public class AccountOutputDTOTest {
     private Long versionNo1;
     private Set<UserLevelDTO> userLevelsNo1;
     private UUID idNo1;
-    private boolean verifiedNo1;
+    private boolean suspendedNo1;
     private boolean activeNo1;
     private boolean blockedNo1;
     private boolean twoFactorAuthNo1;
@@ -47,7 +46,7 @@ public class AccountOutputDTOTest {
         versionNo1 = 0L;
         userLevelsNo1 = Set.of(new AdminDTO(), new StaffDTO(), new ClientDTO());
         idNo1 = UUID.randomUUID();
-        verifiedNo1 = true;
+        suspendedNo1 = true;
         activeNo1 = true;
         blockedNo1 = false;
         twoFactorAuthNo1 = false;
@@ -68,7 +67,7 @@ public class AccountOutputDTOTest {
                 versionNo1,
                 userLevelsNo1,
                 idNo1,
-                verifiedNo1,
+                suspendedNo1,
                 activeNo1,
                 blockedNo1,
                 twoFactorAuthNo1,
@@ -99,7 +98,7 @@ public class AccountOutputDTOTest {
                 versionNo1,
                 userLevelsNo1,
                 idNo1,
-                verifiedNo1,
+                suspendedNo1,
                 activeNo1,
                 blockedNo1,
                 twoFactorAuthNo1,
@@ -122,7 +121,7 @@ public class AccountOutputDTOTest {
         assertEquals(versionNo1, accountOutputDTO.getVersion());
         assertEquals(userLevelsNo1.size(), accountOutputDTO.getUserLevelsDto().size());
         assertEquals(idNo1, accountOutputDTO.getId());
-        assertEquals(verifiedNo1, accountOutputDTO.isVerified());
+        assertEquals(suspendedNo1, accountOutputDTO.isSuspended());
         assertEquals(activeNo1, accountOutputDTO.isActive());
         assertEquals(blockedNo1, accountOutputDTO.isBlocked());
         assertEquals(twoFactorAuthNo1, accountOutputDTO.isTwoFactorAuth());
@@ -146,7 +145,7 @@ public class AccountOutputDTOTest {
         Long versionNo2 = 0L;
         Set<UserLevelDTO> userLevelsNo2 = Set.of(new StaffDTO(), new ClientDTO());
         UUID idNo2 = UUID.randomUUID();
-        boolean verifiedNo2 = !verifiedNo1;
+        boolean suspendedNo2 = !suspendedNo1;
         boolean activeNo2 = !activeNo1;
         boolean blockedNo2 = !blockedNo1;
         boolean twoFactorAuthNo2 = !twoFactorAuthNo1;
@@ -167,7 +166,7 @@ public class AccountOutputDTOTest {
         assertEquals(versionNo1, accountOutputDTO.getVersion());
         assertEquals(userLevelsNo1.size(), accountOutputDTO.getUserLevelsDto().size());
         assertEquals(idNo1, accountOutputDTO.getId());
-        assertEquals(verifiedNo1, accountOutputDTO.isVerified());
+        assertEquals(suspendedNo1, accountOutputDTO.isSuspended());
         assertEquals(activeNo1, accountOutputDTO.isActive());
         assertEquals(blockedNo1, accountOutputDTO.isBlocked());
         assertEquals(twoFactorAuthNo1, accountOutputDTO.isTwoFactorAuth());
@@ -188,7 +187,7 @@ public class AccountOutputDTOTest {
         accountOutputDTO.setVersion(versionNo2);
         accountOutputDTO.setUserLevelsDto(userLevelsNo2);
         accountOutputDTO.setId(idNo2);
-        accountOutputDTO.setVerified(verifiedNo2);
+        accountOutputDTO.setSuspended(suspendedNo2);
         accountOutputDTO.setActive(activeNo2);
         accountOutputDTO.setBlocked(blockedNo2);
         accountOutputDTO.setTwoFactorAuth(twoFactorAuthNo2);
@@ -209,7 +208,7 @@ public class AccountOutputDTOTest {
         assertEquals(versionNo2, accountOutputDTO.getVersion());
         assertEquals(userLevelsNo2.size(), accountOutputDTO.getUserLevelsDto().size());
         assertEquals(idNo2, accountOutputDTO.getId());
-        assertEquals(verifiedNo2, accountOutputDTO.isVerified());
+        assertEquals(suspendedNo2, accountOutputDTO.isSuspended());
         assertEquals(activeNo2, accountOutputDTO.isActive());
         assertEquals(blockedNo2, accountOutputDTO.isBlocked());
         assertEquals(twoFactorAuthNo2, accountOutputDTO.isTwoFactorAuth());
