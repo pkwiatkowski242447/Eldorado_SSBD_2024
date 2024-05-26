@@ -470,14 +470,12 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *                            login attempts from that date and time, then account is considered without recent activity.
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
-    //FIXME
-//    @RolesAllowed({Roles.ADMIN})
+    //TODO RolesAllowed
     public List<Account> findAllAccountsWithoutRecentActivity(
-            LocalDateTime lastSuccessfulLogin, boolean active) throws ApplicationBaseException {
+            LocalDateTime lastSuccessfulLogin) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.findAccountsWithoutAnyActivityFrom", Account.class);
-            findAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
-            findAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
+            findAllAccountsWithoutRecentActivityQuery.setParameter("timestamp", lastSuccessfulLogin);
             List<Account> list = findAllAccountsWithoutRecentActivityQuery.getResultList();
             super.refreshAll(list);
             return list;
@@ -491,19 +489,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @param lastSuccessfulLogin Date and time, which account activity is checked from. If there are no successful
      *                            login attempts from that date and time, then account is considered without recent activity.
-     * @param pageNumber          Number of the page to retrieve.
-     * @param pageSize            Number of results per page.
      * @return Optional containing a number of inactive users accounts in the system. In case of persistence exception
      * empty optional is returned.
      */
     @RolesAllowed({Roles.ADMIN})
     public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(
-            LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
+            LocalDateTime lastSuccessfulLogin, boolean active) throws ApplicationBaseException {
         try {
-            //FIXME wie bitte XD co to za stronicowanie wariacie?
             TypedQuery<Long> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Long.class);
-            countAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
-            countAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);
             countAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
             countAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
             return Optional.of(countAllAccountsWithoutRecentActivityQuery.getSingleResult());

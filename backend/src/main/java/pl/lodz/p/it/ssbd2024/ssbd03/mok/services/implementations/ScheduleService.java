@@ -204,10 +204,8 @@ public class ScheduleService implements ScheduleServiceInterface {
             try {
                 accountMOKFacade.edit(account);
             } catch (ApplicationBaseException exception) {
-                //FIXME hmmm? jaki delete time?
-
                 log.error("Exception of type: {} was throw while activating user: {} after it was blocked for {} hours.",
-                        exception.getClass().getSimpleName(), account.getLogin(), this.deleteTime);
+                        exception.getClass().getSimpleName(), account.getLogin(), this.unblockTime);
             }
 
             mailProvider.sendUnblockAccountInfoEmail(account.getName(),
@@ -218,18 +216,15 @@ public class ScheduleService implements ScheduleServiceInterface {
     }
 
     @Override
-    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.MINUTES, initialDelay = 1L)
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void blockAccountWithoutAuthenticationForSpecifiedTime() {
-        //FIXME co z tymi logami xD?
         log.info("Method: blockAccountWithoutAuthenticationForSpecifiedTime() was invoked.");
 
         List<Account> accountsToBlock = new ArrayList<>();
         try {
-            //FIXME o co chodzi z flagą active xd?
-            //FIXME co dla kont z czasem ostatniego logowania jako NULL
-            accountsToBlock = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.now().minus(Long.parseLong(maxDaysWithoutAuthentication), TimeUnit.MINUTES.toChronoUnit()), true);
+            accountsToBlock = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.now().minus(Long.parseLong(maxDaysWithoutAuthentication), TimeUnit.DAYS.toChronoUnit()));
         } catch (NumberFormatException | ApplicationBaseException exception) {
-            log.error("Exception: {} occurred while searching for accounts to be blocked. Cause: {}.",
+            log.error("Exception: {} occurred while searching for accounts to be deactivated. Cause: {}.",
                     exception.getClass().getSimpleName(), exception.getMessage());
         }
 
@@ -249,12 +244,7 @@ public class ScheduleService implements ScheduleServiceInterface {
                         exception.getClass().getSimpleName(), account.getLogin());
             }
 
-            //FIXME teraz wysyła się jako blokowanie przez admina a powinno być zcustomizowane raczej
-            mailProvider.sendBlockAccountInfoEmail(account.getName(),
-                    account.getLastname(),
-                    account.getEmail(),
-                    account.getAccountLanguage(),
-                    true);
+            //TODO mail handle
         }));
     }
 }

@@ -656,8 +656,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountFind1 = accountMOKFacade.findByLogin(accountLoginNo3).orElseThrow(NoSuchElementException::new);
         accountFind2 = accountMOKFacade.findByLogin(accountLoginNo4).orElseThrow(NoSuchElementException::new);
 
-        List<Account> accounts0 = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.of(2017, 6, 8, 15, 30), true);
-        List<Account> accounts1 = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.of(2018, 6, 8, 15, 30), true);
+        List<Account> accounts0 = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.of(2017, 6, 8, 15, 30));
+        List<Account> accounts1 = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.of(2018, 6, 8, 15, 30));
         assertEquals(1, accounts0.size());
         assertEquals(2, accounts1.size());
 
@@ -700,8 +700,8 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         accountFind1 = accountMOKFacade.findByLogin(accountLoginNo3).orElseThrow(NoSuchElementException::new);
         accountFind2 = accountMOKFacade.findByLogin(accountLoginNo4).orElseThrow(NoSuchElementException::new);
 
-        Long count1 = accountMOKFacade.countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2017, 6, 8, 15, 30), true, 0, 10).orElseThrow(NoSuchElementException::new);
-        Long count2 = accountMOKFacade.countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2018, 6, 8, 15, 30), true, 0, 10).orElseThrow(NoSuchElementException::new);
+        Long count1 = accountMOKFacade.countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2017, 6, 8, 15, 30), true).orElseThrow(NoSuchElementException::new);
+        Long count2 = accountMOKFacade.countAllAccountsWithoutRecentActivityWithPagination(LocalDateTime.of(2018, 6, 8, 15, 30), true).orElseThrow(NoSuchElementException::new);
         assertEquals(1, count1);
         assertEquals(2, count2);
 

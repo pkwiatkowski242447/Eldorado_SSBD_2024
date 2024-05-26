@@ -95,7 +95,7 @@ import java.util.Set;
                 name = "Account.findAllAccountsMarkedForDeletion",
                 query = """
                         SELECT a FROM Account a
-                        WHERE a.verified = false AND a.creationDate < :timestamp
+                        WHERE a.active = false AND a.creationDate < :timestamp
                         ORDER BY a.login
                         """
         ),
@@ -173,7 +173,8 @@ import java.util.Set;
                 name = "Account.findAccountsWithoutAnyActivityFrom",
                 query = """
                         SELECT a FROM Account a
-                        WHERE a.active = :active AND a.activityLog.lastSuccessfulLoginTime < :lastSuccessfulLoginTime
+                        WHERE a.active = true
+                          AND ((a.activityLog.lastSuccessfulLoginTime IS NULL AND a.creationDate < :timestamp) OR a.activityLog.lastSuccessfulLoginTime < :timestamp)
                         ORDER BY a.login ASC
                         """
         ),

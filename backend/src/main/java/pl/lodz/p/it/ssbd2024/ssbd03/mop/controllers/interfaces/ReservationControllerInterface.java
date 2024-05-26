@@ -24,7 +24,7 @@ public interface ReservationControllerInterface {
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
      *                                  layer of facade and service components in the application.
      */
-    @PostMapping(value = "/makeReservation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/make-reservation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> makeReservation(@RequestBody MakeReservationDTO makeReservationDTO) throws ApplicationBaseException;
 
     /**
@@ -36,6 +36,6 @@ public interface ReservationControllerInterface {
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
      *                                  layer of facade and service components in the application.
      */
-    @DeleteMapping(value = "/cancelReservation/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/cancel-reservation/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> cancelReservation(@PathVariable("id") String id) throws ApplicationBaseException;
 }
