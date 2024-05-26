@@ -21,7 +21,7 @@ public class AccountListDTOTest {
     private String lastNameNo1;
     private boolean activeNo1;
     private boolean blockedNo1;
-    private boolean verifiedNo1;
+    private boolean suspendedNo1;
     private LocalDateTime lastSuccessfulLoginTimeNo1;
     private LocalDateTime lastUnsuccessfulLoginTimeNo1;
     private List<String> userLevelsNo1;
@@ -36,12 +36,12 @@ public class AccountListDTOTest {
         lastNameNo1 = "exampleLastNameNo1";
         activeNo1 = true;
         blockedNo1 = false;
-        verifiedNo1 = true;
+        suspendedNo1 = true;
         lastSuccessfulLoginTimeNo1 = LocalDateTime.now();
         lastUnsuccessfulLoginTimeNo1 = LocalDateTime.now();
         userLevelsNo1 = List.of("ROLE_ADMIN", "ROLE_STAFF", "ROLE_CLIENT");
 
-        accountListDTONo1 = new AccountListDTO(idNo1, loginNo1, nameNo1, lastNameNo1, activeNo1, blockedNo1, verifiedNo1, lastSuccessfulLoginTimeNo1, lastUnsuccessfulLoginTimeNo1, userLevelsNo1);
+        accountListDTONo1 = new AccountListDTO(idNo1, loginNo1, nameNo1, lastNameNo1, activeNo1, blockedNo1, suspendedNo1, lastSuccessfulLoginTimeNo1, lastUnsuccessfulLoginTimeNo1, userLevelsNo1);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class AccountListDTOTest {
 
     @Test
     public void accountListDTOAllArgsConstructorAndGettersTestPositive() {
-        AccountListDTO accountListDTO = new AccountListDTO(idNo1, loginNo1, nameNo1, lastNameNo1, activeNo1, blockedNo1, verifiedNo1, lastSuccessfulLoginTimeNo1, lastUnsuccessfulLoginTimeNo1, userLevelsNo1);
+        AccountListDTO accountListDTO = new AccountListDTO(idNo1, loginNo1, nameNo1, lastNameNo1, activeNo1, blockedNo1, suspendedNo1, lastSuccessfulLoginTimeNo1, lastUnsuccessfulLoginTimeNo1, userLevelsNo1);
         assertNotNull(accountListDTO);
         assertEquals(idNo1, accountListDTO.getId());
         assertEquals(loginNo1, accountListDTO.getLogin());
@@ -60,7 +60,7 @@ public class AccountListDTOTest {
         assertEquals(lastNameNo1, accountListDTO.getLastName());
         assertEquals(activeNo1, accountListDTO.isActive());
         assertEquals(blockedNo1, accountListDTO.isBlocked());
-        assertEquals(verifiedNo1, accountListDTO.isVerified());
+        assertEquals(suspendedNo1, accountListDTO.isSuspended());
         assertEquals(lastSuccessfulLoginTimeNo1, accountListDTO.getLastSuccessfulLoginTime());
         assertEquals(lastUnsuccessfulLoginTimeNo1, accountListDTO.getLastUnsuccessfulLoginTime());
         assertEquals(userLevelsNo1, accountListDTO.getUserLevels());
@@ -159,17 +159,17 @@ public class AccountListDTOTest {
     }
 
     @Test
-    public void accountListDTOVerifiedSetterTestPositive() {
-        boolean verifiedBefore = accountListDTONo1.isVerified();
+    public void accountListDTOSuspendedSetterTestPositive() {
+        boolean suspendedBefore = accountListDTONo1.isSuspended();
 
-        boolean newVerified = !verifiedBefore;
-        accountListDTONo1.setVerified(newVerified);
+        boolean newSuspended = !suspendedBefore;
+        accountListDTONo1.setSuspended(newSuspended);
 
-        boolean verifiedAfter = accountListDTONo1.isVerified();
+        boolean suspendedAfter = accountListDTONo1.isSuspended();
 
-        assertNotEquals(verifiedBefore, verifiedAfter);
-        assertNotEquals(verifiedBefore, newVerified);
-        assertEquals(newVerified, verifiedAfter);
+        assertNotEquals(suspendedBefore, suspendedAfter);
+        assertNotEquals(suspendedBefore, newSuspended);
+        assertEquals(newSuspended, suspendedAfter);
     }
 
     @Test

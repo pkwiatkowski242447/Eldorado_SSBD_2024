@@ -212,7 +212,7 @@ public class Account extends AbstractEntity {
     /**
      * Variable indicating whether the user account is suspended.
      */
-    @NotNull(message = AccountMessages.VERIFIED_NULL)
+    @NotNull(message = AccountMessages.SUSPENDED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_SUSPENDED_COLUMN, nullable = false)
     @Setter
     private Boolean suspended = false;

@@ -58,7 +58,7 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void deleteNotVerifiedTestSuccessful() throws Exception {
+    void deleteNotSuspendedTestSuccessful() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         List<Account> accountList = List.of(account, account1);
@@ -74,14 +74,14 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void deleteNotVerifiedTestUnsuccessful() throws Exception {
+    void deleteNotActiveTestUnsuccessful() throws Exception {
         when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenThrow(NumberFormatException.class);
 
         assertDoesNotThrow(() -> scheduleService.deleteNotActivatedAccounts());
     }
 
     @Test
-    void deleteNotVerifiedTestEmpty() throws Exception {
+    void deleteNotActiveTestEmpty() throws Exception {
         List<Account> accountList = new ArrayList<>();
 
         when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenReturn(accountList);

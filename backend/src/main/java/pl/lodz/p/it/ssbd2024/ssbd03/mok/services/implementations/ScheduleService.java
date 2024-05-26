@@ -54,7 +54,7 @@ public class ScheduleService implements ScheduleServiceInterface {
 
     /**
      * String value that specifies time after which deletion will occur.
-     * Deletion time is specified by <code>scheduler.not_verified_account_delete_time</code> property.
+     * Deletion time is specified by <code>scheduler.not_active_account_delete_time</code> property.
      */
     @Value("${scheduler.not_active_account_delete_time}")
     private String deleteTime;
@@ -110,7 +110,7 @@ public class ScheduleService implements ScheduleServiceInterface {
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void deleteNotActivatedAccounts() {
-        log.info("Method: deleteNotVerifiedAccount(), used for removing not activated accounts, was invoked.");
+        log.info("Method: deleteNotActivatedAccount(), used for removing not activated accounts, was invoked.");
 
         List<Account> inactiveAccounts = new ArrayList<>();
         try {

@@ -9,7 +9,7 @@ public interface ScheduleServiceInterface {
 
     /**
      * Removes Accounts which have not finished registration.
-     * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
+     * Time for the Account verification is set by <code>scheduler.not_active_account_delete_time</code> property.
      */
     void deleteNotActivatedAccounts();
 

@@ -22,32 +22,30 @@ import org.springframework.http.MediaType;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfigFull;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
-
-import java.util.List;
-
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.equalTo;
-
-import java.util.Date;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     
@@ -403,7 +401,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("name", Matchers.equalTo("Jerzy"))
                 .body("email", Matchers.equalTo("jerzybem@spoko.pl"))
                 .body("phoneNumber", Matchers.equalTo("111111111"))
-                .body("verified", Matchers.equalTo(true))
+                .body("suspended", Matchers.equalTo(false))
                 .body("active", Matchers.equalTo(true))
                 .body("blocked", Matchers.equalTo(false))
                 .body("accountLanguage", Matchers.equalTo("pl"))
@@ -429,7 +427,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("name", Matchers.equalTo("Adam"))
                 .body("email", Matchers.equalTo("adamn@example.com"))
                 .body("phoneNumber", Matchers.equalTo("200000000"))
-                .body("verified", Matchers.equalTo(false))
+                .body("suspended", Matchers.equalTo(false))
                 .body("active", Matchers.equalTo(true))
                 .body("blocked", Matchers.equalTo(false))
                 .body("accountLanguage", Matchers.equalTo("pl"))
@@ -1809,7 +1807,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("[0].name", equalTo(name))
                 .body("[0].active", equalTo(false))
                 .body("[0].blocked", equalTo(false))
-                .body("[0].verified", equalTo(false))
+                .body("[0].suspended", equalTo(false))
                 .body("[0].userLevels[0]", equalTo(userLevel.substring(0, 1).toUpperCase() + userLevel.substring(1)));
     }
 
@@ -1945,7 +1943,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("[0].name", equalTo(name))
                 .body("[0].active", equalTo(false))
                 .body("[0].blocked", equalTo(false))
-                .body("[0].verified", equalTo(false))
+                .body("[0].suspended", equalTo(false))
                 .body("[0].userLevels[0]", equalTo("Client"));
     }
 

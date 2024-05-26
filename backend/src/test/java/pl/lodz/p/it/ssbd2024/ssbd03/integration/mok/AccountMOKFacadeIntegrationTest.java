@@ -432,7 +432,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         assertFalse(accountToEdit1.isEmpty());
         assertFalse(accountToEdit2.isEmpty());
 
-        //Two unverified accounts - now we use reflection to change their creation time
+        //Two not active accounts - now we use reflection to change their creation time
         Field creationDateField = Account.class.getDeclaredField("creationDate");
         creationDateField.setAccessible(true);
 
