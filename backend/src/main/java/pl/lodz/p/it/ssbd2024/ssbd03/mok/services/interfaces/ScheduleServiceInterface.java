@@ -11,7 +11,7 @@ public interface ScheduleServiceInterface {
      * Removes Accounts which have not finished registration.
      * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
      */
-    void deleteNotVerifiedAccount();
+    void deleteNotActivatedAccounts();
 
     /**
      * This method will be invoked every hour in order to check if half the time to active registered account has passed.
@@ -30,5 +30,5 @@ public interface ScheduleServiceInterface {
      *
      * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
-    void blockAccountWithoutAuthenticationForSpecifiedTime() throws ScheduleBadPropertiesException;
+    void suspendAccountWithoutAuthenticationForSpecifiedTime() throws ScheduleBadPropertiesException;
 }

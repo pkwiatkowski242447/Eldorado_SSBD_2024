@@ -548,45 +548,6 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
-    public void findAllActiveAccountsWithUnverifiedEmailWithPaginationTestPositive() throws Exception {
-        List<Account> accounts0 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 10);
-        List<Account> accounts1 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 2);
-        List<Account> accounts2 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(0, 1);
-        List<Account> accounts3 = accountMOKFacade.findAllActiveAccountsWithUnverifiedEmailWithPagination(1, 1);
-
-        assertEquals(2, accounts0.size());
-        assertEquals(2, accounts1.size());
-        assertEquals(1, accounts2.size());
-        assertEquals(1, accounts3.size());
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
-    public void findAllInactiveAccountsWithUnverifiedEmailWithPagination() throws ApplicationBaseException {
-        Account account0 = accountMOKFacade.findByLogin("tonyhalik").orElseThrow(NoSuchElementException::new);
-        Account account1 = accountMOKFacade.findByLogin("adamn").orElseThrow(NoSuchElementException::new);
-
-        account0.setActive(false);
-        account1.setActive(false);
-
-        accountMOKFacade.edit(account0);
-        accountMOKFacade.edit(account1);
-
-        List<Account> accounts0 = accountMOKFacade.findAllInactiveAccountsWithUnverifiedEmailWithPagination(0, 10);
-        List<Account> accounts1 = accountMOKFacade.findAllInactiveAccountsWithUnverifiedEmailWithPagination(0, 2);
-        List<Account> accounts2 = accountMOKFacade.findAllInactiveAccountsWithUnverifiedEmailWithPagination(0, 1);
-        List<Account> accounts3 = accountMOKFacade.findAllInactiveAccountsWithUnverifiedEmailWithPagination(1, 1);
-
-        assertEquals(2, accounts0.size());
-        assertEquals(2, accounts1.size());
-        assertEquals(1, accounts2.size());
-        assertEquals(1, accounts3.size());
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
     public void findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);

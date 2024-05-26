@@ -34,6 +34,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptExcept
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountSuspendedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AuthenticationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
@@ -122,6 +123,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
                         accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress, this.loginFailedAttemptMaxCount);
                 throw new AccountBlockedByFailedLoginAttemptsException();
             }
+        } catch (AccountExpiredException expiredException) {
+            throw new AccountSuspendedException();
         } catch (AuthenticationException authenticationException) {
             throw new InvalidLoginAttemptException();
         }

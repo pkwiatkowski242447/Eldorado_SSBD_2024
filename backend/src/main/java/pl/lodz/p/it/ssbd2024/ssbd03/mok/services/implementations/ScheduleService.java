@@ -56,7 +56,7 @@ public class ScheduleService implements ScheduleServiceInterface {
      * String value that specifies time after which deletion will occur.
      * Deletion time is specified by <code>scheduler.not_verified_account_delete_time</code> property.
      */
-    @Value("${scheduler.not_verified_account_delete_time}")
+    @Value("${scheduler.not_active_account_delete_time}")
     private String deleteTime;
 
     /**
@@ -109,7 +109,7 @@ public class ScheduleService implements ScheduleServiceInterface {
 
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void deleteNotVerifiedAccount() {
+    public void deleteNotActivatedAccounts() {
         log.info("Method: deleteNotVerifiedAccount(), used for removing not activated accounts, was invoked.");
 
         List<Account> inactiveAccounts = new ArrayList<>();
@@ -217,30 +217,30 @@ public class ScheduleService implements ScheduleServiceInterface {
 
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void blockAccountWithoutAuthenticationForSpecifiedTime() {
-        log.info("Method: blockAccountWithoutAuthenticationForSpecifiedTime() was invoked.");
+    public void suspendAccountWithoutAuthenticationForSpecifiedTime() {
+        log.info("Method: suspendAccountWithoutAuthenticationForSpecifiedTime() was invoked.");
 
-        List<Account> accountsToBlock = new ArrayList<>();
+        List<Account> accountsToSuspend = new ArrayList<>();
         try {
-            accountsToBlock = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.now().minus(Long.parseLong(maxDaysWithoutAuthentication), TimeUnit.DAYS.toChronoUnit()));
+            accountsToSuspend = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.now().minus(Long.parseLong(maxDaysWithoutAuthentication), TimeUnit.DAYS.toChronoUnit()));
         } catch (NumberFormatException | ApplicationBaseException exception) {
-            log.error("Exception: {} occurred while searching for accounts to be deactivated. Cause: {}.",
+            log.error("Exception: {} occurred while searching for accounts to be suspended. Cause: {}.",
                     exception.getClass().getSimpleName(), exception.getMessage());
         }
 
-        if (accountsToBlock.isEmpty()) {
-            log.info("There are no account to be blocked right now.");
+        if (accountsToSuspend.isEmpty()) {
+            log.info("There are no account to be suspended right now.");
             return;
         }
 
-        log.info("List of identifiers of accounts to be blocked: {}", accountsToBlock.stream().map(Account::getId).toList());
+        log.info("List of identifiers of accounts to be suspended: {}", accountsToSuspend.stream().map(Account::getId).toList());
 
-        accountsToBlock.forEach((account -> {
-            account.setActive(false);
+        accountsToSuspend.forEach((account -> {
+            account.setSuspended(true);
             try {
                 accountMOKFacade.edit(account);
             } catch (ApplicationBaseException exception) {
-                log.error("Exception of type: {} was throw while blocking user: {}.",
+                log.error("Exception of type: {} was throw while suspending user: {}.",
                         exception.getClass().getSimpleName(), account.getLogin());
             }
 

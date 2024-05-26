@@ -128,16 +128,6 @@ import java.util.Set;
                         """
         ),
 
-        // Accounts that are active and yet email is still not verified
-        @NamedQuery(
-                name = "Account.findAllAccountsByVerifiedAndActiveInAscOrder",
-                query = """
-                        SELECT a FROM Account a
-                        WHERE a.verified = :verified AND a.active = :active
-                        ORDER BY a.login ASC
-                        """
-        ),
-
         // Find accounts matching user first name
         @NamedQuery(
                 name = "Account.findAccountsByActiveAndMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder",
@@ -173,7 +163,7 @@ import java.util.Set;
                 name = "Account.findAccountsWithoutAnyActivityFrom",
                 query = """
                         SELECT a FROM Account a
-                        WHERE a.active = true
+                        WHERE a.suspended = false
                           AND ((a.activityLog.lastSuccessfulLoginTime IS NULL AND a.creationDate < :timestamp) OR a.activityLog.lastSuccessfulLoginTime < :timestamp)
                         ORDER BY a.login ASC
                         """
@@ -220,12 +210,12 @@ public class Account extends AbstractEntity {
     private final Set<String> previousPasswords = new HashSet<>();
 
     /**
-     * Variable indicating whether the user account is verified.
+     * Variable indicating whether the user account is suspended.
      */
     @NotNull(message = AccountMessages.VERIFIED_NULL)
-    @Column(name = DatabaseConsts.ACCOUNT_VERIFIED_COLUMN, nullable = false)
+    @Column(name = DatabaseConsts.ACCOUNT_SUSPENDED_COLUMN, nullable = false)
     @Setter
-    private Boolean verified = false;
+    private Boolean suspended = false;
 
     /**
      * Variable indicating whether the user account is active.
@@ -424,12 +414,12 @@ public class Account extends AbstractEntity {
 
     /**
      * Method used to establish whether user account could be authenticated to.
-     * If it is either blocked or not activated yet, then boolean flag of false is returned.
+     * If it is either blocked or not activated yet or suspended, then boolean flag of false is returned.
      * Otherwise, true is returned.
      * @return Boolean flag indicating whether account could be authenticated to.
      */
     public boolean couldAuthenticate() {
-        return !this.getBlocked() || this.getActive();
+        return !this.getBlocked() && this.getActive() && !this.getSuspended();
     }
 
     /**

@@ -11,6 +11,7 @@ public class I18n {
     public static final String ACCOUNT_ID_NOT_FOUND = "account.with.given.id.not.found.exception";
     public static final String ACCOUNT_BLOCKED_EXCEPTION = "account.status.blocked.exception";
     public static final String ACCOUNT_INACTIVE_EXCEPTION = "account.status.inactive.exception";
+    public static final String ACCOUNT_SUSPENDED_EXCEPTION = "account.status.suspended.exception";
     public static final String ACCOUNT_AUTHENTICATION_EXCEPTION = "account.authentication.exception";
 
     // Account reset own password exceptions

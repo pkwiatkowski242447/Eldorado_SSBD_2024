@@ -32,7 +32,7 @@ public class AccountMapper {
                 account.getVersion(),
                 list,
                 account.getId(),
-                account.getVerified(),
+                account.getSuspended(),
                 account.getActive(),
                 account.getBlocked(),
                 account.getTwoFactorAuth(),

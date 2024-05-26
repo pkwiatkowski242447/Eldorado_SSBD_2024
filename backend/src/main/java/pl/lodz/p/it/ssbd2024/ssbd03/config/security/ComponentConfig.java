@@ -37,7 +37,7 @@ public class ComponentConfig {
                 return new User(account.getLogin(),
                         account.getPassword(),
                         account.getActive(),
-                        true,
+                        !account.getSuspended(),
                         true,
                         !account.getBlocked(),
                         account.getUserLevels().stream().map(userLevel -> new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase())).toList());

@@ -20,7 +20,7 @@ public class DatabaseConsts {
     public static final String ACCOUNT_LOGIN_COLUMN = "login";
     public static final String ACCOUNT_PASSWORD_COLUMN = "password";
     public static final String ACCOUNT_PAST_PASSWORD_COLUMN = "past_password";
-    public static final String ACCOUNT_VERIFIED_COLUMN = "verified";
+    public static final String ACCOUNT_SUSPENDED_COLUMN = "suspended";
     public static final String ACCOUNT_ACTIVE_COLUMN = "active";
     public static final String ACCOUNT_BLOCKED_COLUMN = "blocked";
     public static final String TWO_FACTOR_AUTH_COLUMN = "two_factor_auth";

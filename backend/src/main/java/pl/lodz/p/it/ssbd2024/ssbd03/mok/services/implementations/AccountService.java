@@ -359,7 +359,6 @@ public class AccountService implements AccountServiceInterface {
                 .orElseThrow(AccountIdNotFoundException::new);
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
             account.setActive(true);
-            account.setVerified(true);
             accountFacade.edit(account);
             tokenFacade.remove(tokenFromDB);
             mailProvider.sendActivationConfirmationEmail(account.getName(),

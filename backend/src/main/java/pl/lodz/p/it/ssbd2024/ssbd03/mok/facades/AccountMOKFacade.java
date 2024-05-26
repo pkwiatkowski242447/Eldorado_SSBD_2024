@@ -372,57 +372,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     }
 
     /**
-     * This method is used to find all active users accounts with unverified email address after setting a new one.
-     *
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List of all active users accounts with unverified email address. If persistence exception is thrown, then
-     * empty list will be returned.
-     */
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllActiveAccountsWithUnverifiedEmailWithPagination(
-            int pageNumber, int pageSize) throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
-            findAllAccountsWithUnverifiedEmailQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setMaxResults(pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("verified", false);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("active", true);
-            List<Account> list = findAllAccountsWithUnverifiedEmailQuery.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to find all inactive users accounts with unverified email address. This could happen after user
-     * account is created and yet not activated.
-     *
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List of all active users accounts with unverified email address. If persistence exception is thrown, then
-     * empty list will be returned.
-     */
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllInactiveAccountsWithUnverifiedEmailWithPagination(
-            int pageNumber, int pageSize) throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
-            findAllAccountsWithUnverifiedEmailQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setMaxResults(pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("verified", false);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("active", false);
-            List<Account> list = findAllAccountsWithUnverifiedEmailQuery.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
      * Retrieve accounts that match the given parameters.
      *
      * @param login      Account's login. The phrase will be sought in logins.
