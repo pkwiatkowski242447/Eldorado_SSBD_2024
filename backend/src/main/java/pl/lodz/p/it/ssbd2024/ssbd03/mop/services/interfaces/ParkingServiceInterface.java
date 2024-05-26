@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -26,4 +27,16 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     void removeParkingById(UUID id) throws ApplicationBaseException;
+
+    /**
+     * Generates allocation code (if it does not exist for a given reservation) and registers entry parking event.
+     * Moreover, this method also sends e-mail notification about beginning of the allocation with the allocation code,
+     * used to end the reservation later.
+     *
+     * @param reservationId Identifier of the reservation, which the user uses.
+     * @param userName      Login of the user, who perform the action.
+     * @return Data transfer object containing allocation code, used later for ending the allocation.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException;
 }
