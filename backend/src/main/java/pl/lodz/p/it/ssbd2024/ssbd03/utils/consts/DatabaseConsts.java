@@ -36,6 +36,34 @@ public class DatabaseConsts {
 
     public static final String UNSUCCESSFUL_LOGIN_COUNTER = "unsuccessful_login_counter";
 
+    // public.account_history_data
+
+    public static final String ACCOUNT_HIST_TABLE = "account_history";
+
+    public static final String ACCOUNT_HIST_ID_COLUMN = "id";
+    public static final String ACCOUNT_HIST_VERSION_COLUMN = "version";
+    public static final String ACCOUNT_HIST_LOGIN_COLUMN = "login";
+    public static final String ACCOUNT_HIST_PASSWORD_COLUMN = "password";
+    public static final String ACCOUNT_HIST_VERIFIED_COLUMN = "verified";
+    public static final String ACCOUNT_HIST_ACTIVE_COLUMN = "active";
+    public static final String ACCOUNT_HIST_BLOCKED_COLUMN = "blocked";
+    public static final String ACCOUNT_HIST_TWO_FACTOR_AUTH_COLUMN = "two_factor_auth";
+    public static final String ACCOUNT_HIST_BLOCKED_TIME_COLUMN = "blocked_time";
+    public static final String ACCOUNT_HIST_FIRST_NAME_COLUMN = "first_name";
+    public static final String ACCOUNT_HIST_LAST_NAME_COLUMN = "last_name";
+    public static final String ACCOUNT_HIST_EMAIL_COLUMN = "email";
+    public static final String ACCOUNT_HIST_PHONE_NUMBER_COLUMN = "phone_number";
+    public static final String ACCOUNT_HIST_LAST_SUCCESSFUL_LOGIN_TIME_COLUMN = "last_successful_login_time";
+    public static final String ACCOUNT_HIST_LAST_SUCCESSFUL_LOGIN_IP_COLUMN = "last_successful_login_ip";
+    public static final String ACCOUNT_HIST_LAST_UNSUCCESSFUL_LOGIN_TIME_COLUMN = "last_unsuccessful_login_time";
+    public static final String ACCOUNT_HIST_LAST_UNSUCCESSFUL_LOGIN_IP_COLUMN = "last_unsuccessful_login_ip";
+    public static final String ACCOUNT_HIST_UNSUCCESSFUL_LOGIN_COUNTER_COLUMN = "unsuccessful_login_counter";
+    public static final String ACCOUNT_HIST_LANGUAGE_COLUMN = "language";
+
+    public static final String ACCOUNT_HIST_OPERATION_TYPE_COLUMN = "operation_type";
+    public static final String ACCOUNT_HIST_MODIFIED_BY_COLUMN = "modified_by";
+    public static final String ACCOUNT_HIST_MODIFICATION_TIME_COLUMN = "modification_time";
+
     // public.past_password table
 
     public static final String PAST_PASSWORD_TABLE = "past_password";
