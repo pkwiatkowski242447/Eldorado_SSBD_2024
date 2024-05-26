@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountRestoreAccessException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
@@ -62,6 +63,9 @@ public class AccountService implements AccountServiceInterface {
 
     @Value("${mail.account.confirm.email.url}")
     private String accountConfirmEmail;
+
+    @Value("${mail.account.restore.access.url}")
+    private String restoreAccountAccessURL;
 
     /**
      * AccountFacade used for operations on account entities.
@@ -635,6 +639,59 @@ public class AccountService implements AccountServiceInterface {
                 account.getLastname(),
                 account.getEmail(),
                 I18n.ADMIN_USER_LEVEL,
+                account.getAccountLanguage());
+    }
+
+    // Restore access to user account methods
+
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS})
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void generateAccessRestoreTokenAndSendEmailMessage(String email) throws ApplicationBaseException {
+        Account account = accountFacade.findByEmail(email).orElseThrow(AccountEmailNotFoundException::new);
+        tokenFacade.removeByTypeAndAccount(Token.TokenType.RESTORE_ACCESS_TOKEN, account.getId());
+
+        if (account.couldAuthenticate()) {
+            throw new AccountRestoreAccessException();
+        }
+
+        Token restoreTokenObject = tokenProvider.generateRestoreAccessToken(account);
+        tokenFacade.create(restoreTokenObject);
+
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(restoreTokenObject.getTokenValue().getBytes()));
+        String accessRestoreURL = this.restoreAccountAccessURL + encodedTokenValue;
+
+        mailProvider.sendAccountAccessRestoreEmailMessage(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
+                accessRestoreURL,
+                account.getAccountLanguage());
+    }
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS})
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void restoreAccountAccess(String token) throws ApplicationBaseException {
+        Token tokenObject = tokenFacade.findByTokenValue(new String(Base64.getUrlDecoder().decode(token))).orElseThrow(TokenNotFoundException::new);
+        Account account = accountFacade.find(tokenObject.getAccount().getId()).orElseThrow(AccountIdNotFoundException::new);
+
+        tokenFacade.remove(tokenObject);
+
+        if (account.couldAuthenticate()) {
+            throw new AccountRestoreAccessException();
+        }
+
+        if (!jwtProvider.isTokenValid(tokenObject.getTokenValue(), account)) {
+            throw new TokenNotValidException();
+        }
+
+        account.setSuspended(false);
+        accountFacade.edit(account);
+
+        mailProvider.sendAccountAccessRestoreInfoEmail(account.getName(),
+                account.getLastname(),
+                account.getEmail(),
                 account.getAccountLanguage());
     }
 }

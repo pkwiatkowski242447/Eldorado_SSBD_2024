@@ -15,6 +15,9 @@ public class TokenProvider {
     @Value("${refresh.token.validity.period.length.minutes}")
     private int refreshTokenTTL;
 
+    @Value("${restore.access.token.validity.period.length.minutes}")
+    private int restoreAccessTokenTTL;
+
     @Value("${account.password.reset.period.length.minutes}")
     private int passwordResetTokenTTL;
 
@@ -53,5 +56,10 @@ public class TokenProvider {
     public Token generateEmailChangeToken(Account account, String newEmail) {
         String tokenValue = jwtProvider.generateEmailToken(account, newEmail, emailChangeTokenTTL);
         return new Token(tokenValue, account, Token.TokenType.CONFIRM_EMAIL);
+    }
+
+    public Token generateRestoreAccessToken(Account account) {
+        String tokenValue = jwtProvider.generateActionToken(account, restoreAccessTokenTTL, ChronoUnit.MINUTES);
+        return new Token(tokenValue, account, Token.TokenType.RESTORE_ACCESS_TOKEN);
     }
 }

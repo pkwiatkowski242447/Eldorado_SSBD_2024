@@ -31,6 +31,8 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         "/api/v1/accounts/change-password",
         "/api/v1/accounts/activate-account",
         "/api/v1/accounts/confirm-email",
+        "/api/v1/accounts/restore-access",
+        "/api/v1/accounts/restore-token",
         "/v3/api-docs",
         "/swagger-ui",
         "/swagger-resources",
