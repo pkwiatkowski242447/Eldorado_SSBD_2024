@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/breadcrumb.tsx";
 import {Loader2, Slash} from "lucide-react";
 import {Switch} from "@/components/ui/switch.tsx";
+import {FiCheck, FiX} from "react-icons/fi";
 
 
 function AccountSettings() {
@@ -217,17 +218,25 @@ function AccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <Button variant="link" onClick={() => setActiveForm('E-Mail')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('E-Mail')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'E-Mail' ? 'font-bold' : ''}`}>
                             {t("accountSettings.email")}
                         </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Password')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'Password' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Password')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Password' ? 'font-bold' : ''}`}>
                             {t("accountSettings.password")}
                         </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Personal Info')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Personal Info')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Personal Info' ? 'font-bold' : ''}`}>
                             {t("accountSettings.personalInfo")}
+                        </Button>
+                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Details')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Details' ? 'font-bold' : ''}`}>
+                            {t("accountSettings.details")}
                         </Button>
 
                     </nav>
@@ -393,7 +402,8 @@ function AccountSettings() {
                                                                             className="text-black">{t("accountSettings.personalInfo.firstName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
-                                                                                placeholder={account?.name} {...field}/>
+                                                                                defaultValue={account?.name}
+                                                                                {...field}/>
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
@@ -410,7 +420,7 @@ function AccountSettings() {
                                                                             className="text-black">{t("accountSettings.personalInfo.lastName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
-                                                                                placeholder={account?.lastname} {...field}/>
+                                                                                defaultValue={account?.lastname} {...field}/>
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
@@ -432,8 +442,7 @@ function AccountSettings() {
                                                                                 render={({field}) => (
                                                                                     <PhoneInput
                                                                                         {...field}
-                                                                                        value={field.value || ""}
-                                                                                        placeholder={account?.phone}
+                                                                                        value={field.value}
                                                                                         onChange={field.onChange}
                                                                                         countries={['PL']}
                                                                                         defaultCountry="PL"
@@ -506,6 +515,58 @@ function AccountSettings() {
                                         <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
                                     </AlertDialogContent>
                                 </AlertDialog>
+                            </div>
+                        )}
+                        {activeForm === 'Details' && (
+                            <div>
+                                <Card className="mx-10 w-auto text-left">
+                                    <CardContent>
+                                        <h2 className="text-lg font-bold text-center p-5">{t("accountSettings.accountInfo")}</h2>
+                                        <p>
+                                            <strong>{t("accountSettings.name")}:</strong> {account?.name} {account?.lastname}
+                                        </p>
+                                        <p><strong>{t("accountSettings.email")}:</strong> {account?.email}</p>
+                                        <p><strong>{t("accountSettings.login")}:</strong> {account?.login}</p>
+                                        <p><strong>{t("accountSettings.phone")}:</strong> {account?.phoneNumber}</p>
+                                        <p>
+                                            <strong>{t("accountSettings.accountLanguage")}: </strong>
+                                            {account?.accountLanguage?.toLowerCase() === 'en' ? t("general.english") :
+                                                account?.accountLanguage?.toLowerCase() === 'pl' ? t("general.polish") :
+                                                    account?.accountLanguage}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.active")}:</strong> {account?.active ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.blocked")}:</strong> {account?.blocked ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.verified")}:</strong> {account?.verified ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.2fa")}:</strong> {account?.twoFactorAuth ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.creationDate")}:</strong> {account?.creationDate ? account.creationDate.toDateString() : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {account?.lastSuccessfulLoginTime ? account.lastSuccessfulLoginTime.toDateString() : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {account?.lastUnsuccessfulLoginTime ? account.lastUnsuccessfulLoginTime.toDateString() : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {account?.lastSuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginIp")}:</strong> {account?.lastUnsuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
                             </div>
                         )}
                     </div>

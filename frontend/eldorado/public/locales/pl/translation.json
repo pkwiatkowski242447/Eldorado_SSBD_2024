@@ -2,7 +2,8 @@
   "general.ok": "OK",
   "general.cancel": "Anuluj",
   "general.confirm": "Potwierdzenie",
-
+  "general.english": "Angielski",
+  "general.polish": "Polski",
 
   "landingPage.title": "Wkrótce dostępne",
   "landingPage.text": "Najprawdopodobniej",
@@ -97,6 +98,22 @@
   "accountSettings.confirmPasswordChange": "Czy na pewno chcesz zmienić hasło?",
   "accountSettings.popUp.changePasswordOK.title": "Sukces!",
   "accountSettings.popUp.changePasswordOK.text": "Twoje hasło zostało pomyślnie zmienione.",
+  "accountSettings.details": "Szczegóły",
+
+  "accountSettings.accountInfo": "Informacje o koncie",
+  "accountSettings.name": "Imię",
+  "accountSettings.login": "Login",
+  "accountSettings.active": "Aktywny",
+  "accountSettings.blocked": "Zablokowany",
+  "accountSettings.verified": "Zweryfikowany",
+  "accountSettings.phone": "Telefon",
+  "accountSettings.accountLanguage": "Język konta",
+  "accountSettings.2fa": "Uwierzytelnianie dwuetapowe",
+  "accountSettings.creationDate": "Data utworzenia konta",
+  "accountSettings.lastSucLoginTime": "Czas ostatniego udanego logowania",
+  "accountSettings.lastSucLoginIp": "Adres IP ostatniego udanego logowania",
+  "accountSettings.lastUnsucLoginTime": "Czas ostatniego nieudanego logowania",
+  "accountSettings.lastUnsucLoginIp": "Adres IP ostatniego nieudanego logowania",
 
 
   "accountSettings.users.table.header.login": "Login",

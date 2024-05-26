@@ -2,7 +2,8 @@
   "general.ok": "OK",
   "general.cancel": "Cancel",
   "general.confirm": "Confirm",
-
+  "general.english": "English",
+  "general.polish": "Polish",
 
   "landingPage.title": "Coming soon",
   "landingPage.text": "Most likely",
@@ -87,6 +88,22 @@
   "accountSettings.twoFactorAuth": "Two-factor authentication",
 
 
+  "accountSettings.accountInfo": "Account Information",
+  "accountSettings.name": "Name",
+  "accountSettings.login": "Login",
+  "accountSettings.active": "Active",
+  "accountSettings.blocked": "Blocked",
+  "accountSettings.verified": "Verified",
+    "accountSettings.phone": "Phone",
+    "accountSettings.accountLanguage": "Account Language",
+    "accountSettings.2fa": "Two Factor Authentication",
+    "accountSettings.creationDate": "Creation Date",
+    "accountSettings.lastSucLoginTime": "Last Successful Login Time",
+    "accountSettings.lastSucLoginIp": "Last Successful Login IP",
+    "accountSettings.lastUnsucLoginTime": "Last Unsuccessful Login Time",
+    "accountSettings.lastUnsucLoginIp": "Last Unsuccessful Login IP",
+
+
   "accountSettings.authentication.oldPassword": "Current Password",
   "accountSettings.authentication.newPassword": "New Password",
   "accountSettings.authentication.newPasswordRepeat": "Confirm New Password",
@@ -98,6 +115,8 @@
   "accountSettings.confirmPasswordChange": "Are you sure you want to change your password?",
   "accountSettings.popUp.changePasswordOK.title": "Success!",
   "accountSettings.popUp.changePasswordOK.text": "Your password has been successfully changed.",
+  "accountSettings.details": "Details",
+
 
   "accountSettings.users.table.header.login": "Login",
   "accountSettings.users.table.header.name": "Name",

@@ -7,6 +7,7 @@ import {useEffect} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import handleApiError from "@/components/HandleApiError.ts";
+import {UserType} from "@/types/Users.ts";
 
 export const useAccount = () => {
 
@@ -69,13 +70,10 @@ export const useAccount = () => {
         try {
             const response = await api.logIn2fa(userLogin, authCodeValue);
             if (response.status === 200) {
-                console.log(isAuthenticated)
                 const accessToken = response.data.accessToken;
                 const refreshToken = response.data.refreshToken;
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
-                console.log(accessToken)
-                console.log(refreshToken)
                 await getCurrentAccount()
                 navigate(Pathnames.public.home)
             }
@@ -87,6 +85,14 @@ export const useAccount = () => {
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
+    }
+
+    function localDateTimeToDate(localDateTime: number[]): Date {
+        if (localDateTime) {
+            const [year, month, day, hour, minute, second, nanosecond] = localDateTime;
+            const millisecond = Math.floor(nanosecond / 1000000);
+            return new Date(year, month - 1, day, hour, minute, second, millisecond);
+        } else return new Date(0);
     }
 
     const getCurrentAccount = async () => {
@@ -118,24 +124,45 @@ export const useAccount = () => {
                 } else {
                     activeUserLevel = account.activeUserLevel;
                 }
-                const user = {
+
+                let creationDate = null;
+                let lastSuccessfulLoginTime = null;
+                let lastUnsuccessfulLoginTime = null;
+
+                if (token.data.creationDate) {
+                    creationDate = localDateTimeToDate(token.data.creationDate);
+                }
+                if (token.data.lastSuccessfulLoginTime) {
+                    lastSuccessfulLoginTime = localDateTimeToDate(token.data.lastSuccessfulLoginTime);
+                }
+
+                if (token.data.lastUnsuccessfulLoginTime) {
+                    lastUnsuccessfulLoginTime = localDateTimeToDate(token.data.lastUnsuccessfulLoginTime);
+                }
+
+                const user: UserType = {
                     accountLanguage: token.data.accountLanguage,
                     active: token.data.active,
                     blocked: token.data.blocked,
-                    creationDate: token.data.creationDate,
                     email: token.data.email,
                     id: token.data.id,
                     lastname: token.data.lastname,
                     login: token.data.login,
                     name: token.data.name,
                     token: tokenRaw,
-                    phone: token.data.phone,
+                    phoneNumber: token.data.phoneNumber,
                     userLevelsDto: token.data.userLevelsDto,
                     activeUserLevel: activeUserLevel,
                     verified: token.data.verified,
                     version: token.data.version,
                     twoFactorAuth: token.data.twoFactorAuth,
+                    lastSuccessfulLoginIp: token.data.lastSuccessfulLoginIp,
+                    lastUnsuccessfulLoginIp: token.data.lastUnsuccessfulLoginIp,
+                    creationDate: creationDate,
+                    lastSuccessfulLoginTime: lastSuccessfulLoginTime,
+                    lastUnsuccessfulLoginTime: lastUnsuccessfulLoginTime
                 };
+
                 setAccount(user);
                 localStorage.setItem('account', JSON.stringify(user));
             }

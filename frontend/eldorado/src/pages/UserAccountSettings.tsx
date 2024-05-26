@@ -34,6 +34,7 @@ import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Loader2, Slash} from "lucide-react";
 import {Switch} from "@/components/ui/switch.tsx";
+import {FiCheck, FiX} from "react-icons/fi";
 
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
@@ -308,23 +309,31 @@ function UserAccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <Button variant="link" onClick={() => setActiveForm('UserLevels')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'UserLevels' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('UserLevels')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'UserLevels' ? 'font-bold' : ''}`}>
                             {t("accountSettings.users.table.settings.account.userLevels")}
                         </Button>
-                        <Button variant="link" onClick={() => setActiveForm('E-Mail')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('E-Mail')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'E-Mail' ? 'font-bold' : ''}`}>
                             {t("accountSettings.email")}
                         </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Password')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'Password' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Password')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Password' ? 'font-bold' : ''}`}>
                             {t("accountSettings.password")}
                         </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Personal Info')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Personal Info')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Personal Info' ? 'font-bold' : ''}`}>
                             {t("accountSettings.users.table.settings.account.personalInfo")}
                         </Button>
-
+                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Details')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Details' ? 'font-bold' : ''}`}>
+                            {t("accountSettings.details")}
+                        </Button>
                     </nav>
                     <div className="grid gap-6">
                         {activeForm === 'UserLevels' && managedUser?.userLevelsDto && (
@@ -507,7 +516,7 @@ function UserAccountSettings() {
                                                                                     <PhoneInput
                                                                                         {...field}
                                                                                         value={field.value || ""}
-                                                                                        placeholder={managedUser?.phone}
+                                                                                        placeholder={managedUser?.phoneNumber}
                                                                                         onChange={field.onChange}
                                                                                         countries={['PL']}
                                                                                         defaultCountry="PL"
@@ -580,6 +589,55 @@ function UserAccountSettings() {
                                         <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
                                     </AlertDialogContent>
                                 </AlertDialog>
+                            </div>
+                        )}
+                        {activeForm === 'Details' && (
+                            <div>
+                                <Card className="mx-10 w-auto text-left">
+                                    <CardContent>
+                                        <h2 className="text-lg font-bold text-center p-5">{t("accountSettings.accountInfo")}</h2>
+                                        <p>
+                                            <strong>{t("accountSettings.name")}:</strong> {managedUser?.name} {managedUser?.lastname}
+                                        </p>
+                                        <p><strong>{t("accountSettings.email")}:</strong> {managedUser?.email}</p>
+                                        <p><strong>{t("accountSettings.login")}:</strong> {managedUser?.login}</p>
+                                        <p><strong>{t("accountSettings.phone")}:</strong> {managedUser?.phoneNumber}</p>
+                                        <p>
+                                            <strong>{t("accountSettings.accountLanguage")}: </strong>
+                                            {managedUser?.accountLanguage?.toLowerCase() === 'en' ? t("general.english") :
+                                                managedUser?.accountLanguage?.toLowerCase() === 'pl' ? t("general.polish") :
+                                                    managedUser?.accountLanguage}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.active")}:</strong> {managedUser?.active ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.blocked")}:</strong> {managedUser?.blocked ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.verified")}:</strong> {managedUser?.verified ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.2fa")}:</strong> {managedUser?.twoFactorAuth ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {managedUser?.lastSuccessfulLoginTime ? managedUser.lastSuccessfulLoginTime.toDateString() : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {managedUser?.lastUnsuccessfulLoginTime ? managedUser.lastUnsuccessfulLoginTime.toDateString() : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {managedUser?.lastSuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginIp")}:</strong> {managedUser?.lastUnsuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
                             </div>
                         )}
                     </div>

@@ -1,6 +1,6 @@
 import {RolesEnum} from "./TokenPayload";
 
-export enum AccountTypeEnum{
+export enum AccountTypeEnum {
     ADMIN = "Admin",
     CLIENT = "Client",
     STAFF = "Staff",
@@ -16,19 +16,23 @@ export interface UserType {
     accountLanguage: string
     active: boolean
     blocked: boolean
-    creationDate: Date
+    creationDate: Date | null
     email: string
     id: string
     lastname: string
     login: string
     name: string
     token: string
-    phone: string
+    phoneNumber: string
     userLevelsDto: UserLevelType[]
     activeUserLevel: UserLevelType
     verified: boolean
     version: number
     twoFactorAuth: boolean
+    lastSuccessfulLoginTime: Date | null
+    lastUnsuccessfulLoginTime: Date | null
+    lastSuccessfulLoginIp: string | null
+    lastUnsuccessfulLoginIp: string | null
 }
 
 export interface ManagedUserType {
@@ -39,7 +43,7 @@ export interface ManagedUserType {
     active: boolean
     blocked: boolean
     verified: boolean
-    // lastSuccessfulLoginTime: Date
-    // lastUnsuccessfulLoginTime: Date
+    lastSuccessfulLoginTime: Date | null
+    lastUnsuccessfulLoginTime: Date | null
     userLevels: AccountTypeEnum[]
 }
