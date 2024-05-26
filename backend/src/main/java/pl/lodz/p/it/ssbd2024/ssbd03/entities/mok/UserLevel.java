@@ -27,6 +27,22 @@ import java.io.Serializable;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = DatabaseConsts.DISCRIMINATOR_COLUMN, discriminatorType = DiscriminatorType.STRING)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NamedQueries(value = {
+        @NamedQuery(
+                name = "UserLevel.findAllUserLevelsForGivenAccount",
+                query = """
+                        SELECT u FROM UserLevel u
+                        WHERE u.account.id = :accountId
+                        """
+        ),
+        @NamedQuery(
+                name = "UserLevel.findGivenUserLevelsForGivenAccount",
+                query = """
+                        SELECT ul FROM UserLevel ul
+                        WHERE ul.account.id = :accountId AND TYPE(ul) = :userLevel
+                        """
+        )
+})
 public abstract class UserLevel extends AbstractEntity implements Serializable {
 
     /**

@@ -100,7 +100,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     /**
      * Retrieves all Accounts.
      *
-     * @return List containing all Accounts.
+     * @return `List` containing all Accounts.
      */
     @Override
     @RolesAllowed({Roles.ADMIN})

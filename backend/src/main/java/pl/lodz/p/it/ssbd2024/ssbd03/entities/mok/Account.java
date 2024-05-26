@@ -296,7 +296,7 @@ public class Account extends AbstractEntity {
     @Size(min = AccountsConsts.USER_LEVEL_MIN_SIZE, message = AccountMessages.USER_LEVEL_EMPTY)
     @Size(max = AccountsConsts.USER_LEVEL_MAX_SIZE, message = AccountMessages.USER_LEVEL_FULL)
     @OneToMany(mappedBy = DatabaseConsts.ACCOUNT_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
-    //TODO: Rozwiązanie konfliktu z uprawnieniami przy wykonywaniu operacji Refresh (gdyż jest kaskada) + uprawnienia do edycji (i ewentualnie rozwiązanie kwestii kasady Merge)
+    //TODO: Rozwiązanie konfliktu z uprawnieniami przy wykonywaniu operacji Refresh (gdyż jest kaskada)
     private final Set<UserLevel> userLevels = new HashSet<>();
 
     /**
