@@ -53,4 +53,21 @@ public interface ParkingControllerInterface {
      */
     @PostMapping(value = "/reservation/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
+
+
+    /**
+     * This method is used to edit parking, that is identified with the given identifier.
+     *
+     * @param id Identifier of the parking to be edited.
+     * @return This method returns 204 NO CONTENT if the parking is edited successfully. Otherwise, if the parking
+     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * when other unexpected exception is encountered while processing the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/parking/{id}")
+    ResponseEntity<?> editParking(@PathVariable("id") String id) throws ApplicationBaseException;
+
+
 }
+
