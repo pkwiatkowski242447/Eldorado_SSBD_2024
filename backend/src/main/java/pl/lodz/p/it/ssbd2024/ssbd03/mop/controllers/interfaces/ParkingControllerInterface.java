@@ -26,6 +26,18 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> getSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
+     * This method is used to find all sectors from parking with a given id.
+     *
+     * @param id Identifier of parking containing the sectors to find.
+     * @return It returns HTTP response 200 OK with information about sectors of a given parking. If parking with the
+     * given uuid doesn't exist, returns 404. If the uuid has invalid format, returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/parking/{id}/sectors", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getSectorsByParkingId(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
      * This method is used to remove parking, that is identified with the given identifier.
      *
      * @param id Identifier of the parking to be removed.

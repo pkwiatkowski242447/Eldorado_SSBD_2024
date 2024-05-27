@@ -4,6 +4,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -19,6 +20,15 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     Sector getSectorById(UUID id) throws ApplicationBaseException;
+
+    /**
+     * Retrieves from the database list of sectors by parking id.
+     *
+     * @param id Parking's id.
+     * @return If Parking with the given id was found, returns list of it's Sectors.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException;
 
     /**
      * Removes parking from the database by its id.

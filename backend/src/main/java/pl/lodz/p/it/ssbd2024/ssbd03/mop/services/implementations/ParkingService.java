@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -31,6 +32,12 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
+    public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
