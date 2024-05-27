@@ -37,7 +37,7 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
-    public Parking getParkingById(UUID id) throws ApplicationBaseException{
+    public Parking getParkingById(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
@@ -62,6 +62,12 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
     public AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    public void exitParking(UUID reservationId, String exitCode) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }

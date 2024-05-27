@@ -71,4 +71,15 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException;
+
+    /**
+     * Ends the parking allocation by registering the end of a parking event.
+     * If the reservation ID and the exit code are correct, the parking spot
+     * is freed and the reservation is marked as ended.
+     *
+     * @param reservationId Identifier of the reservation, which the user uses.
+     * @param exitCode      Code used to end the reservation.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void exitParking(UUID reservationId, String exitCode) throws ApplicationBaseException;
 }

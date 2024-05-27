@@ -29,7 +29,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
-    public ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException{
+    public ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
@@ -56,4 +56,11 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
+
+    @Override
+    @RolesAllowed({Roles.CLIENT})
+    public ResponseEntity<?> exitParking(String reservationId, String exitCode) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
 }
