@@ -35,4 +35,10 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
+    public ResponseEntity<?> removeSectorById(String sectorId) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
 }

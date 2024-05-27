@@ -39,4 +39,7 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException;
+
+
+    void removeSectorById(UUID id) throws ApplicationBaseException;
 }

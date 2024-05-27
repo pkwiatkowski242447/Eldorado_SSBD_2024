@@ -45,4 +45,10 @@ public class ParkingService implements ParkingServiceInterface {
     public AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
+    public void removeSectorById(UUID id) throws ApplicationBaseException{
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
 }
