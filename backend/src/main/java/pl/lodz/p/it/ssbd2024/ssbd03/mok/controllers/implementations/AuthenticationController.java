@@ -25,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokens
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.RefreshTokenDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -79,7 +80,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Login methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.MOK2)
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -89,11 +90,12 @@ public class AuthenticationController implements AuthenticationControllerInterfa
                                                    HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
-            Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
+            this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
                     accountLoginDTO.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = this.authenticationService.registerSuccessfulLoginAttempt(accountLoginDTO.getLogin(), false,
                     sourceAddress, accountLoginDTO.getLanguage());
+
             if (accessAndRefreshTokensDTO != null) {
                 log.info("User: {} successfully authenticated during one factor authentication in the application, starting session at {} from IPv4: {}",
                         accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);

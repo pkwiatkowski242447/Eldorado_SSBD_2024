@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
@@ -117,7 +118,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * If a persistence exception is thrown, then empty list is returned.
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed(Authorities.MOK17)
     public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {

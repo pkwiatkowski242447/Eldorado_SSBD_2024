@@ -13,20 +13,28 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.roles.RolesMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Configuration
 public class ComponentConfig {
 
     private final AuthenticationFacade authenticationFacade;
+    private final RolesMapper rolesMapper;
 
     @Autowired
-    public ComponentConfig(AuthenticationFacade authenticationFacade) {
+    public ComponentConfig(AuthenticationFacade authenticationFacade,
+                           RolesMapper rolesMapper) {
         this.authenticationFacade = authenticationFacade;
+        this.rolesMapper = rolesMapper;
     }
 
     @Bean
@@ -34,6 +42,12 @@ public class ComponentConfig {
         return login -> {
             try {
                 Account account = authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException("Account with given login could not be found!"));
+
+                List<SimpleGrantedAuthority> accountAuthorities = new ArrayList<>();
+                for (UserLevel userLevel : account.getUserLevels()) {
+                    accountAuthorities.addAll(rolesMapper.getAuthorities(userLevel.getClass().getSimpleName().toUpperCase()));
+                }
+
                 return new User(account.getLogin(),
                         account.getPassword(),
                         account.getActive(),

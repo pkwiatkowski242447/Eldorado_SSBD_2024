@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
@@ -461,7 +462,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed(Authorities.MOK17)
     public List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }

@@ -22,6 +22,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountList
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -171,7 +172,7 @@ public class AccountController implements AccountControllerInterface {
     // Read methods
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed(Authorities.MOK17)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllUsers(@RequestParam("pageNumber") int pageNumber,
