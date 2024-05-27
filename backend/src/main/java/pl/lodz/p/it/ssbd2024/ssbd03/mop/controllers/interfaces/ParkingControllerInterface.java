@@ -2,16 +2,28 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
  * Interface used for managing Parking and Sectors
  */
 public interface ParkingControllerInterface {
+
+    /**
+     * This method is used to find all parking in system, using pagination.
+     *
+     * @param pageNumber Number of the page, which parking will be retrieved from.
+     * @param pageSize   Number of parking per page.
+     * @return It returns HTTP response 200 OK with all parking list.
+     *         It returns HTTP response 204 NO CONTENT when list is empty.
+     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllParking(@RequestParam("pageNumber") int pageNumber,
+                                    @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
      * This method is used to find sector by id.

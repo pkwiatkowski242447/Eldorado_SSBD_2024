@@ -19,6 +19,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 public class ParkingController implements ParkingControllerInterface {
 
     @Override
+    @RolesAllowed({Roles.STAFF})
+    public ResponseEntity<?> getAllParking(int pageNumber, int pageSize) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public ResponseEntity<?> getSectorById(String id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
@@ -35,4 +41,6 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
+
+
 }
