@@ -118,7 +118,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * If a persistence exception is thrown, then empty list is returned.
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
-    @RolesAllowed(Authorities.MOK17)
+    @RolesAllowed(Authorities.GET_ALL_USER_ACCOUNTS)
     public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {

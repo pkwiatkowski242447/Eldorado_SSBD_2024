@@ -462,7 +462,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.MOK17)
+    @RolesAllowed(Authorities.GET_ALL_USER_ACCOUNTS)
     public List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }

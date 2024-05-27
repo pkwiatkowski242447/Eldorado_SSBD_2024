@@ -172,7 +172,7 @@ public class AccountController implements AccountControllerInterface {
     // Read methods
 
     @Override
-    @RolesAllowed(Authorities.MOK17)
+    @RolesAllowed(Authorities.GET_ALL_USER_ACCOUNTS)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllUsers(@RequestParam("pageNumber") int pageNumber,

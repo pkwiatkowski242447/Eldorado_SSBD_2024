@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -80,7 +79,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Login methods
 
     @Override
-    @RolesAllowed(Authorities.MOK2)
+    @RolesAllowed(Authorities.LOGIN)
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -134,7 +133,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     }
 
     @Override
-    @RolesAllowed(Authorities.MOK2)
+    @RolesAllowed(Authorities.LOGIN)
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -177,7 +176,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Logout method
 
     @Override
-    @RolesAllowed(Authorities.MOK14)
+    @RolesAllowed(Authorities.LOGOUT)
     public ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
                                     HttpServletRequest request, HttpServletResponse response) {
         String sourceAddress = getSourceAddress(proxyChain, request);
