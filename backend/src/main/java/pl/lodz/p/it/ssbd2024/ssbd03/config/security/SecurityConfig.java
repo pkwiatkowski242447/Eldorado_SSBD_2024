@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.config.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +22,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTAuthenticationFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTRequiredFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.roles.RolesMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.UnsupportedRoleException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
@@ -60,9 +63,21 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtRequiredFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .anonymous((anon) -> anon.authorities(rolesMapper.getAuthoritiesAsStrings(Roles.ANONYMOUS).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())))
+                .anonymous((anon) -> {
+                    try {
+                        anon.authorities(
+                                rolesMapper.getAuthoritiesAsStrings(Roles.ANONYMOUS)
+                                        .stream()
+                                        .map(SimpleGrantedAuthority::new)
+                                        .collect(Collectors.toList())
+                        );
+                    } catch (UnsupportedRoleException ex) {
+                        log.error("Unable to get authorities of role {}", Roles.ANONYMOUS);
+                        anon.authorities("ROLE_ANONYMOUS");
+                    }
+                })
                 .authorizeHttpRequests((requests) -> requests
-                          .requestMatchers("/**").permitAll()
+                        .requestMatchers("/**").permitAll()
                 );
 
         return httpSecurity.build();

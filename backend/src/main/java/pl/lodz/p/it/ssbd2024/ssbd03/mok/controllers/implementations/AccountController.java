@@ -148,7 +148,7 @@ public class AccountController implements AccountControllerInterface {
     @RolesAllowed({Roles.ANONYMOUS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> changeAccountPassword(@PathVariable("token_id") String token,
+    public ResponseEntity<?> changeAccountPassword(@PathVariable("token") String token,
                                                    @RequestBody AccountPasswordDTO accountPasswordDTO) throws ApplicationBaseException {
         this.accountService.changeAccountPassword(token, accountPasswordDTO.getPassword());
         return ResponseEntity.noContent().build();

@@ -567,10 +567,10 @@ public class AccountService implements AccountServiceInterface {
 
         UserLevel clientUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Client).findFirst().orElse(null);
 
+        userLevelFacade.remove(clientUserLevel);
+
         account.removeUserLevel(clientUserLevel);
         accountFacade.edit(account);
-
-        userLevelFacade.remove(clientUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),
@@ -595,10 +595,10 @@ public class AccountService implements AccountServiceInterface {
 
         UserLevel staffUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Staff).findFirst().orElse(null);
 
+        userLevelFacade.remove(staffUserLevel);
+
         account.removeUserLevel(staffUserLevel);
         accountFacade.edit(account);
-
-        userLevelFacade.remove(staffUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),
@@ -631,10 +631,10 @@ public class AccountService implements AccountServiceInterface {
 
         UserLevel adminUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Admin).findFirst().orElse(null);
 
+        userLevelFacade.remove(adminUserLevel);
+
         account.removeUserLevel(adminUserLevel);
         accountFacade.edit(account);
-
-        userLevelFacade.remove(adminUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),
