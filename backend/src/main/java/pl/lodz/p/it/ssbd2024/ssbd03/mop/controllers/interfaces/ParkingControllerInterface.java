@@ -54,7 +54,16 @@ public interface ParkingControllerInterface {
     @PostMapping(value = "/reservation/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 
-
+    /**
+     * This method is used to find all available parkings.
+     *
+     * @param pageNumber          Number of the page to retrieve.
+     * @param pageSize            Number of results per page.
+     * @return It returns HTTP response 200 OK with all available parkings if these parkings exist.
+     * If there are no available parkings returns 204.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
     @GetMapping(value = "/parking/active", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
 
