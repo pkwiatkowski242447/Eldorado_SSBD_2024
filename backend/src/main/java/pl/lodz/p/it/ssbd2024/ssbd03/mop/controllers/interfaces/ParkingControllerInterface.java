@@ -23,6 +23,30 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> getSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
+     * This method is used to find parking by id.
+     *
+     * @param id Identifier of parking to find.
+     * @return It returns HTTP response 200 OK with parking information if sector exists. If parking with id doesn't exist
+     * returns 404. When uuid is invalid returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/parking/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
+     * This method is used to activate a sector with given id.
+     *
+     * @param id Identifier of sector to activate.
+     * @return It returns HTTP response 204 NO_CONTENT when sector is successfully activated. If sector with id doesn't exist
+     * returns 404. When uuid is invalid returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/sectors/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> activateSector(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
      * This method is used to remove parking, that is identified with the given identifier.
      *
      * @param id Identifier of the parking to be removed.

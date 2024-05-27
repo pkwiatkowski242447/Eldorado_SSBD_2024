@@ -426,4 +426,24 @@ public class AccountController implements AccountControllerInterface {
         }
         return ResponseEntity.noContent().build();
     }
+
+    // Restore access to user account methods
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
+    public ResponseEntity<?> sendAccountRestorationEmailMessage(AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
+        accountService.generateAccessRestoreTokenAndSendEmailMessage(accountEmailDTO.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
+    public ResponseEntity<?> restoreAccountAccess(String tokenValue) throws ApplicationBaseException {
+        accountService.restoreAccountAccess(tokenValue);
+        return ResponseEntity.noContent().build();
+    }
 }
