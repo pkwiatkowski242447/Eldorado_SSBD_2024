@@ -31,6 +31,12 @@ public class ParkingController implements ParkingControllerInterface {
     }
 
     @Override
+    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    public ResponseEntity<?> enterParkingWithoutReservation(String parkingId) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
     @RolesAllowed({Roles.CLIENT})
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
