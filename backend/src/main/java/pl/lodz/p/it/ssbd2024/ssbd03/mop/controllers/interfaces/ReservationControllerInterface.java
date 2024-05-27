@@ -23,7 +23,7 @@ public interface ReservationControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/active/self", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAllActiveReservationSelf(@RequestParam("pageNumber") int pageNumber,
                                     @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
