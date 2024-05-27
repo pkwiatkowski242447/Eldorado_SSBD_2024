@@ -2,10 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -38,6 +35,30 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> getSectorsByParkingId(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
+     * This method is used to find parking by id.
+     *
+     * @param id Identifier of parking to find.
+     * @return It returns HTTP response 200 OK with parking information if sector exists. If parking with id doesn't exist
+     * returns 404. When uuid is invalid returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/parking/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
+     * This method is used to activate a sector with given id.
+     *
+     * @param id Identifier of sector to activate.
+     * @return It returns HTTP response 204 NO_CONTENT when sector is successfully activated. If sector with id doesn't exist
+     * returns 404. When uuid is invalid returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/sectors/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> activateSector(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
      * This method is used to remove parking, that is identified with the given identifier.
      *
      * @param id Identifier of the parking to be removed.
@@ -53,6 +74,23 @@ public interface ParkingControllerInterface {
     /**
      * This method is used to begin parking spot allocation. Basically, it generates a parking event for entry,
      * which marks the start of the allocation, and then generates the exit code, which will be needed to end the
+     * allocation. User may enter chosen parking without previously making a reservation. The spot is then assigned
+     * according to the parking's spot assignment algorithm. After choosing the spot inpromptu reservation is created.
+     *
+     * @param parkingId Identifier of the parking, which the client wants to enter.
+     * @return 200 OK response is returned if the allocation is started successfully, body contains exit code and basic
+     * info about the assigned sector. Otherwise, if there is no such parking, user account does not exist or reservation could not
+     * be started, then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned when other unexpected
+     * exception occurs during processing of the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/{id}/enter")
+    ResponseEntity<?> enterParkingWithoutReservation(@PathVariable("id") String parkingId) throws ApplicationBaseException;
+
+    /**
+     * This method is used to begin parking spot allocation. Basically, it generates a parking event for entry,
+     * which marks the start of the allocation, and then generates the exit code, which will be needed to end the
      * allocation.
      *
      * @param reservationId Identifier of the reservation, which the client wants to use.
@@ -63,6 +101,6 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @PostMapping(value = "/reservation/{id}/enter")
+    @PostMapping(value = "/reservations/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 }
