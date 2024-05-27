@@ -224,22 +224,22 @@ function AccountSettings() {
                     >
                         <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('E-Mail')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'E-Mail' ? 'font-bold' : ''}`}>
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.email")}
                         </Button>
                         <Button variant={`${activeForm === 'Password' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('Password')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Password' ? 'font-bold' : ''}`}>
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.password")}
                         </Button>
                         <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('Personal Info')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Personal Info' ? 'font-bold' : ''}`}>
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.personalInfo")}
                         </Button>
                         <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('Details')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Details' ? 'font-bold' : ''}`}>
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.details")}
                         </Button>
 
@@ -406,8 +406,9 @@ function AccountSettings() {
                                                                             className="text-black">{t("accountSettings.personalInfo.firstName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
+                                                                                {...field}
                                                                                 placeholder={account?.name}
-                                                                                {...field}/>
+                                                                                />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>

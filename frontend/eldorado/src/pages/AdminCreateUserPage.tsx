@@ -270,7 +270,7 @@ export function AdminCreateUserPage() {
                                             render={({field}) => (
                                                 <FormItem className={"space-y-3"}>
                                                     <FormLabel
-                                                        className="text-black">{t("registerPage.role")} *</FormLabel>
+                                                        className="text-black">{t("registerPage.role")}</FormLabel>
                                                     <FormControl>
                                                         <RadioGroup
                                                             value={field.value}

@@ -334,17 +334,17 @@ function UserAccountSettings() {
                     >
                         <Button variant={`${activeForm === 'UserLevels' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('UserLevels')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'UserLevels' ? 'font-bold' : ''}`}>
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.users.table.settings.account.userLevels")}
                         </Button>
                         <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('E-Mail')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'E-Mail' ? 'font-bold' : ''}`}>
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.email")}
                         </Button>
                         <Button variant={`${activeForm === 'Password' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('Password')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Password' ? 'font-bold' : ''}`}>
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.password")}
                         </Button>
                         <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}

@@ -17,7 +17,7 @@ apiWithConfig.interceptors.response.use(
     (response) => response,
     (error) => {
         const status = error.response?.status
-        if (status === 401 || status === 403 || status === 404) {
+        if (status === 401 || status === 403) {
             localStorage.removeItem('token')
         }
         return Promise.reject(error)
