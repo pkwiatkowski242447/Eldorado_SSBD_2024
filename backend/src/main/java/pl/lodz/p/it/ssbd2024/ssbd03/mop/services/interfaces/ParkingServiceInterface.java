@@ -14,14 +14,14 @@ import java.util.UUID;
 public interface ParkingServiceInterface {
 
     /**
-     * Retrieve all parking in the system.
+     * Retrieve all parking spaces in the system.
      *
      * @param pageNumber The page number of the results to return.
      * @param pageSize   The number of results to return per page.
      * @return A list of all parking in the system, with pagination applied.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Account> getAllParking(int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Account> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database sector by id.

@@ -32,7 +32,7 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Roles.STAFF})
-    public List<Account> getAllParking(int pageNumber, int pageSize) throws ApplicationBaseException {
+    public List<Account> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 

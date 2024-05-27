@@ -11,10 +11,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 public interface ParkingControllerInterface {
 
     /**
-     * This method is used to find all parking in system, using pagination.
+     * This method is used to find all parking spaces in system, using pagination.
      *
-     * @param pageNumber Number of the page, which parking will be retrieved from.
-     * @param pageSize   Number of parking per page.
+     * @param pageNumber Number of the page, which parking spaces will be retrieved from.
+     * @param pageSize   Number of parking spaces per page.
      * @return It returns HTTP response 200 OK with all parking list.
      *         It returns HTTP response 204 NO CONTENT when list is empty.
      *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
@@ -22,7 +22,7 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> getAllParking(@RequestParam("pageNumber") int pageNumber,
+    ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
                                     @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**

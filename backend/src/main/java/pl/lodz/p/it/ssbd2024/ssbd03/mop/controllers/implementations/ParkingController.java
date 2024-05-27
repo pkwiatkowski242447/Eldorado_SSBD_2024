@@ -20,7 +20,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Roles.STAFF})
-    public ResponseEntity<?> getAllParking(int pageNumber, int pageSize) throws ApplicationBaseException {
+    public ResponseEntity<?> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
