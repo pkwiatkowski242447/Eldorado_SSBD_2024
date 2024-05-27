@@ -1,9 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,4 +41,7 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException;
+
+
+    List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
 }

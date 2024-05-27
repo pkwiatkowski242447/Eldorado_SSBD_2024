@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -43,6 +44,12 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed({Roles.CLIENT})
     public AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    public List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }

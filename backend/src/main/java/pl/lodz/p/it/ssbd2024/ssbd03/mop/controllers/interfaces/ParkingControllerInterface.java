@@ -53,4 +53,10 @@ public interface ParkingControllerInterface {
      */
     @PostMapping(value = "/reservation/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
+
+
+    @GetMapping(value = "/parking/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
+
 }
+

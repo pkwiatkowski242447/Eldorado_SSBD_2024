@@ -10,6 +10,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import javax.management.relation.Role;
+
 /**
  * Controller used for manipulating parking in the system.
  */
@@ -34,5 +36,11 @@ public class ParkingController implements ParkingControllerInterface {
     @RolesAllowed({Roles.CLIENT})
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    public ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException {
+         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 }
