@@ -37,7 +37,8 @@ import {
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
-import {Slash} from "lucide-react";
+import {Loader2, Slash} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
@@ -46,7 +47,7 @@ function UserManagementPage() {
     const [selectedUser, setSelectedUser] = useState<ManagedUserType | null>(null);
     const {t} = useTranslation();
     const {account} = useAccountState();
-
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const navigator = useNavigate();
 
     const handleSettingsClick = (userId: string) => {
@@ -85,10 +86,17 @@ function UserManagementPage() {
         fetchUsers();
     }, [currentPage]);
 
+    function refresh () {
+        setIsRefreshing(true);
+        fetchUsers();
+        setTimeout(() => setIsRefreshing(false), 1000);
+    }
+
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
-            <Breadcrumb className={"pt-5 pl-2"}>
+            <div className="flex justify-between items-center pt-2">
+            <Breadcrumb className={"pl-2"}>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
@@ -101,6 +109,16 @@ function UserManagementPage() {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
+                <Button onClick={refresh} variant={"ghost"} className="w-auto" disabled={isRefreshing}>
+                    {isRefreshing ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                        </>
+                    ) : (
+                        t("general.refresh")
+                    )}
+                </Button>
+            </div>
             <div className={"pt-5"}>
                 <Table className="p-10 flex-grow">
                     <TableHeader>

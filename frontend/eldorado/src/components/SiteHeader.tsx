@@ -69,7 +69,7 @@ const SiteHeader = () => {
                 </a>
                 {account?.activeUserLevel.roleName === RolesEnum.ADMIN && (
                     <Button variant="link" onClick={() => navigate("/manage-users")}
-                            className="text-muted-foreground transition-colors hover:text-foreground">
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
                         {t("siteHeader.users")}
                     </Button>
                 )}

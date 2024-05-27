@@ -162,7 +162,6 @@ export const useAccount = () => {
                     lastSuccessfulLoginTime: lastSuccessfulLoginTime,
                     lastUnsuccessfulLoginTime: lastUnsuccessfulLoginTime
                 };
-
                 setAccount(user);
                 localStorage.setItem('account', JSON.stringify(user));
             }

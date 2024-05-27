@@ -33,6 +33,7 @@ import {
 import {Loader2, Slash} from "lucide-react";
 import {Switch} from "@/components/ui/switch.tsx";
 import {FiCheck, FiX} from "react-icons/fi";
+import {RefreshButton} from "@/components/RefreshButton.tsx";
 
 
 function AccountSettings() {
@@ -195,19 +196,22 @@ function AccountSettings() {
     return (
         <div>
             <SiteHeader/>
-            <Breadcrumb className={"pt-5 pl-2"}>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash/>
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink>{t("breadcrumb.myAccount")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <div className="flex justify-between items-center pt-2">
+                <Breadcrumb className="pl-2">
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink>{t("breadcrumb.myAccount")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <RefreshButton/>
+            </div>
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">
@@ -402,7 +406,7 @@ function AccountSettings() {
                                                                             className="text-black">{t("accountSettings.personalInfo.firstName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
-                                                                                defaultValue={account?.name}
+                                                                                placeholder={account?.name}
                                                                                 {...field}/>
                                                                         </FormControl>
                                                                         <FormMessage/>
@@ -420,7 +424,9 @@ function AccountSettings() {
                                                                             className="text-black">{t("accountSettings.personalInfo.lastName")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
-                                                                                defaultValue={account?.lastname} {...field}/>
+                                                                                {...field}
+                                                                                placeholder={account?.lastname}
+                                                                            />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
@@ -446,6 +452,7 @@ function AccountSettings() {
                                                                                         onChange={field.onChange}
                                                                                         countries={['PL']}
                                                                                         defaultCountry="PL"
+                                                                                        placeholder={account?.phoneNumber}
                                                                                     />
                                                                                 )}
                                                                             />
@@ -550,9 +557,9 @@ function AccountSettings() {
                                             <strong>{t("accountSettings.2fa")}:</strong> {account?.twoFactorAuth ?
                                             <FiCheck color="green"/> : <FiX color="red"/>}
                                         </p>
-                                        <p>
-                                            <strong>{t("accountSettings.creationDate")}:</strong> {account?.creationDate ? account.creationDate.toDateString() : 'N/A'}
-                                        </p>
+                                        {/*<p>*/}
+                                        {/*    <strong>{t("accountSettings.creationDate")}:</strong> {account?.creationDate ? account.creationDate.toDateString() : 'N/A'}*/}
+                                        {/*</p>*/}
                                         <p>
                                             <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {account?.lastSuccessfulLoginTime ? account.lastSuccessfulLoginTime.toDateString() : 'N/A'}
                                         </p>

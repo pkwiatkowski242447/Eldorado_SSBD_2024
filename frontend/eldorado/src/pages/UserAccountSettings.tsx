@@ -48,6 +48,7 @@ function UserAccountSettings() {
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -277,10 +278,22 @@ function UserAccountSettings() {
 
     };
 
+    const refresh = () => {
+        setIsRefreshing(true);
+        if (id) {
+            api.getAccountById(id).then(response => {
+                setManagedUser(response.data);
+                window.localStorage.setItem('etag', response.headers['etag']);
+            });
+        }
+        setTimeout(() => setIsRefreshing(false), 1000);
+    }
+
     return (
         <div>
             <SiteHeader/>
-            <Breadcrumb className={"pt-5 pl-2"}>
+            <div className="flex justify-between items-center pt-2">
+            <Breadcrumb className={"pl-2"}>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
@@ -299,6 +312,16 @@ function UserAccountSettings() {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
+                <Button onClick={refresh} variant={"ghost"} className="w-auto" disabled={isRefreshing}>
+                    {isRefreshing ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                        </>
+                    ) : (
+                        t("general.refresh")
+                    )}
+                </Button>
+            </div>
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">
