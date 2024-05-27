@@ -285,4 +285,25 @@ public interface AccountServiceInterface {
      * @throws AccountUserLevelException Threw when the account has no Staff user level or has only one user level.
      */
     void removeAdminUserLevel(String id) throws ApplicationBaseException;
+
+    // Restore access to user account methods
+
+    /**
+     * Generates access restore token, writes it to the database and sends e-mail notification containing
+     * access restore URL.
+     *
+     * @param email E-mail address of the user, which account will be activated after being suspended for
+     *              long inactivity period.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void generateAccessRestoreTokenAndSendEmailMessage(String email) throws ApplicationBaseException;
+
+    /**
+     * Uses passed token to verify, if it is the correct token for given account and changes the suspended status
+     * value to false, which makes the account possible to authenticate to.
+     *
+     * @param token Access restore token value, used for restoring access to given account.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void restoreAccountAccess(String token) throws ApplicationBaseException;
 }

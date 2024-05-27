@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAuthenticationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountRestoreAccessException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
@@ -147,5 +149,35 @@ public class AccountExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(accountUserLevelException));
+    }
+
+    /**
+     * This method is used to transform any AccountAuthenticationException or exception that extends it.
+     * After such exception is propagated from controller it will be caught and transformed into HTTP Response.
+     *
+     * @param accountAuthenticationException AccountAuthenticationException that was caught in order to be transformed to HTTP Response.
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 401 UNAUTHORIZED.
+     */
+    @ExceptionHandler(value = {AccountAuthenticationException.class})
+    public ResponseEntity<?> handleAccountAuthenticationException(AccountAuthenticationException accountAuthenticationException) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(accountAuthenticationException));
+    }
+
+    /**
+     * This method is used to transform any AccountRestoreAccessException or exception that extends it.
+     * After such exception is propagated from controller it will be caught and transformed into HTTP Response.
+     *
+     * @param accountRestoreAccessException AccountRestoreAccessException that was caught in order to be transformed to HTTP Response.
+     * @return When specified exception is propagated from controller component this method will catch it and transform
+     * to HTTP Response with status code 400 BAD REQUEST.
+     */
+    @ExceptionHandler(value = {AccountRestoreAccessException.class})
+    public ResponseEntity<?> handleAccountRestoreAccessException(AccountRestoreAccessException accountRestoreAccessException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(accountRestoreAccessException));
     }
 }
