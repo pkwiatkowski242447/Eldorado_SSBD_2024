@@ -14,6 +14,16 @@ import java.util.UUID;
  */
 public interface ParkingServiceInterface {
 
+    /***
+     * Create parking with specified address.
+     *
+     * @param city Address - city.
+     * @param zipCode Address - zip code.
+     * @param street Address - street.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void createParking(String city, String zipCode, String street) throws ApplicationBaseException;
+
     /**
      * Retrieves from the database sector by id.
      *

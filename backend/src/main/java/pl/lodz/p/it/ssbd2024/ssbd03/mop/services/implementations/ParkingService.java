@@ -31,6 +31,12 @@ import java.util.UUID;
 public class ParkingService implements ParkingServiceInterface {
 
     @Override
+    @RolesAllowed({Roles.STAFF})
+    public void createParking(String city, String zipCode, String street) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);

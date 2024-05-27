@@ -3,12 +3,27 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
  * Interface used for managing Parking and Sectors
  */
 public interface ParkingControllerInterface {
+
+    /***
+     * This method is used to create new system.
+     *
+     * @param parkingCreateDTO Data transfer object, containing parking data.
+     * @return It returns HTTP response 204 NO CONTENT when parking creation is successful,
+     *         It returns HTTP response 400 BAD REQUEST when persistence exception is being thrown.
+     *         It returns HTTP response 409 CONFLICT when parking with specific data exits.
+     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException;
 
     /**
      * This method is used to find sector by id.
