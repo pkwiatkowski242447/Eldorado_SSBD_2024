@@ -1,13 +1,26 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
  * Interface used for managing Reservations and Parking Events
  */
 public interface ReservationServiceInterface {
+
+    /***
+     * Get all active reservation for client
+     *
+     * @param pageNumber Number of the page, which reservations will be retrieved from.
+     * @param pageSize   Number of reservations per page.
+     * @return List of active reservations for client.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    List<Reservation> getAllActiveReservationsByUserIdWthPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Create new reservation linking client and sector.

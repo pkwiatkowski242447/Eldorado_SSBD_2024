@@ -13,6 +13,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -26,6 +27,12 @@ import java.util.UUID;
 @TxTracked
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ReservationService implements ReservationServiceInterface {
+
+    @Override
+    @RolesAllowed(Roles.CLIENT)
+    public List<Reservation> getAllActiveReservationsByUserIdWthPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
 
     @Override
     @RolesAllowed(Roles.CLIENT)
