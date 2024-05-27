@@ -50,6 +50,15 @@
   "registerPage.hasAccount": "Already have an account?",
   "registerPage.logIn": "Log In",
   "registerPage.passwordInvalid": "Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character",
+  "registerPage.passwordRepeat": "Confirm Password",
+  "registerPage.client": "Client",
+  "registerPage.admin": "Admin",
+  "registerPage.staff": "Staff",
+  "registerPage.role": "User Level",
+
+  "registerPage.admin.popUp.registerOK.title": "Account successfully created",
+  "registerPage.admin.popUp.registerOK.text": "Please check the provided E-Mail address' inbox and click the link to complete the registration process.",
+  "registerPage.admin.popUp.registerOK.button": "Ok",
 
   "forgotPasswordPage.title": "Forgot Password",
   "forgotPasswordPage.info": "Enter your email address to reset your password",
@@ -68,6 +77,7 @@
   "siteHeader.changeLevel": "Change access level",
   "siteHeader.changeLevel.select": "Select your active role:",
   "siteHeader.changeLevel.select.save": "Save",
+  "siteHeader.login": "Log In",
 
 
   "accountSettings.title": "Change your account settings",

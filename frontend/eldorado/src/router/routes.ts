@@ -13,6 +13,7 @@ import ChangeUserLevelPage from "@/pages/ChangeUserLevelPage.tsx";
 import ConfirmEmailChangePage from "@/pages/ConfirmEmailChangePage.tsx";
 import UserAccountSettings from "@/pages/UserAccountSettings.tsx";
 import TwoFactorAuthPage from "@/pages/TwoFactorAuthPage.tsx";
+import AdminCreateUserPage from "@/pages/AdminCreateUserPage.tsx";
 
 
 export const PublicRoutes: RouteType[] = [
@@ -76,7 +77,11 @@ export const AdminRoutes: RouteType[] = [
     {
         path: Pathnames.admin.userAccountSettings,
         Component: UserAccountSettings
-    }
+    },
+    {
+        path: Pathnames.admin.adminCreateUser,
+        Component: AdminCreateUserPage
+    },
 ]
 
 export const StaffRoutes: RouteType[] = [

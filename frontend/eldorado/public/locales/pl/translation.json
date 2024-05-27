@@ -50,7 +50,15 @@
   "registerPage.hasAccount": "Masz już konto?",
   "registerPage.logIn": "Zaloguj się",
   "registerPage.passwordInvalid": "Hasło musi zawierać co najmniej jedną wielką literę, jedną małą literę, jedną cyfrę oraz jeden znak specjalny",
+  "registerPage.passwordRepeat": "Potwierdź Hasło",
+  "registerPage.client": "Klient",
+  "registerPage.admin": "Administrator",
+  "registerPage.staff": "Pracownik",
+  "registerPage.role": "Poziom Użytkownika",
 
+  "registerPage.admin.popUp.registerOK.title": "Konto zostało pomyślnie utworzone.",
+  "registerPage.admin.popUp.registerOK.text": "Należy sprawdzić skrzynkę odbiorczą podanego adresu e-mail i kliknąć w link aktywacyjny, aby zakończyć rejestrację.",
+  "registerPage.admin.popUp.registerOK.button": "Powrót do strony zarządzania użytkownikami",
 
   "forgotPasswordPage.title": "Zapomniałem hasła",
   "forgotPasswordPage.info": "Wprowadź swój adres e-mail, aby zresetować hasło",
@@ -63,13 +71,13 @@
   "siteHeader.hello": "Witaj, ",
   "siteHeader.users": "Użytkownicy",
   "siteHeader.parkings": "Parkingi",
-  "siteHeader.logout": "Wyloguj",
+  "siteHeader.logout": "Wyloguj się",
   "siteHeader.myAccount": "Moje konto",
   "siteHeader.settings": "Ustawienia",
   "siteHeader.changeLevel": "Zmień poziom dostępu",
   "siteHeader.changeLevel.select": "Wybierz swoją aktywną rolę:",
   "siteHeader.changeLevel.select.save": "Zapisz",
-
+  "siteHeader.login": "Zaloguj się",
 
   "accountSettings.title": "Zmień ustawienia konta",
   "accountSettings.email": "E-mail",

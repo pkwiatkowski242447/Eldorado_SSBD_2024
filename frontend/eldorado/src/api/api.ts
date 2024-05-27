@@ -38,6 +38,30 @@ export const api = {
         })
     },
 
+    registerStaff: (login: string, password: string, firstName: string, lastName: string, email: string, phoneNumber: string, language: string) => {
+        return apiWithConfig.post('/register/staff', {
+            login,
+            password,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            language
+        })
+    },
+
+    registerAdmin: (login: string, password: string, firstName: string, lastName: string, email: string, phoneNumber: string, language: string) => {
+        return apiWithConfig.post('/register/admin', {
+            login,
+            password,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            language
+        })
+    },
+
     activateAccount: (token: string) => {
         return apiWithConfig.post(`/accounts/activate-account/${token}`)
     },

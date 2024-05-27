@@ -209,7 +209,7 @@ export function RegisterForm() {
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel
-                                                className="text-black">{t("accountSettings.authentication.newPasswordRepeat")} *</FormLabel>
+                                                className="text-black">{t("registerPage.passwordRepeat")} *</FormLabel>
                                             <FormControl>
                                                 <Input type="password" {...field} />
                                             </FormControl>

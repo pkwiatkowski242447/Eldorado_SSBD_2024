@@ -13,6 +13,7 @@ export const Pathnames = {
     admin: {
         userManagement: '/manage-users',
         userAccountSettings: '/manage-users/:id',
+        adminCreateUser: '/manage-users/create',
     },
     staff: {
 

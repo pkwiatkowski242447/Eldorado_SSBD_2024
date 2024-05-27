@@ -23,6 +23,8 @@ const SiteHeader = () => {
     const navigate = useNavigate();
     const {t} = useTranslation();
 
+    const accountLS = localStorage.getItem('account');
+    const tokenLS = localStorage.getItem('token');
     const {logOut} = useAccount();
 
     function onClickLogout() {
@@ -30,15 +32,19 @@ const SiteHeader = () => {
     }
 
     function onClickSettings() {
-        if (account){
+        if (account) {
             navigate(Pathnames.loggedIn.accountSettings);
         }
     }
 
     function onClickChangeUserLevel() {
-        if (account){
+        if (account) {
             navigate(Pathnames.loggedIn.changeUserLevel);
         }
+    }
+
+    function onClickLogin() {
+        navigate(Pathnames.public.login);
     }
 
     let headerColor = 'bg-gray-200 border-gray-200';
@@ -73,36 +79,64 @@ const SiteHeader = () => {
                         {t("siteHeader.users")}
                     </Button>
                 )}
-                <Button variant="link" onClick={() => navigate("/home")}
-                        className="text-muted-foreground transition-colors hover:text-foreground">
-                    {t("siteHeader.parkings")}
-                </Button>
+                {account?.activeUserLevel.roleName === RolesEnum.ADMIN && (
+                    <Button variant="link" onClick={() => navigate("/manage-users/create")}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        {/*{t("siteHeader.users")}*/}
+                        Create User
+                    </Button>
+
+                )}
+                {/*<Button variant="link" onClick={() => navigate("/home")}*/}
+                {/*        className="text-muted-foreground transition-colors hover:text-foreground">*/}
+                {/*    {t("siteHeader.parkings")}*/}
+                {/*</Button>*/}
             </nav>
             <div className="flex w-full items-center gap-4 justify-end">
-                <small className="text-sm font-medium leading-none">{t("siteHeader.hello")}{account?.login}</small>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" size="icon" className="rounded-full">
-                            <CircleUser className="h-5 w-5"/>
-                            <span className="sr-only">Toggle user menu</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>{t("siteHeader.myAccount")}</DropdownMenuLabel>
-                        <DropdownMenuSeparator/>
-                        <DropdownMenuItem onClick={onClickSettings}>
-                            {t("siteHeader.settings")}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator/>
-                        <DropdownMenuItem onClick={onClickChangeUserLevel}>
-                            {t("siteHeader.changeLevel")}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator/>
-                        <DropdownMenuItem className="font-bold" onClick={onClickLogout}>
-                            {t("siteHeader.logout")}
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                {(accountLS && tokenLS) && (
+                    <>
+                        <small
+                            className="text-sm font-medium leading-none">{t("siteHeader.hello")}{account?.login}</small>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="secondary" size="icon" className="rounded-full">
+                                    <CircleUser className="h-5 w-5"/>
+                                    <span className="sr-only">Toggle user menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>{t("siteHeader.myAccount")}</DropdownMenuLabel>
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuItem onClick={onClickSettings}>
+                                    {t("siteHeader.settings")}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuItem onClick={onClickChangeUserLevel}>
+                                    {t("siteHeader.changeLevel")}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuItem className="font-bold" onClick={onClickLogout}>
+                                    {t("siteHeader.logout")}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </>
+                )}
+                {(!accountLS || !tokenLS) && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="secondary" size="icon" className="rounded-full">
+                                <CircleUser className="h-5 w-5"/>
+                                <span className="sr-only">Toggle user menu</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={onClickLogin} className={"font-bold"}>
+                                {t("siteHeader.login")}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
         </header>
     );
