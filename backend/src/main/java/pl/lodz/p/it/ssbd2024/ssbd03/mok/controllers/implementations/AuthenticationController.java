@@ -134,7 +134,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.MOK2)
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -177,7 +177,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Logout method
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed(Authorities.MOK14)
     public ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
                                     HttpServletRequest request, HttpServletResponse response) {
         String sourceAddress = getSourceAddress(proxyChain, request);
@@ -200,6 +200,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * @return This method returns the actual IPv4 address of the user. If the X-Forwarded-For header is empty or not
      * present (basically null) then IPv4 address is extracted from IP packet as source address, which will be proxy.
      */
+    //TODO w RolesAllowed zawrzec przypadek uzycia dla refreshUserSession, tylko jaki???
+//    @RolesAllowed({Authorities.MOK2, Authorities.MOK14})
     private String getSourceAddress(String proxyChain, HttpServletRequest request) {
         if (proxyChain != null) {
             return proxyChain.indexOf(',') == -1 ? proxyChain : proxyChain.split(",")[0];

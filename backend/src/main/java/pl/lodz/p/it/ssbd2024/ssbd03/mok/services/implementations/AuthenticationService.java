@@ -132,7 +132,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     // Login methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.MOK2)
     public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
         if (!account.getActive()) {
@@ -185,7 +185,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.MOK2)
     public void registerUnsuccessfulLoginAttemptWithIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -204,7 +204,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.MOK2)
     public void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -246,7 +246,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     // Read methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.MOK2)
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         return this.authenticationFacade.findByLogin(login);
     }
@@ -261,7 +261,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
      *                                  on facade components.
      */
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.MOK2)
     private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
         tokenFacade.removeByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId());
 

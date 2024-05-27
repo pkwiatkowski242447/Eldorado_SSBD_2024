@@ -41,7 +41,7 @@ public class ComponentConfig {
     public UserDetailsService userDetailsService() {
         return login -> {
             try {
-                Account account = authenticationFacade.findByLogin(login).orElseThrow(() -> new AccountNotFoundException("Account with given login could not be found!"));
+                Account account = authenticationFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
 
                 List<SimpleGrantedAuthority> accountAuthorities = new ArrayList<>();
                 for (UserLevel userLevel : account.getUserLevels()) {
@@ -54,7 +54,7 @@ public class ComponentConfig {
                         !account.getSuspended(),
                         true,
                         !account.getBlocked(),
-                        account.getUserLevels().stream().map(userLevel -> new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase())).toList());
+                        accountAuthorities);
             } catch (ApplicationBaseException exception) {
                 log.error(exception.getMessage());
             }
