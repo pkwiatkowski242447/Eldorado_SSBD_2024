@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -19,6 +20,15 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     Sector getSectorById(UUID id) throws ApplicationBaseException;
+
+    /**
+     * Retrieves parking from the database by id.
+     *
+     * @param id Parking's id.
+     * @return If parking with the given id was found returns Parking.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    Parking getParkingById(UUID id) throws ApplicationBaseException;
 
     /**
      * Removes parking from the database by its id.
