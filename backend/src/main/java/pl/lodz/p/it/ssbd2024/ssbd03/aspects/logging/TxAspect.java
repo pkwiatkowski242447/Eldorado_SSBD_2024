@@ -96,7 +96,7 @@ public class TxAspect {
             throw throwable;
         }
 
-        message.append(" | Returned");
+        message.append(" | Returned ");
         if (result != null) message.append(": ").append(result).append(".");
         else message.append("no value.");
 
