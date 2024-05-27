@@ -50,6 +50,20 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> activateSector(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
+     * This method is used to deactivate a sector with given id.
+     *
+     * @param id Identifier of sector to deactivate.
+     * @return It returns HTTP response 204 NO_CONTENT when the sector is successfully deactivated.
+     * When the sector with the provided id doesn't exist,
+     * the method returns 400. When the sector still has active parking spots,
+     * or it is already deactivated, the method returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from the facade and service layers below.
+     */
+    @PostMapping(value = "/sectors/{id}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> deactivateSector(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
      * This method is used to remove parking, that is identified with the given identifier.
      *
      * @param id Identifier of the parking to be removed.
