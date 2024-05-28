@@ -11,6 +11,21 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 public interface ParkingControllerInterface {
 
     /**
+     * This method is used to find all parking spaces in system, using pagination.
+     *
+     * @param pageNumber Number of the page, which parking spaces will be retrieved from.
+     * @param pageSize   Number of parking spaces per page.
+     * @return It returns HTTP response 200 OK with all parking list.
+     *         It returns HTTP response 204 NO CONTENT when list is empty.
+     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
+                                    @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+
+    /**
      * This method is used to find sector by id.
      *
      * @param id Identifier of sector to find.
