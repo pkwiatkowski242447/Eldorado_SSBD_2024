@@ -30,6 +30,12 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Override
     @RolesAllowed(Roles.CLIENT)
+    public List<Reservation> getAllActiveReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed(Roles.CLIENT)
     public void makeReservation(String clientLogin, UUID sectorId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
