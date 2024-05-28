@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.annotation.SecurityTestExecutionListeners;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
@@ -21,6 +22,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFa
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataAuthFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenAuthFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AuthenticationService;
@@ -40,7 +43,8 @@ public class AuthenticationServiceMockTest {
 
     @Mock
     private AuthenticationFacade authenticationFacade;
-
+    @Mock
+    private AccountHistoryDataAuthFacade historyDataFacade;
     @Mock
     private JWTProvider jwtProvider;
 
@@ -170,9 +174,12 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     public void registerUnsuccessfulLoginAttemptWithoutIncrementTestPositive() throws ApplicationBaseException {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleIpAddress = "ExampleIpAddress";
+
+        doNothing().when(historyDataFacade).create(any());
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
         doNothing().when(authenticationFacade).edit(account);
 
@@ -191,9 +198,12 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     public void registerUnsuccessfulLoginAttemptWithIncrementTestPositiveWhenEmailIsNotSent() throws ApplicationBaseException {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleIpAddress = "ExampleIpAddress";
+
+        doNothing().when(historyDataFacade).create(any());
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
         doNothing().when(authenticationFacade).edit(account);
 
@@ -203,12 +213,15 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     public void registerUnsuccessfulLoginAttemptWithIncrementTestPositiveWhenEmailIsSent() throws ApplicationBaseException {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         ActivityLog activityLog = account.getActivityLog();
         activityLog.setUnsuccessfulLoginCounter(5);
         account.setActivityLog(activityLog);
         String exampleIpAddress = "ExampleIpAddress";
+
+        doNothing().when(historyDataFacade).create(any());
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
         doNothing().when(authenticationFacade).edit(account);
         doNothing().when(mailProvider).sendBlockAccountInfoEmail(account.getName(),
@@ -238,6 +251,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     public void registerSuccessfulLoginAttemptFor1FATestPositiveWhenNotConfirmed() throws ApplicationBaseException {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         account.setTwoFactorAuth(false);
@@ -247,6 +261,8 @@ public class AuthenticationServiceMockTest {
         String exampleRefreshToken = "ExampleRefreshToken";
         Token refreshTokenObject = new Token(exampleRefreshToken, account, Token.TokenType.REFRESH_TOKEN);
         account.setAccountLanguage(exampleLanguage);
+
+        doNothing().when(historyDataFacade).create(any());
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
         when(tokenProvider.generateRefreshToken(account)).thenReturn(refreshTokenObject);
         doNothing().when(authenticationFacade).edit(account);
@@ -259,6 +275,7 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     public void registerSuccessfulLoginAttemptFor1FATestPositiveWhenConfirmed() throws ApplicationBaseException {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         account.setTwoFactorAuth(false);
@@ -268,6 +285,8 @@ public class AuthenticationServiceMockTest {
         String exampleRefreshToken = "ExampleRefreshToken";
         Token refreshTokenObject = new Token(exampleRefreshToken, account, Token.TokenType.REFRESH_TOKEN);
         account.setAccountLanguage(exampleLanguage);
+
+        doNothing().when(historyDataFacade).create(any());
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
         when(tokenProvider.generateRefreshToken(account)).thenReturn(refreshTokenObject);
         doNothing().when(authenticationFacade).edit(account);

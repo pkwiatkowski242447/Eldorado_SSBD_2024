@@ -1,31 +1,31 @@
 -- -- GRAND PRIVILEGES
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.account        TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.past_password  TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.personal_data  TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.user_level     TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.client_data    TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.staff_data     TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.admin_data     TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.token          TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.account         TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.past_password   TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.personal_data   TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.user_level      TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.client_data     TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.staff_data      TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.admin_data      TO ssbd03mok;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.token           TO ssbd03mok;
+GRANT SELECT, INSERT                 ON TABLE public.account_history TO ssbd03mok;
 
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.reservation    TO ssbd03mop;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.parking        TO ssbd03mop;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.sector         TO ssbd03mop;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.parking_event  TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.account        TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.personal_data  TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.user_level     TO ssbd03mop;
-GRANT SELECT                , UPDATE ON TABLE public.client_data    TO ssbd03mop;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.reservation     TO ssbd03mop;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.parking         TO ssbd03mop;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.sector          TO ssbd03mop;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.parking_event   TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.account         TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.personal_data   TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.user_level      TO ssbd03mop;
+GRANT SELECT                , UPDATE ON TABLE public.client_data     TO ssbd03mop;
 
-GRANT SELECT, UPDATE                 ON TABLE public.account        TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.personal_data  TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.user_level     TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.client_data    TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.staff_data     TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.admin_data     TO ssbd03auth;
-GRANT SELECT, INSERT, DELETE         ON TABLE public.token          TO ssbd03auth;
-
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.token          TO ssbd03mok;
+GRANT SELECT, UPDATE                 ON TABLE public.account         TO ssbd03auth;
+GRANT SELECT                         ON TABLE public.personal_data   TO ssbd03auth;
+GRANT SELECT                         ON TABLE public.user_level      TO ssbd03auth;
+GRANT SELECT                         ON TABLE public.client_data     TO ssbd03auth;
+GRANT SELECT                         ON TABLE public.staff_data      TO ssbd03auth;
+GRANT SELECT                         ON TABLE public.admin_data      TO ssbd03auth;
+GRANT SELECT, INSERT, DELETE         ON TABLE public.token           TO ssbd03auth;
+GRANT SELECT, INSERT                 ON TABLE public.account_history TO ssbd03auth;
 
 -- INSERT VALUE
 -- Admin

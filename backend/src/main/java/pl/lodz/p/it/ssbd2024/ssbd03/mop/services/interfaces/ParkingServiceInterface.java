@@ -26,6 +26,18 @@ public interface ParkingServiceInterface {
     void createParking(String city, String zipCode, String street) throws ApplicationBaseException;
 
     /**
+     * Create sector in the given parking.
+     *
+     * @param parkingId Id of parking to which the sector will be added.
+     * @param name      The name of the sector.
+     * @param type      The type of the sector.
+     * @param maxPlaces The maximum number of parking spots in the sector.
+     * @param weight    The weight of the sector.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException;
+
+    /**
      * Retrieve all parking spaces in the system.
      *
      * @param pageNumber The page number of the results to return.
@@ -105,6 +117,14 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     void editParking (UUID id) throws ApplicationBaseException;
+
+    /**
+     * Edits sector in the database by its id.
+     *
+     * @param id Identifier of the sector to be edited.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void editSector(UUID id) throws ApplicationBaseException;
 
     /**
      * Removes sector from the database by its id.

@@ -47,7 +47,7 @@ public class DatabaseConsts {
     public static final String ACCOUNT_HIST_VERSION_COLUMN = "version";
     public static final String ACCOUNT_HIST_LOGIN_COLUMN = "login";
     public static final String ACCOUNT_HIST_PASSWORD_COLUMN = "password";
-    public static final String ACCOUNT_HIST_VERIFIED_COLUMN = "verified";
+    public static final String ACCOUNT_HIST_SUSPENDED_COLUMN = "suspended";
     public static final String ACCOUNT_HIST_ACTIVE_COLUMN = "active";
     public static final String ACCOUNT_HIST_BLOCKED_COLUMN = "blocked";
     public static final String ACCOUNT_HIST_TWO_FACTOR_AUTH_COLUMN = "two_factor_auth";
