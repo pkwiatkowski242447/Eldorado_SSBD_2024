@@ -33,9 +33,11 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser value constant but could be set).
+     * @return Newly created account with default client user level.
      * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
      */
-    void registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
+    Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
+            throws ApplicationBaseException;
 
     /**
      * This method is used to create new account, which will have default user level of Staff, create
@@ -49,9 +51,11 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
+     * @return Newly created account with default staff user level.
      * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
      */
-    void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
+    Account registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
+            throws ApplicationBaseException;
 
     /**
      * This method is used to create new account, which will have default user level of Admin, create
@@ -65,9 +69,11 @@ public interface AccountServiceInterface {
      * @param email       Email address, which will be used to send messages (e.g. confirmation messages) for actions in the application.
      * @param phoneNumber Phone number of the user.
      * @param language    Predefined language constant used for internationalizing all messages for user (initially browser constant value but could be set).
+     * @return Newly created account with default admin user level.
      * @throws ApplicationBaseException Superclass for all exceptions that could be thrown by the aspect, intercepting facade create method.
      */
-    void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException;
+    Account registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
+            throws ApplicationBaseException;
 
     // Password change methods
 

@@ -1787,7 +1787,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/register/{user_level}", userLevel)
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
@@ -1923,7 +1923,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/register/client")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
