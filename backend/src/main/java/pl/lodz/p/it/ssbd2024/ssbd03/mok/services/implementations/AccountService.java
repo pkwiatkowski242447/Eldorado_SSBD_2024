@@ -134,7 +134,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
+    public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
             throws ApplicationBaseException {
         Account newClientAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newClientAccount.setAccountLanguage(language);
@@ -156,12 +156,14 @@ public class AccountService implements AccountServiceInterface {
                 newClientAccount.getEmail(),
                 confirmationURL,
                 newClientAccount.getAccountLanguage());
+
+        return newClientAccount;
     }
 
     @Override
     @RolesAllowed({Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
+    public Account registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newStaffAccount.setAccountLanguage(language);
         newStaffAccount.getPreviousPasswords().add(newStaffAccount.getPassword());
@@ -182,12 +184,14 @@ public class AccountService implements AccountServiceInterface {
                 newStaffAccount.getEmail(),
                 confirmationURL,
                 newStaffAccount.getAccountLanguage());
+
+        return newStaffAccount;
     }
 
     @Override
     @RolesAllowed({Roles.ADMIN})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
-    public void registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
+    public Account registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newAdminAccount.setAccountLanguage(language);
         newAdminAccount.getPreviousPasswords().add(newAdminAccount.getPassword());
@@ -208,6 +212,8 @@ public class AccountService implements AccountServiceInterface {
                 newAdminAccount.getEmail(),
                 confirmationURL,
                 newAdminAccount.getAccountLanguage());
+
+        return newAdminAccount;
     }
 
     // Password change methods

@@ -21,7 +21,6 @@ import java.util.UUID;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class AccountHistoryData {
 
     @Id

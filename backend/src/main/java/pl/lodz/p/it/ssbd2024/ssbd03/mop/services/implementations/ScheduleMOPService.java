@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ScheduleMOPServiceInterface;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Service managing execution of scheduled tasks.
  * Configuration concerning tasks is set in consts.properties.
