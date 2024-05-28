@@ -606,4 +606,19 @@ public interface AccountControllerInterface {
     })
     ResponseEntity<?> restoreAccountAccess(@PathVariable("token") String tokenValue)
             throws ApplicationBaseException;
+
+    /**
+     * This endpoint allows to check whether the account has a password reset request made by an admin.
+     * @return Boolean representing whether there is a password reset request made by an admin
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *      *                           exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/admin-password-reset-status", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Check if the logged in account has an admin reset password request.", description = "This endpoint allows to check whether the account has a password reset request made by an admin.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request status was read correctly."),
+            @ApiResponse(responseCode = "400", description = "Account which made the check doesn't exist."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getPasswordAdminResetStatus() throws ApplicationBaseException;
 }

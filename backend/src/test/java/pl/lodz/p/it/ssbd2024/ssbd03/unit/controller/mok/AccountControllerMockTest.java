@@ -211,7 +211,7 @@ public class AccountControllerMockTest {
     @Test
     public void resetAccountPasswordTestSuccessful() throws Exception {
         when(accountService.getAccountById(UUID.fromString(testId))).thenReturn(testAccount);
-        doNothing().when(accountService).forgetAccountPassword(testAccount.getEmail());
+        doNothing().when(accountService).forgetAccountPasswordByAdmin(testAccount.getEmail());
 
         mockMvc.perform(
                         post("/api/v1/accounts/reset-password/{id}", testId)

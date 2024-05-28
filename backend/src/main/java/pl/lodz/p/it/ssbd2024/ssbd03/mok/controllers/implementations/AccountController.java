@@ -133,7 +133,7 @@ public class AccountController implements AccountControllerInterface {
         try {
             UUID uuid = UUID.fromString(id);
             Account account = accountService.getAccountById(uuid);
-            this.accountService.forgetAccountPassword(account.getEmail());
+            this.accountService.forgetAccountPasswordByAdmin(account.getEmail());
 
             return ResponseEntity.noContent().build();
         } catch (AccountNotFoundException accountNotFoundException) {
@@ -445,5 +445,13 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> restoreAccountAccess(String tokenValue) throws ApplicationBaseException {
         accountService.restoreAccountAccess(tokenValue);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RolesAllowed({Roles.AUTHENTICATED})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
+    public ResponseEntity<?> getPasswordAdminResetStatus() throws ApplicationBaseException {
+        return ResponseEntity.ok().body(accountService.getPasswordAdminResetStatus());
     }
 }
