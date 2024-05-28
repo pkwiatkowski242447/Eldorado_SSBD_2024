@@ -16,10 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
@@ -498,8 +495,8 @@ public class AccountServiceMockTest {
     @Test
     void addClientUserLevelTestSuccessful() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
-        UserLevel userLevelStaff = new Staff();
-        account.addUserLevel(userLevelStaff);
+        UserLevel userLevelAdmin = new Admin();
+        account.addUserLevel(userLevelAdmin);
         UUID id = UUID.randomUUID();
 
         when(accountMOKFacade.find(id)).thenReturn(Optional.of(account));
@@ -509,6 +506,18 @@ public class AccountServiceMockTest {
         accountService.addClientUserLevel(id.toString());
         var userLevels = account.getUserLevels();
         assertTrue(userLevels.stream().anyMatch(userLevel -> userLevel instanceof Client));
+    }
+
+    @Test
+    void addClientUserLevelTestCollisionWithStaff() throws ApplicationBaseException {
+        Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
+        UserLevel userLevelStaff = new Staff();
+        account.addUserLevel(userLevelStaff);
+        UUID id = UUID.randomUUID();
+
+        when(accountMOKFacade.find(id)).thenReturn(Optional.of(account));
+
+        assertThrows(AccountUserLevelException.class ,() -> accountService.addClientUserLevel(id.toString()));
     }
 
     @Test
@@ -535,8 +544,8 @@ public class AccountServiceMockTest {
     @Test
     void addStaffUserLevelTestSuccessful() throws ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
-        UserLevel userLevelClient = new Client();
-        account.addUserLevel(userLevelClient);
+        UserLevel userLevelAdmin = new Admin();
+        account.addUserLevel(userLevelAdmin);
         UUID id = UUID.randomUUID();
 
         when(accountMOKFacade.find(id)).thenReturn(Optional.of(account));
@@ -546,6 +555,18 @@ public class AccountServiceMockTest {
         accountService.addStaffUserLevel(id.toString());
         var userLevels = account.getUserLevels();
         assertTrue(userLevels.stream().anyMatch(userLevel -> userLevel instanceof Staff));
+    }
+
+    @Test
+    void addStaffUserLevelTestCollisionWithClient() throws ApplicationBaseException {
+        Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
+        UserLevel userLevelClient = new Client();
+        account.addUserLevel(userLevelClient);
+        UUID id = UUID.randomUUID();
+
+        when(accountMOKFacade.find(id)).thenReturn(Optional.of(account));
+
+        assertThrows(AccountUserLevelException.class,() -> accountService.addStaffUserLevel(id.toString()));
     }
     @Test
     void addStaffUserLevelTestAccountNotFound() throws ApplicationBaseException {

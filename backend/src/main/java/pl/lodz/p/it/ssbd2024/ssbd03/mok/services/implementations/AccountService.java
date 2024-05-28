@@ -498,6 +498,10 @@ public class AccountService implements AccountServiceInterface {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
         }
 
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
+            throw new AccountUserLevelException(I18n.ACCOUNT_USER_LEVELS_CONFLICT);
+        }
+
         UserLevel clientUserLevel = new Client();
         account.addUserLevel(clientUserLevel);
         userLevelFacade.create(clientUserLevel);
@@ -518,6 +522,10 @@ public class AccountService implements AccountServiceInterface {
 
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
+        }
+
+        if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
+            throw new AccountUserLevelException(I18n.ACCOUNT_USER_LEVELS_CONFLICT);
         }
 
         UserLevel staffUserLevel = new Staff();
