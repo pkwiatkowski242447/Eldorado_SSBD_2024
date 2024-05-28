@@ -38,6 +38,7 @@ import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
 
 function UserManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
@@ -85,7 +86,7 @@ function UserManagementPage() {
         fetchUsers();
     }, [currentPage]);
 
-    function refresh () {
+    function refresh() {
         setIsRefreshing(true);
         fetchUsers();
         setTimeout(() => setIsRefreshing(false), 1000);
@@ -94,19 +95,19 @@ function UserManagementPage() {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <div className="flex justify-between items-center pt-2">
-            <Breadcrumb className={"pl-2"}>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash/>
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink>{t("breadcrumb.manageUsers")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+                <Breadcrumb className={"pl-2"}>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink>{t("breadcrumb.manageUsers")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
                 <Button onClick={refresh} variant={"ghost"} className="w-auto" disabled={isRefreshing}>
                     {isRefreshing ? (
                         <>
@@ -116,6 +117,29 @@ function UserManagementPage() {
                         t("general.refresh")
                     )}
                 </Button>
+            </div>
+            <div>
+                <Pagination>
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious
+                                onClick={() => {
+                                    if (currentPage > 0) setCurrentPage(currentPage - 1)
+                                }}
+                            />
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationLink>{currentPage + 1}</PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationNext
+                                onClick={() => {
+                                    if (users.length == 4) setCurrentPage(currentPage + 1)
+                                }}
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
             </div>
             <div className={"pt-5"}>
                 <Table className="p-10 flex-grow">
@@ -140,36 +164,22 @@ function UserManagementPage() {
                     </TableHeader>
                     <TableBody className={"text-center"}>
                         {users.map(user => (
-                            <TableRow key={user.id} className="text-center">
+                            <TableRow key={user.id} className="flex-auto">
                                 <TableCell>{user.login}</TableCell>
                                 <TableCell>{user.name}</TableCell>
                                 <TableCell>{user.lastName}</TableCell>
-                                <TableCell className="text-center">
+                                <TableCell className="flex-col justify-center">
                                     {user.active ? <FiCheck color="green"/> : <FiX color="red"/>}
                                 </TableCell>
-                                <TableCell className="text-center">
-                                    {user.blocked ? <FiCheck color="green"/> : <FiX color="red"/>}
+                                <TableCell className="flex-col justify-center">
+                                    {user.blocked ? <FiCheck color="red"/> : <FiX color="green"/>}
                                 </TableCell>
-                                <TableCell>
-                                    {user.verified ? <FiCheck color="green"/> : <FiX color="red"/>}
+                                <TableCell className="flex-auto">
+                                    {user.suspended ? <FiCheck color="red"/> : <FiX color="green"/>}
                                 </TableCell>
                                 <TableCell>
                                     {user.userLevels.map(level => {
-                                        let color;
-                                        switch (level) {
-                                            case 'Admin':
-                                                color = 'black';
-                                                break;
-                                            case 'Staff':
-                                                color = 'black';
-                                                break;
-                                            case 'Client':
-                                                color = 'black';
-                                                break;
-                                            default:
-                                                color = 'black';
-                                        }
-                                        return <span style={{color}}>{level} </span>;
+                                        return <Badge variant={"secondary"}>{level} </Badge>;
                                     })}
                                 </TableCell>
                                 <TableCell>
@@ -207,27 +217,6 @@ function UserManagementPage() {
                     </AlertDialog>
                 </Table>
             </div>
-            <Pagination className="sticky bottom-0 w-full bg-white p-4">
-                <PaginationContent>
-                    <PaginationItem>
-                        <PaginationPrevious
-                            onClick={() => {
-                                if (currentPage > 0) setCurrentPage(currentPage - 1)
-                            }}
-                        />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink>{currentPage + 1}</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationNext
-                            onClick={() => {
-                                if (users.length > 0) setCurrentPage(currentPage + 1)
-                            }}
-                        />
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
         </div>
     );
 }

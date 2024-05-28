@@ -4,7 +4,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Controller, useForm} from "react-hook-form";
-import {Card, CardContent} from "@/components/ui/card.tsx";
+import {Card, CardContent, CardTitle} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
@@ -12,7 +12,7 @@ import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useParams} from "react-router-dom";
-import {localDateTimeToDate, UserType} from "@/types/Users.ts";
+import {AccountTypeEnum, localDateTimeToDate, UserType} from "@/types/Users.ts";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -28,14 +28,14 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
-import {RolesEnum} from "@/types/TokenPayload.ts";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Loader2, Slash} from "lucide-react";
 import {Switch} from "@/components/ui/switch.tsx";
 import {FiCheck, FiX} from "react-icons/fi";
+import {Badge} from "@/components/ui/badge.tsx";
 
-const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
+const allUserLevels: AccountTypeEnum[] = [AccountTypeEnum.ADMIN, AccountTypeEnum.STAFF, AccountTypeEnum.CLIENT];
 
 // I'm fully aware that what i've commited below is a crime.
 // I don't feel like dividing everything into separate components just for the sake of being pretty to look at rn
@@ -46,7 +46,7 @@ function UserAccountSettings() {
     const [activeForm, setActiveForm] = useState('Details');
     const [managedUser, setManagedUser] = useState<UserType | null>(null);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
+    const [levelToChange, setLevelToChange] = useState<AccountTypeEnum | null>(null);
     const {id} = useParams<{ id: string }>();
     const {t} = useTranslation();
     const [formValues, setFormValues] = useState(null);
@@ -130,12 +130,12 @@ function UserAccountSettings() {
         setAlertDialogOpen(false);
     };
 
-    const handleRemoveClick = (level: RolesEnum) => {
+    const handleRemoveClick = (level: AccountTypeEnum) => {
         setLevelToChange(level);
         setAlertDialogOpen(true);
     };
 
-    const handleAddClick = (level: RolesEnum) => {
+    const handleAddClick = (level: AccountTypeEnum) => {
         setLevelToChange(level);
         setAlertDialogOpen(true);
     };
@@ -162,9 +162,9 @@ function UserAccountSettings() {
     //TODO gray out the admin button for the admin that is editing his own account
     const confirmChangeUserLevel = () => {
         if (levelToChange && managedUser) {
-            if (managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange)) {
+            if (managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange.toUpperCase())) {
                 switch (levelToChange) {
-                    case RolesEnum.ADMIN:
+                    case AccountTypeEnum.ADMIN:
                         api.removeLevelAdmin(managedUser.id).then(() => {
                             setAlertDialogOpen(false);
                             toast({
@@ -175,7 +175,7 @@ function UserAccountSettings() {
                             handleApiError(error);
                         });
                         break;
-                    case RolesEnum.STAFF:
+                    case AccountTypeEnum.STAFF:
                         api.removeLevelStaff(managedUser.id).then(() => {
                             setAlertDialogOpen(false);
                             toast({
@@ -186,7 +186,7 @@ function UserAccountSettings() {
                             handleApiError(error);
                         });
                         break;
-                    case RolesEnum.CLIENT:
+                    case AccountTypeEnum.CLIENT:
                         api.removeLevelClient(managedUser.id).then(() => {
                             setAlertDialogOpen(false);
                             toast({
@@ -200,7 +200,7 @@ function UserAccountSettings() {
                 }
             } else {
                 switch (levelToChange) {
-                    case RolesEnum.ADMIN:
+                    case AccountTypeEnum.ADMIN:
                         api.addLevelAdmin(managedUser.id).then(() => {
                             setAlertDialogOpen(false);
                             toast({
@@ -211,7 +211,7 @@ function UserAccountSettings() {
                             handleApiError(error);
                         });
                         break;
-                    case RolesEnum.STAFF:
+                    case AccountTypeEnum.STAFF:
                         api.addLevelStaff(managedUser.id).then(() => {
                             setAlertDialogOpen(false);
                             toast({
@@ -222,7 +222,7 @@ function UserAccountSettings() {
                             handleApiError(error);
                         });
                         break;
-                    case RolesEnum.CLIENT:
+                    case AccountTypeEnum.CLIENT:
                         api.addLevelClient(managedUser.id).then(() => {
                             setAlertDialogOpen(false);
                             toast({
@@ -407,33 +407,42 @@ function UserAccountSettings() {
                             <div>
                                 {activeForm === 'UserLevels' && (
                                     <div>
-                                        {allUserLevels.map((level: RolesEnum) => (
-                                            <div key={level}>
-                                                <span>{level}</span>
-                                                {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === level) ? (
-                                                    <Button className="text-white bg-red-500 hover:bg-red-700 m-5"
-                                                            onClick={() => handleRemoveClick(level)}>
-                                                        {t("accountSettings.users.table.settings.account.userLevels.remove")}
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        className="text-white bg-green-500 hover:bg-green-700 m-5"
-                                                        onClick={() => handleAddClick(level)}>
-                                                        {t("accountSettings.users.table.settings.account.userLevels.add")}
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        ))}
+                                        <Card className="mx-10 w-auto">
+                                            <CardContent>
+                                                <div className="flex flex-row justify-around">
+                                                    {allUserLevels.map((level: AccountTypeEnum) => (
+                                                        <div key={level} className="flex flex-col items-center m-5 ">
+                                                            <Badge variant="secondary">{level}</Badge>
+                                                            <div className={"pt-2"}>
+                                                                {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === level.toUpperCase()) ? (
+                                                                    <Button className="mt-2" variant={"ghost"}
+                                                                            onClick={() => handleRemoveClick(level)}>
+                                                                        {t("accountSettings.users.table.settings.account.userLevels.remove")}
+                                                                    </Button>
+                                                                ) : (
+                                                                    <Button
+                                                                        className="mt-2" variant={"default"}
+                                                                        onClick={() => handleAddClick(level)}>
+                                                                        {t("accountSettings.users.table.settings.account.userLevels.add")}
+                                                                    </Button>
+                                                                )}
+                                                            </div>
+
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
                                         <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
                                             <AlertDialogContent>
                                                 <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                                                 <AlertDialogDescription>
                                                     {t("accountSettings.users.table.settings.block.confirm1")}
-                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange)
+                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange?.toUpperCase())
                                                         ? t("accountSettings.users.table.settings.account.userLevels.remove2") :
                                                         t("accountSettings.users.table.settings.account.userLevels.add2")} {levelToChange}
                                                     {t("accountSettings.users.table.settings.block.level")}
-                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange)
+                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange?.toUpperCase())
                                                         ? t("accountSettings.users.table.settings.block.from") : t("accountSettings.users.table.settings.block.to")}
                                                     {t("accountSettings.users.table.settings.block.confirm2")}
                                                 </AlertDialogDescription>
@@ -661,8 +670,10 @@ function UserAccountSettings() {
                         {activeForm === 'Details' && (
                             <div>
                                 <Card className="mx-10 w-auto text-left">
-                                    <CardContent>
-                                        <h2 className="text-lg font-bold text-center p-5">{t("accountSettings.accountInfo")}</h2>
+                                    <CardTitle className={"flex justify-center mt-5"}>
+                                        {t("accountSettings.accountInfo")}
+                                    </CardTitle>
+                                    <CardContent className={"mt-5"}>
                                         <p>
                                             <strong>{t("accountSettings.name")}:</strong> {managedUser?.name} {managedUser?.lastname}
                                         </p>
@@ -681,11 +692,11 @@ function UserAccountSettings() {
                                         </p>
                                         <p>
                                             <strong>{t("accountSettings.blocked")}:</strong> {managedUser?.blocked ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                            <FiCheck color="red"/> : <FiX color="green"/>}
                                         </p>
                                         <p>
                                             <strong>{t("accountSettings.suspended")}:</strong> {managedUser?.suspended ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                            <FiCheck color="red"/> : <FiX color="green"/>}
                                         </p>
                                         <p>
                                             <strong>{t("accountSettings.2fa")}:</strong> {managedUser?.twoFactorAuth ?

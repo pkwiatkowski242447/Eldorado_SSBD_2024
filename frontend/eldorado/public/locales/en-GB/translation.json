@@ -13,6 +13,8 @@
 
   "adminAddUserPage.confirmUserCreation": "Are you sure you want to create this user?",
 
+  "account.user_levels.conflict.exception": "User levels conflict - the user cannot have both client and staff roles.",
+
   "loginPage.title": "Login",
   "loginPage.info": "Enter your login information to proceed",
   "loginPage.login": "Login",
@@ -146,16 +148,18 @@
   "accountSettings.users.table.settings.unblock2": "Unblock",
   "accountSettings.confirmUserDataChange": "Are you sure you want to change user data?",
   "accountSettings.confirmEmailChange": "Are you sure you want to change the email address?",
-
+  "accountSettings.popUp.resendEmailConfirmationOK.title": "Success!",
+  "accountSettings.popUp.resendEmailConfirmationOK.text": "The email confirmation message has been successfully resent. Check your email to continue.",
+  "accountSettings.popUp.resendEmailConfirmationOK.button": "Resend email confirmation",
 
   "accountSettings.users.table.settings.account.title": "Modify account - ",
   "accountSettings.users.table.settings.account.userLevels": "User Levels",
   "accountSettings.users.table.settings.account.authentication": "Authentication",
   "accountSettings.users.table.settings.account.personalInfo": "Personal Info",
-  "accountSettings.users.table.settings.account.userLevels.add": "Add",
+  "accountSettings.users.table.settings.account.userLevels.add": "Add Role",
   "accountSettings.users.table.settings.account.userLevels.add2": "add",
-  "accountSettings.users.table.settings.account.userLevels.remove": "Remove",
-  "accountSettings.users.table.settings.account.userLevels.remove2": "remove",
+  "accountSettings.users.table.settings.account.userLevels.remove": "Remove Role",
+  "accountSettings.users.table.settings.account.userLevels.remove2": "remove the ",
   "accountSettings.users.table.settings.account.authentication.email": "E-mail",
   "accountSettings.users.table.settings.account.authentication.email.change": "Change your email",
   "accountSettings.users.table.settings.account.personalInfo.firstName": "First Name",
@@ -165,7 +169,7 @@
   "accountSettings.users.table.settings.block.confirm1": "Are you sure you want to ",
   "accountSettings.users.table.settings.block.confirm2": " this user?",
   "accountSettings.users.table.settings.block.confirm3": "Are you sure you want to ",
-  "accountSettings.users.table.settings.block.level": "level",
+  "accountSettings.users.table.settings.block.level": " level",
   "accountSettings.users.table.settings.block.to": " to",
   "accountSettings.users.table.settings.block.from": " from",
 
@@ -210,8 +214,8 @@
   "accountSettings.popUp.changeEmailOK.text": "We have sent a confirmation email to the provided address.",
   "accountSettings.popUp.changeUserDataOK.title": "Success!",
   "accountSettings.popUp.changeUserDataOK.text": "Your personal data has been successfully changed.",
-  "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "User level has been removed successfully.",
-  "accountSettings.popUp.changeUserDataOK.userLevelAdded": "User level has been added successfully.",
+  "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "User level has been removed successfully. Please press the 'Refresh data' button or refresh the page to see the changes.",
+  "accountSettings.popUp.changeUserDataOK.userLevelAdded": "User level has been added successfully. Please press the 'Refresh data' button or refresh the page to see the changes.",
   "accountSettings.popUp.changeOtherUserDataOK.text": "The user's personal data has been successfully changed.",
 
   "confirmEmailPage.popUp.confirmEmailOK.title": "Success!",
@@ -304,7 +308,7 @@
   "account.service.admin.account.not.created.exception" : "Admin account creation failed",
   "account.service.admin.remove.own.admin.user.level.exception" : "Cannot remove own admin user level",
   "user_level.no.such.user.level.exception" : "No such user level",
-  "user_level.one.user.level" : "Only one user level is allowed",
+  "user_level.one.user.level" : "User cannot have less than one user level",
   "user_level.client.client_type.unexpected.exception" : "Unexpected client type",
   "user_level.type.duplicated.exception" : "Duplicate user level",
 
@@ -319,7 +323,7 @@
   "account.service.account.email.collision.exception" : "Email collision detected",
   "account.service.account.try_to_block_own.exception" : "Cannot block own account",
   "account.service.email_from_token_null.exception" : "Email from token is null",
-  "token.not.found.exception" : "Token not found",
+  "token.not.found.exception" : "Operation can't be performed due to having not been initialized.",
 
   "account.controller.token.invalid.or.expired" : "Token is invalid or expired",
   "account.controller.uuid.invalid" : "Invalid UUID",

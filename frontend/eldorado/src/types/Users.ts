@@ -53,7 +53,7 @@ export interface ManagedUserType {
     lastName: string
     active: boolean
     blocked: boolean
-    verified: boolean
+    suspended: boolean
     lastSuccessfulLoginTime: string | null
     lastUnsuccessfulLoginTime: string | null
     userLevels: AccountTypeEnum[]

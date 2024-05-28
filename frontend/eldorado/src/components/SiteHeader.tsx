@@ -66,7 +66,7 @@ const SiteHeader = () => {
 
     return (
         <header
-            className={`sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
+            className={`top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
             <nav className="flex items-center gap-4">
                 <a href="/home" className="flex items-center">
                     <img src={eldoLogo} alt="Eldorado" className="h-25 w-8/12"/>
