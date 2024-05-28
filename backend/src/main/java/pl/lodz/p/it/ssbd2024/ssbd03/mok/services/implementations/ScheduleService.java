@@ -139,7 +139,6 @@ public class ScheduleService implements ScheduleServiceInterface {
             try {
                 tokenFacade.removeByAccount(account.getId());
                 accountMOKFacade.remove(account);
-                //TODO hmmm?
             } catch (ApplicationBaseException exception) {
                 log.error("Exception: {} occurred while removing account with id: {}. Cause: {}.",
                         exception.getClass().getSimpleName(), account.getId(), exception.getMessage());

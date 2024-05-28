@@ -595,7 +595,6 @@ public class AccountService implements AccountServiceInterface {
         account.addUserLevel(clientUserLevel);
         userLevelFacade.create(clientUserLevel);
         accountFacade.edit(account);
-        //TODO hmmmm?
 
         mailProvider.sendEmailNotificationAboutGrantedUserLevel(account.getName(),
                 account.getLastname(),
@@ -622,7 +621,6 @@ public class AccountService implements AccountServiceInterface {
         account.addUserLevel(staffUserLevel);
         userLevelFacade.create(staffUserLevel);
         accountFacade.edit(account);
-        //TODO hmmmm?
 
         mailProvider.sendEmailNotificationAboutGrantedUserLevel(account.getName(),
                 account.getLastname(),
@@ -645,7 +643,6 @@ public class AccountService implements AccountServiceInterface {
         account.addUserLevel(adminUserLevel);
         userLevelFacade.create(adminUserLevel);
         accountFacade.edit(account);
-        //TODO hmmmm?
 
         mailProvider.sendEmailNotificationAboutGrantedUserLevel(account.getName(),
                 account.getLastname(),
@@ -674,7 +671,6 @@ public class AccountService implements AccountServiceInterface {
 
         account.removeUserLevel(clientUserLevel);
         accountFacade.edit(account);
-        //TODO hmmmm?
 
         userLevelFacade.remove(clientUserLevel);
 
@@ -703,7 +699,6 @@ public class AccountService implements AccountServiceInterface {
 
         account.removeUserLevel(staffUserLevel);
         accountFacade.edit(account);
-        //TODO hmmmm?
 
         userLevelFacade.remove(staffUserLevel);
 
@@ -740,7 +735,6 @@ public class AccountService implements AccountServiceInterface {
 
         account.removeUserLevel(adminUserLevel);
         accountFacade.edit(account);
-        //TODO hmmmm?
 
         userLevelFacade.remove(adminUserLevel);
 

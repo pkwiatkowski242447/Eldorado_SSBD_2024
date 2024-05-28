@@ -1,7 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.services;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,12 +11,20 @@ import org.springframework.security.test.context.annotation.SecurityTestExecutio
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
@@ -44,9 +50,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @SecurityTestExecutionListeners
@@ -159,6 +176,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void confirmEmailTestSuccessful() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
@@ -171,6 +189,7 @@ public class AccountServiceMockTest {
         when(jwtProvider.extractEmail(decodedTokenVal)).thenReturn("new@email.com");
         doNothing().when(accountMOKFacade).edit(account);
         doNothing().when(tokenFacade).remove(token);
+        doNothing().when(historyDataFacade).create(any(AccountHistoryData.class));
 
         assertTrue(accountService.confirmEmail(tokenVal));
     }
@@ -859,6 +878,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void changePasswordSelfTestSuccessful() throws ApplicationBaseException {
         String currentPassword = "CurrentPassword";
         String newPassword = "NewPassword";
@@ -870,6 +890,7 @@ public class AccountServiceMockTest {
         doNothing().when(accountMOKFacade).edit(account);
         when(encoder.matches(currentPassword, account.getPassword())).thenReturn(true);
         when(encoder.matches(newPassword, account.getPassword())).thenReturn(false);
+        doNothing().when(historyDataFacade).create(any(AccountHistoryData.class));
 
         accountService.changePasswordSelf(currentPassword, newPassword, account.getLogin());
 
@@ -920,6 +941,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void changeAccountPasswordTestSuccessful() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String newPassword = "NewPassword";
@@ -933,6 +955,7 @@ public class AccountServiceMockTest {
         when(encoder.encode(newPassword)).thenReturn(newPassword);
         doNothing().when(tokenFacade).remove(token);
         doNothing().when(accountMOKFacade).edit(account);
+        doNothing().when(historyDataFacade).create(any(AccountHistoryData.class));
 
         accountService.changeAccountPassword(tokenVal, newPassword);
         assertEquals(newPassword, account.getPassword());
@@ -1047,6 +1070,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void modifyAccountTestSuccessful() throws ApplicationBaseException, NoSuchFieldException, IllegalAccessException {
         String newName = "NewName";
         String newLastname = "NewLastName";
@@ -1069,6 +1093,7 @@ public class AccountServiceMockTest {
 
         when(accountMOKFacade.findByLogin(accountNew.getLogin())).thenReturn(Optional.of(accountOld));
         doNothing().when(accountMOKFacade).edit(any(Account.class));
+        doNothing().when(historyDataFacade).create(any(AccountHistoryData.class));
 
         Account resultAccount = accountService.modifyAccount(accountNew, accountNew.getLogin());
 
