@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import SiteHeader from "@/components/SiteHeader.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {
     Pagination,
@@ -94,7 +93,6 @@ function UserManagementPage() {
 
     return (
         <div className="flex min-h-screen w-full flex-col">
-            <SiteHeader/>
             <div className="flex justify-between items-center pt-2">
             <Breadcrumb className={"pl-2"}>
                 <BreadcrumbList>
@@ -134,7 +132,7 @@ function UserManagementPage() {
                             <TableHead
                                 className="text-center">{t("accountSettings.users.table.header.blocked")}</TableHead>
                             <TableHead
-                                className="text-center">{t("accountSettings.users.table.header.verified")}</TableHead>
+                                className="text-center">{t("accountSettings.users.table.header.suspended")}</TableHead>
                             <TableHead
                                 className="text-center">{t("accountSettings.users.table.header.userLevels")}</TableHead>
                             <TableHead className="text-center"></TableHead>

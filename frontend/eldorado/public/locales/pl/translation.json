@@ -115,7 +115,7 @@
   "accountSettings.login": "Login",
   "accountSettings.active": "Aktywny",
   "accountSettings.blocked": "Zablokowany",
-  "accountSettings.verified": "Zweryfikowany",
+  "accountSettings.suspended": "Konto wygaszone",
   "accountSettings.phone": "Telefon",
   "accountSettings.accountLanguage": "Język konta",
   "accountSettings.2fa": "Uwierzytelnianie dwuetapowe",
@@ -131,7 +131,7 @@
   "accountSettings.users.table.header.lastName": "Nazwisko",
   "accountSettings.users.table.header.active": "Aktywny",
   "accountSettings.users.table.header.blocked": "Zablokowany",
-  "accountSettings.users.table.header.verified": "Zweryfikowany",
+  "accountSettings.users.table.header.suspended": "Konto wygaszone",
   "accountSettings.users.table.header.userLevels": "Poziomy użytkownika",
   "accountSettings.users.table.pagination.next": "Następna",
   "accountSettings.users.table.pagination.previous": "Poprzednia",
@@ -176,7 +176,7 @@
   "confirmEmailPage.title": "Prawie gotowe!",
   "confirmEmailPage.info": "Potwierdź zmianę adresu e-mail w Eldorado, klikając przycisk poniżej.",
   "confirmEmailPage.button": "Zmień Email",
-
+  "confirmEmailPage.popUp": "Czy na pewno chcesz zmienić adres e-mail?",
 
   "resetPasswordPage.title": "Zresetuj hasło",
   "resetPasswordPage.info": "Wprowadź nowe hasło",
@@ -185,8 +185,7 @@
   "resetPasswordPage.password": "Hasło",
   "resetPasswordPage.button": "Zmień Hasło",
   "resetPasswordPage.resetPassword": "Czy na pewno chcesz zresetować hasło?",
-
-
+  "resetPasswordPage.popUp": "Czy na pewno chcesz zmienić hasło?",
 
   "activateAccountPage.title": "Już prawie gotowe!",
   "activateAccountPage.info": "Aktywuj swoje konto Eldorado, naciskając przycisk poniżej.",

@@ -1,4 +1,3 @@
-import SiteHeader from "@/components/SiteHeader.tsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,} from "@/components/ui/breadcrumb.tsx";
 
 import {useTranslation} from "react-i18next";
@@ -9,7 +8,6 @@ function HomePage() {
 
     return (
         <div className="flex min-h-screen w-full flex-col">
-            <SiteHeader/>
             <div className="flex justify-between items-center pt-2">
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>

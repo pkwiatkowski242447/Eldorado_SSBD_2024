@@ -105,7 +105,7 @@
   "accountSettings.login": "Login",
   "accountSettings.active": "Active",
   "accountSettings.blocked": "Blocked",
-  "accountSettings.verified": "Verified",
+  "accountSettings.suspended": "Suspended",
     "accountSettings.phone": "Phone",
     "accountSettings.accountLanguage": "Account Language",
     "accountSettings.2fa": "Two Factor Authentication",
@@ -135,7 +135,7 @@
   "accountSettings.users.table.header.lastName": "Last Name",
   "accountSettings.users.table.header.active": "Active",
   "accountSettings.users.table.header.blocked": "Blocked",
-  "accountSettings.users.table.header.verified": "Verfied",
+  "accountSettings.users.table.header.suspended": "Suspended",
   "accountSettings.users.table.header.userLevels": "User Levels",
   "accountSettings.users.table.pagination.next": "Next",
   "accountSettings.users.table.pagination.previous": "Previous",
@@ -178,7 +178,7 @@
   "confirmEmailPage.title": "Almost there!",
   "confirmEmailPage.info": "Confirm the change of your Eldorado email account by pressing the button below.",
   "confirmEmailPage.button": "Change Email",
-
+  "confirmEmailPage.popUp": "Are you sure you want to change your email?",
 
   "resetPasswordPage.title": "Reset Password",
   "resetPasswordPage.info": "Enter your new password",
@@ -187,7 +187,7 @@
   "resetPasswordPage.password": "Password",
   "resetPasswordPage.button": "Change Password",
   "resetPasswordPage.resetPassword": "Are you sure you want to reset the password?",
-
+  "resetPasswordPage.popUp": "Are you sure you want to change your password?",
 
   "activateAccountPage.title": "Almost there!",
   "activateAccountPage.info": "Activate your Eldorado account by pressing the button below.",

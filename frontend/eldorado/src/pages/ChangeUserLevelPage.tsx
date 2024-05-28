@@ -4,7 +4,6 @@ import {z} from "zod";
 import {Button} from "@/components/ui/button";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import SiteHeader from "@/components/SiteHeader.tsx";
 import {Card, CardHeader} from "@/components/ui/card.tsx";
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {useNavigate} from "react-router-dom";
@@ -70,7 +69,6 @@ function ChangeUserLevelPage() {
 
     return (
         <div className="flex min-h-screen w-full flex-col">
-            <SiteHeader/>
             <div className="flex justify-between items-center pt-2">
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>

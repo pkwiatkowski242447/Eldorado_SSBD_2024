@@ -1,5 +1,4 @@
 import {SetStateAction, useEffect, useState} from 'react';
-import SiteHeader from "@/components/SiteHeader.tsx";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
@@ -98,7 +97,7 @@ function UserAccountSettings() {
                     name: response.data.name,
                     phoneNumber: response.data.phoneNumber,
                     userLevelsDto: response.data.userLevelsDto,
-                    verified: response.data.verified,
+                    suspended: response.data.suspended,
                     version: response.data.version,
                     twoFactorAuth: response.data.twoFactorAuth,
                     lastSuccessfulLoginIp: response.data.lastSuccessfulLoginIp,
@@ -337,7 +336,6 @@ function UserAccountSettings() {
 
     return (
         <div>
-            <SiteHeader/>
             <div className="flex justify-between items-center pt-2">
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
@@ -686,7 +684,7 @@ function UserAccountSettings() {
                                             <FiCheck color="green"/> : <FiX color="red"/>}
                                         </p>
                                         <p>
-                                            <strong>{t("accountSettings.verified")}:</strong> {managedUser?.verified ?
+                                            <strong>{t("accountSettings.suspended")}:</strong> {managedUser?.suspended ?
                                             <FiCheck color="green"/> : <FiX color="red"/>}
                                         </p>
                                         <p>

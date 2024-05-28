@@ -13,6 +13,14 @@ import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Loader2} from "lucide-react";
 import {useState} from "react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
 
 
 function ResetPasswordPage() {
@@ -22,6 +30,8 @@ function ResetPasswordPage() {
     const navigate = useNavigate();
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+    const [formValues, setFormValues] = useState(null);
 
     const formSchema = z.object({
         password: z.string().min(8, {message: t("resetPasswordPage.passwordTooShort")})
@@ -35,6 +45,18 @@ function ResetPasswordPage() {
             password: "",
         },
     })
+
+    const onSubmitPassword = (values: z.infer<typeof formSchema>) => {
+        // @ts-expect-error - fix this
+        setFormValues(values);
+        setAlertDialogOpen(true);
+    };
+
+    const handleDialogAction = () => {
+        // @ts-expect-error - fix this
+        onSubmit(formValues)
+        setAlertDialogOpen(false);
+    };
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
@@ -74,7 +96,7 @@ function ResetPasswordPage() {
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                        <form onSubmit={form.handleSubmit(onSubmitPassword)}>
                             <div className="flex flex-col space-y-4">
                                 <div>
                                     <FormField
@@ -106,6 +128,18 @@ function ResetPasswordPage() {
                     </Form>
                 </CardContent>
             </Card>
+            <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t("resetPasswordPage.popUp")}
+                    </AlertDialogDescription>
+                    <AlertDialogAction onClick={handleDialogAction}>
+                        {t("general.ok")}
+                    </AlertDialogAction>
+                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

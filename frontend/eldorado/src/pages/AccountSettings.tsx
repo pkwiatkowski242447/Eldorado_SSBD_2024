@@ -1,5 +1,4 @@
 import {SetStateAction, useEffect, useState} from 'react';
-import SiteHeader from "@/components/SiteHeader.tsx";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
@@ -201,7 +200,6 @@ function AccountSettings() {
 
     return (
         <div>
-            <SiteHeader/>
             <div className="flex justify-between items-center pt-2">
                 <Breadcrumb className="pl-2">
                     <BreadcrumbList>
@@ -557,7 +555,7 @@ function AccountSettings() {
                                             <FiCheck color="green"/> : <FiX color="red"/>}
                                         </p>
                                         <p>
-                                            <strong>{t("accountSettings.verified")}:</strong> {account?.verified ?
+                                            <strong>{t("accountSettings.suspended")}:</strong> {account?.suspended ?
                                             <FiCheck color="green"/> : <FiX color="red"/>}
                                         </p>
                                         <p>
