@@ -433,7 +433,7 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
         assertFalse(accountToEdit2.isEmpty());
 
         //Two not active accounts - now we use reflection to change their creation time
-        Field creationDateField = Account.class.getDeclaredField("creationDate");
+        Field creationDateField = Account.class.getDeclaredField("creationTime");
         creationDateField.setAccessible(true);
 
         List<Account> accounts0 = accountMOKFacade.findAllAccountsMarkedForDeletion(2, TimeUnit.HOURS);

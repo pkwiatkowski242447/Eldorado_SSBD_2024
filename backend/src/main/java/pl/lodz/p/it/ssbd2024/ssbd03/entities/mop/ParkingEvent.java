@@ -2,10 +2,13 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingEventMessages;
@@ -22,6 +25,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = DatabaseConsts.PARKING_EVENT_TABLE)
 @NoArgsConstructor
+@Getter
 public class ParkingEvent extends AbstractEntity implements Serializable {
 
     /**
@@ -41,7 +45,6 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @NotNull(message = ParkingEventMessages.RESERVATION_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
-    @Getter
     @Setter
     private Reservation reservation;
 
@@ -50,8 +53,8 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
      */
     @NotNull(message = ParkingEventMessages.DATE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_DATE_COLUMN, nullable = false, updatable = false)
+    @PastOrPresent(message = ParkingEventMessages.CREATION_TIMESTAMP_FUTURE)
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter
     private LocalDateTime date;
 
     /**
@@ -60,8 +63,16 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
     @NotNull(message = ParkingEventMessages.EVENT_TYPE_NULL)
     @Column(name = DatabaseConsts.PARKING_EVENT_TYPE_COLUMN, nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    @Getter
     private EventType type;
+
+    // Other fields - used for access control, and storing historical data
+
+    /**
+     * Identity of the user creating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATED_BY, updatable = false)
+    private String createdBy;
 
     /**
      *
@@ -87,5 +98,14 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
         return new ToStringBuilder(this)
                 .append(super.toString())
                 .toString();
+    }
+
+    @PrePersist
+    private void beforePersistingToTheDatabase() {
+        this.date = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.createdBy = authentication.getName();
+        }
     }
 }

@@ -7,4 +7,7 @@ public class ParkingMessages {
     public static final String LIST_OF_SECTORS_NULL = "bean.validation.parking.sector.list.null";
     public static final String LIST_OF_SECTORS_EMPTY = "bean.validation.parking.sector.list.empty";
     public static final String LIST_OF_SECTORS_FULL = "bean.validation.parking.sector.list.full";
+
+    public static final String CREATION_TIMESTAMP_FUTURE = "bean.validation.parking.creation.time.from.future";
+    public static final String UPDATE_TIMESTAMP_FUTURE = "bean.validation.parking.update.time.from.future";
 }

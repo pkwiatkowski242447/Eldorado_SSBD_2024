@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -104,7 +103,7 @@ public class ScheduleServiceMockTest {
         Token newToken = new Token("NewTokenValue", account, Token.TokenType.REGISTER);
         Token newToken1 = new Token("NewTokenValue1", account1, Token.TokenType.REGISTER);
 
-        Field creationDateField = Account.class.getDeclaredField("creationDate");
+        Field creationDateField = Account.class.getDeclaredField("creationTime");
         creationDateField.setAccessible(true);
         creationDateField.set(account, LocalDateTime.now().minusHours(13));
         creationDateField.set(account1, LocalDateTime.now().minusHours(13));
@@ -133,7 +132,7 @@ public class ScheduleServiceMockTest {
         Token token1 = new Token("TEST VALUE", account1, Token.TokenType.REGISTER);
         List<Token> tokenList = List.of(token, token1);
 
-        Field creationDateField = Account.class.getDeclaredField("creationDate");
+        Field creationDateField = Account.class.getDeclaredField("creationTime");
         creationDateField.setAccessible(true);
         creationDateField.set(account, LocalDateTime.now());
         creationDateField.set(account1, LocalDateTime.now());

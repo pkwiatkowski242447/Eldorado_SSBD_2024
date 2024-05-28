@@ -41,4 +41,7 @@ public class AccountMessages {
 
     public static final String VERSION_NULL = "bean.validation.account.version.null";
     public static final String VERSION_LESS_THAN_ZERO = "bean.validation.account.version.less.than.zero";
+
+    public static final String CREATION_TIMESTAMP_FUTURE = "bean.validation.account.creation.time.from.future";
+    public static final String UPDATE_TIMESTAMP_FUTURE = "bean.validation.account.update.time.from.future";
 }

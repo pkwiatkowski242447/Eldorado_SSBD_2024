@@ -2,13 +2,12 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
@@ -95,7 +94,7 @@ import java.util.Set;
                 name = "Account.findAllAccountsMarkedForDeletion",
                 query = """
                         SELECT a FROM Account a
-                        WHERE a.active = false AND a.creationDate < :timestamp
+                        WHERE a.active = false AND a.creationTime < :timestamp
                         ORDER BY a.login
                         """
         ),
@@ -164,7 +163,7 @@ import java.util.Set;
                 query = """
                         SELECT a FROM Account a
                         WHERE a.suspended = false
-                          AND ((a.activityLog.lastSuccessfulLoginTime IS NULL AND a.creationDate < :timestamp) OR a.activityLog.lastSuccessfulLoginTime < :timestamp)
+                          AND ((a.activityLog.lastSuccessfulLoginTime IS NULL AND a.creationTime < :timestamp) OR a.activityLog.lastSuccessfulLoginTime < :timestamp)
                         ORDER BY a.login ASC
                         """
         ),
@@ -315,14 +314,40 @@ public class Account extends AbstractEntity {
     @Getter @Setter
     private String phoneNumber;
 
+    // Other fields - used for access control, and storing historical data
+
     /**
-     * Date and time when the account was created.
+     * Time of the creation of the entity object in the database.
+     * Basically, this time is saved when persisting object to the database.
      */
-    @Column(name = DatabaseConsts.ACCOUNT_CREATION_DATE_COLUMN, nullable = false, updatable = false)
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Getter
-    private LocalDateTime creationDate;
+    @Column(name = DatabaseConsts.CREATION_TIMESTAMP, nullable = false, updatable = false)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @PastOrPresent(message = AccountMessages.CREATION_TIMESTAMP_FUTURE)
+    private LocalDateTime creationTime;
+
+    /**
+     * Identity of the user creating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATED_BY, updatable = false)
+    private String createdBy;
+
+    /**
+     * Time of the update of the entity object in the database.
+     * Basically, this time is saved when updating object to the database.
+     */
+    @Column(name = DatabaseConsts.UPDATE_TIMESTAMP)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @PastOrPresent(message = AccountMessages.UPDATE_TIMESTAMP_FUTURE)
+    private LocalDateTime updateTime;
+
+    /**
+     * Identity of the user updating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when updating object in the database.
+     */
+    @Column(name = DatabaseConsts.UPDATED_BY)
+    @Setter
+    private String updatedBy;
 
     /**
      * Constructs new Account entity.
@@ -465,5 +490,23 @@ public class Account extends AbstractEntity {
                 .append(super.toString())
                 .append("Login: ", login)
                 .toString();
+    }
+
+    @PrePersist
+    private void beforePersistingToTheDatabase() {
+        this.creationTime = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.createdBy = authentication.getName();
+        }
+    }
+
+    @PreUpdate
+    private void beforeUpdatingInTheDatabase() {
+        this.updateTime = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.updatedBy = authentication.getName();
+        }
     }
 }

@@ -1175,6 +1175,7 @@ public class AccountServiceMockTest {
 
         when(accountMOKFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));
         when(tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId())).thenReturn(Optional.of(tokenObject));
+        when(jwtProvider.isTokenValid(tokenObject.getTokenValue(), account)).thenReturn(true);
         when(jwtProvider.extractEmail(tokenObject.getTokenValue())).thenReturn(tokenEmail);
         when(tokenProvider.generateEmailChangeToken(account, tokenEmail)).thenReturn(newTokenObject);
         doNothing().when(mailProvider).sendEmailConfirmEmail(eq(account.getName()), eq(account.getLastname()), eq(tokenEmail), anyString(), eq(account.getAccountLanguage()));

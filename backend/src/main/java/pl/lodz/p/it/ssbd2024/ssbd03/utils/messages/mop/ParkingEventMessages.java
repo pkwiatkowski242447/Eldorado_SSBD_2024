@@ -5,4 +5,6 @@ public class ParkingEventMessages {
     public static final String RESERVATION_NULL = "bean.validation.parking.event.parking.null";
     public static final String DATE_NULL = "bean.validation.parking.event.date.null";
     public static final String EVENT_TYPE_NULL = "bean.validation.parking.event.event.type.null";
+
+    public static final String CREATION_TIMESTAMP_FUTURE = "bean.validation.parking.event.creation.time.from.future";
 }

@@ -7,6 +7,11 @@ public class DatabaseConsts {
     public static final String PK_COLUMN = "id";
     public static final String VERSION_COLUMN = "version";
 
+    public static final String CREATION_TIMESTAMP = "creation_timestamp";
+    public static final String UPDATE_TIMESTAMP = "update_timestamp";
+    public static final String CREATED_BY = "created_by";
+    public static final String UPDATED_BY = "updated_by";
+
     public static final String TOKEN_TABLE = "token";
     public static final String TOKEN_TOKEN_TYPE_COLUMN = "type";
     public static final String TOKEN_TOKEN_VALUE_COLUMN = "token_value";
@@ -27,13 +32,11 @@ public class DatabaseConsts {
     public static final String ACCOUNT_BLOCKED_TIME_COLUMN = "blocked_timestamp";
     public static final String ACCOUNT_LANGUAGE_COLUMN = "language";
     public static final String ACCOUNT_PHONE_NUMBER_COLUMN = "phone_number";
-    public static final String ACCOUNT_CREATION_DATE_COLUMN = "creation_date";
 
     public static final String ACCOUNT_LAST_SUCCESSFUL_LOGIN_TIME = "last_successful_login_time";
     public static final String ACCOUNT_LAST_SUCCESSFUL_LOGIN_IP = "last_successful_login_ip";
     public static final String ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_TIME = "last_unsuccessful_login_time";
     public static final String ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_IP = "last_unsuccessful_login_ip";
-
     public static final String UNSUCCESSFUL_LOGIN_COUNTER = "unsuccessful_login_counter";
 
     // public.account_history_data
