@@ -50,6 +50,12 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Roles.STAFF})
+    public void deactivateSector(UUID id) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
     public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }

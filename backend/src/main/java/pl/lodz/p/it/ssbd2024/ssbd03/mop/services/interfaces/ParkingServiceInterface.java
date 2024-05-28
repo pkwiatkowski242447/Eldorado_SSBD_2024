@@ -50,6 +50,14 @@ public interface ParkingServiceInterface {
     void activateSector(UUID id) throws ApplicationBaseException;
 
     /**
+     * Deactivates sector with given id.
+     *
+     * @param id Sector's id.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void deactivateSector(UUID id) throws ApplicationBaseException;
+
+    /**
      * Removes parking from the database by its id.
      *
      * @param id Identifier of the parking to be removed.
