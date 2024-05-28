@@ -12,11 +12,22 @@ export interface UserLevelType {
     version: number
 }
 
+export function localDateTimeToDate(localDateTime: number[]): string {
+    if (localDateTime) {
+        const [year, month, day, hour, minute, second, nanosecond] = localDateTime;
+        const millisecond = Math.floor(nanosecond / 1000000);
+        const date = new Date(year, month - 1, day, hour, minute, second, millisecond);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    } else {
+        return new Date(0).toLocaleString();
+    }
+}
+
 export interface UserType {
     accountLanguage: string
     active: boolean
     blocked: boolean
-    creationDate: Date | null
+    creationDate: string | null
     email: string
     id: string
     lastname: string
@@ -25,12 +36,12 @@ export interface UserType {
     token: string
     phoneNumber: string
     userLevelsDto: UserLevelType[]
-    activeUserLevel: UserLevelType
+    activeUserLevel: UserLevelType | null
     verified: boolean
     version: number
     twoFactorAuth: boolean
-    lastSuccessfulLoginTime: Date | null
-    lastUnsuccessfulLoginTime: Date | null
+    lastSuccessfulLoginTime: string | null
+    lastUnsuccessfulLoginTime: string | null
     lastSuccessfulLoginIp: string | null
     lastUnsuccessfulLoginIp: string | null
 }
@@ -43,7 +54,7 @@ export interface ManagedUserType {
     active: boolean
     blocked: boolean
     verified: boolean
-    lastSuccessfulLoginTime: Date | null
-    lastUnsuccessfulLoginTime: Date | null
+    lastSuccessfulLoginTime: string | null
+    lastUnsuccessfulLoginTime: string | null
     userLevels: AccountTypeEnum[]
 }

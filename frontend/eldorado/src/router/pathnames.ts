@@ -11,6 +11,7 @@ export const Pathnames = {
         confirmEmailChange: '/confirm-email/:token',
     },
     admin: {
+        landingPage: '/',
         userManagement: '/manage-users',
         userAccountSettings: '/manage-users/:id',
         adminCreateUser: '/manage-users/create',
@@ -22,6 +23,7 @@ export const Pathnames = {
 
     },
     loggedIn: {
+        landingPage: '/',
         home: '/home',
         accountSettings: '/account-settings',
         changeUserLevel: '/change-user-level',

@@ -13,7 +13,7 @@ import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useParams} from "react-router-dom";
-import {UserType} from "@/types/Users.ts";
+import {localDateTimeToDate, UserType} from "@/types/Users.ts";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -66,7 +66,48 @@ function UserAccountSettings() {
     useEffect(() => {
         if (id) {
             api.getAccountById(id).then(response => {
-                setManagedUser(response.data);
+
+                let creationDate = null;
+                let lastSuccessfulLoginTime = null;
+                let lastUnsuccessfulLoginTime = null;
+
+                if (response.data.creationDate) {
+                    creationDate = localDateTimeToDate(response.data.creationDate);
+                }
+                if (response.data.lastSuccessfulLoginTime) {
+                    lastSuccessfulLoginTime = localDateTimeToDate(response.data.lastSuccessfulLoginTime);
+                }
+
+                if (response.data.lastUnsuccessfulLoginTime) {
+                    lastUnsuccessfulLoginTime = localDateTimeToDate(response.data.lastUnsuccessfulLoginTime);
+                }
+
+                const managedUser: UserType = {
+                    accountLanguage: response.data.accountLanguage,
+                    active: response.data.active,
+                    blocked: response.data.blocked,
+                    email: response.data.email,
+                    id: response.data.id,
+                    lastname: response.data.lastname,
+                    login: response.data.login,
+                    name: response.data.name,
+                    phoneNumber: response.data.phoneNumber,
+                    userLevelsDto: response.data.userLevelsDto,
+                    verified: response.data.verified,
+                    version: response.data.version,
+                    twoFactorAuth: response.data.twoFactorAuth,
+                    lastSuccessfulLoginIp: response.data.lastSuccessfulLoginIp,
+                    lastUnsuccessfulLoginIp: response.data.lastUnsuccessfulLoginIp,
+                    creationDate: creationDate,
+                    lastSuccessfulLoginTime: lastSuccessfulLoginTime,
+                    lastUnsuccessfulLoginTime: lastUnsuccessfulLoginTime,
+                    token: '',
+                    activeUserLevel: null,
+                };
+                //the token and activeUserLevel are not needed in this context hence null is passed
+
+                setManagedUser(managedUser);
+                console.table(managedUser)
                 window.localStorage.setItem('etag', response.headers['etag']);
             });
         }
@@ -293,25 +334,25 @@ function UserAccountSettings() {
         <div>
             <SiteHeader/>
             <div className="flex justify-between items-center pt-2">
-            <Breadcrumb className={"pl-2"}>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash/>
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/manage-users">{t("breadcrumb.manageUsers")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash/>
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink>{t("breadcrumb.userAccount")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+                <Breadcrumb className={"pl-2"}>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/manage-users">{t("breadcrumb.manageUsers")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink>{t("breadcrumb.userAccount")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
                 <Button onClick={refresh} variant={"ghost"} className="w-auto" disabled={isRefreshing}>
                     {isRefreshing ? (
                         <>
@@ -648,10 +689,10 @@ function UserAccountSettings() {
                                             <FiCheck color="green"/> : <FiX color="red"/>}
                                         </p>
                                         <p>
-                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {managedUser?.lastSuccessfulLoginTime ? managedUser.lastSuccessfulLoginTime.toDateString() : 'N/A'}
+                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {managedUser?.lastSuccessfulLoginTime ? managedUser.lastSuccessfulLoginTime : 'N/A'}
                                         </p>
                                         <p>
-                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {managedUser?.lastUnsuccessfulLoginTime ? managedUser.lastUnsuccessfulLoginTime.toDateString() : 'N/A'}
+                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {managedUser?.lastUnsuccessfulLoginTime ? managedUser.lastUnsuccessfulLoginTime : 'N/A'}
                                         </p>
                                         <p>
                                             <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {managedUser?.lastSuccessfulLoginIp || 'N/A'}

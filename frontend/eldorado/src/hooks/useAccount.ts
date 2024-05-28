@@ -7,7 +7,7 @@ import {useEffect} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import handleApiError from "@/components/HandleApiError.ts";
-import {UserType} from "@/types/Users.ts";
+import {localDateTimeToDate, UserType} from "@/types/Users.ts";
 
 export const useAccount = () => {
 
@@ -85,14 +85,6 @@ export const useAccount = () => {
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
-    }
-
-    function localDateTimeToDate(localDateTime: number[]): Date {
-        if (localDateTime) {
-            const [year, month, day, hour, minute, second, nanosecond] = localDateTime;
-            const millisecond = Math.floor(nanosecond / 1000000);
-            return new Date(year, month - 1, day, hour, minute, second, millisecond);
-        } else return new Date(0);
     }
 
     const getCurrentAccount = async () => {

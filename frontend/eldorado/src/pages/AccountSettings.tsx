@@ -408,7 +408,7 @@ function AccountSettings() {
                                                                             <Input
                                                                                 {...field}
                                                                                 placeholder={account?.name}
-                                                                                />
+                                                                            />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
@@ -558,14 +558,14 @@ function AccountSettings() {
                                             <strong>{t("accountSettings.2fa")}:</strong> {account?.twoFactorAuth ?
                                             <FiCheck color="green"/> : <FiX color="red"/>}
                                         </p>
-                                        {/*<p>*/}
-                                        {/*    <strong>{t("accountSettings.creationDate")}:</strong> {account?.creationDate ? account.creationDate.toDateString() : 'N/A'}*/}
-                                        {/*</p>*/}
                                         <p>
-                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {account?.lastSuccessfulLoginTime ? account.lastSuccessfulLoginTime.toDateString() : 'N/A'}
+                                            <strong>{t("accountSettings.creationDate")}:</strong> {account?.creationDate ? account.creationDate : 'N/A'}
                                         </p>
                                         <p>
-                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {account?.lastUnsuccessfulLoginTime ? account.lastUnsuccessfulLoginTime.toDateString() : 'N/A'}
+                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {account?.lastSuccessfulLoginTime ? account.lastSuccessfulLoginTime : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {account?.lastUnsuccessfulLoginTime ? account.lastUnsuccessfulLoginTime : 'N/A'}
                                         </p>
                                         <p>
                                             <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {account?.lastSuccessfulLoginIp || 'N/A'}
