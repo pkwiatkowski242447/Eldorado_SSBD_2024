@@ -6,6 +6,7 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -13,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.ActivityLog;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAuthenticationException;
@@ -27,6 +26,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivate
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataAuthFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenAuthFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
@@ -61,6 +62,8 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * Facade component used for operations on accounts.
      */
     private final AuthenticationFacade authenticationFacade;
+
+    private final AccountHistoryDataAuthFacade historyDataFacade;
 
     /**
      * Token facade, used for token manipulation in the database.
@@ -102,12 +105,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     @Autowired
     public AuthenticationService(AuthenticationFacade authenticationFacade,
+                                 AccountHistoryDataAuthFacade historyDataFacade,
                                  TokenAuthFacade tokenFacade,
                                  PasswordEncoder passwordEncoder,
                                  MailProvider mailProvider,
                                  JWTProvider jwtProvider,
                                  TokenProvider tokenProvider) {
         this.authenticationFacade = authenticationFacade;
+        this.historyDataFacade = historyDataFacade;
         this.tokenFacade = tokenFacade;
         this.passwordEncoder = passwordEncoder;
         this.mailProvider = mailProvider;
@@ -179,6 +184,13 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         account.setActivityLog(activityLog);
         account.setAccountLanguage(language);
         authenticationFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.LOGIN,
+                authenticationFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
 
         return new AccessAndRefreshTokensDTO(accessToken, refreshTokenObject.getTokenValue());
     }
@@ -200,6 +212,13 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         }
 
         authenticationFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.LOGIN,
+                authenticationFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
     }
 
     @Override
@@ -211,6 +230,13 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
         account.setActivityLog(activityLog);
         authenticationFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.LOGIN,
+                authenticationFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
     }
 
     // Refresh user session method

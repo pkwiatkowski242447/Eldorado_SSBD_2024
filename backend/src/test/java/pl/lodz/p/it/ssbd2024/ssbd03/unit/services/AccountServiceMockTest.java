@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.services;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +29,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedExce
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
@@ -62,6 +65,9 @@ public class AccountServiceMockTest {
     private AccountMOKFacade accountMOKFacade;
 
     @Mock
+    private AccountHistoryDataFacade historyDataFacade;
+
+    @Mock
     private UserLevelFacade userLevelFacade;
 
     @Mock
@@ -74,6 +80,7 @@ public class AccountServiceMockTest {
     private AccountService accountService;
 
     @Test
+    @WithMockUser(username = "login")
     void registerClientTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
         String hashedPassword = "HASHED_PASSWORD";
@@ -83,6 +90,7 @@ public class AccountServiceMockTest {
         Token accountActivationToken = new Token(exampleTokenValue, clientAccount, Token.TokenType.REGISTER);
 
         doNothing().when(accountMOKFacade).create(any(Account.class));
+        doNothing().when(historyDataFacade).create(any());
         when(encoder.encode(password)).thenReturn(hashedPassword);
         when(tokenProvider.generateAccountActivationToken(clientAccount)).thenReturn(accountActivationToken);
         doNothing().when(mailProvider).sendRegistrationConfirmEmail(any(), any(), any(), any(), any());
@@ -99,6 +107,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void registerStaffTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
         String hashedPassword = "HASHED_PASSWORD";
@@ -107,6 +116,7 @@ public class AccountServiceMockTest {
         String exampleTokenValue = "exampleActivationTokenValue";
         Token accountActivationToken = new Token(exampleTokenValue, staffAccount, Token.TokenType.REGISTER);
 
+        doNothing().when(historyDataFacade).create(any());
         doNothing().when(accountMOKFacade).create(any(Account.class));
         when(encoder.encode(password)).thenReturn(hashedPassword);
         when(tokenProvider.generateAccountActivationToken(staffAccount)).thenReturn(accountActivationToken);
@@ -123,6 +133,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void registerAdminTestSuccessful() throws ApplicationBaseException {
         String password = "P@ssw0rd!";
         String hashedPassword = "HASHED_PASSWORD";
@@ -131,6 +142,7 @@ public class AccountServiceMockTest {
         String exampleTokenValue = "exampleActivationTokenValue";
         Token accountActivationToken = new Token(exampleTokenValue, adminAccount, Token.TokenType.REGISTER);
 
+        doNothing().when(historyDataFacade).create(any());
         doNothing().when(accountMOKFacade).create(any(Account.class));
         when(encoder.encode(password)).thenReturn(hashedPassword);
         when(tokenProvider.generateAccountActivationToken(adminAccount)).thenReturn(accountActivationToken);
@@ -259,12 +271,14 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void activateAccountTestSuccessful() throws ApplicationBaseException {
         String tokenVal = "TU9DSyBUT0tFTg==";
         String decodedTokenVal = new String(Base64.getDecoder().decode(tokenVal));
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Token token = new Token(decodedTokenVal, account, Token.TokenType.REGISTER);
 
+        doNothing().when(historyDataFacade).create(any());
         when(tokenFacade.findByTokenValue(decodedTokenVal)).thenReturn(Optional.of(token));
         when(jwtProvider.extractAccountId(decodedTokenVal)).thenReturn(account.getId());
         when(accountMOKFacade.find(account.getId())).thenReturn(Optional.of(account));
@@ -325,11 +339,13 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void blockAccountTestSuccessful() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         UUID id = UUID.randomUUID();
 
+        doNothing().when(historyDataFacade).create(any());
         when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
         doNothing().when(accountMOKFacade).edit(account);
         doNothing().when(mailProvider).sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage(), true);
@@ -340,6 +356,7 @@ public class AccountServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void blockAccountTestBlockedBySystem() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
@@ -347,6 +364,7 @@ public class AccountServiceMockTest {
         account.blockAccount(false);
 
         when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
+        doNothing().when(historyDataFacade).create(any());
         doNothing().when(accountMOKFacade).edit(account);
         doNothing().when(mailProvider).sendBlockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage(), true);
 
@@ -381,13 +399,14 @@ public class AccountServiceMockTest {
         assertThrows(AccountNotFoundException.class, () -> accountService.blockAccount(id));
     }
 
-    @Test
+    @Test@WithMockUser(username = "login")
     void unblockAccountTestSuccessful() throws ApplicationBaseException {
 
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         account.blockAccount(true);
         UUID id = UUID.randomUUID();
 
+        doNothing().when(historyDataFacade).create(any());
         when(accountMOKFacade.findAndRefresh(id)).thenReturn(Optional.of(account));
         doNothing().when(accountMOKFacade).edit(account);
         doNothing().when(mailProvider).sendUnblockAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage());

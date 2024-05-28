@@ -11,28 +11,28 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountRestoreAccessException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.PasswordPreviouslyUsedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
@@ -71,6 +71,8 @@ public class AccountService implements AccountServiceInterface {
      * AccountFacade used for operations on account entities.
      */
     private final AccountMOKFacade accountFacade;
+
+    private final AccountHistoryDataFacade historyDataFacade;
 
     /**
      * PasswordEncoder used for encoding passwords.
@@ -114,6 +116,7 @@ public class AccountService implements AccountServiceInterface {
      */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
+                          AccountHistoryDataFacade historyDataFacade,
                           PasswordEncoder passwordEncoder,
                           TokenFacade tokenFacade,
                           MailProvider mailProvider,
@@ -121,6 +124,7 @@ public class AccountService implements AccountServiceInterface {
                           TokenProvider tokenProvider,
                           UserLevelFacade userLevelFacade) {
         this.accountFacade = accountFacade;
+        this.historyDataFacade = historyDataFacade;
         this.passwordEncoder = passwordEncoder;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
@@ -144,9 +148,17 @@ public class AccountService implements AccountServiceInterface {
         newClientAccount.addUserLevel(clientUserLevel);
 
         this.accountFacade.create(newClientAccount);
+        historyDataFacade.create(new AccountHistoryData(newClientAccount,
+                OperationType.REGISTRATION,
+                accountFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
 
         Token accountActivationToken = tokenProvider.generateAccountActivationToken(newClientAccount);
         tokenFacade.create(accountActivationToken);
+
 
         String encodedTokenValue = new String(Base64.getUrlEncoder().encode(accountActivationToken.getTokenValue().getBytes()));
         String confirmationURL = this.accountCreationConfirmationUrl + encodedTokenValue;
@@ -172,6 +184,13 @@ public class AccountService implements AccountServiceInterface {
         newStaffAccount.addUserLevel(staffUserLevel);
 
         accountFacade.create(newStaffAccount);
+        historyDataFacade.create(new AccountHistoryData(newStaffAccount,
+                OperationType.REGISTRATION,
+                accountFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
 
         Token accountActivationToken = tokenProvider.generateAccountActivationToken(newStaffAccount);
         tokenFacade.create(accountActivationToken);
@@ -200,6 +219,13 @@ public class AccountService implements AccountServiceInterface {
         newAdminAccount.addUserLevel(adminUserLevel);
 
         accountFacade.create(newAdminAccount);
+        historyDataFacade.create(new AccountHistoryData(newAdminAccount,
+                OperationType.REGISTRATION,
+                accountFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
 
         Token accountActivationToken = tokenProvider.generateAccountActivationToken(newAdminAccount);
         tokenFacade.create(accountActivationToken);
@@ -303,6 +329,13 @@ public class AccountService implements AccountServiceInterface {
 
         account.blockAccount(true);
         accountFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.BLOCK,
+                accountFacade.findByLogin(SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName())
+                        .orElse(null)));
 
         // Sending information email
         mailProvider.sendBlockAccountInfoEmail(account.getName(), account.getLastname(),
@@ -319,6 +352,13 @@ public class AccountService implements AccountServiceInterface {
 
         account.unblockAccount();
         accountFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.UNBLOCK,
+                accountFacade.findByLogin(SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName())
+                        .orElse(null)));
 
         // Sending information email
         mailProvider.sendUnblockAccountInfoEmail(account.getName(), account.getLastname(),
@@ -370,6 +410,14 @@ public class AccountService implements AccountServiceInterface {
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
             account.setActive(true);
             accountFacade.edit(account);
+
+            historyDataFacade.create(new AccountHistoryData(account,
+                    OperationType.ACTIVATION,
+                    accountFacade.findByLogin(SecurityContextHolder
+                            .getContext()
+                            .getAuthentication()
+                            .getName()).orElse(null)));
+
             tokenFacade.remove(tokenFromDB);
             mailProvider.sendActivationConfirmationEmail(account.getName(),
                     account.getLastname(),

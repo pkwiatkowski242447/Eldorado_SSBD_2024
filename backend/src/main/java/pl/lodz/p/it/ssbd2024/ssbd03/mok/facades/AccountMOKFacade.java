@@ -214,7 +214,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Roles.AUTHENTICATED, Roles.ANONYMOUS})
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
