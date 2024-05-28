@@ -13,7 +13,8 @@ public enum OperationType {
     UNBLOCK("operation.type.unblock"),
     PASSWORD_CHANGE("operation.type.password.change"),
     EMAIL_CHANGE("operation.type.email.change"),
-    UPDATE("operation.type.update"),
+    SUSPEND("operation.type.suspend"),
+    RESTORE_ACCESS("operation.type.restore.access"),
     PERSONAL_DATA_MODIFICATION("operation.type.personal.data.modification");
 
     private final String operationName;

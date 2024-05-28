@@ -27,7 +27,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstra
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataAuthFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AuthenticationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenAuthFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
@@ -98,6 +97,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * Autowired constructor for the service.
      *
      * @param authenticationFacade Facade used for reading users accounts information for authentication purposes.
+     * @param historyDataFacade    Facade used for inserting information about account modifications to the database.
      * @param tokenFacade          Facade used for inserting, deleting and reading token objects from the database.
      * @param passwordEncoder      Component, responsible for generating hashes for given authentication code, and verifying them.
      * @param jwtProvider          Component, responsible for generating JWT tokens with given content, and for given amount of time.
@@ -183,6 +183,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         activityLog.setUnsuccessfulLoginCounter(0);
         account.setActivityLog(activityLog);
         account.setAccountLanguage(language);
+
         authenticationFacade.edit(account);
         historyDataFacade.create(new AccountHistoryData(account,
                 OperationType.LOGIN,
@@ -229,6 +230,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         activityLog.setLastUnsuccessfulLoginIp(ipAddress);
         activityLog.setLastUnsuccessfulLoginTime(LocalDateTime.now());
         account.setActivityLog(activityLog);
+
         authenticationFacade.edit(account);
         historyDataFacade.create(new AccountHistoryData(account,
                 OperationType.LOGIN,
