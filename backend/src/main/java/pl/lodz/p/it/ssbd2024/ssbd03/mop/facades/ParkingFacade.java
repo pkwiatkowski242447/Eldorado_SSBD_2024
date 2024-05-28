@@ -228,6 +228,15 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
+     * Persists a new Sector to the database.
+     */
+    @Transactional
+    public void createSector(Sector sector) throws ApplicationBaseException {
+        getEntityManager().persist(sector);
+        getEntityManager().flush();
+    }
+
+    /**
      * Removes a sector from the database.
      * This method will not single-handedly remove the sector from database.
      * To remove it you need to additionally update the parking and save changes to database.
