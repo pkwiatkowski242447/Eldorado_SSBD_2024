@@ -7,6 +7,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class AccountUnitTest {
 
     //ACCOUNT DATA
@@ -70,17 +73,17 @@ public class AccountUnitTest {
         testAccount1.setBlocked(false);
         testAccount1.setActive(true);
 
-        Assertions.assertTrue(testAccount1.couldAuthenticate());
+        assertTrue(testAccount1.couldAuthenticate());
 
         testAccount1.setBlocked(false);
         testAccount1.setActive(false);
 
-        Assertions.assertTrue(testAccount1.couldAuthenticate());
+        assertFalse(testAccount1.couldAuthenticate());
 
         testAccount1.setBlocked(true);
         testAccount1.setActive(true);
 
-        Assertions.assertTrue(testAccount1.couldAuthenticate());
+        assertFalse(testAccount1.couldAuthenticate());
     }
 
     @Test
@@ -91,7 +94,7 @@ public class AccountUnitTest {
         testAccount1.setBlocked(true);
         testAccount1.setActive(false);
 
-        Assertions.assertFalse(testAccount1.couldAuthenticate());
+        assertFalse(testAccount1.couldAuthenticate());
     }
 
     @Test
@@ -99,8 +102,8 @@ public class AccountUnitTest {
         Account testAccount1 = new Account(ACCOUNT_LOGIN_NO_1, ACCOUNT_PASSWORD_NO_1, ACCOUNT_NAME_NO_1, ACCOUNT_LASTNAME_NO_1,
                 ACCOUNT_EMAIL_NO_1, ACCOUNT_PHONE_NUMBER_NO_1);
 
-        Assertions.assertFalse(testAccount1.equals(null));
-        Assertions.assertFalse(testAccount1.equals("String"));
+        assertFalse(testAccount1.equals(null));
+        assertFalse(testAccount1.equals("String"));
 
     }
 }

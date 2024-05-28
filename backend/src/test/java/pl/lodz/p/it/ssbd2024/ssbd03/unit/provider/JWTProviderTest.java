@@ -414,7 +414,7 @@ public class JWTProviderTest {
         UUID exampleId = UUID.randomUUID();
         String exampleLogin = "exampleLogin";
         long exampleVersion = 10L;
-        boolean exampleVerified = true;
+        boolean exampleSuspended = true;
         boolean exampleActive = true;
         boolean exampleBlocked = false;
         boolean twoFactorAuth = true;
@@ -433,7 +433,7 @@ public class JWTProviderTest {
                 exampleVersion,
                 setOfUserLevelDTO,
                 exampleId,
-                exampleVerified,
+                exampleSuspended,
                 exampleActive,
                 exampleBlocked,
                 twoFactorAuth,

@@ -54,9 +54,9 @@ public class ScheduleService implements ScheduleServiceInterface {
 
     /**
      * String value that specifies time after which deletion will occur.
-     * Deletion time is specified by <code>scheduler.not_verified_account_delete_time</code> property.
+     * Deletion time is specified by <code>scheduler.not_active_account_delete_time</code> property.
      */
-    @Value("${scheduler.not_verified_account_delete_time}")
+    @Value("${scheduler.not_active_account_delete_time}")
     private String deleteTime;
 
     /**
@@ -81,6 +81,13 @@ public class ScheduleService implements ScheduleServiceInterface {
     private int resendRegistrationConfirmationEmailAfterHours;
 
     /**
+     * String value that specifies the number of days after which the account will be blocked.
+     * Number of days is specified by <code>scheduler.max_days_without_authentication</code> property.
+     */
+    @Value("${scheduler.max_days_without_authentication}")
+    private String maxDaysWithoutAuthentication;
+
+    /**
      * Autowired constructor for the service.
      *
      * @param accountMOKFacade Facade used for managing user accounts.
@@ -102,8 +109,8 @@ public class ScheduleService implements ScheduleServiceInterface {
 
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void deleteNotVerifiedAccount() {
-        log.info("Method: deleteNotVerifiedAccount(), used for removing not activated accounts, was invoked.");
+    public void deleteNotActivatedAccounts() {
+        log.info("Method: deleteNotActivatedAccount(), used for removing not activated accounts, was invoked.");
 
         List<Account> inactiveAccounts = new ArrayList<>();
         try {
@@ -198,13 +205,46 @@ public class ScheduleService implements ScheduleServiceInterface {
                 accountMOKFacade.edit(account);
             } catch (ApplicationBaseException exception) {
                 log.error("Exception of type: {} was throw while activating user: {} after it was blocked for {} hours.",
-                        exception.getClass().getSimpleName(), account.getLogin(), this.deleteTime);
+                        exception.getClass().getSimpleName(), account.getLogin(), this.unblockTime);
             }
 
             mailProvider.sendUnblockAccountInfoEmail(account.getName(),
                     account.getLastname(),
                     account.getEmail(),
                     account.getAccountLanguage());
+        }));
+    }
+
+    @Override
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    public void suspendAccountWithoutAuthenticationForSpecifiedTime() {
+        log.info("Method: suspendAccountWithoutAuthenticationForSpecifiedTime() was invoked.");
+
+        List<Account> accountsToSuspend = new ArrayList<>();
+        try {
+            accountsToSuspend = accountMOKFacade.findAllAccountsWithoutRecentActivity(LocalDateTime.now().minus(Long.parseLong(maxDaysWithoutAuthentication), TimeUnit.DAYS.toChronoUnit()));
+        } catch (NumberFormatException | ApplicationBaseException exception) {
+            log.error("Exception: {} occurred while searching for accounts to be suspended. Cause: {}.",
+                    exception.getClass().getSimpleName(), exception.getMessage());
+        }
+
+        if (accountsToSuspend.isEmpty()) {
+            log.info("There are no account to be suspended right now.");
+            return;
+        }
+
+        log.info("List of identifiers of accounts to be suspended: {}", accountsToSuspend.stream().map(Account::getId).toList());
+
+        accountsToSuspend.forEach((account -> {
+            account.setSuspended(true);
+            try {
+                accountMOKFacade.edit(account);
+            } catch (ApplicationBaseException exception) {
+                log.error("Exception of type: {} was throw while suspending user: {}.",
+                        exception.getClass().getSimpleName(), account.getLogin());
+            }
+
+            //TODO mail handle
         }));
     }
 }

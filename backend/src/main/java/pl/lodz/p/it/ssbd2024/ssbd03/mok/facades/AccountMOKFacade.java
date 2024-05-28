@@ -372,57 +372,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     }
 
     /**
-     * This method is used to find all active users accounts with unverified email address after setting a new one.
-     *
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List of all active users accounts with unverified email address. If persistence exception is thrown, then
-     * empty list will be returned.
-     */
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllActiveAccountsWithUnverifiedEmailWithPagination(
-            int pageNumber, int pageSize) throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
-            findAllAccountsWithUnverifiedEmailQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setMaxResults(pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("verified", false);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("active", true);
-            List<Account> list = findAllAccountsWithUnverifiedEmailQuery.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to find all inactive users accounts with unverified email address. This could happen after user
-     * account is created and yet not activated.
-     *
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List of all active users accounts with unverified email address. If persistence exception is thrown, then
-     * empty list will be returned.
-     */
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllInactiveAccountsWithUnverifiedEmailWithPagination(
-            int pageNumber, int pageSize) throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccountsWithUnverifiedEmailQuery = entityManager.createNamedQuery("Account.findAllAccountsByVerifiedAndActiveInAscOrder", Account.class);
-            findAllAccountsWithUnverifiedEmailQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setMaxResults(pageSize);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("verified", false);
-            findAllAccountsWithUnverifiedEmailQuery.setParameter("active", false);
-            List<Account> list = findAllAccountsWithUnverifiedEmailQuery.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
      * Retrieve accounts that match the given parameters.
      *
      * @param login      Account's login. The phrase will be sought in logins.
@@ -468,19 +417,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @param lastSuccessfulLogin Date and time, which account activity is checked from. If there are no successful
      *                            login attempts from that date and time, then account is considered without recent activity.
-     * @param pageNumber          Number of the page to retrieve.
-     * @param pageSize            Number of results per page.
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
-    @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsWithoutRecentActivityWithPagination(
-            LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
+    //TODO RolesAllowed
+    public List<Account> findAllAccountsWithoutRecentActivity(
+            LocalDateTime lastSuccessfulLogin) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.findAccountsWithoutAnyActivityFrom", Account.class);
-            findAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);
-            findAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
-            findAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
+            findAllAccountsWithoutRecentActivityQuery.setParameter("timestamp", lastSuccessfulLogin);
             List<Account> list = findAllAccountsWithoutRecentActivityQuery.getResultList();
             super.refreshAll(list);
             return list;
@@ -494,18 +438,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *
      * @param lastSuccessfulLogin Date and time, which account activity is checked from. If there are no successful
      *                            login attempts from that date and time, then account is considered without recent activity.
-     * @param pageNumber          Number of the page to retrieve.
-     * @param pageSize            Number of results per page.
      * @return Optional containing a number of inactive users accounts in the system. In case of persistence exception
      * empty optional is returned.
      */
     @RolesAllowed({Roles.ADMIN})
     public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(
-            LocalDateTime lastSuccessfulLogin, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
+            LocalDateTime lastSuccessfulLogin, boolean active) throws ApplicationBaseException {
         try {
             TypedQuery<Long> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Long.class);
-            countAllAccountsWithoutRecentActivityQuery.setFirstResult(pageNumber * pageSize);
-            countAllAccountsWithoutRecentActivityQuery.setMaxResults(pageSize);
             countAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
             countAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
             return Optional.of(countAllAccountsWithoutRecentActivityQuery.getSingleResult());

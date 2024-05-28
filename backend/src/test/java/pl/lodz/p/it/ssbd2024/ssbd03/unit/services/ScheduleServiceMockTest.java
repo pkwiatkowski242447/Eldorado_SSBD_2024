@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.ScheduleService;
@@ -59,7 +58,7 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
-    void deleteNotVerifiedTestSuccessful() throws Exception {
+    void deleteNotSuspendedTestSuccessful() throws Exception {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         List<Account> accountList = List.of(account, account1);
@@ -68,26 +67,26 @@ public class ScheduleServiceMockTest {
         doNothing().when(tokenFacade).removeByAccount(null);
         doNothing().when(accountMOKFacade).remove(any(Account.class));
 
-        scheduleService.deleteNotVerifiedAccount();
+        scheduleService.deleteNotActivatedAccounts();
 
         verify(accountMOKFacade, times(1)).remove(account);
         verify(accountMOKFacade, times(1)).remove(account1);
     }
 
     @Test
-    void deleteNotVerifiedTestUnsuccessful() throws Exception {
+    void deleteNotActiveTestUnsuccessful() throws Exception {
         when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenThrow(NumberFormatException.class);
 
-        assertDoesNotThrow(() -> scheduleService.deleteNotVerifiedAccount());
+        assertDoesNotThrow(() -> scheduleService.deleteNotActivatedAccounts());
     }
 
     @Test
-    void deleteNotVerifiedTestEmpty() throws Exception {
+    void deleteNotActiveTestEmpty() throws Exception {
         List<Account> accountList = new ArrayList<>();
 
         when(accountMOKFacade.findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS)).thenReturn(accountList);
 
-        scheduleService.deleteNotVerifiedAccount();
+        scheduleService.deleteNotActivatedAccounts();
 
         verify(accountMOKFacade, times(1)).findAllAccountsMarkedForDeletion(24L, TimeUnit.HOURS);
     }
