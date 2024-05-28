@@ -22,6 +22,17 @@ public interface ReservationServiceInterface {
      */
     List<Reservation> getAllActiveReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException;
 
+    /***
+     * Get all historical reservations for client
+     *
+     * @param pageNumber Number of the page, which reservations will be retrieved from.
+     * @param pageSize   Number of reservations per page.
+     * @return List of historical reservations for client.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException;
+
     /**
      * Create new reservation linking client and sector.
      *

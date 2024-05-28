@@ -28,6 +28,21 @@ public interface ReservationControllerInterface {
                                     @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
+     * This method is used to find all historical reservations in system, using pagination.
+     *
+     * @param pageNumber Number of the page, which reservations will be retrieved from.
+     * @param pageSize   Number of reservations per page.
+     * @return It returns HTTP response 200 OK with all historical reservation list.
+     *         It returns HTTP response 204 NO CONTENT when list is empty.
+     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/historical/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllHistoricalReservationSelf(@RequestParam("pageNumber") int pageNumber,
+                                    @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+
+    /**
      * This endpoint allows the client to reserve a place in the chosen sector.
      *
      * @param makeReservationDTO Data transfer object, containing the chosen sector id, the start time and
