@@ -559,4 +559,51 @@ public interface AccountControllerInterface {
     })
     ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id)
             throws ApplicationBaseException;
+
+    // Restore access to user account methods
+
+    /**
+     * This endpoint is used to restore access to the user account, which was blocked for not being active in
+     * the application for given amount of time. It basically generates restore access token, and sends the restore
+     * URL to the e-mail address of the user.
+     *
+     * @param accountEmailDTO Data transfer object containing unauthenticated user e-mail address, used for restoring
+     *                        access to the user account, which was blocked for not being active too long.
+     * @return 204 NO CONTENT if entire process of sending restore message is successful. Otherwise, 400 BAD REQUEST could
+     * be returned (when account is either blocked, is active or account with given e-mail could not be found).
+     * 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/restore-access")
+    @Operation(summary = "Generate account access restore token.", description = "The endpoint is used to generate access restore token, that is to send e-mail message with access restore URL.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The restore access URL has been sent to the user's e-mail address."),
+            @ApiResponse(responseCode = "400", description = "The account is blocked, is activated or the account with given e-mail has not been found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> sendAccountRestorationEmailMessage(@RequestBody AccountEmailDTO accountEmailDTO)
+            throws ApplicationBaseException;
+
+    /**
+     * This endpoint is used to restore access to the user account, which was blocked for not being active in
+     * the application for given amount of time. It basically searches for access restore token, removes it and then
+     * changes status of the account from inactive to active, which user can authenticate after.
+     *
+     * @param tokenValue Value of the access restore token, used for finishing account access restoration process.
+     * @return 204 NO CONTENT if entire process of sending restore message is successful. Otherwise, 400 BAD REQUEST could
+     * be returned (when account is either blocked, is active or account with given e-mail could not be found).
+     * 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/restore-token/{token}")
+    @Operation(summary = "Use generated token to restore access to the account.", description = "The endpoint is used to use restore token in the user to restore access to the account.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Account access restoration process was successful."),
+            @ApiResponse(responseCode = "400", description = "The account is blocked, is activated or the account with given e-mail has not been found."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> restoreAccountAccess(@PathVariable("token") String tokenValue)
+            throws ApplicationBaseException;
 }

@@ -59,7 +59,8 @@ public class Token extends AbstractEntity {
         REGISTER,
         RESET_PASSWORD,
         CONFIRM_EMAIL,
-        CHANGE_OVERWRITTEN_PASSWORD
+        CHANGE_OVERWRITTEN_PASSWORD,
+        RESTORE_ACCESS_TOKEN
     }
 
     /**

@@ -79,6 +79,66 @@ public class MailProvider {
     }
 
     /**
+     * This method is used to send e-mail message that will contain URL used
+     * for restoring access to the account, which was blocked for not being active too long.
+     *
+     * @param firstName       User's first name.
+     * @param lastName        User's last name.
+     * @param emailReceiver   E-mail address to which the message will be sent.
+     * @param confirmationURL URL used to restore access to the account creation.
+     * @param language        Language of the message.
+     */
+    public void sendAccountAccessRestoreEmailMessage(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("link-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.RESTORE_ACCESS_CODE_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.RESTORE_ACCESS_CODE_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.RESTORE_ACCESS_CODE_ACTION_DESCRIPTION, language))
+                    .replace("$action_link", confirmationURL)
+                    .replace("$note_title", I18n.getMessage(I18n.RESTORE_ACCESS_CODE_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.RESTORE_ACCESS_CODE_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending account access restore message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
+        }
+    }
+
+    /**
+     * This method is used to send e-mail message containing confirmation for
+     * restoring access to the user account.
+     *
+     * @param firstName       User's first name.
+     * @param lastName        User's last name.
+     * @param emailReceiver   E-mail address to which the message will be sent.
+     * @param language        Language of the message.
+     */
+    public void sendAccountAccessRestoreInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException(MailProviderMessages.EMAIL_TEMPLATE_NOT_FOUND_EXCEPTION))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.RESTORE_ACCESS_CONFIRM_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.RESTORE_ACCESS_CONFIRM_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.RESTORE_ACCESS_CONFIRM_ACTION_DESCRIPTION, language))
+                    .replace("$note_title", I18n.getMessage(I18n.RESTORE_ACCESS_CONFIRM_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.RESTORE_ACCESS_CONFIRM_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending account access restore e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
+        }
+    }
+
+    /**
      * Sends an account blocking notification e-mail to the specified e-mail address.
      *
      * @param firstName     User's first name.

@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
+
 /**
  * Interface used for managing execution of scheduled tasks.
  */
@@ -7,9 +9,9 @@ public interface ScheduleServiceInterface {
 
     /**
      * Removes Accounts which have not finished registration.
-     * Time for the Account verification is set by <code>scheduler.not_verified_account_delete_time</code> property.
+     * Time for the Account verification is set by <code>scheduler.not_active_account_delete_time</code> property.
      */
-    void deleteNotVerifiedAccount();
+    void deleteNotActivatedAccounts();
 
     /**
      * This method will be invoked every hour in order to check if half the time to active registered account has passed.
@@ -22,4 +24,11 @@ public interface ScheduleServiceInterface {
      * Time for the Account blockade is set by <code>scheduler.blocked_account_unblock_time</code> property.
      */
     void unblockAccount();
+
+    /**
+     * Block Accounts without authentication for the last N days, where N is specified in the file consts.properties.
+     *
+     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
+     */
+    void suspendAccountWithoutAuthenticationForSpecifiedTime() throws ScheduleBadPropertiesException;
 }

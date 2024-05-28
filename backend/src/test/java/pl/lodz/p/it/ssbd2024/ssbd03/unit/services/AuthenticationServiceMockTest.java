@@ -305,6 +305,8 @@ public class AuthenticationServiceMockTest {
     @Test
     public void refreshUserSessionTestPositive() throws ApplicationBaseException {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        account.setActive(true);
+
         String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
         String newExampleRefreshTokenValue = "newExampleRefreshTokenNo1";
         String newExampleAccessTokenValue = "newExampleAccessTokenNo1";
@@ -359,6 +361,7 @@ public class AuthenticationServiceMockTest {
     @Test
     public void refreshUserSessionTestNegativeTokenNotValid() throws Exception {
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
+        account.setActive(true);
         String exampleRefreshTokenValue = "exampleRefreshTokenNo1";
         Token refreshTokenObject = new Token(exampleRefreshTokenValue, account, Token.TokenType.REFRESH_TOKEN);
         when(authenticationFacade.findByLogin(account.getLogin())).thenReturn(Optional.of(account));

@@ -30,4 +30,10 @@ public class ReservationController implements ReservationControllerInterface {
     public ResponseEntity<?> cancelReservation(String id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
+
+    @Override
+    @RolesAllowed({Roles.CLIENT})
+    public ResponseEntity<?> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
 }

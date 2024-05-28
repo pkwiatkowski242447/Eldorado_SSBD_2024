@@ -8,7 +8,7 @@ public class AccountListMapper {
     static public AccountListDTO toAccountListDTO(Account a) {
         return new AccountListDTO(a.getId(), a.getLogin(), a.getName(),
                 a.getLastname(), a.getActive(), a.getBlocked(),
-                a.getVerified(), a.getActivityLog().getLastSuccessfulLoginTime(),
+                a.getSuspended(), a.getActivityLog().getLastSuccessfulLoginTime(),
                 a.getActivityLog().getLastUnsuccessfulLoginTime(),
                 a.getUserLevels().stream().map(userLevel -> userLevel.getClass().getSimpleName()).toList());
     }
