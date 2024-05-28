@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
-public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
+public class AccountMOKFacadeIT extends TestcontainersConfig {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -97,6 +98,12 @@ public class AccountMOKFacadeIntegrationTest extends TestcontainersConfig {
     private final UserLevel accountUserLevelClientNo1 = new Client();
     private final UserLevel accountUserLevelStaffNo1 = new Staff();
     private final UserLevel accountUserLevelAdminNo1 = new Admin();
+
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void AccountMOKFacadeGetEntityManagerReturnsNotNullTestPositive() {
+        Assertions.assertNotNull(accountMOKFacade.getEntityManager());
+    }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)

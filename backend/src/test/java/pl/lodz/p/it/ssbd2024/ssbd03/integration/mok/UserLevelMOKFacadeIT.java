@@ -20,7 +20,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
@@ -33,7 +32,7 @@ import java.util.UUID;
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
-public class UserLevelMOKFacadeIntegrationTest extends TestcontainersConfig {
+public class UserLevelMOKFacadeIT extends TestcontainersConfig {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

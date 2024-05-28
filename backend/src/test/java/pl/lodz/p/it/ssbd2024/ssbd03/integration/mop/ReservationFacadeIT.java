@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
-public class ReservationFacadeIntegrationTest extends TestcontainersConfig {
+public class ReservationFacadeIT extends TestcontainersConfig {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

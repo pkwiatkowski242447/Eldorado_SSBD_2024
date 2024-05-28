@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
-public class ParkingEventFacadeIntegrationTest extends TestcontainersConfig {
+public class ParkingEventFacadeIT extends TestcontainersConfig {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

@@ -10,15 +10,8 @@ import org.testcontainers.utility.MountableFile;
 @Testcontainers
 public class TestcontainersConfig {
 
-//    static final String testDBName = "testDB";
-
     @Container
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16")
-//            .withCreateContainerCmdModifier(cmd -> {
-//                        cmd.withName(testDBName);
-//                        cmd.withHostName(testDBName);
-//                    }
-//            )
             .withUsername("postgres")
             .withPassword("postgres")
             .withDatabaseName("postgres")

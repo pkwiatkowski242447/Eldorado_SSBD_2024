@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
-public class TokenMOKFacadeIntegrationTest extends TestcontainersConfig {
+public class TokenMOKFacadeIT extends TestcontainersConfig {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
