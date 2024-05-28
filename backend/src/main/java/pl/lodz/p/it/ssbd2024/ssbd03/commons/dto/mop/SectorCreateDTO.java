@@ -1,7 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop;
 
-import java.util.UUID;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,8 +15,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @AllArgsConstructor
 public class SectorCreateDTO {
 
-    @Schema(description = "Identifier of parking to which the sector will be added", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", requiredMode = Schema.RequiredMode.REQUIRED)
-    private UUID parkingId;
     @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)

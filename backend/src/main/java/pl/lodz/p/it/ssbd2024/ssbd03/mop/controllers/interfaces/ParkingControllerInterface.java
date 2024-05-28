@@ -42,8 +42,8 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @PostMapping
-    ResponseEntity<?> createSector(@RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
+    @PostMapping(value = "/{id}/sectors")
+    ResponseEntity<?> createSector(@PathVariable("id") String parkingId, @RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
 
     /**
      * This method is used to find all parking spaces in system, using pagination.
@@ -58,7 +58,7 @@ public interface ParkingControllerInterface {
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
-                                    @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+                                                  @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
      * This method is used to find sector by id.
@@ -81,8 +81,8 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/parking/{id}/sectors", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> getSectorsByParkingId(@PathVariable("id") String id) throws ApplicationBaseException;
+    @GetMapping(value = "/{id}/sectors", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getSectorsByParkingId(@PathVariable("id") String parkingId) throws ApplicationBaseException;
 
     /**
      * This method is used to find parking by id.
@@ -93,7 +93,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/parking/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
@@ -132,7 +132,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @DeleteMapping(value = "/parking/{id}")
+    @DeleteMapping(value = "/{id}")
     ResponseEntity<?> removeParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
@@ -179,7 +179,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @PostMapping(value = "/parking")
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> editParking(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                   @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException;
 
@@ -194,7 +194,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @PostMapping(value = "/sector")
+    @PutMapping(value = "/sectors", consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> editSector(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                  @Valid @RequestBody SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException;
 
@@ -213,17 +213,17 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> removeSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
-     * This method is used to find all available parkings.
+     * This method is used to find all available parking.
      *
      * @param pageNumber          Number of the page to retrieve.
      * @param pageSize            Number of results per page.
-     * @return It returns HTTP response 200 OK with all available parkings if these parkings exist.
-     * If there are no available parkings returns 204.
+     * @return It returns HTTP response 200 OK with all available parking if these parking exist.
+     * If there are no available parking returns 204.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/parking/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
+    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * This method is used to end the parking spot allocation.
