@@ -73,6 +73,12 @@ public class ParkingService implements ParkingServiceInterface {
     }
 
     @Override
+    @RolesAllowed({Roles.STAFF})
+    public void removeSectorById(UUID id) throws ApplicationBaseException{
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
     public List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);

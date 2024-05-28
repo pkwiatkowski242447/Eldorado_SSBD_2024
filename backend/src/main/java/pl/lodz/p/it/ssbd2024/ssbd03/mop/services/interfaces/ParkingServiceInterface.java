@@ -78,6 +78,14 @@ public interface ParkingServiceInterface {
     AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException;
 
     /**
+     * Removes sector from the database by its id.
+     *
+     * @param id Identifier of the sector to be removed.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void removeSectorById(UUID id) throws ApplicationBaseException;
+
+    /**
      * Retrieves all parkings that are available from the database.
      *
      * @param pageNumber          Number of the page to retrieve.
