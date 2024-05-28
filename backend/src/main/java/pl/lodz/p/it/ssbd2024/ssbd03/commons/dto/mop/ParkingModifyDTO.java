@@ -51,6 +51,9 @@ public class ParkingModifyDTO {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("ParkingId: ", parkingId)
+                .append("city: ", city)
+                .append("zipCode: ", zipCode)
+                .append("street: ", street)
                 .toString();
     }
 }
