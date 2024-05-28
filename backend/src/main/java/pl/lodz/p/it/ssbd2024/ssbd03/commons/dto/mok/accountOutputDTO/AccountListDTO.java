@@ -24,7 +24,7 @@ public class AccountListDTO {
     private String lastName;
     private boolean active;
     private boolean blocked;
-    private boolean verified;
+    private boolean suspended;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     private LocalDateTime lastSuccessfulLoginTime;

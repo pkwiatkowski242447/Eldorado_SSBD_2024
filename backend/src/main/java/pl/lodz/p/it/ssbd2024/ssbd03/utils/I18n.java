@@ -11,7 +11,9 @@ public class I18n {
     public static final String ACCOUNT_ID_NOT_FOUND = "account.with.given.id.not.found.exception";
     public static final String ACCOUNT_BLOCKED_EXCEPTION = "account.status.blocked.exception";
     public static final String ACCOUNT_INACTIVE_EXCEPTION = "account.status.inactive.exception";
+    public static final String ACCOUNT_SUSPENDED_EXCEPTION = "account.status.suspended.exception";
     public static final String ACCOUNT_AUTHENTICATION_EXCEPTION = "account.authentication.exception";
+    public static final String ACCOUNT_RESTORE_ACCESS_EXCEPTION = "account.restore.access.exception";
 
     // Account reset own password exceptions
     public static final String SET_NEW_PASSWORD_IS_THE_SAME_AS_CURRENT_ONE = "account.reset.password.same.passwords.exception";
@@ -54,9 +56,7 @@ public class I18n {
     // Account service
     public static final String INVALID_LOGIN_ATTEMPT_EXCEPTION = "account.service.invalid.login.attempt.exception";
     public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "account.service.account.not.found.exception";
-    public static final String ACCOUNT_CONSTRAINT_VALIDATION_EXCEPTION = "account.service.account.constraint.validation.exception";
     public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
-    public static final String ACCOUNT_EMAIL_COLLISION_EXCEPTION = "account.service.account.email.collision.exception";
     public static final String ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION = "account.service.account.try_to_block_own.exception";
     public static final String ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION = "account.service.email_from_token_null.exception";
     public static final String TOKEN_NOT_FOUND_EXCEPTION = "token.not.found.exception";
@@ -79,6 +79,18 @@ public class I18n {
     public static final String CONFIRM_REGISTER_RESULT_MESSAGE = "mail.confirm.register.result_message";
     public static final String CONFIRM_REGISTER_ACTION_DESCRIPTION = "mail.confirm.register.action_description";
     public static final String CONFIRM_REGISTER_NOTE_TITLE = "mail.confirm.register.note_title";
+
+    public static final String RESTORE_ACCESS_CODE_GREETING_MESSAGE = "mail.restore.access.code.greeting.message";
+    public static final String RESTORE_ACCESS_CODE_MESSAGE_SUBJECT = "mail.restore.access.code.message.subject";
+    public static final String RESTORE_ACCESS_CODE_RESULT_MESSAGE = "mail.restore.access.code.result_message";
+    public static final String RESTORE_ACCESS_CODE_ACTION_DESCRIPTION = "mail.restore.access.code.action_description";
+    public static final String RESTORE_ACCESS_CODE_NOTE_TITLE = "mail.restore.access.code.note_title";
+
+    public static final String RESTORE_ACCESS_CONFIRM_GREETING_MESSAGE = "mail.restore.access.confirm.greeting.message";
+    public static final String RESTORE_ACCESS_CONFIRM_MESSAGE_SUBJECT = "mail.restore.access.confirm.message.subject";
+    public static final String RESTORE_ACCESS_CONFIRM_RESULT_MESSAGE = "mail.restore.access.confirm.result_message";
+    public static final String RESTORE_ACCESS_CONFIRM_ACTION_DESCRIPTION = "mail.restore.access.confirm.action_description";
+    public static final String RESTORE_ACCESS_CONFIRM_NOTE_TITLE = "mail.restore.access.confirm.note_title";
 
     public static final String LOGIN_AUTHENTICATION_CODE_GREETING_MESSAGE = "mail.login.auth.code.greeting.message";
     public static final String LOGIN_AUTHENTICATION_CODE_MESSAGE_SUBJECT = "mail.login.auth.code.message.subject";

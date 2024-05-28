@@ -28,7 +28,7 @@ GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.token          TO ssbd03mok
 
 -- INSERT VALUE
 -- Admin
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'jerzybem', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '111111111', current_timestamp, 0, false);
+INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'jerzybem', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '111111111', current_timestamp, 0, false);
 INSERT INTO public.past_password (account_id, past_password) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa');
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 'Jerzy', 'Bem', 'jerzybem@spoko.pl');
 
@@ -41,7 +41,7 @@ INSERT INTO public.user_level (id, level, account_id, version) VALUES ('9ba0d086
 INSERT INTO public.staff_data (id) VALUES ('9ba0d086-edec-475d-8569-69156e79be9d');
 
 -- Staff
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('e0bf979b-6b42-432d-8462-544d88b1ab5f', 'kamilslimak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '222222222', current_timestamp, 0, false);
+INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('e0bf979b-6b42-432d-8462-544d88b1ab5f', 'kamilslimak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '222222222', current_timestamp, 0, false);
 INSERT INTO public.past_password (account_id, past_password) VALUES ('e0bf979b-6b42-432d-8462-544d88b1ab5f', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa');
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('e0bf979b-6b42-432d-8462-544d88b1ab5f', 'Kamil', 'Slimak', 'kamilslimak1@spoko.pl');
 
@@ -49,7 +49,7 @@ INSERT INTO public.user_level (id, level, account_id, version) VALUES ('2488831d
 INSERT INTO public.staff_data (id) VALUES ('2488831d-c7c4-4f61-b48a-3be87364271f');
 
 -- First Client
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'michalkowal', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000000', current_timestamp, 0, false);
+INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'michalkowal', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000000', current_timestamp, 0, false);
 INSERT INTO public.past_password (account_id, past_password) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa');
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'Michal', 'Kowalski', 'michalkowal@spoko.pl');
 
@@ -57,7 +57,7 @@ INSERT INTO public.user_level (id, level, account_id, version) VALUES ('69507c7f
 INSERT INTO public.client_data (id, type) VALUES ('69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'BASIC');
 
 -- Second Client
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'jakubkoza', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000001', current_timestamp, 0, false);
+INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'jakubkoza', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000001', current_timestamp, 0, false);
 INSERT INTO public.past_password (account_id, past_password) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa');
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'Jakub', 'Koza', 'jakubkoza@adresik.net');
 
@@ -65,7 +65,7 @@ INSERT INTO public.user_level (id, level, account_id, version) VALUES ('9428fadf
 INSERT INTO public.client_data (id, type) VALUES ('9428fadf-191c-4dd7-8626-01c3e0ff603c', 'BASIC');
 
 -- Third Client
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'piotrnowak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000003', current_timestamp, 0, false);
+INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'piotrnowak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000003', current_timestamp, 0, false);
 INSERT INTO public.past_password (account_id, past_password) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa');
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'Piotr', 'Nowak', 'piotrnowak@porn.hub.pl');
 
@@ -112,8 +112,8 @@ INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUE
 
 -------------------------------------
 
--- Not verified User 1 - Client
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('f5afc042-79b0-47fe-87ee-710c14af888c', 'tonyhalik', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', false, true, false, 'PL', '100000000', current_timestamp, 0, false);
+-- Not suspended User 1 - Client
+INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('f5afc042-79b0-47fe-87ee-710c14af888c', 'tonyhalik', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '100000000', current_timestamp, 0, false);
 
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('f5afc042-79b0-47fe-87ee-710c14af888c', 'Tony', 'Halik', 'tonyhalik@example.com');
 
@@ -125,8 +125,8 @@ INSERT INTO public.token (id, account_id, token_value, type, version) VALUES ('5
 -- User 1 - Token 2
 INSERT INTO public.token (id, account_id, token_value, type, version) VALUES ('e0c86942-aed7-44a4-bda2-a89c3f4bdd37', 'f5afc042-79b0-47fe-87ee-710c14af888c', 'TEST_VALUE91', 'CONFIRM_EMAIL', 0);
 
--- Not verified User 2 - Staff
-INSERT INTO public.account (id, login, password, verified, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('d20f860d-555a-479e-8783-67aee5b66692', 'adamn', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', false, true, false, 'PL', '200000000', current_timestamp, 0, false);
+-- Not suspended User 2 - Staff
+INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_date, version, blocked) VALUES ('d20f860d-555a-479e-8783-67aee5b66692', 'adamn', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '200000000', current_timestamp, 0, false);
 
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('d20f860d-555a-479e-8783-67aee5b66692', 'Adam', 'Niezgodka', 'adamn@example.com');
 
@@ -135,3 +135,10 @@ INSERT INTO public.staff_data (id) VALUES ('c09d20a0-69e9-4a50-af00-3973b5d1d85c
 
 -- User 2 - Token 1
 INSERT INTO public.token (id, account_id, token_value, type, version) VALUES ('9847130d-6e60-4b3d-a9c3-b913f50769da', 'd20f860d-555a-479e-8783-67aee5b66692', 'TEST_VALUE93', 'CONFIRM_EMAIL', 0);
+
+-------------------------------------
+
+-- Historical data for certain accounts
+INSERT INTO public.account_history (id, version, login, password, verified, active, blocked, two_factor_auth, blocked_time, first_name, last_name, email, phone_number, last_successful_login_ip, last_successful_login_time, last_unsuccessful_login_ip, last_unsuccessful_login_time, unsuccessful_login_counter, language, operation_type, modified_by, modification_time)VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 1, 'jerzybem', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, false, null, 'Jerzy', 'Banan', 'jerzybem@spoko.pl', '987654321', '192.168.1.1', TIMESTAMP '2024-05-26 10:00:00', '192.168.1.1', null, 0, 'pl', 'BLOCK', 'b3b8c2ac-21ff-434b-b490-aa6d717447c0', current_timestamp);
+INSERT INTO public.account_history (id, version, login, password, verified, active, blocked, two_factor_auth, blocked_time, first_name, last_name, email, phone_number, last_successful_login_ip, last_successful_login_time, last_unsuccessful_login_ip, last_unsuccessful_login_time, unsuccessful_login_counter, language, operation_type, modified_by, modification_time)VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 2, 'jerzybem', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, true, null, 'Jerzy', 'Banan', 'jerzybem@spoko.pl', '987654321', '192.168.1.1', TIMESTAMP '2024-05-26 12:00:00', '192.168.1.1', null, 0, 'pl', 'PERSONAL_DATA_MODIFICATION', 'b3b8c2ac-21ff-434b-b490-aa6d717447c0', current_timestamp);
+INSERT INTO public.account_history (id, version, login, password, verified, active, blocked, two_factor_auth, blocked_time, first_name, last_name, email, phone_number, last_successful_login_ip, last_successful_login_time, last_unsuccessful_login_ip, last_unsuccessful_login_time, unsuccessful_login_counter, language, operation_type, modified_by, modification_time)VALUES ('b3b8c2ac-21ff-434b-b490-aa6d717447c0', 3, 'jerzybem', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, false, null, 'Jerzy', 'Banan', 'jerzybem@spoko.pl', '987654321', '192.168.1.1', TIMESTAMP '2024-05-26 14:00:00', '192.168.1.1', null, 0, 'pl', 'LOGIN', 'b3b8c2ac-21ff-434b-b490-aa6d717447c0', current_timestamp);

@@ -10,7 +10,7 @@ public class AccountMessages {
     public static final String PASSWORD_BLANK = "bean.validation.account.password.blank";
     public static final String PASSWORD_INVALID_LENGTH = "bean.validation.account.password.invalid.length";
 
-    public static final String VERIFIED_NULL = "bean.validation.account.verified.flag.null";
+    public static final String SUSPENDED_NULL = "bean.validation.account.suspended.flag.null";
     public static final String ACTIVE_NULL = "bean.validation.account.active.flag.null";
     public static final String BLOCKED_NULL = "bean.validation.account.blocked.flag.null";
     public static final String TWO_FACTOR_AUTH_NULL = "bean.validation.account.two.factor.auth.flag.null";

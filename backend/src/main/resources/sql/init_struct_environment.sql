@@ -3,7 +3,7 @@ CREATE TABLE public.account (
     blocked boolean NOT NULL,
     two_factor_auth boolean NOT NULL,
     unsuccessful_login_counter integer,
-    verified boolean NOT NULL,
+    suspended boolean NOT NULL,
     blocked_timestamp timestamp(6) without time zone,
     creation_date timestamp(6) without time zone NOT NULL,
     last_successful_login_time timestamp(6) without time zone,
