@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -166,6 +167,20 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> editParking(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                   @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException;
 
+    /**
+     * This method is used to edit sector, that is identified with the given identifier.
+     *
+     * @param ifMatch          Value of If-Match header
+     * @param sectorModifyDTO  Sector properties with potentially changed values.
+     * @return This method returns 204 NO CONTENT if the sector is edited successfully. Otherwise, if the sector
+     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * when other unexpected exception is encountered while processing the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/sector")
+    ResponseEntity<?> editSector(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                 @Valid @RequestBody SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException;
 
     /**
      *
