@@ -27,6 +27,21 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException;
 
     /**
+     * This method is used to find all parking spaces in system, using pagination.
+     *
+     * @param pageNumber Number of the page, which parking spaces will be retrieved from.
+     * @param pageSize   Number of parking spaces per page.
+     * @return It returns HTTP response 200 OK with all parking list.
+     *         It returns HTTP response 204 NO CONTENT when list is empty.
+     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
+                                    @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+
+    /**
      * This method is used to find sector by id.
      *
      * @param id Identifier of sector to find.
@@ -75,6 +90,20 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> activateSector(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
+     * This method is used to deactivate a sector with given id.
+     *
+     * @param id Identifier of sector to deactivate.
+     * @return It returns HTTP response 204 NO_CONTENT when the sector is successfully deactivated.
+     * When the sector with the provided id doesn't exist,
+     * the method returns 400. When the sector still has active parking spots,
+     * or it is already deactivated, the method returns 400.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from the facade and service layers below.
+     */
+    @PostMapping(value = "/sectors/{id}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> deactivateSector(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
      * This method is used to remove parking, that is identified with the given identifier.
      *
      * @param id Identifier of the parking to be removed.
@@ -119,4 +148,49 @@ public interface ParkingControllerInterface {
      */
     @PostMapping(value = "/reservations/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
+
+    /**
+     *
+     This method is used to remove sector, that is identified with the given identifier.
+     *
+     * @param id Identifier of the sector to be removed.
+     * @return This method returns 204 NO CONTENT if the sector is removed successfully. Otherwise, if the sector
+     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * when other unexpected exception is encountered while processing the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @DeleteMapping(value = "/sectors/{id}")
+    ResponseEntity<?> removeSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
+     * This method is used to find all available parkings.
+     *
+     * @param pageNumber          Number of the page to retrieve.
+     * @param pageSize            Number of results per page.
+     * @return It returns HTTP response 200 OK with all available parkings if these parkings exist.
+     * If there are no available parkings returns 204.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/parking/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    /**
+     * This method is used to end the parking spot allocation.
+     * The exit code which was generated during the start of the allocation must be provided for the allocation to end.
+     *
+     * @param reservationId Identifier of the reservation, which the client wants to use.
+     * @param exitCode Code that was generated during the start of the allocation.
+     * @return 204 NO CONTENT responses are returned if the allocation ended successfully
+     * Otherwise, if there is no such reservation, a user account does not exist,
+     * the provided exit code is incorrect or the reservation could not be ended; then 400 BAD REQUESTs are returned.
+     * 500 INTERNAL SERVER ERROR is returned when another unexpected
+     * exception occurs during processing of the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from the facade and service layers below.
+     */
+    @PostMapping(value = "/reservations/{id}/exit/{exitCode}")
+    ResponseEntity<?> exitParking(@PathVariable("id") String reservationId, @PathVariable("exitCode") String exitCode) throws ApplicationBaseException;
 }
+

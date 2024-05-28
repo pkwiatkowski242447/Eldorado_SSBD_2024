@@ -1,7 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -23,4 +25,13 @@ public interface ReservationServiceInterface {
      * @param reservationId Identifier of the reservation to be cancelled.
      */
     void cancelReservation(UUID reservationId) throws ApplicationBaseException;
+
+    /**
+     * Retrieve all reservations for a user in the system.
+     * @param pageNumber The page number of the results to return.
+     * @param pageSize   The number of results to return per page.
+     * @return A list of all accounts in the system, ordered by account login, with pagination applied.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<Reservation> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException;
 }

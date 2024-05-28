@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
@@ -23,6 +24,16 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     void createParking(String city, String zipCode, String street) throws ApplicationBaseException;
+
+    /**
+     * Retrieve all parking spaces in the system.
+     *
+     * @param pageNumber The page number of the results to return.
+     * @param pageSize   The number of results to return per page.
+     * @return A list of all parking in the system, with pagination applied.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<Account> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database sector by id.
@@ -60,6 +71,14 @@ public interface ParkingServiceInterface {
     void activateSector(UUID id) throws ApplicationBaseException;
 
     /**
+     * Deactivates sector with given id.
+     *
+     * @param id Sector's id.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void deactivateSector(UUID id) throws ApplicationBaseException;
+
+    /**
      * Removes parking from the database by its id.
      *
      * @param id Identifier of the parking to be removed.
@@ -80,6 +99,24 @@ public interface ParkingServiceInterface {
     AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException;
 
     /**
+     * Removes sector from the database by its id.
+     *
+     * @param id Identifier of the sector to be removed.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void removeSectorById(UUID id) throws ApplicationBaseException;
+
+    /**
+     * Retrieves all parkings that are available from the database.
+     *
+     * @param pageNumber          Number of the page to retrieve.
+     * @param pageSize            Number of results per page.
+     * @return If there are available parkings returns these parkings.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    /**
      * Uses parking's spot assignment algorithm to choose a parking spot for the requested entry. Then in creates
      * a new reservation , generates allocation code and registers entry parking event. Moreover, if the entry is made
      * by a registered client this method also sends an e-mail notification about beginning of the allocation
@@ -91,4 +128,15 @@ public interface ParkingServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException;
+
+    /**
+     * Ends the parking allocation by registering the end of a parking event.
+     * If the reservation ID and the exit code are correct, the parking spot
+     * is freed and the reservation is marked as ended.
+     *
+     * @param reservationId Identifier of the reservation, which the user uses.
+     * @param exitCode      Code used to end the reservation.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void exitParking(UUID reservationId, String exitCode) throws ApplicationBaseException;
 }
