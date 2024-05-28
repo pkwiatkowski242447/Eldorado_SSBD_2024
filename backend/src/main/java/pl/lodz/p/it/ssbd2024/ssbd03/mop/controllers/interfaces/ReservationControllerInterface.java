@@ -2,10 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -38,4 +35,20 @@ public interface ReservationControllerInterface {
      */
     @DeleteMapping(value = "/cancel-reservation/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> cancelReservation(@PathVariable("id") String id) throws ApplicationBaseException;
+
+    /**
+     * This endpoint allows retrieving all reservations for a user in the system. In order to avoid sending too much data at once, the results are paginated.
+     *
+     * @param pageNumber Number of the page, which reservations will be retrieved from.
+     * @param pageSize   Number of reservations per page.
+     * @return This method returns 200 OK as a response, where in response body a list of user's reservations is a JSON format.
+     * If the list is empty (there are no reservations for the user in the system),
+     * this method would return 204 NO CONTENT as the response.
+     * 500 INTERNAL SERVER ERROR is returned when another unexpected exception occurs.
+     * @throws ApplicationBaseException Superclass for any application exception
+     * thrown by exception handling aspects in the layer of facade and service components in the application.
+     */
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllReservations(@RequestParam("pageNumber") int pageNumber,
+                                         @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 }
