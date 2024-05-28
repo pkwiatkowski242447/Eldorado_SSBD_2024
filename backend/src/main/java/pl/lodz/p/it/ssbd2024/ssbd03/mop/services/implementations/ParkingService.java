@@ -74,6 +74,12 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    public List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
     public AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }

@@ -119,6 +119,19 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 
     /**
+     * This method is used to find all available parkings.
+     *
+     * @param pageNumber          Number of the page to retrieve.
+     * @param pageSize            Number of results per page.
+     * @return It returns HTTP response 200 OK with all available parkings if these parkings exist.
+     * If there are no available parkings returns 204.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/parking/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    /**
      * This method is used to end the parking spot allocation.
      * The exit code which was generated during the start of the allocation must be provided for the allocation to end.
      *
@@ -135,3 +148,4 @@ public interface ParkingControllerInterface {
     @PostMapping(value = "/reservations/{id}/exit/{exitCode}")
     ResponseEntity<?> exitParking(@PathVariable("id") String reservationId, @PathVariable("exitCode") String exitCode) throws ApplicationBaseException;
 }
+

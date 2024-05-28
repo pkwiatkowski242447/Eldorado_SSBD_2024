@@ -78,6 +78,16 @@ public interface ParkingServiceInterface {
     AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException;
 
     /**
+     * Retrieves all parkings that are available from the database.
+     *
+     * @param pageNumber          Number of the page to retrieve.
+     * @param pageSize            Number of results per page.
+     * @return If there are available parkings returns these parkings.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    /**
      * Uses parking's spot assignment algorithm to choose a parking spot for the requested entry. Then in creates
      * a new reservation , generates allocation code and registers entry parking event. Moreover, if the entry is made
      * by a registered client this method also sends an e-mail notification about beginning of the allocation

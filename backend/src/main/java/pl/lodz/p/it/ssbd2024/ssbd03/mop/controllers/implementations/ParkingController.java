@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+
 /**
  * Controller used for manipulating parking in the system.
  */
@@ -68,9 +69,14 @@ public class ParkingController implements ParkingControllerInterface {
     }
 
     @Override
+    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    public ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException {
+         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
     @RolesAllowed({Roles.CLIENT})
     public ResponseEntity<?> exitParking(String reservationId, String exitCode) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
-
 }
