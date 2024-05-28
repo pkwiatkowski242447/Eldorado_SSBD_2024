@@ -2,13 +2,16 @@
   "general.ok": "OK",
   "general.cancel": "Anuluj",
   "general.confirm": "Potwierdzenie",
-
+  "general.english": "Angielski",
+  "general.polish": "Polski",
+  "general.refresh": "Odśwież informacje o koncie",
 
   "landingPage.title": "Wkrótce dostępne",
   "landingPage.text": "Najprawdopodobniej",
   "landingPage.logIn": "Zaloguj się",
   "landingPage.register": "Zarejestruj się",
 
+  "adminAddUserPage.confirmUserCreation": "Czy na pewno chcesz utworzyć konto?",
 
   "loginPage.title": "Logowanie",
   "loginPage.info": "Wprowadź swoje dane logowania, aby kontynuować",
@@ -48,7 +51,15 @@
   "registerPage.hasAccount": "Masz już konto?",
   "registerPage.logIn": "Zaloguj się",
   "registerPage.passwordInvalid": "Hasło musi zawierać co najmniej jedną wielką literę, jedną małą literę, jedną cyfrę oraz jeden znak specjalny",
+  "registerPage.passwordRepeat": "Potwierdź Hasło",
+  "registerPage.client": "Klient",
+  "registerPage.admin": "Administrator",
+  "registerPage.staff": "Pracownik",
+  "registerPage.role": "Poziom Użytkownika",
 
+  "registerPage.admin.popUp.registerOK.title": "Konto zostało pomyślnie utworzone.",
+  "registerPage.admin.popUp.registerOK.text": "Należy sprawdzić skrzynkę odbiorczą podanego adresu e-mail i kliknąć w link aktywacyjny, aby zakończyć rejestrację.",
+  "registerPage.admin.popUp.registerOK.button": "Powrót do strony zarządzania użytkownikami",
 
   "forgotPasswordPage.title": "Zapomniałem hasła",
   "forgotPasswordPage.info": "Wprowadź swój adres e-mail, aby zresetować hasło",
@@ -61,13 +72,13 @@
   "siteHeader.hello": "Witaj, ",
   "siteHeader.users": "Użytkownicy",
   "siteHeader.parkings": "Parkingi",
-  "siteHeader.logout": "Wyloguj",
+  "siteHeader.logout": "Wyloguj się",
   "siteHeader.myAccount": "Moje konto",
   "siteHeader.settings": "Ustawienia",
   "siteHeader.changeLevel": "Zmień poziom dostępu",
   "siteHeader.changeLevel.select": "Wybierz swoją aktywną rolę:",
   "siteHeader.changeLevel.select.save": "Zapisz",
-
+  "siteHeader.login": "Zaloguj się",
 
   "accountSettings.title": "Zmień ustawienia konta",
   "accountSettings.email": "E-mail",
@@ -97,11 +108,27 @@
   "accountSettings.confirmPasswordChange": "Czy na pewno chcesz zmienić hasło?",
   "accountSettings.popUp.changePasswordOK.title": "Sukces!",
   "accountSettings.popUp.changePasswordOK.text": "Twoje hasło zostało pomyślnie zmienione.",
+  "accountSettings.details": "Szczegóły",
+
+  "accountSettings.accountInfo": "Informacje o koncie",
+  "accountSettings.name": "Imię",
+  "accountSettings.login": "Login",
+  "accountSettings.active": "Aktywny",
+  "accountSettings.blocked": "Zablokowany",
+  "accountSettings.verified": "Zweryfikowany",
+  "accountSettings.phone": "Telefon",
+  "accountSettings.accountLanguage": "Język konta",
+  "accountSettings.2fa": "Uwierzytelnianie dwuetapowe",
+  "accountSettings.creationDate": "Data utworzenia konta",
+  "accountSettings.lastSucLoginTime": "Czas ostatniego udanego logowania",
+  "accountSettings.lastSucLoginIp": "Adres IP ostatniego udanego logowania",
+  "accountSettings.lastUnsucLoginTime": "Czas ostatniego nieudanego logowania",
+  "accountSettings.lastUnsucLoginIp": "Adres IP ostatniego nieudanego logowania",
 
 
   "accountSettings.users.table.header.login": "Login",
   "accountSettings.users.table.header.name": "Imię",
-  "accountSettings.users.table.header.lastName": "E-mail",
+  "accountSettings.users.table.header.lastName": "Nazwisko",
   "accountSettings.users.table.header.active": "Aktywny",
   "accountSettings.users.table.header.blocked": "Zablokowany",
   "accountSettings.users.table.header.verified": "Zweryfikowany",
@@ -115,6 +142,8 @@
   "accountSettings.users.table.settings.unblock2": "odblokować",
   "accountSettings.confirmUserDataChange": "Czy na pewno chcesz zmienić dane użytkownika?",
   "accountSettings.confirmEmailChange": "Czy na pewno chcesz zmienić adres e-mail?",
+  "accountSettings.twoFactorAuth": "Uwierzytelnianie dwuskładnikowe",
+
 
   "accountSettings.users.table.settings.account.title": "Modyfikuj konto - ",
   "accountSettings.users.table.settings.account.userLevels": "Poziomy użytkownika",
@@ -182,7 +211,7 @@
   "accountSettings.popUp.changeUserDataOK.text": "Twoje dane osobowe zostały pomyślnie zmienione.",
   "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "Poziom użytkownika został pomyślnie usunięty.",
   "accountSettings.popUp.changeUserDataOK.userLevelAdded": "Poziom użytkownika został pomyślnie dodany.",
-
+  "accountSettings.popUp.changeOtherUserDataOK.text": "Dane użytkownika zostały pomyślnie zmienione.",
 
   "confirmEmailPage.popUp.confirmEmailOK.title": "Sukces!",
   "confirmEmailPage.popUp.confirmEmailOK.loggedIn.text": "Twój adres e-mail został pomyślnie zmieniony.",
@@ -352,6 +381,7 @@
   "breadcrumb.changeUserlevel": "Zmień poziom dostępu",
   "breadcrumb.myAccount": "Moje konto",
   "breadcrumb.userAccount": "Edytuj konto",
+  "breadcrumb.createUser" : "Utwórz nowe konto",
 
   "notFound.title": "Strona nie znaleziona",
   "notFound.description": "Strona, której szukasz, nie istnieje",

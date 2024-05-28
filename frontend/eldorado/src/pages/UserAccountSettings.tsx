@@ -13,7 +13,7 @@ import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useParams} from "react-router-dom";
-import {UserType} from "@/types/Users.ts";
+import {localDateTimeToDate, UserType} from "@/types/Users.ts";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -32,12 +32,19 @@ import {
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
-import {Slash} from "lucide-react";
+import {Loader2, Slash} from "lucide-react";
+import {Switch} from "@/components/ui/switch.tsx";
+import {FiCheck, FiX} from "react-icons/fi";
 
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
+// I'm fully aware that what i've commited below is a crime.
+// I don't feel like dividing everything into separate components just for the sake of being pretty to look at rn
+// No one is going to look at this anyway and time is not on my side
+// bk
+
 function UserAccountSettings() {
-    const [activeForm, setActiveForm] = useState(localStorage.getItem('activeForm') || 'E-Mail');
+    const [activeForm, setActiveForm] = useState('Details');
     const [managedUser, setManagedUser] = useState<UserType | null>(null);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
@@ -45,6 +52,8 @@ function UserAccountSettings() {
     const {t} = useTranslation();
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -52,21 +61,60 @@ function UserAccountSettings() {
 
     const userDataSchema = z.object({
         name: z.string().min(2, {message: t("accountSettings.firstNameTooShort")})
-            .max(50, {message: t("accountSettings.firstNameTooLong")}),
+            .max(50, {message: t("accountSettings.firstNameTooLong")}).optional(),
         lastName: z.string().min(2, {message: t("accountSettings.lastNameTooShort")})
-            .max(50, {message: t("accountSettings.lastNameTooLong")}),
-        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
+            .max(50, {message: t("accountSettings.lastNameTooLong")}).optional(),
+        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}).optional(),
+        twoFactorAuth: z.boolean().optional().default(managedUser?.twoFactorAuth || false),
     });
 
     useEffect(() => {
         if (id) {
-            localStorage.setItem('activeForm', activeForm);
             api.getAccountById(id).then(response => {
-                setManagedUser(response.data);
+
+                let creationDate = null;
+                let lastSuccessfulLoginTime = null;
+                let lastUnsuccessfulLoginTime = null;
+
+                if (response.data.creationDate) {
+                    creationDate = localDateTimeToDate(response.data.creationDate);
+                }
+                if (response.data.lastSuccessfulLoginTime) {
+                    lastSuccessfulLoginTime = localDateTimeToDate(response.data.lastSuccessfulLoginTime);
+                }
+
+                if (response.data.lastUnsuccessfulLoginTime) {
+                    lastUnsuccessfulLoginTime = localDateTimeToDate(response.data.lastUnsuccessfulLoginTime);
+                }
+
+                const managedUser: UserType = {
+                    accountLanguage: response.data.accountLanguage,
+                    active: response.data.active,
+                    blocked: response.data.blocked,
+                    email: response.data.email,
+                    id: response.data.id,
+                    lastname: response.data.lastname,
+                    login: response.data.login,
+                    name: response.data.name,
+                    phoneNumber: response.data.phoneNumber,
+                    userLevelsDto: response.data.userLevelsDto,
+                    verified: response.data.verified,
+                    version: response.data.version,
+                    twoFactorAuth: response.data.twoFactorAuth,
+                    lastSuccessfulLoginIp: response.data.lastSuccessfulLoginIp,
+                    lastUnsuccessfulLoginIp: response.data.lastUnsuccessfulLoginIp,
+                    creationDate: creationDate,
+                    lastSuccessfulLoginTime: lastSuccessfulLoginTime,
+                    lastUnsuccessfulLoginTime: lastUnsuccessfulLoginTime,
+                    token: '',
+                    activeUserLevel: null,
+                };
+                //the token and activeUserLevel are not needed in this context hence null is passed
+                setManagedUser(managedUser);
                 window.localStorage.setItem('etag', response.headers['etag']);
             });
         }
-    }, [activeForm, id]);
+    }, [id]);
 
     const {getCurrentAccount} = useAccount();
 
@@ -203,6 +251,7 @@ function UserAccountSettings() {
 
     const SubmitEmail = (values: z.infer<typeof emailSchema>) => {
         if (managedUser) {
+            setIsLoading(true)
             api.changeEmailUser(managedUser.id, values.email).then(() => {
                 toast({
                     title: t("accountSettings.popUp.changeUserDataOK.title"),
@@ -218,26 +267,36 @@ function UserAccountSettings() {
 
             }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
     };
 
     const SubmitUserData = (values: z.infer<typeof userDataSchema>) => {
+        setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
         if (managedUser && managedUser.accountLanguage && etag !== null) {
+            const name = values.name !== undefined ? values.name : managedUser.name;
+            const lastName = values.lastName !== undefined ? values.lastName : managedUser.lastname;
+            const phoneNumber = values.phoneNumber !== undefined ? values.phoneNumber : managedUser.phoneNumber;
+            const twoFactorAuth = values.twoFactorAuth !== undefined ? values.twoFactorAuth : managedUser.twoFactorAuth;
+
             api.modifyAccountUser(managedUser.login, managedUser.version, managedUser.userLevelsDto,
-                values.name, values.lastName, values.phoneNumber, false, etag)
+                name, lastName, phoneNumber, twoFactorAuth, etag)
                 .then(() => {
                     getCurrentAccount();
                     toast({
-                        title: "Success!",
-                        description: "The account info has been successfully changed.",
+                        title: t("accountSettings.popUp.changeUserDataOK.title"),
+                        description: t("accountSettings.popUp.changeOtherUserDataOK.text"),
                     });
                     setFormType(null);
                     setFormValues(null);
 
                 }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
             });
         } else {
             console.log('Account or account language is not defined');
@@ -246,7 +305,7 @@ function UserAccountSettings() {
 
     const SubmitPassword = () => {
         if (id) {
-            console.log(id);
+            setIsLoading(true)
             api.resetPasswordByAdmin(id).then(() => {
                 getCurrentAccount();
                 toast({
@@ -258,33 +317,57 @@ function UserAccountSettings() {
 
             }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
 
     };
 
+    const refresh = () => {
+        setIsRefreshing(true);
+        if (id) {
+            api.getAccountById(id).then(response => {
+                setManagedUser(response.data);
+                window.localStorage.setItem('etag', response.headers['etag']);
+            });
+        }
+        setTimeout(() => setIsRefreshing(false), 1000);
+    }
+
     return (
         <div>
             <SiteHeader/>
-            <Breadcrumb className={"p-5"}>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash />
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/manage-users">{t("breadcrumb.manageUsers")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash />
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink>{t("breadcrumb.userAccount")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <div className="flex justify-between items-center pt-2">
+                <Breadcrumb className={"pl-2"}>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/manage-users">{t("breadcrumb.manageUsers")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink>{t("breadcrumb.userAccount")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <Button onClick={refresh} variant={"ghost"} className="w-auto" disabled={isRefreshing}>
+                    {isRefreshing ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                        </>
+                    ) : (
+                        t("general.refresh")
+                    )}
+                </Button>
+            </div>
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">
@@ -295,23 +378,31 @@ function UserAccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <Button variant="link" onClick={() => setActiveForm('UserLevels')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Details')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.details")}
+                        </Button>
+                        <Button variant={`${activeForm === 'UserLevels' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('UserLevels')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.users.table.settings.account.userLevels")}
                         </Button>
-                        <Button variant="link" onClick={() => setActiveForm('E-Mail')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
-                            {t("accountSettings.email")}
-                        </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Password')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
-                            {t("accountSettings.password")}
-                        </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Personal Info')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Personal Info')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.users.table.settings.account.personalInfo")}
                         </Button>
-
+                        <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('E-Mail')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.email")}
+                        </Button>
+                        <Button variant={`${activeForm === 'Password' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Password')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.password")}
+                        </Button>
                     </nav>
                     <div className="grid gap-6">
                         {activeForm === 'UserLevels' && managedUser?.userLevelsDto && (
@@ -373,7 +464,7 @@ function UserAccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.authentication.email")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.users.table.settings.account.authentication.email")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={managedUser?.email} {...field} />
@@ -382,8 +473,15 @@ function UserAccountSettings() {
                                                                     </FormItem>
                                                                 )}/>
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.users.table.settings.account.authentication.email.change")}
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.users.table.settings.account.authentication.email.change")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -407,9 +505,9 @@ function UserAccountSettings() {
                         )}
                         {activeForm === 'Password' && (
                             <div>
-                                <Card className="mx-10 w-auto p-10">
-                                    <CardContent>
-                                        <Button onClick={onSubmitPassword} className="w-full">
+                                <Card className="mx-10 w-auto">
+                                    <CardContent className={"flex items-center justify-center pt-5"}>
+                                        <Button onClick={onSubmitPassword} className="w-full pb-2">
                                             {t("resetPasswordPage.title")}
                                         </Button>
                                     </CardContent>
@@ -430,13 +528,13 @@ function UserAccountSettings() {
                         )}
                         {activeForm === 'Personal Info' && (
                             <div>
-                                <Card className="mx-auto">
+                                <Card className="mx-10 w-auto">
                                     <CardContent>
                                         <Form {...formUserData}>
                                             {// @ts-expect-error - fix this maybe
                                                 <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
                                                       className="space-y-4">
-                                                    <div className="grid gap-4 p-10">
+                                                    <div className="grid gap-4 p-5">
                                                         <div className="grid gap-2">
                                                             <FormField
                                                                 control={formUserData.control}
@@ -487,7 +585,7 @@ function UserAccountSettings() {
                                                                                     <PhoneInput
                                                                                         {...field}
                                                                                         value={field.value || ""}
-                                                                                        placeholder={managedUser?.phone}
+                                                                                        placeholder={managedUser?.phoneNumber?.startsWith('+48') ? managedUser.phoneNumber.slice(3).replace(/\B(?=(\d{3})+(?!\d))/g, " ") : managedUser?.phoneNumber}
                                                                                         onChange={field.onChange}
                                                                                         countries={['PL']}
                                                                                         defaultCountry="PL"
@@ -500,8 +598,47 @@ function UserAccountSettings() {
                                                                 )}
                                                             />
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.users.table.settings.account.personalInfo.saveChanges")}
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formUserData.control}
+                                                                name="twoFactorAuth"
+                                                                render={() => (
+                                                                    <FormField
+                                                                        control={formUserData.control}
+                                                                        name="twoFactorAuth"
+                                                                        render={({field}) => (
+                                                                            <FormItem>
+                                                                                <div className="flex flex-col">
+                                                                                    <FormLabel className="text-black">
+                                                                                        {t("accountSettings.twoFactorAuth")}
+                                                                                    </FormLabel>
+                                                                                    <FormControl>
+                                                                                        <div
+                                                                                            className={"justify-center pt-5"}>
+                                                                                            <Switch {...field}
+                                                                                                    defaultChecked={managedUser?.twoFactorAuth}
+                                                                                                    checked={field.value}
+                                                                                                    onCheckedChange={field.onChange}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </FormControl>
+                                                                                </div>
+                                                                                <FormMessage/>
+                                                                            </FormItem>
+                                                                        )}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.users.table.settings.account.personalInfo.saveChanges")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -521,6 +658,55 @@ function UserAccountSettings() {
                                         <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
                                     </AlertDialogContent>
                                 </AlertDialog>
+                            </div>
+                        )}
+                        {activeForm === 'Details' && (
+                            <div>
+                                <Card className="mx-10 w-auto text-left">
+                                    <CardContent>
+                                        <h2 className="text-lg font-bold text-center p-5">{t("accountSettings.accountInfo")}</h2>
+                                        <p>
+                                            <strong>{t("accountSettings.name")}:</strong> {managedUser?.name} {managedUser?.lastname}
+                                        </p>
+                                        <p><strong>{t("accountSettings.email")}:</strong> {managedUser?.email}</p>
+                                        <p><strong>{t("accountSettings.login")}:</strong> {managedUser?.login}</p>
+                                        <p><strong>{t("accountSettings.phone")}:</strong> {managedUser?.phoneNumber}</p>
+                                        <p>
+                                            <strong>{t("accountSettings.accountLanguage")}: </strong>
+                                            {managedUser?.accountLanguage?.toLowerCase() === 'en' ? t("general.english") :
+                                                managedUser?.accountLanguage?.toLowerCase() === 'pl' ? t("general.polish") :
+                                                    managedUser?.accountLanguage}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.active")}:</strong> {managedUser?.active ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.blocked")}:</strong> {managedUser?.blocked ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.verified")}:</strong> {managedUser?.verified ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.2fa")}:</strong> {managedUser?.twoFactorAuth ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {managedUser?.lastSuccessfulLoginTime ? managedUser.lastSuccessfulLoginTime : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {managedUser?.lastUnsuccessfulLoginTime ? managedUser.lastUnsuccessfulLoginTime : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {managedUser?.lastSuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginIp")}:</strong> {managedUser?.lastUnsuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
                             </div>
                         )}
                     </div>

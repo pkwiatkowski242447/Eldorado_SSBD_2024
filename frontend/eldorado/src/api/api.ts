@@ -16,8 +16,7 @@ export const api = {
     },
 
     logOut: () => {
-        const url = '/auth/logout';
-        return apiWithConfig.post(url);
+        return apiWithConfig.post('/auth/logout');
     },
 
     changePasswordSelf: (oldPassword: string, newPassword: string) => {
@@ -29,6 +28,30 @@ export const api = {
 
     registerClient: (login: string, password: string, firstName: string, lastName: string, email: string, phoneNumber: string, language: string) => {
         return apiWithConfig.post('/register/client', {
+            login,
+            password,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            language
+        })
+    },
+
+    registerStaff: (login: string, password: string, firstName: string, lastName: string, email: string, phoneNumber: string, language: string) => {
+        return apiWithConfig.post('/register/staff', {
+            login,
+            password,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            language
+        })
+    },
+
+    registerAdmin: (login: string, password: string, firstName: string, lastName: string, email: string, phoneNumber: string, language: string) => {
+        return apiWithConfig.post('/register/admin', {
             login,
             password,
             firstName,
@@ -79,7 +102,7 @@ export const api = {
     modifyAccountUser: (login: string, version: number, userLevelsDto: UserLevelType[], name: string,
                         lastname: string, phoneNumber: string, twoFactorAuth: boolean, etag: string) => {
         const cleanedEtag = etag.replace(/^"|"$/g, '');
-        //this is necessary because backend requires etag to be without quotes
+        //this is necessary because backend requires the etag to be without quotes
         const test = apiWithConfig.put('/accounts', {
             login: login,
             version: version,

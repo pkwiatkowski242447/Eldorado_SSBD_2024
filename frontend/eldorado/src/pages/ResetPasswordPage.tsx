@@ -11,6 +11,8 @@ import {Input} from "@/components/ui/input.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
+import {Loader2} from "lucide-react";
+import {useState} from "react";
 
 
 function ResetPasswordPage() {
@@ -19,6 +21,7 @@ function ResetPasswordPage() {
     const {toast} = useToast();
     const navigate = useNavigate();
     const {t} = useTranslation();
+    const [isLoading, setIsLoading] = useState(false);
 
     const formSchema = z.object({
         password: z.string().min(8, {message: t("resetPasswordPage.passwordTooShort")})
@@ -34,7 +37,7 @@ function ResetPasswordPage() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        // console.table(values)
+        setIsLoading(true);
         api.resetPasswordByUser(decodedToken, values.password)
             .then(() => {
                 toast({
@@ -53,12 +56,17 @@ function ResetPasswordPage() {
             })
             .catch((error) => {
                 handleApiError(error);
-            });
+            }).finally(() => {
+            setIsLoading(false);
+        });
     }
 
     return (
         <div>
-            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <Card className="mx-auto max-w-2xl">
                 <CardHeader>
                     <CardTitle>{t("resetPasswordPage.title")}</CardTitle>
@@ -84,7 +92,15 @@ function ResetPasswordPage() {
                                         )}
                                     />
                                 </div>
-                                <Button type="submit">{t("resetPasswordPage.button")}</Button>
+                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                        </>
+                                    ) : (
+                                        t("resetPasswordPage.button")
+                                    )}
+                                </Button>
                             </div>
                         </form>
                     </Form>

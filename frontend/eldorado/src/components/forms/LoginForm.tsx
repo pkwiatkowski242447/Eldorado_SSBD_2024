@@ -8,11 +8,14 @@ import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components
 import {FormLabel} from "react-bootstrap";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
+import {useState} from "react";
+import {Loader2} from "lucide-react";
 
 
 function LoginForm() {
     const {logIn} = useAccount();
     const {t} = useTranslation();
+    const [isLoading, setIsLoading] = useState(false);
 
     const formSchema = z.object({
         login: z.string().min(5, {message: t("loginPage.loginTooShort")})
@@ -29,10 +32,15 @@ function LoginForm() {
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        logIn(values.login, values.password).catch((error) => {
-            console.log(error)
-        });
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsLoading(true);
+        try {
+            await logIn(values.login, values.password);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
@@ -82,7 +90,15 @@ function LoginForm() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full">{t("loginPage.submit")}</Button>
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                </>
+                            ) : (
+                                t("loginPage.submit")
+                            )}
+                        </Button>
                         <div className="mt-4 text-center text-sm">
                             {t("loginPage.noAccount")}
                             <a href="/register" className="font-medium text-black hover:text-blue-500">

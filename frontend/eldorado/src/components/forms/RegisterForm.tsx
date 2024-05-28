@@ -10,10 +10,14 @@ import {useToast} from "@/components/ui/use-toast.ts";
 import {isValidPhoneNumber} from "react-phone-number-input";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
 import {useTranslation} from "react-i18next";
+import {Loader2} from "lucide-react";
+import {useState} from "react";
+import handleApiError from "@/components/HandleApiError.ts";
 
 export function RegisterForm() {
     const {toast} = useToast()
     const {t} = useTranslation();
+    const [isLoading, setIsLoading] = useState(false);
 
     const formSchema = z.object({
         email: z.string().min(1, {message: t("registerPage.emptyEmail")})
@@ -29,6 +33,12 @@ export function RegisterForm() {
         lastName: z.string().min(2, {message: t("registerPage.lastNameTooShort")})
             .max(50, {message: t("registerPage.lastNameTooLong")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("registerPage.phoneNumberInvalid")}),
+        newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+    }).refine(values => values.password === values.newPasswordRepeat, {
+        message: t("accountSettings.passwordsMustMatch"),
+        path: ["newPasswordRepeat"],
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -44,7 +54,7 @@ export function RegisterForm() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.table(values)
+        setIsLoading(true);
         api.registerClient(
             values.login,
             values.password,
@@ -61,24 +71,12 @@ export function RegisterForm() {
                 });
             })
             .catch((error) => {
-                if (error.response && error.response.data) {
-                    const {message, violations} = error.response.data;
-                    const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
-
-                    toast({
-                        variant: "destructive",
-                        title: t(message),
-                        description: violationMessages,
-                    });
-                } else {
-                    toast({
-                        variant: "destructive",
-                        description: "Error",
-                    });
-                }
-            });
+                handleApiError(error);
+            }).finally(() => {
+            setIsLoading(false);
+        });
     }
-    
+
     return (
         <Card className="mx-auto max-w-2xl">
             <CardHeader>
@@ -99,7 +97,7 @@ export function RegisterForm() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel
-                                                    className="text-black">{t("registerPage.firstName")}</FormLabel>
+                                                    className="text-black">{t("registerPage.firstName")} *</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="" {...field}/>
                                                 </FormControl>
@@ -115,7 +113,7 @@ export function RegisterForm() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel
-                                                    className="text-black">{t("registerPage.lastName")}</FormLabel>
+                                                    className="text-black">{t("registerPage.lastName")} *</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="" {...field}/>
                                                 </FormControl>
@@ -135,7 +133,7 @@ export function RegisterForm() {
                                         render={() => (
                                             <FormItem className="items-start">
                                                 <FormLabel
-                                                    className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
+                                                    className="text-black text-center">{t("registerPage.phoneNumber")} *</FormLabel>
                                                 <FormControl className="w-full">
 
                                                     <Controller
@@ -145,7 +143,7 @@ export function RegisterForm() {
                                                             //ts-expect-error - PhoneInput is not typed
                                                             <PhoneInput
                                                                 {...field}
-                                                                value={field.value as never|| ""}
+                                                                value={field.value as never || ""}
                                                                 onChange={field.onChange}
                                                                 countries={['PL']}
                                                                 defaultCountry="PL"
@@ -165,7 +163,8 @@ export function RegisterForm() {
                                         name="email"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel className="text-black">{t("registerPage.email")}</FormLabel>
+                                                <FormLabel
+                                                    className="text-black">{t("registerPage.email")} *</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="mail@example.com" {...field}/>
                                                 </FormControl>
@@ -181,7 +180,7 @@ export function RegisterForm() {
                                     name="login"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel className="text-black">{t("registerPage.login")}</FormLabel>
+                                            <FormLabel className="text-black">{t("registerPage.login")} *</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="" {...field}/>
                                             </FormControl>
@@ -196,7 +195,7 @@ export function RegisterForm() {
                                     name="password"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel className="text-black">{t("registerPage.password")}</FormLabel>
+                                            <FormLabel className="text-black">{t("registerPage.password")} *</FormLabel>
                                             <FormControl>
                                                 <Input type="password" {...field}/>
                                             </FormControl>
@@ -204,9 +203,29 @@ export function RegisterForm() {
                                         </FormItem>
                                     )}
                                 />
+                                <FormField
+                                    control={form.control}
+                                    name="newPasswordRepeat"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel
+                                                className="text-black">{t("registerPage.passwordRepeat")} *</FormLabel>
+                                            <FormControl>
+                                                <Input type="password" {...field} />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
-                            <Button type="submit" className="w-full">
-                                {t("registerPage.submit")}
+                            <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                    </>
+                                ) : (
+                                    t("registerPage.submit")
+                                )}
                             </Button>
                         </div>
                         <div className="mt-4 text-center text-sm">

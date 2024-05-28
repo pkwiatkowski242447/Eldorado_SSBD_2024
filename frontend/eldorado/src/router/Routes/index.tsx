@@ -1,89 +1,83 @@
 import {Route, Routes} from "react-router-dom";
 // import {AdminRoutes, ClientRoutes, PublicRoutes, STAFFRoutes} from "../routes";
 import PublicLayout from "../../components/layouts/PublicLayout";
-// import AdminLayout from "../../components/layouts/AdminLayout";
-// import ClientLayout from "../../components/layouts/ClientLayout";
+import AdminLayout from "../../components/layouts/AdminLayout";
+import ClientLayout from "../../components/layouts/ClientLayout";
 import {useEffect} from "react";
-import {PublicRoutes} from "../routes";
+import {AdminRoutes, ClientRoutes, PublicRoutes, StaffRoutes} from "../routes";
 import NotFoundPage from "@/pages/NotFoundPage.tsx";
-// import PageNotFound from "../../pages/PageNotFound";
-// import ResourceAdminLayout from "../../components/layouts/ResourceAdminLayout";
+import StaffLayout from "@/components/layouts/StaffLayout";
+import {useAccount} from "@/hooks/useAccount.ts";
+import {RolesEnum} from "@/types/TokenPayload.ts";
 
 export const RoutesComponents = () => {
-    // const {isAuthenticated} = useAccount();
+    const {isAuthenticated, account, getCurrentAccount} = useAccount();
     useEffect(() => {
-        // getCurrentAccount();
+        getCurrentAccount();
     }, []);
+
     return (
         <Routes>
-            {PublicRoutes.map(({path, Component}) => (
+            {!isAuthenticated &&
+                <Route path="*" element={
+                    <PublicLayout>
+                        <NotFoundPage/>
+                    </PublicLayout>
+                }/>}
+
+            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.ADMIN && AdminRoutes.map(({
+                                                                                                              path,
+                                                                                                              Component
+                                                                                                          }) => (
+                <Route key={path} path={path} element={
+                    <AdminLayout>
+                        <Component/>
+                    </AdminLayout>}/>
+            ))}
+
+            {isAuthenticated && account?.activeUserLevel.roleName
+                === RolesEnum.CLIENT && ClientRoutes.map(({path, Component}) => (
+                <Route key={path} path={path} element={
+                    <ClientLayout>
+                        <Component/>
+                    </ClientLayout>}/>
+            ))}
+
+            {isAuthenticated && account?.activeUserLevel.roleName
+                === RolesEnum.STAFF && StaffRoutes.map(({path, Component }) => (
+                <Route key={path} path={path} element={
+                    <StaffLayout>
+                        <Component/>
+                    </StaffLayout>}/>
+            ))}
+
+            {!isAuthenticated && PublicRoutes.map(({path, Component}) => (
                 <Route key={path} path={path} element={
                     <PublicLayout>
                         <Component/>
                     </PublicLayout>}/>
             ))}
 
-            <Route path="*" element={
-                <PublicLayout>
-                    <NotFoundPage/>
-                </PublicLayout>
-            }/>
-            {/*{isAuthenticated && accountType===AccountTypeEnum.ADMIN && AdminRoutes.map(({path, Component}) => (*/}
-            {/*    <Route key={path} path={path} element={*/}
-            {/*        <AdminLayout>*/}
-            {/*            <Component/>*/}
-            {/*        </AdminLayout>}/>*/}
-            {/*))}*/}
+            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.ADMIN &&
+                <Route path="*" element={
+                    <AdminLayout>
+                        <NotFoundPage/>
+                    </AdminLayout>
+                }/>}
 
-            {/*{isAuthenticated && accountType===AccountTypeEnum.CLIENT && ClientRoutes.map(({path, Component}) => (*/}
-            {/*    <Route key={path} path={path} element={*/}
-            {/*        <ClientLayout>*/}
-            {/*            <Component/>*/}
-            {/*        </ClientLayout>}/>*/}
-            {/*))}*/}
+            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.STAFF &&
+                <Route path="*" element={
+                    <StaffLayout>
+                        <NotFoundPage/>
+                    </StaffLayout>
+                }/>}
 
-            {/*{isAuthenticated && accountType===AccountTypeEnum.STAFF && STAFFRoutes.map(({path, Component}) => (*/}
-            {/*    <Route key={path} path={path} element={*/}
-            {/*        <ResourceAdminLayout>*/}
-            {/*            <Component/>*/}
-            {/*        </ResourceAdminLayout>}/>*/}
-            {/*))}*/}
-
-            {/*{!isAuthenticated && PublicRoutes.map(({path, Component}) => (*/}
-            {/*    <Route key={path} path={path} element={*/}
-            {/*        <PublicLayout>*/}
-            {/*            <Component/>*/}
-            {/*        </PublicLayout>}/>*/}
-            {/*))}*/}
-
-
-            {/*{!isAuthenticated &&*/}
-            {/*    <Route path="*" element={*/}
-            {/*        <PublicLayout>*/}
-            {/*            <PageNotFound/>*/}
-            {/*        </PublicLayout>*/}
-            {/*    }/>}*/}
-
-            {/*{isAuthenticated && accountType===AccountTypeEnum.ADMIN &&*/}
-            {/*    <Route path="*" element={*/}
-            {/*        <AdminLayout>*/}
-            {/*            <PageNotFound/>*/}
-            {/*        </AdminLayout>*/}
-            {/*        }/>}*/}
-
-            {/*{isAuthenticated && accountType===AccountTypeEnum.STAFF &&*/}
-            {/*    <Route path="*" element={*/}
-            {/*        <ResourceAdminLayout>*/}
-            {/*            <PageNotFound/>*/}
-            {/*        </ResourceAdminLayout>*/}
-            {/*    }/>}*/}
-
-            {/*{isAuthenticated && accountType===AccountTypeEnum.CLIENT &&*/}
-            {/*    <Route path="*" element={*/}
-            {/*        <ClientLayout>*/}
-            {/*            <PageNotFound/>*/}
-            {/*        </ClientLayout>*/}
-            {/*    }/>}*/}
+            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.CLIENT &&
+                <Route path="*" element={
+                    <ClientLayout>
+                        <NotFoundPage/>
+                    </ClientLayout>
+                }/>}
         </Routes>
     )
 }
