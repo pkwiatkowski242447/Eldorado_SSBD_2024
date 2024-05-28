@@ -4,6 +4,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -18,6 +19,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.RegistrationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 
+import java.net.URI;
+
 /**
  * Controller used to create new Accounts in the system.
  *
@@ -29,6 +32,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterf
 @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
         retryFor = {ApplicationDatabaseException.class, RollbackException.class})
 public class RegistrationController implements RegistrationControllerInterface {
+
+    @Value("${created.account.resource.url}")
+    private String createdAccountResourceURL;
 
     /**
      * AccountServiceInterface used for operation on accounts.
@@ -50,39 +56,39 @@ public class RegistrationController implements RegistrationControllerInterface {
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
-        this.accountService.registerClient(accountRegisterDTO.getLogin(),
+        Account clientAccount = this.accountService.registerClient(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
                 accountRegisterDTO.getFirstName(),
                 accountRegisterDTO.getLastName(),
                 accountRegisterDTO.getEmail(),
                 accountRegisterDTO.getPhoneNumber(),
                 accountRegisterDTO.getLanguage());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.created(URI.create(this.createdAccountResourceURL + clientAccount.getId())).build();
     }
 
     @Override
     @RolesAllowed({Roles.ADMIN})
     public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
-        this.accountService.registerStaff(accountRegisterDTO.getLogin(),
+        Account staffAccount = this.accountService.registerStaff(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
                 accountRegisterDTO.getFirstName(),
                 accountRegisterDTO.getLastName(),
                 accountRegisterDTO.getEmail(),
                 accountRegisterDTO.getPhoneNumber(),
                 accountRegisterDTO.getLanguage());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.created(URI.create(this.createdAccountResourceURL + staffAccount.getId())).build();
     }
 
     @Override
     @RolesAllowed({Roles.ADMIN})
     public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
-        this.accountService.registerAdmin(accountRegisterDTO.getLogin(),
+        Account adminAccount = this.accountService.registerAdmin(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
                 accountRegisterDTO.getFirstName(),
                 accountRegisterDTO.getLastName(),
                 accountRegisterDTO.getEmail(),
                 accountRegisterDTO.getPhoneNumber(),
                 accountRegisterDTO.getLanguage());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.created(URI.create(this.createdAccountResourceURL + adminAccount.getId())).build();
     }
 }

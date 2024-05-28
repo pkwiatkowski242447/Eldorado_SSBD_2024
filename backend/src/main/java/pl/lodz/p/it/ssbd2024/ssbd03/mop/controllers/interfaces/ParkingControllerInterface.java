@@ -1,10 +1,14 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
+import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -25,6 +29,21 @@ public interface ParkingControllerInterface {
      */
     @PostMapping
     ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException;
+
+    /**
+     * This method is used to create new sector.
+     *
+     * @param sectorCreateDTO Data transfer object, containing sector data.
+     * @return It returns HTTP response 204 NO CONTENT when sector creation is successful,
+     *         It returns HTTP response 400 BAD REQUEST when persistence exception is being thrown.
+     *         It returns HTTP response 404 NOT FOUND when parking with specified id does not exist.
+     *         It returns HTTP response 409 CONFLICT when sector with specific data exits.
+     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping
+    ResponseEntity<?> createSector(@RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
 
     /**
      * This method is used to find all parking spaces in system, using pagination.
@@ -148,6 +167,36 @@ public interface ParkingControllerInterface {
      */
     @PostMapping(value = "/reservations/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
+
+    /**
+     * This method is used to edit parking, that is identified with the given identifier.
+     *
+     * @param ifMatch          Value of If-Match header
+     * @param parkingModifyDTO Parking properties with potentially changed values.
+     * @return This method returns 204 NO CONTENT if the parking is edited successfully. Otherwise, if the parking
+     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * when other unexpected exception is encountered while processing the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/parking")
+    ResponseEntity<?> editParking(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                  @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException;
+
+    /**
+     * This method is used to edit sector, that is identified with the given identifier.
+     *
+     * @param ifMatch          Value of If-Match header
+     * @param sectorModifyDTO  Sector properties with potentially changed values.
+     * @return This method returns 204 NO CONTENT if the sector is edited successfully. Otherwise, if the sector
+     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * when other unexpected exception is encountered while processing the request.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     * exception handling aspects from facade and service layers below.
+     */
+    @PostMapping(value = "/sector")
+    ResponseEntity<?> editSector(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                 @Valid @RequestBody SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException;
 
     /**
      *

@@ -30,16 +30,25 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
-import {Slash} from "lucide-react";
+import {Loader2, Slash} from "lucide-react";
+import {Switch} from "@/components/ui/switch.tsx";
+import {FiCheck, FiX} from "react-icons/fi";
+import {RefreshButton} from "@/components/RefreshButton.tsx";
 
+// I'm fully aware that what i've commited below is a crime.
+// I don't feel like dividing everything into separate components just for the sake of being pretty to look at rn
+// No one is going to look at this anyway and time is not on my side
+// bk
 
 function AccountSettings() {
-    const [activeForm, setActiveForm] = useState('E-Mail');
+    const [activeForm, setActiveForm] = useState('Details');
     const {account} = useAccountState();
     const {t} = useTranslation();
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
+    const {getCurrentAccount} = useAccount();
+    const [isLoading, setIsLoading] = useState(false);
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -47,10 +56,11 @@ function AccountSettings() {
 
     const userDataSchema = z.object({
         name: z.string().min(2, {message: t("accountSettings.firstNameTooShort")})
-            .max(50, {message: t("accountSettings.firstNameTooLong")}),
+            .max(50, {message: t("accountSettings.firstNameTooLong")}).optional(),
         lastName: z.string().min(2, {message: t("accountSettings.lastNameTooShort")})
-            .max(50, {message: t("accountSettings.lastNameTooLong")}),
-        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
+            .max(50, {message: t("accountSettings.lastNameTooLong")}).optional(),
+        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}).optional(),
+        twoFactorAuth: z.boolean().optional().default(account?.twoFactorAuth || false),
     });
 
     const passwordSchema = z.object({
@@ -71,13 +81,9 @@ function AccountSettings() {
         path: ["newPassword"],
     });
 
-    const {getCurrentAccount} = useAccount();
-
-    //It has to be that way afaik so ignore the warning and enjoy your day :)
     useEffect(() => {
         getCurrentAccount();
     }, []);
-
 
     const formEmail = useForm({
         resolver: zodResolver(emailSchema),
@@ -128,10 +134,9 @@ function AccountSettings() {
     };
 
     const SubmitEmail = (values: z.infer<typeof emailSchema>) => {
-        // console.log(values.email)
+        setIsLoading(true)
         api.changeEmailSelf(values.email).then(() => {
             getCurrentAccount();
-
             toast({
                 title: t("accountSettings.popUp.changeEmailOK.title"),
                 description: t("accountSettings.popUp.changeEmailOK.text"),
@@ -141,12 +146,13 @@ function AccountSettings() {
 
         }).catch((error) => {
             handleApiError(error);
+        }).finally(() => {
+            setIsLoading(false)
         });
     };
 
     const SubmitPassword = (values: z.infer<typeof passwordSchema>) => {
-        // console.log(values.email)
-        console.log(values.oldPassword, values.newPassword);
+        setIsLoading(true)
         api.changePasswordSelf(values.oldPassword, values.newPassword).then(() => {
             getCurrentAccount();
             toast({
@@ -158,17 +164,24 @@ function AccountSettings() {
 
         }).catch((error) => {
             handleApiError(error);
+        }).finally(() => {
+            setIsLoading(false)
         });
     };
 
     const SubmitUserData = (values: z.infer<typeof userDataSchema>) => {
+        setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
         if (account && account.accountLanguage && etag !== null) {
+            const name = values.name !== undefined ? values.name : account.name;
+            const lastName = values.lastName !== undefined ? values.lastName : account.lastname;
+            const phoneNumber = values.phoneNumber !== undefined ? values.phoneNumber : account.phoneNumber;
+            const twoFactorAuth = values.twoFactorAuth !== undefined ? values.twoFactorAuth : account.twoFactorAuth;
+
             api.modifyAccountSelf(account.login, account.version, account.userLevelsDto,
-                values.name, values.lastName, values.phoneNumber, false, etag)
+                name, lastName, phoneNumber, twoFactorAuth, etag)
                 .then(() => {
                     getCurrentAccount();
-                    // window.location.reload()
                     toast({
                         title: t("accountSettings.popUp.changeUserDataOK.title"),
                         description: t("accountSettings.popUp.changeUserDataOK.text"),
@@ -178,6 +191,8 @@ function AccountSettings() {
 
                 }).catch((error) => {
                 handleApiError(error);
+            }).finally(() => {
+                setIsLoading(false)
             });
         } else {
             console.log('Account or account language is not defined');
@@ -187,19 +202,22 @@ function AccountSettings() {
     return (
         <div>
             <SiteHeader/>
-            <Breadcrumb className={"p-5"}>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash />
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink>{t("breadcrumb.myAccount")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <div className="flex justify-between items-center pt-2">
+                <Breadcrumb className="pl-2">
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink>{t("breadcrumb.myAccount")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <RefreshButton/>
+            </div>
             <main
                 className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
                 <div className="mx-auto grid w-full max-w-6xl gap-2">
@@ -210,19 +228,26 @@ function AccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
-                        <Button variant="link" onClick={() => setActiveForm('E-Mail')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
-                            {t("accountSettings.email")}
+                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Details')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.details")}
                         </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Password')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
-                            {t("accountSettings.password")}
-                        </Button>
-                        <Button variant="link" onClick={() => setActiveForm('Personal Info')}
-                                className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Personal Info')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.personalInfo")}
                         </Button>
-
+                        <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('E-Mail')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.email")}
+                        </Button>
+                        <Button variant={`${activeForm === 'Password' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Password')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.password")}
+                        </Button>
                     </nav>
                     <div className="grid gap-6">
                         {activeForm === 'E-Mail' && (
@@ -241,7 +266,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.email")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.authentication.email")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={account?.email} {...field} />
@@ -250,8 +275,15 @@ function AccountSettings() {
                                                                     </FormItem>
                                                                 )}/>
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.authentication.email.change")}
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.authentication.email.change")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -289,35 +321,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.oldPassword")}</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input type="password" {...field} />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                            <FormField
-                                                                control={formPassword.control}
-                                                                name="newPassword"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.newPassword")}</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input type="password" {...field} />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                            <FormField
-                                                                control={formPassword.control}
-                                                                name="newPasswordRepeat"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.newPasswordRepeat")}</FormLabel>
+                                                                            className="text-black">{t("accountSettings.authentication.oldPassword")} *</FormLabel>
                                                                         <FormControl>
                                                                             <Input type="password" {...field} />
                                                                         </FormControl>
@@ -326,8 +330,47 @@ function AccountSettings() {
                                                                 )}
                                                             />
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.authentication.password.change")}
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="newPassword"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.newPassword")} *</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formPassword.control}
+                                                                name="newPasswordRepeat"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormLabel
+                                                                            className="text-black">{t("accountSettings.authentication.newPasswordRepeat")} *</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input type="password" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.authentication.password.change")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -351,13 +394,13 @@ function AccountSettings() {
                         )}
                         {activeForm === 'Personal Info' && (
                             <div>
-                                <Card className="mx-auto">
+                                <Card className="mx-10 w-auto">
                                     <CardContent>
                                         <Form {...formUserData}>
                                             {// @ts-expect-error - fix this
                                                 <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
                                                       className="space-y-4">
-                                                    <div className="grid gap-4 p-10">
+                                                    <div className="grid gap-4 p-5">
                                                         <div className="grid gap-2">
                                                             <FormField
                                                                 control={formUserData.control}
@@ -368,7 +411,9 @@ function AccountSettings() {
                                                                             className="text-black">{t("accountSettings.personalInfo.firstName")}</FormLabel>
                                                                         <FormControl>
                                                                             <Input
-                                                                                placeholder={account?.name} {...field}/>
+                                                                                {...field}
+                                                                                placeholder={account?.name}
+                                                                            />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
@@ -385,7 +430,9 @@ function AccountSettings() {
                                                                             className="text-black">{t("accountSettings.personalInfo.lastName")}</FormLabel>
                                                                         <FormControl>
                                                                             <Input
-                                                                                placeholder={account?.lastname} {...field}/>
+                                                                                {...field}
+                                                                                placeholder={account?.lastname}
+                                                                            />
                                                                         </FormControl>
                                                                         <FormMessage/>
                                                                     </FormItem>
@@ -407,11 +454,12 @@ function AccountSettings() {
                                                                                 render={({field}) => (
                                                                                     <PhoneInput
                                                                                         {...field}
-                                                                                        value={field.value || ""}
-                                                                                        placeholder={account?.phone}
+                                                                                        value={field.value}
                                                                                         onChange={field.onChange}
                                                                                         countries={['PL']}
                                                                                         defaultCountry="PL"
+                                                                                        placeholder={account?.phoneNumber?.startsWith('+48') ? account.phoneNumber.slice(3).replace(/\B(?=(\d{3})+(?!\d))/g, " ") : account?.phoneNumber}
+
                                                                                     />
                                                                                 )}
                                                                             />
@@ -421,8 +469,47 @@ function AccountSettings() {
                                                                 )}
                                                             />
                                                         </div>
-                                                        <Button type="submit" className="w-full pb-2">
-                                                            {t("accountSettings.personalInfo.saveChanges")}
+                                                        <div className="grid gap-2">
+                                                            <FormField
+                                                                control={formUserData.control}
+                                                                name="twoFactorAuth"
+                                                                render={() => (
+                                                                    <FormField
+                                                                        control={formUserData.control}
+                                                                        name="twoFactorAuth"
+                                                                        render={({field}) => (
+                                                                            <FormItem>
+                                                                                <div className="flex flex-col">
+                                                                                    <FormLabel className="text-black">
+                                                                                        {t("accountSettings.twoFactorAuth")}
+                                                                                    </FormLabel>
+                                                                                    <FormControl>
+                                                                                        <div
+                                                                                            className={"justify-center pt-5"}>
+                                                                                            <Switch {...field}
+                                                                                                    defaultChecked={account?.twoFactorAuth}
+                                                                                                    checked={field.value}
+                                                                                                    onCheckedChange={field.onChange}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </FormControl>
+                                                                                </div>
+                                                                                <FormMessage/>
+                                                                            </FormItem>
+                                                                        )}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <Button type="submit" className="w-full pb-2"
+                                                                disabled={isLoading}>
+                                                            {isLoading ? (
+                                                                <>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                                </>
+                                                            ) : (
+                                                                t("accountSettings.personalInfo.saveChanges")
+                                                            )}
                                                         </Button>
                                                     </div>
                                                 </form>
@@ -442,6 +529,58 @@ function AccountSettings() {
                                         <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
                                     </AlertDialogContent>
                                 </AlertDialog>
+                            </div>
+                        )}
+                        {activeForm === 'Details' && (
+                            <div>
+                                <Card className="mx-10 w-auto text-left">
+                                    <CardContent>
+                                        <h2 className="text-lg font-bold text-center p-5">{t("accountSettings.accountInfo")}</h2>
+                                        <p>
+                                            <strong>{t("accountSettings.name")}:</strong> {account?.name} {account?.lastname}
+                                        </p>
+                                        <p><strong>{t("accountSettings.email")}:</strong> {account?.email}</p>
+                                        <p><strong>{t("accountSettings.login")}:</strong> {account?.login}</p>
+                                        <p><strong>{t("accountSettings.phone")}:</strong> {account?.phoneNumber}</p>
+                                        <p>
+                                            <strong>{t("accountSettings.accountLanguage")}: </strong>
+                                            {account?.accountLanguage?.toLowerCase() === 'en' ? t("general.english") :
+                                                account?.accountLanguage?.toLowerCase() === 'pl' ? t("general.polish") :
+                                                    account?.accountLanguage}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.active")}:</strong> {account?.active ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.blocked")}:</strong> {account?.blocked ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.verified")}:</strong> {account?.verified ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.2fa")}:</strong> {account?.twoFactorAuth ?
+                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.creationDate")}:</strong> {account?.creationDate ? account.creationDate : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {account?.lastSuccessfulLoginTime ? account.lastSuccessfulLoginTime : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {account?.lastUnsuccessfulLoginTime ? account.lastUnsuccessfulLoginTime : 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {account?.lastSuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                        <p>
+                                            <strong>{t("accountSettings.lastUnsucLoginIp")}:</strong> {account?.lastUnsuccessfulLoginIp || 'N/A'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
                             </div>
                         )}
                     </div>

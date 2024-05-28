@@ -11,7 +11,6 @@ interface ApiError {
 }
 
 function handleApiError(error: ApiError): void {
-
     if (error.response && error.response.data) {
         const {message, violations} = error.response.data;
         let violationMessages = "";

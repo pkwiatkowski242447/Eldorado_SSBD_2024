@@ -801,6 +801,22 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @ParameterizedTest
+    @MethodSource("provideConflictingUserLevelForAccountParameters")
+    public void addUserLevelTestAccountConflictingUserLevel(String id, String oldUserLevel) throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .post(BASE_URL + "/accounts/{id}/add-level-{level}", id, oldUserLevel)
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.ACCOUNT_USER_LEVELS_CONFLICT)
+                );
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"client", "staff", "admin"})
     public void addUserLevelTestInvalidId(String userLevel) throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
@@ -1787,7 +1803,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/register/{user_level}", userLevel)
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
@@ -1923,7 +1939,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/register/client")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
@@ -2013,7 +2029,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     private static Stream<Arguments> provideNewUserLevelForAccountParameters() {
         return Stream.of(
                 Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "staff"), //aandrus
-                Arguments.of("f512c0b6-40b2-4bcb-8541-46077ac02101", "client"), //tkarol
+                Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "client"), //aandrus
                 Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "admin") //kwotyla
         );
     }
@@ -2023,6 +2039,13 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "admin"), //aandrus
                 Arguments.of("f512c0b6-40b2-4bcb-8541-46077ac02101", "staff"), //tkarol
                 Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "client") //kwotyla
+        );
+    }
+
+    private static Stream<Arguments> provideConflictingUserLevelForAccountParameters() {
+        return Stream.of(
+                Arguments.of("f512c0b6-40b2-4bcb-8541-46077ac02101", "client"), //tkarol
+                Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "staff") //kwotyla
         );
     }
 

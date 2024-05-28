@@ -7,6 +7,15 @@ import {Card, CardDescription, CardHeader, CardTitle,} from "@/components/ui/car
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
+import {useState} from "react";
+import {Loader2} from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
 
 function ConfirmEmailChangePage() {
     const {token} = useParams<{ token: string }>();
@@ -14,12 +23,17 @@ function ConfirmEmailChangePage() {
     const {toast} = useToast();
     const navigate = useNavigate();
     const {t} = useTranslation();
-
+    const [isLoading, setIsLoading] = useState(false);
     const {getCurrentAccount} = useAccount();
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+
+    function openAlert() {
+        setAlertDialogOpen(true);
+    }
 
     function onClickButton() {
-        // console.log(decodedToken)
-        if (localStorage.getItem('token')!==null) {
+        if (localStorage.getItem('token') !== null) {
+            setIsLoading(true)
             api.confirmEmail(decodedToken!)
                 .then(() => {
                     toast({
@@ -38,24 +52,14 @@ function ConfirmEmailChangePage() {
                     });
                 })
                 .catch((error) => {
-                    if (error.response && error.response.data) {
-                        const {message, violations} = error.response.data;
-                        const violationMessages = violations.map((violation: string | string[]) => t(violation)).join(", ");
+                    handleApiError(error);
+                }).finally(() => {
+                    setAlertDialogOpen(false)
+                    setIsLoading(false)
 
-                        toast({
-                            variant: "destructive",
-                            title: t(message),
-                            description: violationMessages,
-                        });
-                    } else {
-                        toast({
-                            variant: "destructive",
-                            description: "Error",
-                        });
-                    }
-                    // console.log(error.response ? error.response.data : error);
-                });
+            });
         } else {
+            setIsLoading(true)
             api.confirmEmail(decodedToken!)
                 .then(() => {
                     toast({
@@ -75,20 +79,46 @@ function ConfirmEmailChangePage() {
                 })
                 .catch((error) => {
                     handleApiError(error);
-                });
+                }).finally(() => {
+                setIsLoading(false)
+            });
         }
     }
 
     return (
         <div>
-            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <Card>
                 <CardHeader>
                     <CardTitle>{t("confirmEmailPage.title")}</CardTitle>
                     <CardDescription>{t("confirmEmailPage.info")}</CardDescription>
-                    <Button onClick={onClickButton} className='mx-auto h-auto w-auto'>{t("confirmEmailPage.button")}</Button>
+                    <Button onClick={onClickButton}
+                            className='mx-auto h-auto w-auto' disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                            </>
+                        ) : (
+                            t("confirmEmailPage.button")
+                        )}
+                    </Button>
                 </CardHeader>
             </Card>
+            <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t("adminAddUserPage.confirmUserCreation")}
+                    </AlertDialogDescription>
+                    <AlertDialogAction onClick={openAlert}>
+                        {t("general.ok")}
+                    </AlertDialogAction>
+                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

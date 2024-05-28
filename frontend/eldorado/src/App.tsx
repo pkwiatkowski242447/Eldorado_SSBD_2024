@@ -5,7 +5,6 @@ import {AccountStateContextProvider} from "./context/AccountContext";
 import './i18n';
 
 function App() {
-
     return (
         <AccountStateContextProvider>
             <Router>

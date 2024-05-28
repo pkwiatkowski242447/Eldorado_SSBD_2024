@@ -3,15 +3,18 @@ import {useNavigate} from "react-router-dom";
 import {api} from "../api/api";
 import {Pathnames} from "../router/pathnames";
 import {usersApi} from "@/api/userApi.ts";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import handleApiError from "@/components/HandleApiError.ts";
+import {localDateTimeToDate, UserType} from "@/types/Users.ts";
 
 export const useAccount = () => {
-    const navigate = useNavigate()
+
     const {account, setAccount} = useAccountState()
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const isAuthenticated = !!account
+
+    const navigate = useNavigate()
     const {toast} = useToast()
 
     useEffect(() => {
@@ -38,7 +41,6 @@ export const useAccount = () => {
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('account')
             localStorage.removeItem('etag')
-            setIsAuthenticated(false)
             setAccount(null)
             navigateToMainPage()
         }
@@ -52,7 +54,6 @@ export const useAccount = () => {
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
                 await getCurrentAccount()
-                setIsAuthenticated(true);
                 navigate(Pathnames.public.home)
             } else if (response.status === 204) {
                 navigate(`/login/2fa/${login}`);
@@ -73,10 +74,7 @@ export const useAccount = () => {
                 const refreshToken = response.data.refreshToken;
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
-                console.log(accessToken)
-                console.log(refreshToken)
                 await getCurrentAccount()
-                setIsAuthenticated(true);
                 navigate(Pathnames.public.home)
             }
         } catch (e) {
@@ -84,7 +82,6 @@ export const useAccount = () => {
                 variant: "destructive",
                 description: "Something went wrong. Please try again later.",
             })
-            // console.log(e);
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
@@ -97,7 +94,17 @@ export const useAccount = () => {
                 const token = await usersApi.getSelf();
                 window.localStorage.setItem('etag', token.headers['etag']);
                 let activeUserLevel = token.data.userLevelsDto[0];
-                if (!account?.activeUserLevel) {
+                const storedUserLevel = localStorage.getItem('chosenUserLevel');
+
+                if (storedUserLevel) {
+                    const chosenLevel = token.data.userLevelsDto.find((userLevel: {
+                        roleName: string;
+                    }) => userLevel.roleName === storedUserLevel);
+                    if (chosenLevel) {
+                        activeUserLevel = chosenLevel;
+                    }
+
+                } else if (!account?.activeUserLevel) {
                     for (const userLevel of token.data.userLevelsDto) {
                         if (userLevel.roleName === RolesEnum.ADMIN) {
                             activeUserLevel = userLevel;
@@ -109,24 +116,45 @@ export const useAccount = () => {
                 } else {
                     activeUserLevel = account.activeUserLevel;
                 }
-                const user = {
+
+                let creationDate = null;
+                let lastSuccessfulLoginTime = null;
+                let lastUnsuccessfulLoginTime = null;
+
+                if (token.data.creationDate) {
+                    creationDate = localDateTimeToDate(token.data.creationDate);
+                }
+                if (token.data.lastSuccessfulLoginTime) {
+                    lastSuccessfulLoginTime = localDateTimeToDate(token.data.lastSuccessfulLoginTime);
+                }
+
+                if (token.data.lastUnsuccessfulLoginTime) {
+                    lastUnsuccessfulLoginTime = localDateTimeToDate(token.data.lastUnsuccessfulLoginTime);
+                }
+
+                const user: UserType = {
                     accountLanguage: token.data.accountLanguage,
                     active: token.data.active,
                     blocked: token.data.blocked,
-                    creationDate: token.data.creationDate,
                     email: token.data.email,
                     id: token.data.id,
                     lastname: token.data.lastname,
                     login: token.data.login,
                     name: token.data.name,
                     token: tokenRaw,
-                    phone: token.data.phone,
+                    phoneNumber: token.data.phoneNumber,
                     userLevelsDto: token.data.userLevelsDto,
                     activeUserLevel: activeUserLevel,
                     verified: token.data.verified,
                     version: token.data.version,
                     twoFactorAuth: token.data.twoFactorAuth,
+                    lastSuccessfulLoginIp: token.data.lastSuccessfulLoginIp,
+                    lastUnsuccessfulLoginIp: token.data.lastUnsuccessfulLoginIp,
+                    creationDate: creationDate,
+                    lastSuccessfulLoginTime: lastSuccessfulLoginTime,
+                    lastUnsuccessfulLoginTime: lastUnsuccessfulLoginTime
                 };
+                
                 setAccount(user);
                 localStorage.setItem('account', JSON.stringify(user));
             }

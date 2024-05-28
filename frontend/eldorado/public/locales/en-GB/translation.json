@@ -2,13 +2,16 @@
   "general.ok": "OK",
   "general.cancel": "Cancel",
   "general.confirm": "Confirm",
-
+  "general.english": "English",
+  "general.polish": "Polish",
+  "general.refresh": "Refresh data",
 
   "landingPage.title": "Coming soon",
   "landingPage.text": "Most likely",
   "landingPage.logIn": "Log In",
   "landingPage.register": "Register",
 
+  "adminAddUserPage.confirmUserCreation": "Are you sure you want to create this user?",
 
   "loginPage.title": "Login",
   "loginPage.info": "Enter your login information to proceed",
@@ -48,6 +51,15 @@
   "registerPage.hasAccount": "Already have an account?",
   "registerPage.logIn": "Log In",
   "registerPage.passwordInvalid": "Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character",
+  "registerPage.passwordRepeat": "Confirm Password",
+  "registerPage.client": "Client",
+  "registerPage.admin": "Admin",
+  "registerPage.staff": "Staff",
+  "registerPage.role": "User Level",
+
+  "registerPage.admin.popUp.registerOK.title": "Account successfully created",
+  "registerPage.admin.popUp.registerOK.text": "Please check the provided E-Mail address' inbox and click the link to complete the registration process.",
+  "registerPage.admin.popUp.registerOK.button": "Ok",
 
   "forgotPasswordPage.title": "Forgot Password",
   "forgotPasswordPage.info": "Enter your email address to reset your password",
@@ -66,6 +78,7 @@
   "siteHeader.changeLevel": "Change access level",
   "siteHeader.changeLevel.select": "Select your active role:",
   "siteHeader.changeLevel.select.save": "Save",
+  "siteHeader.login": "Log In",
 
 
   "accountSettings.title": "Change your account settings",
@@ -84,6 +97,24 @@
   "accountSettings.lastNameTooLong": "Last name can be at most 50 characters long",
   "accountSettings.phoneNumberInvalid": "Phone number is not valid",
   "accountSettings.wrongEmail": "The email address is not valid",
+  "accountSettings.twoFactorAuth": "Two-factor authentication",
+
+
+  "accountSettings.accountInfo": "Account Information",
+  "accountSettings.name": "Name",
+  "accountSettings.login": "Login",
+  "accountSettings.active": "Active",
+  "accountSettings.blocked": "Blocked",
+  "accountSettings.verified": "Verified",
+    "accountSettings.phone": "Phone",
+    "accountSettings.accountLanguage": "Account Language",
+    "accountSettings.2fa": "Two Factor Authentication",
+    "accountSettings.creationDate": "Creation Date",
+    "accountSettings.lastSucLoginTime": "Last Successful Login Time",
+    "accountSettings.lastSucLoginIp": "Last Successful Login IP",
+    "accountSettings.lastUnsucLoginTime": "Last Unsuccessful Login Time",
+    "accountSettings.lastUnsucLoginIp": "Last Unsuccessful Login IP",
+
 
   "accountSettings.authentication.oldPassword": "Current Password",
   "accountSettings.authentication.newPassword": "New Password",
@@ -96,10 +127,12 @@
   "accountSettings.confirmPasswordChange": "Are you sure you want to change your password?",
   "accountSettings.popUp.changePasswordOK.title": "Success!",
   "accountSettings.popUp.changePasswordOK.text": "Your password has been successfully changed.",
+  "accountSettings.details": "Details",
+
 
   "accountSettings.users.table.header.login": "Login",
   "accountSettings.users.table.header.name": "Name",
-  "accountSettings.users.table.header.lastName": "E-mail",
+  "accountSettings.users.table.header.lastName": "Last Name",
   "accountSettings.users.table.header.active": "Active",
   "accountSettings.users.table.header.blocked": "Blocked",
   "accountSettings.users.table.header.verified": "Verfied",
@@ -179,7 +212,7 @@
   "accountSettings.popUp.changeUserDataOK.text": "Your personal data has been successfully changed.",
   "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "User level has been removed successfully.",
   "accountSettings.popUp.changeUserDataOK.userLevelAdded": "User level has been added successfully.",
-
+  "accountSettings.popUp.changeOtherUserDataOK.text": "The user's personal data has been successfully changed.",
 
   "confirmEmailPage.popUp.confirmEmailOK.title": "Success!",
   "confirmEmailPage.popUp.confirmEmailOK.loggedIn.text": "Your email has been successfully changed.",
@@ -358,8 +391,9 @@
   "breadcrumb.changeUserlevel": "Change access level",
   "breadcrumb.myAccount": "My account",
   "breadcrumb.userAccount": "Edit user account",
+  "breadcrumb.createUser": "Create new user",
 
   "notFound.title": "Page not found",
-    "notFound.description": "The page you are looking for does not exist",
-    "notFound.home": "Go to the home page"
+  "notFound.description": "The page you are looking for does not exist",
+  "notFound.home": "Go to the home page"
 }

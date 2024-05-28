@@ -19,6 +19,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.AccountExceptio
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.GenericExceptionResolver;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
@@ -56,7 +57,8 @@ public class RegistrationControllerMockTest {
 
     @Test
     public void registerClientSuccessful() throws Exception {
-        Mockito.doNothing().when(accountService).registerClient(
+        Account account = new Account(testLogin, testPassword, testFirstname, testLastname, testEmail, testPhoneNumber);
+        Mockito.doReturn(account).when(accountService).registerClient(
                 testLogin,
                 testPassword,
                 testFirstname,
@@ -78,7 +80,7 @@ public class RegistrationControllerMockTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/register/client")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountRegisterDTO)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         // Verify
         Mockito.verify(accountService, Mockito.times(1)).registerClient(
@@ -246,7 +248,8 @@ public class RegistrationControllerMockTest {
 
     @Test
     public void registerStaffSuccessful() throws Exception {
-        Mockito.doNothing().when(accountService).registerStaff(
+        Account account = new Account(testLogin, testPassword, testFirstname, testLastname, testEmail, testPhoneNumber);
+        Mockito.doReturn(account).when(accountService).registerStaff(
                 testLogin,
                 testPassword,
                 testFirstname,
@@ -268,7 +271,7 @@ public class RegistrationControllerMockTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/register/staff")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountRegisterDTO)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         // Verify
         Mockito.verify(accountService, Mockito.times(1)).registerStaff(
@@ -284,7 +287,8 @@ public class RegistrationControllerMockTest {
 
     @Test
     public void registerAdminSuccessful() throws Exception {
-        Mockito.doNothing().when(accountService).registerAdmin(
+        Account account = new Account(testLogin, testPassword, testFirstname, testLastname, testEmail, testPhoneNumber);
+        Mockito.doReturn(account).when(accountService).registerAdmin(
                 testLogin,
                 testPassword,
                 testFirstname,
@@ -306,7 +310,7 @@ public class RegistrationControllerMockTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/register/admin")
                         .contentType(CONTENT_TYPE)
                         .content(mapper.writeValueAsString(accountRegisterDTO)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         // Verify
         Mockito.verify(accountService, Mockito.times(1)).registerAdmin(

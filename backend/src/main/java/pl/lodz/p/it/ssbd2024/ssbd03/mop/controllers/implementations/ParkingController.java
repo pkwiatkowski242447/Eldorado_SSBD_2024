@@ -1,12 +1,19 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
@@ -21,9 +28,16 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 @RequestMapping("/api/v1/parking")
 public class ParkingController implements ParkingControllerInterface {
 
+
     @Override
     @RolesAllowed({Roles.STAFF})
     public ResponseEntity<?> createParking(ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed({Roles.STAFF})
+    public ResponseEntity<?> createSector(@RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
@@ -78,6 +92,19 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed({Roles.CLIENT})
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    @RolesAllowed(Roles.STAFF)
+    public ResponseEntity<?> editParking(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                         @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException {
+        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    }
+
+    @Override
+    public ResponseEntity<?> editSector(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
+                                        @Valid @RequestBody SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
