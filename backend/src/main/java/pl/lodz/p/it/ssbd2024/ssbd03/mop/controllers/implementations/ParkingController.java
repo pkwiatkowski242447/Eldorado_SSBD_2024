@@ -37,7 +37,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Roles.STAFF})
-    public ResponseEntity<?> createSector(@RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> createSector(@PathVariable("id") String parkingId, @RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
@@ -116,7 +116,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
-    public ResponseEntity<?> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException {
+    public ResponseEntity<?> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
          throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
