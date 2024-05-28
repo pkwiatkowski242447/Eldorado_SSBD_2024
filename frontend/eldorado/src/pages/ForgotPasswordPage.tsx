@@ -48,7 +48,10 @@ function ForgotPasswordPage() {
 
     return (
         <div className="flex flex-col items-center justify-center">
-            <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2 mb-8"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <Card className="mx-auto max-w-2xl">
                 <CardHeader>
                     <CardTitle>{t("forgotPasswordPage.title")}</CardTitle>

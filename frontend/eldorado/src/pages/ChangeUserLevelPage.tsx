@@ -71,21 +71,23 @@ function ChangeUserLevelPage() {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <SiteHeader/>
-            <Breadcrumb className={"pt-5 pl-2"}>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator>
-                        <Slash/>
-                    </BreadcrumbSeparator>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink>{t("breadcrumb.changeUserlevel")}</BreadcrumbLink>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <div className="flex justify-between items-center pt-2">
+                <Breadcrumb className={"pl-2"}>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <Slash/>
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink>{t("breadcrumb.changeUserlevel")}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <Button variant={"ghost"} disabled={true}/>
+            </div>
             <div className="flex justify-center items-center mx-auto p-10">
-
                 <Card>
                     <CardHeader className="p-3 font-bold">
                         {t("siteHeader.changeLevel.select")}

@@ -9,6 +9,13 @@ import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {useState} from "react";
 import {Loader2} from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
 
 function ConfirmEmailChangePage() {
     const {token} = useParams<{ token: string }>();
@@ -18,6 +25,11 @@ function ConfirmEmailChangePage() {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const {getCurrentAccount} = useAccount();
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+
+    function openAlert() {
+        setAlertDialogOpen(true);
+    }
 
     function onClickButton() {
         if (localStorage.getItem('token') !== null) {
@@ -42,7 +54,9 @@ function ConfirmEmailChangePage() {
                 .catch((error) => {
                     handleApiError(error);
                 }).finally(() => {
-                setIsLoading(false)
+                    setAlertDialogOpen(false)
+                    setIsLoading(false)
+
             });
         } else {
             setIsLoading(true)
@@ -73,7 +87,10 @@ function ConfirmEmailChangePage() {
 
     return (
         <div>
-            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <Card>
                 <CardHeader>
                     <CardTitle>{t("confirmEmailPage.title")}</CardTitle>
@@ -90,6 +107,18 @@ function ConfirmEmailChangePage() {
                     </Button>
                 </CardHeader>
             </Card>
+            <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t("adminAddUserPage.confirmUserCreation")}
+                    </AlertDialogDescription>
+                    <AlertDialogAction onClick={openAlert}>
+                        {t("general.ok")}
+                    </AlertDialogAction>
+                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

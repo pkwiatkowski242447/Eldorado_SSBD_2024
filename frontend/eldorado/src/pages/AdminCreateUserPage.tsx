@@ -24,12 +24,22 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useNavigate} from "react-router-dom";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
 
 export function AdminCreateUserPage() {
     const {toast} = useToast()
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+    const [formValues, setFormValues] = useState(null);
 
     const formSchema = z.object({
         email: z.string().min(1, {message: t("registerPage.emptyEmail")})
@@ -67,7 +77,19 @@ export function AdminCreateUserPage() {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    const onSubmitUser = (values: z.infer<typeof formSchema>) => {
+        // @ts-expect-error - fix this
+        setFormValues(values);
+        setAlertDialogOpen(true);
+    };
+
+    const handleDialogAction = () => {
+        // @ts-expect-error - fix this
+        submitUser(formValues)
+        setAlertDialogOpen(false);
+    };
+
+    function submitUser(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         const registerFn = {
             client: api.registerClient,
@@ -125,7 +147,7 @@ export function AdminCreateUserPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{t("breadcrumb.userAccount")}</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrumb.createUser")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -141,7 +163,7 @@ export function AdminCreateUserPage() {
                     </CardHeader>
                     <CardContent>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <form onSubmit={form.handleSubmit(onSubmitUser)} className="space-y-4">
                                 <div className="grid gap-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="grid gap-2">
@@ -327,6 +349,18 @@ export function AdminCreateUserPage() {
                         </Form>
                     </CardContent>
                 </Card>
+                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t("adminAddUserPage.confirmUserCreation")}
+                        </AlertDialogDescription>
+                        <AlertDialogAction onClick={handleDialogAction}>
+                            {t("general.ok")}
+                        </AlertDialogAction>
+                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                    </AlertDialogContent>
+                </AlertDialog>
             </main>
         </div>
     )

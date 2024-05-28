@@ -4,7 +4,10 @@ import RegisterForm from "@/components/forms/RegisterForm.tsx";
 function RegisterPage() {
     return (
         <div>
-            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <RegisterForm/>
         </div>
     )

@@ -11,6 +11,7 @@
   "landingPage.logIn": "Log In",
   "landingPage.register": "Register",
 
+  "adminAddUserPage.confirmUserCreation": "Are you sure you want to create this user?",
 
   "loginPage.title": "Login",
   "loginPage.info": "Enter your login information to proceed",
@@ -390,8 +391,9 @@
   "breadcrumb.changeUserlevel": "Change access level",
   "breadcrumb.myAccount": "My account",
   "breadcrumb.userAccount": "Edit user account",
+  "breadcrumb.createUser": "Create new user",
 
   "notFound.title": "Page not found",
-    "notFound.description": "The page you are looking for does not exist",
-    "notFound.home": "Go to the home page"
+  "notFound.description": "The page you are looking for does not exist",
+  "notFound.home": "Go to the home page"
 }

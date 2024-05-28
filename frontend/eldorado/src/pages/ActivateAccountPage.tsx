@@ -44,7 +44,10 @@ function ActivateAccountPage() {
 
     return (
         <div>
-            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <Card>
                 <CardHeader>
                     <CardTitle>{t("activateAccountPage.title")}</CardTitle>

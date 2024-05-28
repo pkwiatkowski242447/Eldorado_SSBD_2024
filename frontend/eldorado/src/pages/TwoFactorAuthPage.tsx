@@ -46,7 +46,10 @@ function TwoFactorAuthPage() {
 
     return (
         <div className="flex flex-col items-center justify-center">
-            <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2 mb-8"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2 mb-8"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-auto">
                     <FormField

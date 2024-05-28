@@ -63,7 +63,10 @@ function ResetPasswordPage() {
 
     return (
         <div>
-            <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+            <a href="/home" className="flex items-center">
+                <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/2"/>
+                <span className="sr-only">Eldorado</span>
+            </a>
             <Card className="mx-auto max-w-2xl">
                 <CardHeader>
                     <CardTitle>{t("resetPasswordPage.title")}</CardTitle>

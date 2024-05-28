@@ -35,9 +35,13 @@ import {Switch} from "@/components/ui/switch.tsx";
 import {FiCheck, FiX} from "react-icons/fi";
 import {RefreshButton} from "@/components/RefreshButton.tsx";
 
+// I'm fully aware that what i've commited below is a crime.
+// I don't feel like dividing everything into separate components just for the sake of being pretty to look at rn
+// No one is going to look at this anyway and time is not on my side
+// bk
 
 function AccountSettings() {
-    const [activeForm, setActiveForm] = useState('E-Mail');
+    const [activeForm, setActiveForm] = useState('Details');
     const {account} = useAccountState();
     const {t} = useTranslation();
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -52,10 +56,10 @@ function AccountSettings() {
 
     const userDataSchema = z.object({
         name: z.string().min(2, {message: t("accountSettings.firstNameTooShort")})
-            .max(50, {message: t("accountSettings.firstNameTooLong")}),
+            .max(50, {message: t("accountSettings.firstNameTooLong")}).optional(),
         lastName: z.string().min(2, {message: t("accountSettings.lastNameTooShort")})
-            .max(50, {message: t("accountSettings.lastNameTooLong")}),
-        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
+            .max(50, {message: t("accountSettings.lastNameTooLong")}).optional(),
+        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}).optional(),
         twoFactorAuth: z.boolean().optional().default(account?.twoFactorAuth || false),
     });
 
@@ -169,11 +173,13 @@ function AccountSettings() {
         setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
         if (account && account.accountLanguage && etag !== null) {
-            if (values.twoFactorAuth === undefined) {
-                values.twoFactorAuth = false;
-            }
+            const name = values.name !== undefined ? values.name : account.name;
+            const lastName = values.lastName !== undefined ? values.lastName : account.lastname;
+            const phoneNumber = values.phoneNumber !== undefined ? values.phoneNumber : account.phoneNumber;
+            const twoFactorAuth = values.twoFactorAuth !== undefined ? values.twoFactorAuth : account.twoFactorAuth;
+
             api.modifyAccountSelf(account.login, account.version, account.userLevelsDto,
-                values.name, values.lastName, values.phoneNumber, values.twoFactorAuth, etag)
+                name, lastName, phoneNumber, twoFactorAuth, etag)
                 .then(() => {
                     getCurrentAccount();
                     toast({
@@ -222,6 +228,16 @@ function AccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
+                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Details')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.details")}
+                        </Button>
+                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Personal Info')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.personalInfo")}
+                        </Button>
                         <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('E-Mail')}
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
@@ -232,17 +248,6 @@ function AccountSettings() {
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.password")}
                         </Button>
-                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
-                                onClick={() => setActiveForm('Personal Info')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                            {t("accountSettings.personalInfo")}
-                        </Button>
-                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
-                                onClick={() => setActiveForm('Details')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                            {t("accountSettings.details")}
-                        </Button>
-
                     </nav>
                     <div className="grid gap-6">
                         {activeForm === 'E-Mail' && (
@@ -403,7 +408,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.personalInfo.firstName")} *</FormLabel>
+                                                                            className="text-black">{t("accountSettings.personalInfo.firstName")}</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 {...field}
@@ -422,7 +427,7 @@ function AccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.personalInfo.lastName")} *</FormLabel>
+                                                                            className="text-black">{t("accountSettings.personalInfo.lastName")}</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 {...field}
@@ -441,7 +446,7 @@ function AccountSettings() {
                                                                 render={() => (
                                                                     <FormItem className="items-start">
                                                                         <FormLabel
-                                                                            className="text-black text-center">{t("registerPage.phoneNumber")} *</FormLabel>
+                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                                         <FormControl className="w-full">
                                                                             <Controller
                                                                                 name="phoneNumber"
@@ -453,7 +458,8 @@ function AccountSettings() {
                                                                                         onChange={field.onChange}
                                                                                         countries={['PL']}
                                                                                         defaultCountry="PL"
-                                                                                        placeholder={account?.phoneNumber}
+                                                                                        placeholder={account?.phoneNumber?.startsWith('+48') ? account.phoneNumber.slice(3).replace(/\B(?=(\d{3})+(?!\d))/g, " ") : account?.phoneNumber}
+
                                                                                     />
                                                                                 )}
                                                                             />

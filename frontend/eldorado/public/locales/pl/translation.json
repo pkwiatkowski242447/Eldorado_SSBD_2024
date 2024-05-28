@@ -11,6 +11,7 @@
   "landingPage.logIn": "Zaloguj się",
   "landingPage.register": "Zarejestruj się",
 
+  "adminAddUserPage.confirmUserCreation": "Czy na pewno chcesz utworzyć konto?",
 
   "loginPage.title": "Logowanie",
   "loginPage.info": "Wprowadź swoje dane logowania, aby kontynuować",
@@ -380,6 +381,7 @@
   "breadcrumb.changeUserlevel": "Zmień poziom dostępu",
   "breadcrumb.myAccount": "Moje konto",
   "breadcrumb.userAccount": "Edytuj konto",
+  "breadcrumb.createUser" : "Utwórz nowe konto",
 
   "notFound.title": "Strona nie znaleziona",
   "notFound.description": "Strona, której szukasz, nie istnieje",

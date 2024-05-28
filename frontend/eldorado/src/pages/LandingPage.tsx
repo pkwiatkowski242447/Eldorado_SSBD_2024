@@ -8,7 +8,7 @@ function LandingPage() {
         navigate('/home');
     }, [navigate]);
 
-    return null;
+    return <div></div>;
 }
 
 export default LandingPage;

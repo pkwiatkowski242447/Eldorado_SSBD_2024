@@ -38,8 +38,13 @@ import {FiCheck, FiX} from "react-icons/fi";
 
 const allUserLevels: RolesEnum[] = [RolesEnum.ADMIN, RolesEnum.STAFF, RolesEnum.CLIENT];
 
+// I'm fully aware that what i've commited below is a crime.
+// I don't feel like dividing everything into separate components just for the sake of being pretty to look at rn
+// No one is going to look at this anyway and time is not on my side
+// bk
+
 function UserAccountSettings() {
-    const [activeForm, setActiveForm] = useState('UserLevels');
+    const [activeForm, setActiveForm] = useState('Details');
     const [managedUser, setManagedUser] = useState<UserType | null>(null);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [levelToChange, setLevelToChange] = useState<RolesEnum | null>(null);
@@ -56,10 +61,10 @@ function UserAccountSettings() {
 
     const userDataSchema = z.object({
         name: z.string().min(2, {message: t("accountSettings.firstNameTooShort")})
-            .max(50, {message: t("accountSettings.firstNameTooLong")}),
+            .max(50, {message: t("accountSettings.firstNameTooLong")}).optional(),
         lastName: z.string().min(2, {message: t("accountSettings.lastNameTooShort")})
-            .max(50, {message: t("accountSettings.lastNameTooLong")}),
-        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}),
+            .max(50, {message: t("accountSettings.lastNameTooLong")}).optional(),
+        phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}).optional(),
         twoFactorAuth: z.boolean().optional().default(managedUser?.twoFactorAuth || false),
     });
 
@@ -105,9 +110,7 @@ function UserAccountSettings() {
                     activeUserLevel: null,
                 };
                 //the token and activeUserLevel are not needed in this context hence null is passed
-
                 setManagedUser(managedUser);
-                console.table(managedUser)
                 window.localStorage.setItem('etag', response.headers['etag']);
             });
         }
@@ -274,11 +277,13 @@ function UserAccountSettings() {
         setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
         if (managedUser && managedUser.accountLanguage && etag !== null) {
-            if (values.twoFactorAuth === undefined) {
-                values.twoFactorAuth = false;
-            }
+            const name = values.name !== undefined ? values.name : managedUser.name;
+            const lastName = values.lastName !== undefined ? values.lastName : managedUser.lastname;
+            const phoneNumber = values.phoneNumber !== undefined ? values.phoneNumber : managedUser.phoneNumber;
+            const twoFactorAuth = values.twoFactorAuth !== undefined ? values.twoFactorAuth : managedUser.twoFactorAuth;
+
             api.modifyAccountUser(managedUser.login, managedUser.version, managedUser.userLevelsDto,
-                values.name, values.lastName, values.phoneNumber, values.twoFactorAuth, etag)
+                name, lastName, phoneNumber, twoFactorAuth, etag)
                 .then(() => {
                     getCurrentAccount();
                     toast({
@@ -373,10 +378,20 @@ function UserAccountSettings() {
                     <nav
                         className="grid gap-4 text-sm text-muted-foreground"
                     >
+                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Details')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.details")}
+                        </Button>
                         <Button variant={`${activeForm === 'UserLevels' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('UserLevels')}
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.users.table.settings.account.userLevels")}
+                        </Button>
+                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Personal Info')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.users.table.settings.account.personalInfo")}
                         </Button>
                         <Button variant={`${activeForm === 'E-Mail' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('E-Mail')}
@@ -387,16 +402,6 @@ function UserAccountSettings() {
                                 onClick={() => setActiveForm('Password')}
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.password")}
-                        </Button>
-                        <Button variant={`${activeForm === 'Personal Info' ? 'outline' : 'ghost'}`}
-                                onClick={() => setActiveForm('Personal Info')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Personal Info' ? 'font-bold' : ''}`}>
-                            {t("accountSettings.users.table.settings.account.personalInfo")}
-                        </Button>
-                        <Button variant={`${activeForm === 'Details' ? 'outline' : 'ghost'}`}
-                                onClick={() => setActiveForm('Details')}
-                                className={`text-muted-foreground transition-colors hover:text-foreground ${activeForm === 'Details' ? 'font-bold' : ''}`}>
-                            {t("accountSettings.details")}
                         </Button>
                     </nav>
                     <div className="grid gap-6">
@@ -537,7 +542,7 @@ function UserAccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.firstName")} *</FormLabel>
+                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.firstName")}</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={managedUser?.name} {...field}/>
@@ -554,7 +559,7 @@ function UserAccountSettings() {
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.lastName")} *</FormLabel>
+                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.lastName")}</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 placeholder={managedUser?.lastname} {...field}/>
@@ -571,7 +576,7 @@ function UserAccountSettings() {
                                                                 render={() => (
                                                                     <FormItem className="items-start">
                                                                         <FormLabel
-                                                                            className="text-black text-center">{t("registerPage.phoneNumber")} *</FormLabel>
+                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
                                                                         <FormControl className="w-full">
                                                                             <Controller
                                                                                 name="phoneNumber"
@@ -580,7 +585,7 @@ function UserAccountSettings() {
                                                                                     <PhoneInput
                                                                                         {...field}
                                                                                         value={field.value || ""}
-                                                                                        placeholder={managedUser?.phoneNumber}
+                                                                                        placeholder={managedUser?.phoneNumber?.startsWith('+48') ? managedUser.phoneNumber.slice(3).replace(/\B(?=(\d{3})+(?!\d))/g, " ") : managedUser?.phoneNumber}
                                                                                         onChange={field.onChange}
                                                                                         countries={['PL']}
                                                                                         defaultCountry="PL"
