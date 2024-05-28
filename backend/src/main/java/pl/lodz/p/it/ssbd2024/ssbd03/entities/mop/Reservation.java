@@ -1,21 +1,14 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQueries;
-import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
@@ -39,6 +32,7 @@ import java.util.List;
 @Entity
 @Table(name = DatabaseConsts.RESERVATION_TABLE)
 @NoArgsConstructor
+@Getter
 @NamedQueries({
         @NamedQuery(
                 name = "Reservation.findAll",
@@ -83,7 +77,6 @@ public class Reservation extends AbstractEntity implements Serializable {
      */
     @ManyToOne
     @JoinColumn(name = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, updatable = false)
-    @Getter
     private Client client;
 
     /**
@@ -92,7 +85,6 @@ public class Reservation extends AbstractEntity implements Serializable {
     @NotNull(message = ReservationMessages.SECTOR_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
-    @Getter
     private Sector sector;
 
     /**
@@ -100,7 +92,7 @@ public class Reservation extends AbstractEntity implements Serializable {
      */
     @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter @Setter
+    @Setter
     private LocalDateTime beginTime;
 
     /**
@@ -108,7 +100,7 @@ public class Reservation extends AbstractEntity implements Serializable {
      */
     @Column(name = DatabaseConsts.RESERVATION_END_TIME_COLUMN)
     @Temporal(TemporalType.TIMESTAMP)
-    @Getter @Setter
+    @Setter
     private LocalDateTime endTime;
 
     /**
@@ -117,7 +109,41 @@ public class Reservation extends AbstractEntity implements Serializable {
     @NotNull(message = ReservationMessages.LIST_OF_PARKING_EVENTS_NULL)
     @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @Getter
-    private List<ParkingEvent> parkingEvents = new ArrayList<>();
+    private final List<ParkingEvent> parkingEvents = new ArrayList<>();
+
+    // Other fields - used for access control, and storing historical data
+
+    /**
+     * Time of the creation of the entity object in the database.
+     * Basically, this time is saved when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATION_TIMESTAMP, nullable = false, updatable = false)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @PastOrPresent(message = ReservationMessages.CREATION_TIMESTAMP_FUTURE)
+    private LocalDateTime creationTime;
+
+    /**
+     * Identity of the user creating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATED_BY, updatable = false)
+    private String createdBy;
+
+    /**
+     * Time of the update of the entity object in the database.
+     * Basically, this time is saved when updating object to the database.
+     */
+    @Column(name = DatabaseConsts.UPDATE_TIMESTAMP)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @PastOrPresent(message = ReservationMessages.UPDATE_TIMESTAMP_FUTURE)
+    private LocalDateTime updateTime;
+
+    /**
+     * Identity of the user updating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when updating object in the database.
+     */
+    @Column(name = DatabaseConsts.UPDATED_BY)
+    private String updatedBy;
 
     /**
      * Constructs a new reservation for a non-anonymous client.
@@ -159,5 +185,23 @@ public class Reservation extends AbstractEntity implements Serializable {
         return new ToStringBuilder(this)
                 .append(super.toString())
                 .toString();
+    }
+
+    @PrePersist
+    private void beforePersistingToTheDatabase() {
+        this.creationTime = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.createdBy = authentication.getName();
+        }
+    }
+
+    @PreUpdate
+    private void beforeUpdatingInTheDatabase() {
+        this.updateTime = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.updatedBy = authentication.getName();
+        }
     }
 }

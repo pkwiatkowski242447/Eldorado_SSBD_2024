@@ -159,7 +159,7 @@ public class ScheduleService implements ScheduleServiceInterface {
         for (Token token : registerTokens) {
             try {
                 Account account = token.getAccount();
-                if (account.getCreationDate().isBefore(LocalDateTime.now().minusHours(resendRegistrationConfirmationEmailAfterHours))) {
+                if (account.getCreationTime().isBefore(LocalDateTime.now().minusHours(resendRegistrationConfirmationEmailAfterHours))) {
                     tokenFacade.removeByTypeAndAccount(Token.TokenType.REGISTER, account.getId());
                     Token tokenObject = tokenProvider.generateAccountActivationToken(account);
                     tokenFacade.create(tokenObject);

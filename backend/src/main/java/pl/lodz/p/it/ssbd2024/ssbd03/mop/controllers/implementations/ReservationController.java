@@ -27,7 +27,7 @@ public class ReservationController implements ReservationControllerInterface {
 
     @Override
     @RolesAllowed(Roles.CLIENT)
-    public ResponseEntity<?> getAllCompletedReservationSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
+    public ResponseEntity<?> getAllHistoricalReservationSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 

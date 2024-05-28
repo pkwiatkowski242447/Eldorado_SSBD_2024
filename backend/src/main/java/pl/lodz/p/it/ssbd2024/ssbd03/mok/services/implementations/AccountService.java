@@ -30,8 +30,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.Password
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -481,11 +482,18 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Roles.AUTHENTICATED})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = TokenBaseException.class)
     public void resendEmailConfirmation() throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Account account = accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         Token dbToken = tokenFacade.findByTypeAndAccount(Token.TokenType.CONFIRM_EMAIL, account.getId()).orElseThrow(TokenNotFoundException::new);
+
+        tokenFacade.remove(dbToken);
+
+        if (!jwtProvider.isTokenValid(dbToken.getTokenValue(), account)) {
+            throw new TokenNotValidException();
+        }
 
         String newEmail = jwtProvider.extractEmail(dbToken.getTokenValue());
         Token emailChangeToken = tokenProvider.generateEmailChangeToken(account, newEmail);
@@ -495,7 +503,6 @@ public class AccountService implements AccountServiceInterface {
 
         mailProvider.sendEmailConfirmEmail(account.getName(), account.getLastname(), newEmail, confirmationURL, account.getAccountLanguage());
 
-        tokenFacade.remove(dbToken);
         tokenFacade.create(emailChangeToken);
     }
 

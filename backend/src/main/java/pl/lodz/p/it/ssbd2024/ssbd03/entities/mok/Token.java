@@ -1,10 +1,16 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.TokenMessages;
+
+import java.time.LocalDateTime;
 
 /**
  * Entity representing Token used in keeping track of various Account related actions.
@@ -13,7 +19,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 @Entity
 @Table(name = DatabaseConsts.TOKEN_TABLE)
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @NamedQueries({
         @NamedQuery(
@@ -74,7 +79,6 @@ public class Token extends AbstractEntity {
      * The account associated with this token.
      */
     @ManyToOne(cascade = {CascadeType.REFRESH})
-    @ToString.Exclude
     private Account account;
 
     /**
@@ -83,6 +87,37 @@ public class Token extends AbstractEntity {
     @Column(name = DatabaseConsts.TOKEN_TOKEN_TYPE_COLUMN, nullable = false)
     @Enumerated(EnumType.STRING)
     private TokenType type = TokenType.RESET_PASSWORD;
+
+    // Other fields - used for access control, and storing historical data
+
+    /**
+     * Time of the creation of the entity object in the database.
+     * Basically, this time is saved when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATION_TIMESTAMP, nullable = false, updatable = false)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @PastOrPresent(message = TokenMessages.CREATION_TIMESTAMP_FUTURE)
+    private LocalDateTime creationTime;
+
+    /**
+     * Identity of the user creating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATED_BY, updatable = false)
+    private String createdBy;
+
+    /**
+     * Constructs new token object using only essential data.
+     *
+     * @param tokenValue Value of the token to be stored in the database
+     * @param account Account, which the token belongs to / is associated with.
+     * @param type Type of the token.
+     */
+    public Token(String tokenValue, Account account, TokenType type) {
+        this.tokenValue = tokenValue;
+        this.account = account;
+        this.type = type;
+    }
 
     /**
      * Custom toString() method implementation that
@@ -96,5 +131,14 @@ public class Token extends AbstractEntity {
         return new ToStringBuilder(this)
                 .append(super.toString())
                 .toString();
+    }
+
+    @PrePersist
+    private void beforePersistingToTheDatabase() {
+        this.creationTime = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.createdBy = authentication.getName();
+        }
     }
 }

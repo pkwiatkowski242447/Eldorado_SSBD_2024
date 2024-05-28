@@ -37,7 +37,7 @@ public class AccountMapper {
                 account.getBlocked(),
                 account.getTwoFactorAuth(),
                 account.getBlockedTime(),
-                account.getCreationDate(),
+                account.getCreationTime(),
                 account.getActivityLog().getLastSuccessfulLoginTime(),
                 account.getActivityLog().getLastUnsuccessfulLoginTime(),
                 account.getAccountLanguage(),

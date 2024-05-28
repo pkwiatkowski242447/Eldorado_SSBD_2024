@@ -2,14 +2,18 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.ParkingConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,6 +79,40 @@ public class Parking extends AbstractEntity {
     @OneToMany(mappedBy = DatabaseConsts.PARKING_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Sector> sectors = new ArrayList<>();
 
+    // Other fields - used for access control, and storing historical data
+
+    /**
+     * Time of the creation of the entity object in the database.
+     * Basically, this time is saved when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATION_TIMESTAMP, nullable = false, updatable = false)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @PastOrPresent(message = ParkingMessages.CREATION_TIMESTAMP_FUTURE)
+    private LocalDateTime creationTime;
+
+    /**
+     * Identity of the user creating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when persisting object to the database.
+     */
+    @Column(name = DatabaseConsts.CREATED_BY, updatable = false)
+    private String createdBy;
+
+    /**
+     * Time of the update of the entity object in the database.
+     * Basically, this time is saved when updating object to the database.
+     */
+    @Column(name = DatabaseConsts.UPDATE_TIMESTAMP)
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @PastOrPresent(message = ParkingMessages.UPDATE_TIMESTAMP_FUTURE)
+    private LocalDateTime updateTime;
+
+    /**
+     * Identity of the user updating entity object in the database.
+     * Basically, this is user login taken from SecurityContext when updating object in the database.
+     */
+    @Column(name = DatabaseConsts.UPDATED_BY)
+    private String updatedBy;
+
     /**
      * Constructs a new parking
      *
@@ -129,5 +167,23 @@ public class Parking extends AbstractEntity {
         return new ToStringBuilder(this)
                 .append(super.toString())
                 .toString();
+    }
+
+    @PrePersist
+    private void beforePersistingToTheDatabase() {
+        this.creationTime = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.createdBy = authentication.getName();
+        }
+    }
+
+    @PreUpdate
+    private void beforeUpdatingInTheDatabase() {
+        this.updateTime = LocalDateTime.now();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.updatedBy = authentication.getName();
+        }
     }
 }
