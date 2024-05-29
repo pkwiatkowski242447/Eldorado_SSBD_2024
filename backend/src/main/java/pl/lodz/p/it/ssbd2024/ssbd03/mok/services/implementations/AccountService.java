@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -555,7 +556,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed(Authorities.GET_ALL_USER_ACCOUNTS)
     public List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
@@ -668,10 +669,10 @@ public class AccountService implements AccountServiceInterface {
 
         UserLevel clientUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Client).findFirst().orElse(null);
 
+        userLevelFacade.remove(clientUserLevel);
+
         account.removeUserLevel(clientUserLevel);
         accountFacade.edit(account);
-
-        userLevelFacade.remove(clientUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),
@@ -696,10 +697,10 @@ public class AccountService implements AccountServiceInterface {
 
         UserLevel staffUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Staff).findFirst().orElse(null);
 
+        userLevelFacade.remove(staffUserLevel);
+
         account.removeUserLevel(staffUserLevel);
         accountFacade.edit(account);
-
-        userLevelFacade.remove(staffUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),
@@ -732,10 +733,10 @@ public class AccountService implements AccountServiceInterface {
 
         UserLevel adminUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Admin).findFirst().orElse(null);
 
+        userLevelFacade.remove(adminUserLevel);
+
         account.removeUserLevel(adminUserLevel);
         accountFacade.edit(account);
-
-        userLevelFacade.remove(adminUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),

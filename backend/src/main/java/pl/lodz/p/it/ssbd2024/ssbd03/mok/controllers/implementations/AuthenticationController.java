@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -25,6 +24,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokens
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.RefreshTokenDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -79,7 +79,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Login methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.LOGIN)
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -89,11 +89,12 @@ public class AuthenticationController implements AuthenticationControllerInterfa
                                                    HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
-            Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
+            this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountLoginDTO.getLogin(),
                     accountLoginDTO.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = this.authenticationService.registerSuccessfulLoginAttempt(accountLoginDTO.getLogin(), false,
                     sourceAddress, accountLoginDTO.getLanguage());
+
             if (accessAndRefreshTokensDTO != null) {
                 log.info("User: {} successfully authenticated during one factor authentication in the application, starting session at {} from IPv4: {}",
                         accountLoginDTO.getLogin(), LocalDateTime.now(), sourceAddress);
@@ -132,7 +133,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.LOGIN)
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -175,7 +176,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Logout method
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed(Authorities.LOGOUT)
     public ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
                                     HttpServletRequest request, HttpServletResponse response) {
         String sourceAddress = getSourceAddress(proxyChain, request);
@@ -198,6 +199,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * @return This method returns the actual IPv4 address of the user. If the X-Forwarded-For header is empty or not
      * present (basically null) then IPv4 address is extracted from IP packet as source address, which will be proxy.
      */
+    //TODO w RolesAllowed zawrzec przypadek uzycia dla refreshUserSession, tylko jaki???
+//    @RolesAllowed({Authorities.MOK2, Authorities.MOK14})
     private String getSourceAddress(String proxyChain, HttpServletRequest request) {
         if (proxyChain != null) {
             return proxyChain.indexOf(',') == -1 ? proxyChain : proxyChain.split(",")[0];

@@ -24,6 +24,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutp
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountHistoryDataMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -149,7 +150,7 @@ public class AccountController implements AccountControllerInterface {
     @RolesAllowed({Roles.ANONYMOUS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> changeAccountPassword(@PathVariable("token_id") String token,
+    public ResponseEntity<?> changeAccountPassword(@PathVariable("token") String token,
                                                    @RequestBody AccountPasswordDTO accountPasswordDTO) throws ApplicationBaseException {
         this.accountService.changeAccountPassword(token, accountPasswordDTO.getPassword());
         return ResponseEntity.noContent().build();
@@ -173,7 +174,7 @@ public class AccountController implements AccountControllerInterface {
     // Read methods
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed(Authorities.GET_ALL_USER_ACCOUNTS)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllUsers(@RequestParam("pageNumber") int pageNumber,
