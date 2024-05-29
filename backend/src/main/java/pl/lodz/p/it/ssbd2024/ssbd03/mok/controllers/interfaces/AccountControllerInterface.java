@@ -129,14 +129,14 @@ public interface AccountControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @PostMapping(value = "/change-password/{token_id}")
+    @PostMapping(value = "/change-password/{token}")
     @Operation(summary = "Change account password", description = "The endpoint is used by unauthenticated user to change their account password, by clicking the link sent to their e-mail address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The password was changed successfully."),
             @ApiResponse(responseCode = "400", description = "The account is blocked or not activated or account, which the password is changed for has not been found, or there is no password change token for given account."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> changeAccountPassword(@PathVariable("token_id") String token,
+    ResponseEntity<?> changeAccountPassword(@PathVariable("token") String token,
                                             @RequestBody AccountPasswordDTO accountPasswordDTO)
             throws ApplicationBaseException;
 

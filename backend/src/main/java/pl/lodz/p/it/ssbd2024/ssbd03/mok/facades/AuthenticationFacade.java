@@ -1,6 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -61,9 +61,9 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @param id ID of the Account to be retrieved.
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
-    @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    @PermitAll
+    @DenyAll
+    @Transactional(propagation = Propagation.REQUIRED)
     public Optional<Account> find(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -74,7 +74,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @param entity Account to be modified.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({Authorities.LOGIN})
     public void edit(Account entity) throws ApplicationBaseException {
         super.edit(entity);
     }
@@ -86,7 +86,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -98,7 +98,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
-    @PermitAll
+    @RolesAllowed({Authorities.LOGIN, Authorities.REFRESH_SESSION})
     @Transactional(propagation = Propagation.REQUIRED)
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {

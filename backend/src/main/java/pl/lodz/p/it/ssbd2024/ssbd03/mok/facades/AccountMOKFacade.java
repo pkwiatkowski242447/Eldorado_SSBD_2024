@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
+import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
@@ -67,7 +69,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param account Entity to be persisted.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
     public void create(Account account) throws ApplicationBaseException {
         super.create(account);
     }
@@ -81,7 +83,10 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({
+            Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE, Authorities.CHANGE_OWN_MAIL,
+            Authorities.ADD_USER_LEVEL, Authorities.REMOVE_USER_LEVEL, Authorities.RESTORE_ACCOUNT_ACCESS
+    })
     public Optional<Account> find(UUID id) throws ApplicationBaseException {
         Optional<Account> optionalAccount = super.find(id);
         optionalAccount.ifPresent(entity -> entityManager.refresh(entity));
@@ -95,7 +100,10 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({
+            Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT, Authorities.UNBLOCK_ACCOUNT,
+            Authorities.GET_USER_ACCOUNT, Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT
+    })
     public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -106,7 +114,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return `List` containing all Accounts.
      */
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<Account> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
@@ -120,7 +128,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * If a persistence exception is thrown, then empty list is returned.
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.GET_ALL_USER_ACCOUNTS})
     public List<Account> findAllAccountsWithPagination(int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {
@@ -144,7 +152,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * If a persistence exception is thrown, then empty list is returned.
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<Account> findAllActiveAccountsWithPagination(int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {
@@ -169,7 +177,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * If a persistence exception is thrown, then empty list is returned.
      * @note. counts are be default ordered (in the returned list) by the login.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<Account> findAllInactiveAccountsWithPagination(int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {
@@ -194,7 +202,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List containing user accounts with specified user level. If no accounts with given user level are found or
      * persistence exception is thrown, then empty list is returned.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<Account> findAllActiveAccountsWithGivenUserLevelWithPagination(
             Class<? extends UserLevel> userLevel, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
@@ -217,7 +225,14 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
-    @RolesAllowed({Roles.AUTHENTICATED, Roles.ANONYMOUS})
+    @RolesAllowed({
+            Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.CHANGE_USER_PASSWORD,
+            Authorities.CHANGE_OWN_PASSWORD, Authorities.BLOCK_ACCOUNT, Authorities.UNBLOCK_ACCOUNT,
+            Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT, Authorities.CONFIRM_ACCOUNT_CREATION,
+            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL, Authorities.GET_OWN_HISTORICAL_DATA,
+            Authorities.GET_OWN_ACCOUNT, Authorities.CHANGE_OWN_MAIL, Authorities.REMOVE_USER_LEVEL,
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.GET_ADMIN_PASSWORD_RESET_STATUS
+    })
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
@@ -237,7 +252,10 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return If there is user account with given e-mail address in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
-    @PermitAll
+    @RolesAllowed({
+            Authorities.RESET_PASSWORD, Authorities.CHANGE_OWN_MAIL,
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.CHANGE_USER_PASSWORD
+    })
     public Optional<Account> findByEmail(String email) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByEmail = entityManager.createNamedQuery("Account.findAccountByEmail", Account.class);
@@ -261,7 +279,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of accounts, which login matches given phrase. If there are no accounts, which login matches given
      * phrase or persistence exception is thrown, then empty list is returned.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<Account> findAllAccountsMatchingLoginWithPagination(
             String login, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
@@ -287,7 +305,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of accounts that were not activated in time (and therefore could not be activated). In case of
      * persistence exception, empty list is returned.
      */
-    @PermitAll
+    @DenyAll
     public List<Account> findAllAccountsMarkedForDeletion(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
@@ -309,7 +327,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of all accounts with the specified value of blocked status. In case of persistence exception
      * empty list will be returned.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<Account> findAllAccountsByBlocked(boolean blocked, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllBlockedAccounts = entityManager.createNamedQuery("Account.findAllAccountsByBlockedInAscOrder", Account.class);
@@ -333,7 +351,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of all users accounts that were blocked by the admin. If persistence exception is thrown, then
      * empty list will be returned.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<Account> findAllBlockedAccountsThatWereBlockedByAdminWithPagination(int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {
@@ -358,7 +376,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of all users accounts that were blocked by the logging incorrectly certain amount of time.
      * If persistence exception is thrown, then empty list will be returned.
      */
-    @PermitAll
+    @DenyAll
     public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(
             long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
@@ -384,12 +402,12 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param pageNumber Number of the page to retrieve.
      * @return List of accounts that match the parameters.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.GET_ALL_USER_ACCOUNTS})
     public List<Account> findAccountsMatchingPhraseInNameOrLastnameWithPagination(String phrase,
-                                                                                                   String orderBy,
-                                                                                                   boolean order,
-                                                                                                   int pageNumber,
-                                                                                                   int pageSize) throws ApplicationBaseException {
+                                                                                  String orderBy,
+                                                                                  boolean order,
+                                                                                  int pageNumber,
+                                                                                  int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMatchingCriteriaQuery;
             if (orderBy.equals("level")) {
@@ -424,7 +442,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *                            login attempts from that date and time, then account is considered without recent activity.
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
-    //TODO RolesAllowed
+    @DenyAll
     public List<Account> findAllAccountsWithoutRecentActivity(
             LocalDateTime lastSuccessfulLogin) throws ApplicationBaseException {
         try {
@@ -446,7 +464,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return Optional containing a number of inactive users accounts in the system. In case of persistence exception
      * empty optional is returned.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(
             LocalDateTime lastSuccessfulLogin, boolean active) throws ApplicationBaseException {
         try {
@@ -467,7 +485,12 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param account Account to be modified.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({
+            Authorities.CHANGE_USER_PASSWORD, Authorities.CHANGE_OWN_PASSWORD, Authorities.BLOCK_ACCOUNT,
+            Authorities.UNBLOCK_ACCOUNT, Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT,
+            Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE,
+            Authorities.ADD_USER_LEVEL, Authorities.REMOVE_USER_LEVEL, Authorities.RESTORE_ACCOUNT_ACCESS
+    })
     public void edit(Account account) throws ApplicationBaseException {
         super.edit(account);
     }
@@ -480,7 +503,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param account Account to be removed from the database.
      */
     @Override
-    @PermitAll
+    @DenyAll
     public void remove(Account account) throws ApplicationBaseException {
         super.remove(account);
     }

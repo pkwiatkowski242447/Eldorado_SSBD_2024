@@ -18,7 +18,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.roles.RolesMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -41,12 +43,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTProvider jwtProvider;
     private final AuthenticationFacade authenticationFacade;
+    private final RolesMapper rolesMapper;
 
     @Autowired
     public JWTAuthenticationFilter(JWTProvider jwtProvider,
-                                   AuthenticationFacade authenticationFacade) {
+                                   AuthenticationFacade authenticationFacade,
+                                   RolesMapper rolesMapper) {
         this.jwtProvider = jwtProvider;
         this.authenticationFacade = authenticationFacade;
+        this.rolesMapper = rolesMapper;
     }
 
     @Override
@@ -67,12 +72,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 Account account = authenticationFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
                 if (!jwtProvider.isTokenValid(jwtToken, account)) throw new TokenNotValidException();
 
-                List<SimpleGrantedAuthority> listOfRoles = new ArrayList<>();
+                List<SimpleGrantedAuthority> listOfAuthorities = new ArrayList<>();
                 for (UserLevel userLevel : account.getUserLevels()) {
-                    listOfRoles.add(new SimpleGrantedAuthority("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase()));
+                    listOfAuthorities.addAll(rolesMapper.getAuthorities(userLevel.getClass().getSimpleName().toUpperCase()));
                 }
-                listOfRoles.add(new SimpleGrantedAuthority("ROLE_AUTHENTICATED"));
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account.getLogin(), account.getPassword(), listOfRoles);
+                listOfAuthorities.addAll(rolesMapper.getAuthorities(Roles.AUTHENTICATED));
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account.getLogin(), account.getPassword(), listOfAuthorities);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } catch (ApplicationDatabaseException exception) {

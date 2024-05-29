@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -136,7 +137,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     // Login methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.LOGIN})
     public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
         if (!account.getActive()) {
@@ -164,7 +165,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     // Register successful & unsuccessful login attempt methods
 
     @Override
-    @RolesAllowed({Roles.CLIENT, Roles.STAFF, Roles.ADMIN, Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.LOGIN})
     public AccessAndRefreshTokensDTO registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         if (!confirmed && account.getTwoFactorAuth()) {
@@ -197,7 +198,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.LOGIN)
     public void registerUnsuccessfulLoginAttemptWithIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -223,7 +224,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.LOGIN)
     public void registerUnsuccessfulLoginAttemptWithoutIncrement(String userLogin, String ipAddress) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         ActivityLog activityLog = account.getActivityLog();
@@ -243,7 +244,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
 
     // Refresh user session method
 
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.REFRESH_SESSION})
     public AccessAndRefreshTokensDTO refreshUserSession(String refreshToken, String userLogin) throws ApplicationBaseException {
         // Retrieve user account and token object from database
         Account foundAccount = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
@@ -273,7 +274,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     // Read methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed(Authorities.LOGIN)
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         return this.authenticationFacade.findByLogin(login);
     }
@@ -288,7 +289,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
      *                                  on facade components.
      */
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.LOGIN})
     private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
         tokenFacade.removeByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId());
 

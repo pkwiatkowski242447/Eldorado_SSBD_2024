@@ -46,6 +46,7 @@ public class I18n {
     public static final String UNEXPECTED_DATABASE_EXCEPTION = "application.database.server.exception";
     public static final String PATH_NOT_FOUND_EXCEPTION = "application.path.not.found.exception";
     public static final String UNSUPPORTED_OPERATION_EXCEPTION = "application.unsupported.operation.exception";
+    public static final String UNSUPPORTED_ROLE_EXCEPTION = "application.unsupported.role.exception";
 
     // Account service
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
