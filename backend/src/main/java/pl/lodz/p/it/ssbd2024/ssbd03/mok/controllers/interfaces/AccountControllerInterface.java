@@ -190,9 +190,8 @@ public interface AccountControllerInterface {
     /**
      * This method is used to retrieve user accounts that match specified criteria.
      *
-     * @param login      Login of the searched user account. Its default value is empty string (in that case this parameter will not have any impact of final result of the search).
-     * @param firstName  First name of the searched users.
-     * @param lastName   Last name of the searched users.
+     * @param phrase     Phrase in account's firstname or lastname.
+     * @param orderBy    Either "login" or "level", defaults to "login". If entered incorrectly set as "login".
      * @param order      Ordering of the searched users. Could be either true (for ascending order) or false (for descending order).
      * @param pageNumber Number of the page containing searched users.
      * @param pageSize   Number of the users per page.
@@ -202,16 +201,15 @@ public interface AccountControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/match-login-firstname-and-lastname", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/match-phrase-in-account", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all users matching criteria", description = "The endpoint is used retrieve list of accounts that match certain criteria, that is either contain certain phrase in login, firstName, lastName, with certain activity status and ordered by login alphabetically or not.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of accounts returned from given page of given size is not empty."),
             @ApiResponse(responseCode = "204", description = "List of accounts returned from given page of given size is empty."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
-                                                                     @RequestParam(name = "firstName", defaultValue = "") String firstName,
-                                                                     @RequestParam(name = "lastName", defaultValue = "") String lastName,
+    ResponseEntity<?> getAccountsMatchingPhraseInNameOrLastname(@RequestParam(name = "phrase", defaultValue = "") String phrase,
+                                                                     @RequestParam(name = "orderBy", defaultValue = "login") String orderBy,
                                                                      @RequestParam(name = "order", defaultValue = "true") boolean order,
                                                                      @RequestParam(name = "pageNumber") int pageNumber,
                                                                      @RequestParam(name = "pageSize") int pageSize)

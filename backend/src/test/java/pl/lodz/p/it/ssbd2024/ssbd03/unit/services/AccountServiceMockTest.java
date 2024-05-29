@@ -463,25 +463,23 @@ public class AccountServiceMockTest {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
         List<Account> accountList = List.of(account, account1);
-        String login = "login";
-        String firstName = "firstName";
-        String lastName = "lastName";
+        String phrase = "firstName";
+        String orderBy = "login";
         boolean order = true;
-        boolean active = true;
         int pageNumber = 0;
         int pageSize = 5;
 
         when(accountMOKFacade
-                .findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize))
+                .findAccountsMatchingPhraseInNameOrLastnameWithPagination(phrase, orderBy, order, pageNumber, pageSize))
                 .thenReturn(accountList);
 
-        var retList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName, lastName, order, pageNumber, pageSize);
+        var retList = accountService.getAccountsMatchingPhraseInNameOrLastname(phrase, orderBy, order, pageNumber, pageSize);
 
         assertEquals(account, retList.get(0));
         assertEquals(account1, retList.get(1));
 
         Mockito.verify(accountMOKFacade, Mockito.times(1))
-                .findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
+                .findAccountsMatchingPhraseInNameOrLastnameWithPagination(phrase, orderBy, order, pageNumber, pageSize);
     }
 
     @Test

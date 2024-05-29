@@ -2,7 +2,10 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -374,33 +377,37 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     /**
      * Retrieve accounts that match the given parameters.
      *
-     * @param login      Account's login. The phrase will be sought in logins.
-     * @param firstName  Account's owner first name. The phrase will be sought in first names.
-     * @param lastName   Account's owner last name. The phrase will be sought in last names.
-     * @param order      Login sorting order. True for ascending order, false for descending.
+     * @param phrase     Account's login. The phrase will be sought in first and last name.
+     * @param orderBy    Order by which the list be ordered, either "login" or "level", if set to anything else defaults to "login".
+     * @param order      Sorting order. True for ascending order, false for descending.
      * @param pageSize   Number of results per page.
      * @param pageNumber Number of the page to retrieve.
      * @return List of accounts that match the parameters.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(String login,
-                                                                                                   String firstName,
-                                                                                                   String lastName,
+    public List<Account> findAccountsMatchingPhraseInNameOrLastnameWithPagination(String phrase,
+                                                                                                   String orderBy,
                                                                                                    boolean order,
                                                                                                    int pageNumber,
                                                                                                    int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMatchingCriteriaQuery;
-            if (order) {
-                findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder", Account.class);
+            if (orderBy.equals("level")) {
+                if (order) {
+                    findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingPhraseInNameOrLastnameWithUserLevelInAscendingOrder", Account.class);
+                } else {
+                    findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingPhraseInNameOrLastnameWithUserLevelInDescendingOrder", Account.class);
+                }
             } else {
-                findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInDescendingOrder", Account.class);
+                if (order) {
+                    findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingPhraseInNameOrLastnameWithLoginAscendingOrder", Account.class);
+                } else {
+                    findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingPhraseInNameOrLastnameWithLoginInDescendingOrder", Account.class);
+                }
             }
             findAllAccountsMatchingCriteriaQuery.setFirstResult(pageNumber * pageSize);
             findAllAccountsMatchingCriteriaQuery.setMaxResults(pageSize);
-            findAllAccountsMatchingCriteriaQuery.setParameter("login", login);
-            findAllAccountsMatchingCriteriaQuery.setParameter("firstName", firstName);
-            findAllAccountsMatchingCriteriaQuery.setParameter("lastName", lastName);
+            findAllAccountsMatchingCriteriaQuery.setParameter("phrase", phrase);
             List<Account> list = findAllAccountsMatchingCriteriaQuery.getResultList();
             super.refreshAll(list);
             return list;
