@@ -1,13 +1,10 @@
 import {SetStateAction, useEffect, useState} from 'react';
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Controller, useForm} from "react-hook-form";
-import {Card, CardContent, CardTitle} from "@/components/ui/card.tsx";
-import {Input} from "@/components/ui/input.tsx";
+import {useForm} from "react-hook-form";
+import {Card, CardContent} from "@/components/ui/card.tsx";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
-import {PhoneInput} from "@/components/ui/phone-input.tsx";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
@@ -31,16 +28,11 @@ import {
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Loader2, Slash} from "lucide-react";
-import {Switch} from "@/components/ui/switch.tsx";
-import {FiCheck, FiX} from "react-icons/fi";
-import {Badge} from "@/components/ui/badge.tsx";
-
-const allUserLevels: AccountTypeEnum[] = [AccountTypeEnum.ADMIN, AccountTypeEnum.STAFF, AccountTypeEnum.CLIENT];
-
-// I'm fully aware that what i've commited below is a crime.
-// I don't feel like dividing everything into separate components just for the sake of being pretty to look at rn
-// No one is going to look at this anyway and time is not on my side
-// bk
+import EmailForm from "@/components/forms/EmailForm.tsx";
+import PersonalInfoForm from "@/components/forms/PersonalInfoForm.tsx";
+import DetailsForm from "@/components/forms/DetailsForm.tsx";
+import UserLevelsForm from "@/components/forms/UserLevelsForm.tsx";
+import UserHistoryPage from "@/pages/UserHistoryPage.tsx";
 
 function UserAccountSettings() {
     const [activeForm, setActiveForm] = useState('Details');
@@ -401,114 +393,32 @@ function UserAccountSettings() {
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.password")}
                         </Button>
+                        <Button variant={`${activeForm === 'History' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('History')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            History
+                        </Button>
                     </nav>
                     <div className="grid gap-6">
                         {activeForm === 'UserLevels' && managedUser?.userLevelsDto && (
                             <div>
                                 {activeForm === 'UserLevels' && (
-                                    <div>
-                                        <Card className="mx-10 w-auto">
-                                            <CardContent>
-                                                <div className="flex flex-row justify-around">
-                                                    {allUserLevels.map((level: AccountTypeEnum) => (
-                                                        <div key={level} className="flex flex-col items-center m-5 ">
-                                                            <Badge variant="secondary">{level}</Badge>
-                                                            <div className={"pt-2"}>
-                                                                {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === level.toUpperCase()) ? (
-                                                                    <Button className="mt-2" variant={"ghost"}
-                                                                            onClick={() => handleRemoveClick(level)}>
-                                                                        {t("accountSettings.users.table.settings.account.userLevels.remove")}
-                                                                    </Button>
-                                                                ) : (
-                                                                    <Button
-                                                                        className="mt-2" variant={"default"}
-                                                                        onClick={() => handleAddClick(level)}>
-                                                                        {t("accountSettings.users.table.settings.account.userLevels.add")}
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                        <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
-                                            <AlertDialogContent>
-                                                <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    {t("accountSettings.users.table.settings.block.confirm1")}
-                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange?.toUpperCase())
-                                                        ? t("accountSettings.users.table.settings.account.userLevels.remove2") :
-                                                        t("accountSettings.users.table.settings.account.userLevels.add2")} {levelToChange}
-                                                    {t("accountSettings.users.table.settings.block.level")}
-                                                    {managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange?.toUpperCase())
-                                                        ? t("accountSettings.users.table.settings.block.from") : t("accountSettings.users.table.settings.block.to")}
-                                                    {t("accountSettings.users.table.settings.block.confirm2")}
-                                                </AlertDialogDescription>
-                                                <AlertDialogAction
-                                                    onClick={confirmChangeUserLevel}>{t("general.ok")}</AlertDialogAction>
-                                                <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </div>
+                                    <UserLevelsForm managedUser={managedUser} handleRemoveClick={handleRemoveClick}
+                                                    handleAddClick={handleAddClick}
+                                                    isAlertDialogOpen={isAlertDialogOpen}
+                                                    setAlertDialogOpen={setAlertDialogOpen}
+                                                    confirmChangeUserLevel={confirmChangeUserLevel}
+                                                    levelToChange={levelToChange}/>
                                 )}
                             </div>
                         )}
                         {activeForm === 'E-Mail' && (
-                            <div>
-                                <Card className="mx-10 w-auto">
-                                    <CardContent>
-                                        <Form {...formEmail}>
-                                            {// @ts-expect-error - fix this maybe
-                                                <form onSubmit={formEmail.handleSubmit(onSubmitEmail)}
-                                                      className="space-y-4">
-                                                    <div className="grid gap-4 p-5">
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formEmail.control}
-                                                                name="email"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.authentication.email")} *</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input
-                                                                                placeholder={managedUser?.email} {...field} />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}/>
-                                                        </div>
-                                                        <Button type="submit" className="w-full pb-2"
-                                                                disabled={isLoading}>
-                                                            {isLoading ? (
-                                                                <>
-                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                                                                </>
-                                                            ) : (
-                                                                t("accountSettings.users.table.settings.account.authentication.email.change")
-                                                            )}
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            }
-                                        </Form>
-                                    </CardContent>
-                                </Card>
-                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
-                                    <AlertDialogContent>
-                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            {t("accountSettings.confirmEmailChange")}
-                                        </AlertDialogDescription>
-                                        <AlertDialogAction onClick={handleDialogAction}>
-                                            {t("general.ok")}
-                                        </AlertDialogAction>
-                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
+                            <EmailForm formEmail={formEmail} onSubmitEmail={onSubmitEmail} isLoading={isLoading}
+                                       account={managedUser} handleDialogAction={handleDialogAction}
+                                       isAlertDialogOpen={isAlertDialogOpen}
+                                       setAlertDialogOpen={setAlertDialogOpen} isLoadingReset={isLoading}
+                                       showResendButton={false}
+                            />
                         )}
                         {activeForm === 'Password' && (
                             <div>
@@ -534,189 +444,17 @@ function UserAccountSettings() {
                             </div>
                         )}
                         {activeForm === 'Personal Info' && (
-                            <div>
-                                <Card className="mx-10 w-auto">
-                                    <CardContent>
-                                        <Form {...formUserData}>
-                                            {// @ts-expect-error - fix this maybe
-                                                <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
-                                                      className="space-y-4">
-                                                    <div className="grid gap-4 p-5">
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="name"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.firstName")}</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input
-                                                                                placeholder={managedUser?.name} {...field}/>
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="lastName"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.users.table.settings.account.personalInfo.lastName")}</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input
-                                                                                placeholder={managedUser?.lastname} {...field}/>
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="phoneNumber"
-                                                                render={() => (
-                                                                    <FormItem className="items-start">
-                                                                        <FormLabel
-                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
-                                                                        <FormControl className="w-full">
-                                                                            <Controller
-                                                                                name="phoneNumber"
-                                                                                control={formUserData.control}
-                                                                                render={({field}) => (
-                                                                                    <PhoneInput
-                                                                                        {...field}
-                                                                                        value={field.value || ""}
-                                                                                        placeholder={managedUser?.phoneNumber?.startsWith('+48') ? managedUser.phoneNumber.slice(3).replace(/\B(?=(\d{3})+(?!\d))/g, " ") : managedUser?.phoneNumber}
-                                                                                        onChange={field.onChange}
-                                                                                        countries={['PL']}
-                                                                                        defaultCountry="PL"
-                                                                                    />
-                                                                                )}
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="twoFactorAuth"
-                                                                render={() => (
-                                                                    <FormField
-                                                                        control={formUserData.control}
-                                                                        name="twoFactorAuth"
-                                                                        render={({field}) => (
-                                                                            <FormItem>
-                                                                                <div className="flex flex-col">
-                                                                                    <FormLabel className="text-black">
-                                                                                        {t("accountSettings.twoFactorAuth")}
-                                                                                    </FormLabel>
-                                                                                    <FormControl>
-                                                                                        <div
-                                                                                            className={"justify-center pt-5"}>
-                                                                                            <Switch {...field}
-                                                                                                    defaultChecked={managedUser?.twoFactorAuth}
-                                                                                                    checked={field.value}
-                                                                                                    onCheckedChange={field.onChange}
-                                                                                            />
-                                                                                        </div>
-                                                                                    </FormControl>
-                                                                                </div>
-                                                                                <FormMessage/>
-                                                                            </FormItem>
-                                                                        )}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <Button type="submit" className="w-full pb-2"
-                                                                disabled={isLoading}>
-                                                            {isLoading ? (
-                                                                <>
-                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                                                                </>
-                                                            ) : (
-                                                                t("accountSettings.users.table.settings.account.personalInfo.saveChanges")
-                                                            )}
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            }
-                                        </Form>
-                                    </CardContent>
-                                </Card>
-                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
-                                    <AlertDialogContent>
-                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            {t("accountSettings.confirmUserDataChange")}
-                                        </AlertDialogDescription>
-                                        <AlertDialogAction onClick={handleDialogAction}>
-                                            {t("general.ok")}
-                                        </AlertDialogAction>
-                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
+                            <PersonalInfoForm formUserData={formUserData} onSubmitUserData={onSubmitUserData}
+                                              isLoading={isLoading} account={managedUser}
+                                              handleDialogAction={handleDialogAction}
+                                              isAlertDialogOpen={isAlertDialogOpen}
+                                              setAlertDialogOpen={setAlertDialogOpen}/>
                         )}
                         {activeForm === 'Details' && (
-                            <div>
-                                <Card className="mx-10 w-auto text-left">
-                                    <CardTitle className={"flex justify-center mt-5"}>
-                                        {t("accountSettings.accountInfo")}
-                                    </CardTitle>
-                                    <CardContent className={"mt-5"}>
-                                        <p>
-                                            <strong>{t("accountSettings.name")}:</strong> {managedUser?.name} {managedUser?.lastname}
-                                        </p>
-                                        <p><strong>{t("accountSettings.email")}:</strong> {managedUser?.email}</p>
-                                        <p><strong>{t("accountSettings.login")}:</strong> {managedUser?.login}</p>
-                                        <p><strong>{t("accountSettings.phone")}:</strong> {managedUser?.phoneNumber}</p>
-                                        <p>
-                                            <strong>{t("accountSettings.accountLanguage")}: </strong>
-                                            {managedUser?.accountLanguage?.toLowerCase() === 'en' ? t("general.english") :
-                                                managedUser?.accountLanguage?.toLowerCase() === 'pl' ? t("general.polish") :
-                                                    managedUser?.accountLanguage}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.active")}:</strong> {managedUser?.active ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.blocked")}:</strong> {managedUser?.blocked ?
-                                            <FiCheck color="red"/> : <FiX color="green"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.suspended")}:</strong> {managedUser?.suspended ?
-                                            <FiCheck color="red"/> : <FiX color="green"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.2fa")}:</strong> {managedUser?.twoFactorAuth ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {managedUser?.lastSuccessfulLoginTime ? managedUser.lastSuccessfulLoginTime : 'N/A'}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {managedUser?.lastUnsuccessfulLoginTime ? managedUser.lastUnsuccessfulLoginTime : 'N/A'}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {managedUser?.lastSuccessfulLoginIp || 'N/A'}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastUnsucLoginIp")}:</strong> {managedUser?.lastUnsuccessfulLoginIp || 'N/A'}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                            <DetailsForm account={managedUser}/>
+                        )}
+                        {activeForm === 'History' && (
+                            <UserHistoryPage userId={managedUser?.id} />
                         )}
                     </div>
                 </div>

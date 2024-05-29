@@ -1,26 +1,14 @@
 import {SetStateAction, useEffect, useState} from 'react';
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Controller, useForm} from "react-hook-form";
-import {Card, CardContent, CardTitle} from "@/components/ui/card.tsx";
-import {Input} from "@/components/ui/input.tsx";
+import {useForm} from "react-hook-form";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
-import {PhoneInput} from "@/components/ui/phone-input.tsx";
 import {useAccountState} from "@/context/AccountContext.tsx";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogTitle
-} from "@/components/ui/alert-dialog.tsx";
 import handleApiError from "@/components/HandleApiError.ts";
 import {
     Breadcrumb,
@@ -29,15 +17,14 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
-import {Loader2, Slash} from "lucide-react";
-import {Switch} from "@/components/ui/switch.tsx";
-import {FiCheck, FiX} from "react-icons/fi";
+import {Slash} from "lucide-react";
 import {RefreshButton} from "@/components/RefreshButton.tsx";
+import PersonalInfoForm from "@/components/forms/PersonalInfoForm.tsx";
+import PasswordForm from "@/components/forms/PasswordForm.tsx";
+import EmailForm from "@/components/forms/EmailForm.tsx";
+import DetailsForm from "@/components/forms/DetailsForm.tsx";
+import UserHistoryPage from "@/pages/UserHistoryPage.tsx";
 
-// I'm fully aware that what i've commited below is a crime.
-// I don't feel like dividing everything into separate components just for the sake of being pretty to look at rn
-// No one is going to look at this anyway and time is not on my side
-// bk
 
 function AccountSettings() {
     const [activeForm, setActiveForm] = useState('Details');
@@ -261,355 +248,38 @@ function AccountSettings() {
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
                             {t("accountSettings.password")}
                         </Button>
+                        <Button variant={`${activeForm === 'History' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('History')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            History
+                        </Button>
                     </nav>
                     <div className="grid gap-6">
                         {activeForm === 'E-Mail' && (
-                            <div>
-                                <Card className="mx-10 w-auto">
-                                    <CardContent>
-                                        <Form {...formEmail}>
-                                            {// @ts-expect-error - fix this
-                                                <form onSubmit={formEmail.handleSubmit(onSubmitEmail)}
-                                                      className="space-y-4">
-                                                    <div className="grid gap-4 p-5">
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formEmail.control}
-                                                                name="email"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.email")} *</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input
-                                                                                placeholder={account?.email} {...field} />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}/>
-                                                        </div>
-                                                        <Button type="submit" className="w-full pb-2"
-                                                                disabled={isLoading}>
-                                                            {isLoading ? (
-                                                                <>
-                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                                                                </>
-                                                            ) : (
-                                                                t("accountSettings.authentication.email.change")
-                                                            )}
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            }
-                                        </Form>
-                                    </CardContent>
-                                    <div className={"flex mb-5 justify-center "}>
-                                        <Button onClick={resendEmailConfirmation} variant={"outline"}  className="w-auto pb-2"
-                                                disabled={isLoadingReset}>
-                                            {isLoadingReset ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                                                </>
-                                            ) : (
-                                                t("accountSettings.popUp.resendEmailConfirmationOK.button")
-                                            )}
-                                        </Button>
-                                    </div>
-
-                                </Card>
-                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
-                                    <AlertDialogContent>
-                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            {t("accountSettings.confirmEmailChange")}
-                                        </AlertDialogDescription>
-                                        <AlertDialogAction onClick={handleDialogAction}>
-                                            {t("general.ok")}
-                                        </AlertDialogAction>
-                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
+                            <EmailForm formEmail={formEmail} onSubmitEmail={onSubmitEmail} isLoading={isLoading}
+                                       account={account} handleDialogAction={handleDialogAction}
+                                       isAlertDialogOpen={isAlertDialogOpen}
+                                       setAlertDialogOpen={setAlertDialogOpen} isLoadingReset={isLoadingReset}
+                                       resendEmailConfirmation={resendEmailConfirmation} showResendButton={true}/>
                         )}
                         {activeForm === 'Password' && (
-                            <div>
-                                <Card className="mx-10 w-auto">
-                                    <CardContent>
-                                        <Form {...formPassword}>
-                                            {// @ts-expect-error - fix this
-                                                <form onSubmit={formPassword.handleSubmit(onSubmitPassword)}
-                                                      className="space-y-4">
-                                                    <div className="grid gap-4 p-5">
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formPassword.control}
-                                                                name="oldPassword"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.oldPassword")} *</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input type="password" {...field} />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formPassword.control}
-                                                                name="newPassword"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.newPassword")} *</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input type="password" {...field} />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formPassword.control}
-                                                                name="newPasswordRepeat"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.authentication.newPasswordRepeat")} *</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input type="password" {...field} />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <Button type="submit" className="w-full pb-2"
-                                                                disabled={isLoading}>
-                                                            {isLoading ? (
-                                                                <>
-                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                                                                </>
-                                                            ) : (
-                                                                t("accountSettings.authentication.password.change")
-                                                            )}
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            }
-                                        </Form>
-                                    </CardContent>
-                                </Card>
-                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
-                                    <AlertDialogContent>
-                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            {t("accountSettings.confirmPasswordChange")}
-                                        </AlertDialogDescription>
-                                        <AlertDialogAction onClick={handleDialogAction}>
-                                            {t("general.ok")}
-                                        </AlertDialogAction>
-                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
+                            <PasswordForm formPassword={formPassword} onSubmitPassword={onSubmitPassword}
+                                          isLoading={isLoading} setAlertDialogOpen={setAlertDialogOpen}
+                                          handleDialogAction={handleDialogAction}
+                                          isAlertDialogOpen={isAlertDialogOpen}/>
                         )}
                         {activeForm === 'Personal Info' && (
-                            <div>
-                                <Card className="mx-10 w-auto">
-                                    <CardContent>
-                                        <Form {...formUserData}>
-                                            {// @ts-expect-error - fix this
-                                                <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
-                                                      className="space-y-4">
-                                                    <div className="grid gap-4 p-5">
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="name"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.personalInfo.firstName")}</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input
-                                                                                {...field}
-                                                                                placeholder={account?.name}
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="lastName"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormLabel
-                                                                            className="text-black">{t("accountSettings.personalInfo.lastName")}</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input
-                                                                                {...field}
-                                                                                placeholder={account?.lastname}
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="phoneNumber"
-                                                                render={() => (
-                                                                    <FormItem className="items-start">
-                                                                        <FormLabel
-                                                                            className="text-black text-center">{t("registerPage.phoneNumber")}</FormLabel>
-                                                                        <FormControl className="w-full">
-                                                                            <Controller
-                                                                                name="phoneNumber"
-                                                                                control={formUserData.control}
-                                                                                render={({field}) => (
-                                                                                    <PhoneInput
-                                                                                        {...field}
-                                                                                        value={field.value}
-                                                                                        onChange={field.onChange}
-                                                                                        countries={['PL']}
-                                                                                        defaultCountry="PL"
-                                                                                        placeholder={account?.phoneNumber?.startsWith('+48') ? account.phoneNumber.slice(3).replace(/\B(?=(\d{3})+(?!\d))/g, " ") : account?.phoneNumber}
-
-                                                                                    />
-                                                                                )}
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <div className="grid gap-2">
-                                                            <FormField
-                                                                control={formUserData.control}
-                                                                name="twoFactorAuth"
-                                                                render={() => (
-                                                                    <FormField
-                                                                        control={formUserData.control}
-                                                                        name="twoFactorAuth"
-                                                                        render={({field}) => (
-                                                                            <FormItem>
-                                                                                <div className="flex flex-col">
-                                                                                    <FormLabel className="text-black">
-                                                                                        {t("accountSettings.twoFactorAuth")}
-                                                                                    </FormLabel>
-                                                                                    <FormControl>
-                                                                                        <div
-                                                                                            className={"justify-center pt-5"}>
-                                                                                            <Switch {...field}
-                                                                                                    defaultChecked={account?.twoFactorAuth}
-                                                                                                    checked={field.value}
-                                                                                                    onCheckedChange={field.onChange}
-                                                                                            />
-                                                                                        </div>
-                                                                                    </FormControl>
-                                                                                </div>
-                                                                                <FormMessage/>
-                                                                            </FormItem>
-                                                                        )}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        <Button type="submit" className="w-full pb-2"
-                                                                disabled={isLoading}>
-                                                            {isLoading ? (
-                                                                <>
-                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                                                                </>
-                                                            ) : (
-                                                                t("accountSettings.personalInfo.saveChanges")
-                                                            )}
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            }
-                                        </Form>
-                                    </CardContent>
-                                </Card>
-                                <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
-                                    <AlertDialogContent>
-                                        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            {t("accountSettings.confirmUserDataChange")}
-                                        </AlertDialogDescription>
-                                        <AlertDialogAction onClick={handleDialogAction}>
-                                            {t("general.ok")}
-                                        </AlertDialogAction>
-                                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
+                            <PersonalInfoForm formUserData={formUserData} onSubmitUserData={onSubmitUserData}
+                                              isLoading={isLoading} account={account}
+                                              handleDialogAction={handleDialogAction}
+                                              isAlertDialogOpen={isAlertDialogOpen}
+                                              setAlertDialogOpen={setAlertDialogOpen}/>
                         )}
                         {activeForm === 'Details' && (
-                            <div>
-                                <Card className="mx-10 w-auto text-left">
-                                    <CardTitle className={"flex justify-center mt-5"}>
-                                        {t("accountSettings.accountInfo")}
-                                    </CardTitle>
-                                    <CardContent className={"mt-5"}>
-                                        <p>
-                                            <strong>{t("accountSettings.name")}:</strong> {account?.name} {account?.lastname}
-                                        </p>
-                                        <p><strong>{t("accountSettings.email")}:</strong> {account?.email}</p>
-                                        <p><strong>{t("accountSettings.login")}:</strong> {account?.login}</p>
-                                        <p><strong>{t("accountSettings.phone")}:</strong> {account?.phoneNumber}</p>
-                                        <p>
-                                            <strong>{t("accountSettings.accountLanguage")}: </strong>
-                                            {account?.accountLanguage?.toLowerCase() === 'en' ? t("general.english") :
-                                                account?.accountLanguage?.toLowerCase() === 'pl' ? t("general.polish") :
-                                                    account?.accountLanguage}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.active")}:</strong> {account?.active ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.blocked")}:</strong> {account?.blocked ?
-                                            <FiCheck color="red"/> : <FiX color="green"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.suspended")}:</strong> {account?.suspended ?
-                                            <FiCheck color="red"/> : <FiX color="green"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.2fa")}:</strong> {account?.twoFactorAuth ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.creationDate")}:</strong> {account?.creationDate ? account.creationDate : 'N/A'}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastSucLoginTime")}:</strong> {account?.lastSuccessfulLoginTime ? account.lastSuccessfulLoginTime : 'N/A'}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastUnsucLoginTime")}:</strong> {account?.lastUnsuccessfulLoginTime ? account.lastUnsuccessfulLoginTime : 'N/A'}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastSucLoginIp")}:</strong> {account?.lastSuccessfulLoginIp || 'N/A'}
-                                        </p>
-                                        <p>
-                                            <strong>{t("accountSettings.lastUnsucLoginIp")}:</strong> {account?.lastUnsuccessfulLoginIp || 'N/A'}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                            <DetailsForm account={account}/>
+                        )}
+                        {activeForm === 'History' && (
+                            <UserHistoryPage/>
                         )}
                     </div>
                 </div>

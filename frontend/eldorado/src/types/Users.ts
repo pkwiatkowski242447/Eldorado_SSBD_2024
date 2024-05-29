@@ -58,3 +58,26 @@ export interface ManagedUserType {
     lastUnsuccessfulLoginTime: string | null
     userLevels: AccountTypeEnum[]
 }
+
+export interface UserHistoryType {
+    id: string;
+    version: number;
+    login: string;
+    suspended: boolean;
+    active: boolean;
+    blocked: boolean;
+    twoFactorAuth: boolean;
+    blockedTime: null | string;
+    lastSuccessfulLoginTime: number[];
+    lastUnsuccessfulLoginTime: number[];
+    accountLanguage: string;
+    lastSuccessfulLoginIp: string;
+    lastUnsuccessfulLoginIp: null | string;
+    phoneNumber: string;
+    lastname: string;
+    name: string;
+    email: string;
+    operationType: string;
+    modificationTime: number[];
+    modifiedBy: string;
+}

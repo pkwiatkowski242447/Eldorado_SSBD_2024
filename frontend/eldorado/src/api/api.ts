@@ -195,4 +195,13 @@ export const api = {
             }
         });
     },
+
+    historyDataSelf: (details: string) => {
+        return apiWithConfig.get('/accounts/history-data/self' + details)
+    },
+
+    historyDataUser: (id: string, details: string) => {
+        return apiWithConfig.get(`/accounts/${id}/history-data` + details)
+    },
+
 }

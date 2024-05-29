@@ -14,6 +14,29 @@
   "general.sessionExpired.text": "Your session has expired. You need to log in again.",
   "general.sessionExpired.text.button": "Log in again",
 
+  "userHistory.title": "User History",
+  "userHistory.version": "Version",
+  "userHistory.id": "User ID",
+  "userHistory.login": "Login",
+  "userHistory.suspended": "Suspended",
+  "userHistory.active": "Active",
+  "userHistory.blocked": "Blocked",
+  "userHistory.twoFactorAuth": "Two-Factor Authentication",
+  "userHistory.blockedTime": "Blocked Time",
+  "userHistory.lastSuccessfulLoginTime": "Last Successful Login Time",
+  "userHistory.lastUnsuccessfulLoginTime": "Last Unsuccessful Login Time",
+  "userHistory.accountLanguage": "Account Language",
+  "userHistory.lastSuccessfulLoginIp": "Last Successful Login IP",
+  "userHistory.lastUnsuccessfulLoginIp": "Last Unsuccessful Login IP",
+  "userHistory.phoneNumber": "Phone Number",
+  "userHistory.lastname": "Last Name",
+  "userHistory.name": "Name",
+  "userHistory.email": "Email",
+  "userHistory.operationType": "Operation Type",
+  "userHistory.modificationTime": "Modification Time",
+  "userHistory.modifiedBy": "Modified By",
+  "userHistory.noHistory": "The account history is empty",
+
   "landingPage.title": "Coming soon",
   "landingPage.text": "Most likely",
   "landingPage.logIn": "Log In",
@@ -91,7 +114,7 @@
   "siteHeader.login": "Log In",
 
 
-  "accountSettings.title": "Change your account settings",
+  "accountSettings.title": "Account settings",
   "accountSettings.email": "E-mail",
   "accountSettings.password": "Password",
   "accountSettings.personalInfo": "Personal Info",
@@ -108,7 +131,7 @@
   "accountSettings.phoneNumberInvalid": "Phone number is not valid",
   "accountSettings.wrongEmail": "The email address is not valid",
   "accountSettings.twoFactorAuth": "Two-factor authentication",
-
+  "operation.type.login": "Logging in",
 
   "accountSettings.accountInfo": "Account Information",
   "accountSettings.name": "Name",
