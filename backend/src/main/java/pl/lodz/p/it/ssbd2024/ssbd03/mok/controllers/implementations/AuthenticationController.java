@@ -160,7 +160,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Refresh user session method
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.REFRESH_SESSION})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> refreshUserSession(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
@@ -199,8 +199,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
      * @return This method returns the actual IPv4 address of the user. If the X-Forwarded-For header is empty or not
      * present (basically null) then IPv4 address is extracted from IP packet as source address, which will be proxy.
      */
-    //TODO w RolesAllowed zawrzec przypadek uzycia dla refreshUserSession, tylko jaki???
-//    @RolesAllowed({Authorities.MOK2, Authorities.MOK14})
+    @RolesAllowed({Authorities.LOGIN, Authorities.LOGOUT, Authorities.REFRESH_SESSION})
     private String getSourceAddress(String proxyChain, HttpServletRequest request) {
         if (proxyChain != null) {
             return proxyChain.indexOf(',') == -1 ? proxyChain : proxyChain.split(",")[0];
