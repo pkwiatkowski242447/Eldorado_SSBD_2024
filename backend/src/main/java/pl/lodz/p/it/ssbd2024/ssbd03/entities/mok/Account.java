@@ -129,31 +129,54 @@ import java.util.Set;
 
         // Find accounts matching user first name
         @NamedQuery(
-                name = "Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder",
+                name = "Account.findAccountsMatchingPhraseInNameOrLastnameWithLoginAscendingOrder",
                 query = """
                         SELECT a FROM Account a
                         WHERE
                             (
-                                LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
-                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')
+                                LOWER(a.name) LIKE CONCAT('%', LOWER(:phrase), '%') OR
+                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:phrase), '%')
                             )
-                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:login) , '%')
                         ORDER BY a.login ASC
                         """
         ),
         @NamedQuery(
-                name = "Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInDescendingOrder",
+                name = "Account.findAccountsMatchingPhraseInNameOrLastnameWithLoginInDescendingOrder",
                 query = """
                         SELECT a FROM Account a
                         WHERE
                             (
-                                LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
-                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')
+                                LOWER(a.name) LIKE CONCAT('%', LOWER(:phrase), '%') OR
+                                LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:phrase), '%')
                             )
-                            AND LOWER(a.login) LIKE CONCAT('%', LOWER(:login) , '%')
                         ORDER BY a.login DESC
                         """
         ),
+        @NamedQuery(
+                name = "Account.findAccountsMatchingPhraseInNameOrLastnameWithUserLevelInAscendingOrder",
+                query = """
+                        SELECT level.account FROM UserLevel level
+                        WHERE
+                            (
+                                LOWER(level.account.name) LIKE CONCAT('%', LOWER(:phrase), '%') OR
+                                LOWER(level.account.lastname) LIKE CONCAT ('%', LOWER(:phrase), '%')
+                            )
+                        ORDER BY level.class ASC, level.account.login
+                        """
+        ),
+        @NamedQuery(
+                name = "Account.findAccountsMatchingPhraseInNameOrLastnameWithUserLevelInDescendingOrder",
+                query = """
+                        SELECT level.account FROM UserLevel level
+                        WHERE
+                            (
+                                LOWER(level.account.name) LIKE CONCAT('%', LOWER(:phrase), '%') OR
+                                LOWER(level.account.lastname) LIKE CONCAT ('%', LOWER(:phrase), '%')
+                            )
+                        ORDER BY level.class DESC, level.account.login
+                        """
+        ),
+
 
         // Connected to activity log
         @NamedQuery(

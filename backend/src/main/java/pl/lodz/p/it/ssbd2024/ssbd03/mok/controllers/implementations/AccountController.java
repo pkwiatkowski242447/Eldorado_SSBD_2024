@@ -191,14 +191,13 @@ public class AccountController implements AccountControllerInterface {
     @RolesAllowed({Roles.ADMIN})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
-    public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
-                                                                            @RequestParam(name = "firstName", defaultValue = "") String firstName,
-                                                                            @RequestParam(name = "lastName", defaultValue = "") String lastName,
+    public ResponseEntity<?> getAccountsMatchingPhraseInNameOrLastname(@RequestParam(name = "phrase", defaultValue = "") String phrase,
+                                                                            @RequestParam(name = "orderBy", defaultValue = "login") String orderBy,
                                                                             @RequestParam(name = "order", defaultValue = "true") boolean order,
                                                                             @RequestParam(name = "pageNumber") int pageNumber,
                                                                             @RequestParam(name = "pageSize") int pageSize) throws ApplicationBaseException {
-        List<AccountListDTO> accountList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(
-                        login, firstName, lastName, order, pageNumber, pageSize)
+        List<AccountListDTO> accountList = accountService.getAccountsMatchingPhraseInNameOrLastname(
+                        phrase, orderBy, order, pageNumber, pageSize)
                 .stream()
                 .map(AccountListMapper::toAccountListDTO)
                 .toList();

@@ -546,14 +546,13 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.GET_ALL_USER_ACCOUNTS})
-    public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
-                                                                        String firstName,
-                                                                        String lastName,
+    public List<Account> getAccountsMatchingPhraseInNameOrLastname(String phrase,
+                                                                        String orderBy,
                                                                         boolean order,
                                                                         int pageNumber,
                                                                         int pageSize) throws ApplicationBaseException {
-        return accountFacade.findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(
-                login, firstName, lastName, order, pageNumber, pageSize);
+        return accountFacade.findAccountsMatchingPhraseInNameOrLastnameWithPagination(
+                phrase, orderBy, order, pageNumber, pageSize);
     }
 
     @Override

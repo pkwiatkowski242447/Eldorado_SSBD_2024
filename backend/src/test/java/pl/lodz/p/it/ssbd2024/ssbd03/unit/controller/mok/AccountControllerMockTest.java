@@ -598,14 +598,10 @@ public class AccountControllerMockTest {
         Account accountNo3 = new Account("exampleLogin3", "examplePassword3", "exampleFirstName3", "exampleLastName3", "exampleEmail3", "examplePhoneNumber3");
         List<Account> listOfAccounts = List.of(accountNo1, accountNo2, accountNo3);
 
-        when(accountService.getAccountsByMatchingLoginFirstNameAndLastName(anyString(), anyString(), anyString(),
-                anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
+        when(accountService.getAccountsMatchingPhraseInNameOrLastname(anyString(), anyString(),anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
 
-        mockMvc.perform(get("/api/v1/accounts//match-login-firstname-and-lastname")
-                        .queryParam("login", "ExampleLogin")
-                        .queryParam("firstName", "ExampleFirstName")
-                        .queryParam("lastName", "ExampleLastName")
-                        .queryParam("active", "true")
+        mockMvc.perform(get("/api/v1/accounts/match-phrase-in-account")
+                        .queryParam("phrase", "ExampleFirstName")
                         .queryParam("order", "false")
                         .queryParam("pageNumber", "0")
                         .queryParam("pageSize", "5"))
@@ -616,14 +612,11 @@ public class AccountControllerMockTest {
     public void getAccountsByMatchingLoginFirstNameAndLastNameTestPositiveWhenThereAreNoAccounts() throws Exception {
         List<Account> listOfAccounts = new ArrayList<>();
 
-        when(accountService.getAccountsByMatchingLoginFirstNameAndLastName(anyString(), anyString(), anyString(),
+        when(accountService.getAccountsMatchingPhraseInNameOrLastname(anyString(), anyString(),
                 anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
 
-        mockMvc.perform(get("/api/v1/accounts//match-login-firstname-and-lastname")
-                        .queryParam("login", "ExampleLogin")
-                        .queryParam("firstName", "ExampleFirstName")
-                        .queryParam("lastName", "ExampleLastName")
-                        .queryParam("active", "true")
+        mockMvc.perform(get("/api/v1/accounts/match-phrase-in-account")
+                        .queryParam("phrase", "ExampleFirstName")
                         .queryParam("order", "false")
                         .queryParam("pageNumber", "0")
                         .queryParam("pageSize", "5"))

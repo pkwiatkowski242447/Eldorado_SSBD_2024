@@ -206,17 +206,16 @@ public interface AccountServiceInterface {
     /**
      * Retrieve Account that match the parameters, in a given order.
      *
-     * @param login      Account's login. A phrase is sought in the logins.
-     * @param firstName  Account's owner first name. A phrase is sought in the names.
-     * @param lastName   Account's owner last name. A phrase is sought in the last names.
+     * @param phrase     Phrase in account's firstname or lastname.
+     * @param orderBy    Either "login" or "level", defaults to "login". If entered incorrectly set as "login".
      * @param order      Ordering in which user accounts should be returned.
      * @param pageNumber Number of the page with searched users accounts.
      * @param pageSize   Number of the users accounts per page.
      * @return List of user accounts that match the given parameters.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Account> getAccountsByMatchingLoginFirstNameAndLastName(
-            String login, String firstName, String lastName, boolean order, int pageNumber, int pageSize)
+    List<Account> getAccountsMatchingPhraseInNameOrLastname(
+            String phrase, String orderBy, boolean order, int pageNumber, int pageSize)
             throws ApplicationBaseException;
 
     /**
