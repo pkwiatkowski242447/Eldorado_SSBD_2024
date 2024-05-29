@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
@@ -66,7 +67,12 @@ public class AccountHistoryDataFacade extends AbstractFacade<AccountHistoryData>
      * @param account Entity to be persisted.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({
+            Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.CHANGE_USER_PASSWORD,
+            Authorities.CHANGE_OWN_PASSWORD, Authorities.BLOCK_ACCOUNT, Authorities.UNBLOCK_ACCOUNT,
+            Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT, Authorities.CONFIRM_ACCOUNT_CREATION,
+            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESTORE_ACCOUNT_ACCESS
+    })
     public void create(AccountHistoryData account) throws ApplicationBaseException {
         super.create(account);
     }
@@ -94,7 +100,7 @@ public class AccountHistoryDataFacade extends AbstractFacade<AccountHistoryData>
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
-    @PermitAll
+    @DenyAll
     public Optional<AccountHistoryData> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -119,7 +125,7 @@ public class AccountHistoryDataFacade extends AbstractFacade<AccountHistoryData>
      * If a persistence exception is thrown, then empty list is returned.
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public List<AccountHistoryData> findAllAccountsWithPagination(int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {
@@ -143,7 +149,7 @@ public class AccountHistoryDataFacade extends AbstractFacade<AccountHistoryData>
      * @return If there are historic entries for the requested account, this method returns part of the entries
      * specified by pageSize and pageNumber. Otherwise, empty list.
      */
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.GET_OWN_HISTORICAL_DATA, Authorities.GET_ACCOUNT_HISTORICAL_DATA})
     public List<AccountHistoryData> findByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<AccountHistoryData> findAccountsByLogin = entityManager.createNamedQuery("AccountHistoryData.findByAccountId", AccountHistoryData.class);

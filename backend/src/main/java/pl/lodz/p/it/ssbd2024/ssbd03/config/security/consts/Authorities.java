@@ -99,4 +99,12 @@ public class Authorities {
     public static final String GET_RESERVATION = "GET_RESERVATION";
     // MOP 23
     public static final String END_RESERVATION = "END_RESERVATION";
+
+    // Additional
+
+    public static final String REFRESH_SESSION = "REFRESH_SESSION";
+    public static final String RESTORE_ACCOUNT_ACCESS = "RESTORE_ACCOUNT_ACCESS";
+    public static final String GET_ADMIN_PASSWORD_RESET_STATUS = "RESTORE_ACCOUNT_ACCESS";
+    public static final String GET_ACCOUNT_HISTORICAL_DATA = "GET_ACCOUNT_HISTORICAL_DATA";
+    public static final String GET_OWN_HISTORICAL_DATA = "GET_OWN_HISTORICAL_DATA";
 }

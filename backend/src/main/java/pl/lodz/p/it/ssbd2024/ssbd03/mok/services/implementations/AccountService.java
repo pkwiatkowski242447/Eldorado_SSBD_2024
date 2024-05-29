@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
@@ -139,7 +138,7 @@ public class AccountService implements AccountServiceInterface {
     // Register user account methods - Client, Staff, Admin
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
+    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
             throws ApplicationBaseException {
@@ -176,7 +175,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REGISTER_USER})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public Account registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -211,7 +210,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REGISTER_USER})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public Account registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -247,7 +246,8 @@ public class AccountService implements AccountServiceInterface {
 
     // Password change methods
 
-    @RolesAllowed({Roles.ANONYMOUS})
+    @Override
+    @RolesAllowed({Authorities.RESET_PASSWORD})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPassword(String userEmail) throws ApplicationBaseException {
         Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
@@ -270,7 +270,8 @@ public class AccountService implements AccountServiceInterface {
                 account.getAccountLanguage());
     }
 
-    @RolesAllowed({Roles.ANONYMOUS})
+    @Override
+    @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class, noRollbackFor = PasswordPreviouslyUsedException.class)
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
@@ -303,7 +304,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD})
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationBaseException.class)
     public void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException {
 
@@ -338,7 +339,7 @@ public class AccountService implements AccountServiceInterface {
     // Block & unblock account method
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.BLOCK_ACCOUNT})
     public void blockAccount(UUID id) throws ApplicationBaseException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (account.getBlocked() && account.getBlockedTime() == null) {
@@ -362,7 +363,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
     public void unblockAccount(UUID id) throws ApplicationBaseException {
         Account account = accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
         if (!account.getBlocked()) {
@@ -388,7 +389,7 @@ public class AccountService implements AccountServiceInterface {
     // Modify account methods
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
         Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
@@ -427,7 +428,7 @@ public class AccountService implements AccountServiceInterface {
     // Activate account method
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
@@ -458,7 +459,7 @@ public class AccountService implements AccountServiceInterface {
     // E-mail change methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.CONFIRM_EMAIL_CHANGE})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean confirmEmail(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
@@ -495,7 +496,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.CHANGE_OWN_MAIL})
     @Transactional(propagation = Propagation.REQUIRED)
     public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
@@ -516,7 +517,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
     @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = TokenBaseException.class)
     public void resendEmailConfirmation() throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -544,7 +545,7 @@ public class AccountService implements AccountServiceInterface {
     // Read methods
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.GET_ALL_USER_ACCOUNTS})
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
                                                                         String lastName,
@@ -556,20 +557,20 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_ALL_USER_ACCOUNTS)
+    @RolesAllowed({Authorities.GET_ALL_USER_ACCOUNTS})
     public List<Account> getAllAccounts(int pageNumber, int pageSize) throws ApplicationBaseException {
         return accountFacade.findAllAccountsWithPagination(pageNumber, pageSize);
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.GET_OWN_HISTORICAL_DATA, Authorities.GET_OWN_ACCOUNT, Authorities.CHANGE_OWN_MAIL})
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getAccountByLogin(String login) throws ApplicationBaseException {
         return accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 
-    @RolesAllowed({Roles.ADMIN})
     @Override
+    @RolesAllowed({Authorities.GET_USER_ACCOUNT, Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT})
     public Account getAccountById(UUID id) throws ApplicationBaseException {
         return accountFacade.findAndRefresh(id).orElseThrow(AccountNotFoundException::new);
     }
@@ -577,7 +578,7 @@ public class AccountService implements AccountServiceInterface {
     // Add user level methods - Client, Staff, Admin
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.ADD_USER_LEVEL})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addClientUserLevel(String id) throws ApplicationBaseException {
 
@@ -604,7 +605,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.ADD_USER_LEVEL})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -630,7 +631,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.ADD_USER_LEVEL})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addAdminUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -654,7 +655,7 @@ public class AccountService implements AccountServiceInterface {
     // Remove user level methods - Client, Staff, Admin
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeClientUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -682,7 +683,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -710,7 +711,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeAdminUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -749,7 +750,7 @@ public class AccountService implements AccountServiceInterface {
 
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void generateAccessRestoreTokenAndSendEmailMessage(String email) throws ApplicationBaseException {
         Account account = accountFacade.findByEmail(email).orElseThrow(AccountEmailNotFoundException::new);
@@ -773,7 +774,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void restoreAccountAccess(String token) throws ApplicationBaseException {
         Token tokenObject = tokenFacade.findByTokenValue(new String(Base64.getUrlDecoder().decode(token))).orElseThrow(TokenNotFoundException::new);
@@ -806,7 +807,7 @@ public class AccountService implements AccountServiceInterface {
                 account.getAccountLanguage());
     }
 
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPasswordByAdmin(String userEmail) throws ApplicationBaseException {
         Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
@@ -830,6 +831,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
+    @RolesAllowed({Authorities.GET_ADMIN_PASSWORD_RESET_STATUS})
     public boolean getPasswordAdminResetStatus() throws ApplicationBaseException {
         Account account = accountFacade.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -837,6 +839,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
+    @RolesAllowed({Authorities.GET_OWN_HISTORICAL_DATA, Authorities.GET_ACCOUNT_HISTORICAL_DATA})
     public List<AccountHistoryData> getHistoryDataByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         return historyDataFacade.findByAccountId(id, pageNumber, pageSize);
     }

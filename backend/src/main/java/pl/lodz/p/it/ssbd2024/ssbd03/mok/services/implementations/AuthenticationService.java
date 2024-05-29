@@ -137,7 +137,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     // Login methods
 
     @Override
-    @RolesAllowed(Authorities.LOGIN)
+    @RolesAllowed({Authorities.LOGIN})
     public void loginUsingAuthenticationCode(String login, String code) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(login).orElseThrow(InvalidLoginAttemptException::new);
         if (!account.getActive()) {
@@ -165,7 +165,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     // Register successful & unsuccessful login attempt methods
 
     @Override
-    @RolesAllowed(Authorities.LOGIN)
+    @RolesAllowed({Authorities.LOGIN})
     public AccessAndRefreshTokensDTO registerSuccessfulLoginAttempt(String userLogin, boolean confirmed, String ipAddress, String language) throws ApplicationBaseException {
         Account account = this.authenticationFacade.findByLogin(userLogin).orElseThrow(InvalidLoginAttemptException::new);
         if (!confirmed && account.getTwoFactorAuth()) {
@@ -244,7 +244,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
 
     // Refresh user session method
 
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.REFRESH_SESSION})
     public AccessAndRefreshTokensDTO refreshUserSession(String refreshToken, String userLogin) throws ApplicationBaseException {
         // Retrieve user account and token object from database
         Account foundAccount = this.authenticationFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
@@ -289,7 +289,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects
      *                                  on facade components.
      */
-    @RolesAllowed(Authorities.LOGIN)
+    @RolesAllowed({Authorities.LOGIN})
     private void generateAndSendEmailMessageWithAuthenticationCode(Account account) throws ApplicationBaseException {
         tokenFacade.removeByTypeAndAccount(Token.TokenType.MULTI_FACTOR_AUTHENTICATION_CODE, account.getId());
 

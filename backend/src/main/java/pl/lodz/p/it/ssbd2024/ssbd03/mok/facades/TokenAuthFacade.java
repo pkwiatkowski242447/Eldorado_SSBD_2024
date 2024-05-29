@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
+import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -58,7 +61,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @param entity Token to be persisted.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({Authorities.LOGIN, Authorities.REFRESH_SESSION})
     public void create(Token entity) throws ApplicationBaseException {
         super.create(entity);
     }
@@ -70,7 +73,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @return If Token with the given ID was found returns an Optional containing the Token, otherwise returns an empty Optional.
      */
     @Override
-    @PermitAll
+    @DenyAll
     public Optional<Token> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
@@ -82,7 +85,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @param accountId ID of the associated Account.
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
-    @PermitAll
+    @RolesAllowed({Authorities.LOGIN})
     public Optional<Token> findByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
@@ -102,7 +105,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @param tokenValue Value of the token to be found.
      * @return If found returns Optional containing the Token, otherwise returns Empty Optional.
      */
-    @PermitAll
+    @RolesAllowed({Authorities.REFRESH_SESSION})
     public Optional<Token> findByTokenValue(String tokenValue) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
@@ -122,7 +125,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @param tokenType Type of Tokens to be removed.
      * @param accountId ID of the Account which Tokens are to be removed.
      */
-    @PermitAll
+    @RolesAllowed({Authorities.LOGIN})
     public void removeByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Token.removeByTypeAndAccount")
                 .setParameter("tokenType", tokenType)
@@ -136,7 +139,7 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
      * @param entity Token to be removed from the database.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({Authorities.LOGIN, Authorities.REFRESH_SESSION})
     public void remove(Token entity) throws ApplicationBaseException {
         super.remove(entity);
     }
