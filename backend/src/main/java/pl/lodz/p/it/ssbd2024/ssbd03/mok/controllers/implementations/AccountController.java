@@ -18,12 +18,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountChang
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountPasswordDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountHistoryDataOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountHistoryDataMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
@@ -453,5 +456,30 @@ public class AccountController implements AccountControllerInterface {
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> getPasswordAdminResetStatus() throws ApplicationBaseException {
         return ResponseEntity.ok().body(accountService.getPasswordAdminResetStatus());
+    }
+
+    @Override
+    @RolesAllowed({Roles.AUTHENTICATED})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> getHistoryDataSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
+        Account account = accountService.getAccountByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<AccountHistoryDataOutputDTO> accountList = accountService.getHistoryDataByAccountId(account.getId(),pageNumber, pageSize)
+                .stream()
+                .map(AccountHistoryDataMapper::toAccountHistoryDataOutputDto)
+                .toList();
+        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(accountList);
+    }
+
+    @Override
+    @RolesAllowed({Roles.ADMIN})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> getHistoryDataByAccountId(String id, int pageNumber, int pageSize) throws ApplicationBaseException {
+        List<AccountHistoryDataOutputDTO> accountList = accountService.getHistoryDataByAccountId(UUID.fromString(id), pageNumber, pageSize)
+                .stream()
+                .map(AccountHistoryDataMapper::toAccountHistoryDataOutputDto)
+                .toList();
+        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(accountList);
     }
 }

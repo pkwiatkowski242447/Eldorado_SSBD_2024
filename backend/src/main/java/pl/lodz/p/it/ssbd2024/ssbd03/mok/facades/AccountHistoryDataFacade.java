@@ -144,7 +144,7 @@ public class AccountHistoryDataFacade extends AbstractFacade<AccountHistoryData>
      * specified by pageSize and pageNumber. Otherwise, empty list.
      */
     @RolesAllowed({Roles.AUTHENTICATED})
-    public List<AccountHistoryData> findByAccountId(String id, int pageNumber, int pageSize) throws ApplicationBaseException {
+    public List<AccountHistoryData> findByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<AccountHistoryData> findAccountsByLogin = entityManager.createNamedQuery("AccountHistoryData.findByAccountId", AccountHistoryData.class);
             findAccountsByLogin.setParameter("id", id);

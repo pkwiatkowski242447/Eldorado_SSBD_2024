@@ -621,4 +621,56 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     ResponseEntity<?> getPasswordAdminResetStatus() throws ApplicationBaseException;
+
+    /**
+     * This method retrieves user account's history data from the system. In order to avoid sending huge amounts of user data
+     * it used pagination, so that history data from a particular page, of a particular size can be retrieved.
+     * This method retrieves account history data of the account that requests it. The results are ordered by
+     * modification time.
+     *
+     * @param pageNumber Number of the page, which user history data will be retrieved from.
+     * @param pageSize   Number of user history data per page.
+     * @return This method returns 200 OK as a response, where in response body a list of user account's history data is located, is a JSON format.
+     * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
+     * 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/history-data/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get history data of the requesting account", description = "The endpoint is used retrieve list of account history data for the requesting account from given page of given size.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of account's history data returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of account's history data returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getHistoryDataSelf(@RequestParam("pageNumber") int pageNumber,
+                                         @RequestParam("pageSize") int pageSize)
+            throws ApplicationBaseException;
+
+    /**
+     * This method retrieves user account's history data from the system. In order to avoid sending huge amounts of user data
+     * it used pagination, so that history data from a particular page, of a particular size can be retrieved.
+     * This method retrieves account history data by the account's id. The results are ordered by
+     * modification time.
+     *
+     * @param id ID of the account which history data will be retrieved.
+     * @param pageNumber Number of the page, which user history data will be retrieved from.
+     * @param pageSize   Number of user history data per page.
+     * @return This method returns 200 OK as a response, where in response body a list of user account's history data is located, is a JSON format.
+     * If the list is empty (there are not user accounts in the system), this method would return 204 NO CONTENT as the response.
+     * 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
+    @GetMapping(value = "/{id}/history-data",produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get history data of a account", description = "The endpoint is used retrieve list of account history data from given page of given size.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of account's history data returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of account's history data returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getHistoryDataByAccountId(@RequestParam("id") String id,
+                                                @RequestParam("pageNumber") int pageNumber,
+                                                @RequestParam("pageSize") int pageSize)
+            throws ApplicationBaseException;
 }
