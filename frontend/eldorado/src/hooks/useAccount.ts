@@ -45,6 +45,7 @@ export const useAccount = () => {
             navigateToMainPage()
         }
     }
+
     const logIn = async (login: string, password: string) => {
         try {
             const response = await api.logIn(login, password);
@@ -160,8 +161,8 @@ export const useAccount = () => {
             }
         } catch (e) {
             if (account !== null) {
-                alert('Unable to get current account!');
-                await logOut();
+                //@ts-expect-error idk
+                handleApiError(e);
             }
         }
     };

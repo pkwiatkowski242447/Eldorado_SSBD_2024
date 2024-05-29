@@ -9,6 +9,10 @@ export const api = {
         return apiWithConfig.post('/auth/login-credentials', {login, password, language})
     },
 
+    refreshSession: (refreshToken: string) => {
+        return apiWithConfig.post('/auth/refresh-session', {refreshToken})
+    },
+
     logIn2fa: (userLogin: string, authCodeValue: string) => {
         let language = window.navigator.language;
         language = language.substring(0, 2)
