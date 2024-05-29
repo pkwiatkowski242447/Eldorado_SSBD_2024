@@ -383,26 +383,24 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of accounts that match the parameters.
      */
     @RolesAllowed({Roles.ADMIN})
-    public List<Account> findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(String login,
-                                                                                                      String firstName,
-                                                                                                      String lastName,
-                                                                                                      boolean active,
-                                                                                                      boolean order,
-                                                                                                      int pageNumber,
-                                                                                                      int pageSize) throws ApplicationBaseException {
+    public List<Account> findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(String login,
+                                                                                                   String firstName,
+                                                                                                   String lastName,
+                                                                                                   boolean order,
+                                                                                                   int pageNumber,
+                                                                                                   int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMatchingCriteriaQuery;
             if (order) {
-                findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsByActiveAndMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder", Account.class);
+                findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder", Account.class);
             } else {
-                findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsByActiveAndMatchingUserFirstNameOrUserLastNameAndLoginInDescendingOrder", Account.class);
+                findAllAccountsMatchingCriteriaQuery = entityManager.createNamedQuery("Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInDescendingOrder", Account.class);
             }
             findAllAccountsMatchingCriteriaQuery.setFirstResult(pageNumber * pageSize);
             findAllAccountsMatchingCriteriaQuery.setMaxResults(pageSize);
             findAllAccountsMatchingCriteriaQuery.setParameter("login", login);
             findAllAccountsMatchingCriteriaQuery.setParameter("firstName", firstName);
             findAllAccountsMatchingCriteriaQuery.setParameter("lastName", lastName);
-            findAllAccountsMatchingCriteriaQuery.setParameter("active", active);
             List<Account> list = findAllAccountsMatchingCriteriaQuery.getResultList();
             super.refreshAll(list);
             return list;

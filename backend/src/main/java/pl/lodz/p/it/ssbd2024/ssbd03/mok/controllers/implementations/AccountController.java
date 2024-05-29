@@ -26,7 +26,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
@@ -194,12 +193,11 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
                                                                             @RequestParam(name = "firstName", defaultValue = "") String firstName,
                                                                             @RequestParam(name = "lastName", defaultValue = "") String lastName,
-                                                                            @RequestParam(name = "active", defaultValue = "true") boolean active,
                                                                             @RequestParam(name = "order", defaultValue = "true") boolean order,
                                                                             @RequestParam(name = "pageNumber") int pageNumber,
                                                                             @RequestParam(name = "pageSize") int pageSize) throws ApplicationBaseException {
         List<AccountListDTO> accountList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(
-                        login, firstName, lastName, active, order, pageNumber, pageSize)
+                        login, firstName, lastName, order, pageNumber, pageSize)
                 .stream()
                 .map(AccountListMapper::toAccountListDTO)
                 .toList();

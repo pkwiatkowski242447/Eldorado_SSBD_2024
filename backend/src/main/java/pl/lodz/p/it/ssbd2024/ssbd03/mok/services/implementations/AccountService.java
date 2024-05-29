@@ -547,12 +547,11 @@ public class AccountService implements AccountServiceInterface {
     public List<Account> getAccountsByMatchingLoginFirstNameAndLastName(String login,
                                                                         String firstName,
                                                                         String lastName,
-                                                                        boolean active,
                                                                         boolean order,
                                                                         int pageNumber,
                                                                         int pageSize) throws ApplicationBaseException {
-        return accountFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(
-                login, firstName, lastName, active, order, pageNumber, pageSize);
+        return accountFacade.findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(
+                login, firstName, lastName, order, pageNumber, pageSize);
     }
 
     @Override

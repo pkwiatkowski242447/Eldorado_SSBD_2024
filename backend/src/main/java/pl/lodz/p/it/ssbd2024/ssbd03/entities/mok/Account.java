@@ -129,11 +129,10 @@ import java.util.Set;
 
         // Find accounts matching user first name
         @NamedQuery(
-                name = "Account.findAccountsByActiveAndMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder",
+                name = "Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInAscendingOrder",
                 query = """
                         SELECT a FROM Account a
                         WHERE
-                            a.active = :active AND
                             (
                                 LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
                                 LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')
@@ -143,11 +142,10 @@ import java.util.Set;
                         """
         ),
         @NamedQuery(
-                name = "Account.findAccountsByActiveAndMatchingUserFirstNameOrUserLastNameAndLoginInDescendingOrder",
+                name = "Account.findAccountsMatchingUserFirstNameOrUserLastNameAndLoginInDescendingOrder",
                 query = """
                         SELECT a FROM Account a
                         WHERE
-                            a.active = :active AND
                             (
                                 LOWER(a.name) LIKE CONCAT('%', LOWER(:firstName), '%') OR
                                 LOWER(a.lastname) LIKE CONCAT ('%', LOWER(:lastName), '%')

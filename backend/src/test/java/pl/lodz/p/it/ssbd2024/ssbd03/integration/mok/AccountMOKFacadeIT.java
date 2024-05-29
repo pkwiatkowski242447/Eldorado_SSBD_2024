@@ -555,7 +555,7 @@ public class AccountMOKFacadeIT extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
-    public void findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination() throws ApplicationBaseException {
+    public void findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination() throws ApplicationBaseException {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -575,10 +575,10 @@ public class AccountMOKFacadeIT extends TestcontainersConfig {
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
 
-        List<Account> accounts0 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, true, 0, 10);
-        List<Account> accounts1 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, false, 0, 10);
-        List<Account> accounts2 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, false, 0, 2);
-        List<Account> accounts3 = accountMOKFacade.findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, false, 1, 1);
+        List<Account> accounts0 = accountMOKFacade.findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", true, 0, 10);
+        List<Account> accounts1 = accountMOKFacade.findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", false, 0, 10);
+        List<Account> accounts2 = accountMOKFacade.findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", false, 0, 2);
+        List<Account> accounts3 = accountMOKFacade.findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination("ginIT", "irstNa", "eITN", false, 1, 1);
 
         assertEquals(2, accounts0.size());
         assertEquals(2, accounts1.size());

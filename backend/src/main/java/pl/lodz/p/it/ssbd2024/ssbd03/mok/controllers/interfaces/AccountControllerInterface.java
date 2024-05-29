@@ -212,7 +212,6 @@ public interface AccountControllerInterface {
     ResponseEntity<?> getAccountsByMatchingLoginFirstNameAndLastName(@RequestParam(name = "login", defaultValue = "") String login,
                                                                      @RequestParam(name = "firstName", defaultValue = "") String firstName,
                                                                      @RequestParam(name = "lastName", defaultValue = "") String lastName,
-                                                                     @RequestParam(name = "active", defaultValue = "true") boolean active,
                                                                      @RequestParam(name = "order", defaultValue = "true") boolean order,
                                                                      @RequestParam(name = "pageNumber") int pageNumber,
                                                                      @RequestParam(name = "pageSize") int pageSize)
