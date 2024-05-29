@@ -104,6 +104,12 @@ function LoginForm() {
                             <a href="/register" className="font-medium text-black hover:text-blue-500">
                                 {t("loginPage.signUp")} </a>
                         </div>
+                        <div className="mt-4 text-center text-sm">
+                            {t("loginPage.accountSuspended")}
+                            <a href="/restore-access" className="font-medium text-black hover:text-blue-500">
+                                {t("loginPage.accountSuspended.text")} </a>
+                        </div>
+
                     </form>
                 </Form>
             </CardContent>

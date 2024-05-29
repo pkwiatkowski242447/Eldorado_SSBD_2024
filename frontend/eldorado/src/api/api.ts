@@ -204,4 +204,12 @@ export const api = {
         return apiWithConfig.get(`/accounts/${id}/history-data` + details)
     },
 
+    restoreAccess: (email: string) => {
+        return apiWithConfig.post('/accounts/restore-access', {email})
+    },
+
+    restoreAccessToken: (token: string) => {
+        return apiWithConfig.post(`/accounts/restore-token/${token}`)
+    }
+
 }
