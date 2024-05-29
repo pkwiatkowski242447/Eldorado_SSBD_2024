@@ -434,7 +434,7 @@ public class AccountService implements AccountServiceInterface {
         Account account = accountFacade.find(jwtProvider.extractAccountId(tokenFromDB.getTokenValue()))
                 .orElseThrow(AccountIdNotFoundException::new);
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
-            account.setActive(true);
+            account.activateAccount(true);
 
             accountFacade.edit(account);
             historyDataFacade.create(new AccountHistoryData(account,
@@ -789,7 +789,7 @@ public class AccountService implements AccountServiceInterface {
             throw new TokenNotValidException();
         }
 
-        account.setSuspended(false);
+        account.activateAccount(false);
 
         accountFacade.edit(account);
         historyDataFacade.create(new AccountHistoryData(account,

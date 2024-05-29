@@ -163,7 +163,10 @@ import java.util.Set;
                 query = """
                         SELECT a FROM Account a
                         WHERE a.suspended = false
-                          AND ((a.activityLog.lastSuccessfulLoginTime IS NULL AND a.creationTime < :timestamp) OR a.activityLog.lastSuccessfulLoginTime < :timestamp)
+                            AND (
+                                (a.activityLog.lastSuccessfulLoginTime IS NULL AND a.creationTime < :timestamp)
+                                OR (a.activationTime < :timestamp AND a.activityLog.lastSuccessfulLoginTime < :timestamp)
+                            )
                         ORDER BY a.login ASC
                         """
         ),
@@ -314,6 +317,12 @@ public class Account extends AbstractEntity {
     @Getter @Setter
     private String phoneNumber;
 
+    @Column(name = DatabaseConsts.ACCOUNT_ACTIVATION_TIMESTAMP)
+    @PastOrPresent(message = AccountMessages.ACTIVATION_TIMESTAMP_FUTURE)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Getter
+    private LocalDateTime activationTime;
+
     // Other fields - used for access control, and storing historical data
 
     /**
@@ -415,6 +424,12 @@ public class Account extends AbstractEntity {
      */
     public ActivityLog getActivityLog() {
         return this.activityLog == null ? new ActivityLog() : this.activityLog;
+    }
+
+    public void activateAccount(boolean firstActivation) {
+        if (firstActivation) this.active = true;
+        else this.suspended = false;
+        this.activationTime = LocalDateTime.now();
     }
 
     /**

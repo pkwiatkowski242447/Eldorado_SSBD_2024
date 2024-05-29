@@ -592,7 +592,7 @@ public class AccountMOKFacadeIT extends TestcontainersConfig {
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Roles.AUTHENTICATED, Roles.ADMIN})
-    public void findAllAccountsWithoutRecentActivityWithPagination() throws ApplicationBaseException {
+    public void findAllAccountsWithoutRecentActivityWithPagination() throws Exception {
         Account account = new Account(accountLoginNo3, accountPasswordNo1, accountFirstNameNo3, accountLastNameNo3,
                 accountEmailNo3, accountPhoneNumberNo3);
         UserLevel userLevelClientNo1 = new Client();
@@ -608,6 +608,12 @@ public class AccountMOKFacadeIT extends TestcontainersConfig {
         account2.setAccountLanguage(accountLanguageNo1);
         account2.setActive(true);
         account.setActive(true);
+
+        Field activationTime = Account.class.getDeclaredField("activationTime");
+        activationTime.setAccessible(true);
+        activationTime.set(account, LocalDateTime.of(2010, 4, 10, 8, 41));
+        activationTime.set(account2, LocalDateTime.of(2002, 9, 11, 12, 0));
+        activationTime.setAccessible(false);
 
         accountMOKFacade.create(account);
         accountMOKFacade.create(account2);
