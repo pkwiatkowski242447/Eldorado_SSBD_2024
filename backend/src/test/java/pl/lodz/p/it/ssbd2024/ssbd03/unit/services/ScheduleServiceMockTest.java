@@ -6,9 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.test.context.annotation.SecurityTestExecutionListeners;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.ScheduleService;
@@ -24,7 +29,8 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, SpringExtension.class})
+@SecurityTestExecutionListeners
 public class ScheduleServiceMockTest {
     @Mock
     private MailProvider mailProvider;
@@ -32,6 +38,8 @@ public class ScheduleServiceMockTest {
     private TokenFacade tokenFacade;
     @Mock
     private AccountMOKFacade accountMOKFacade;
+    @Mock
+    private AccountHistoryDataFacade historyDataFacade;
     @Mock
     private TokenProvider tokenProvider;
 
@@ -145,6 +153,7 @@ public class ScheduleServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username = "login")
     void unblockAccountTestSuccessful() throws NoSuchFieldException, IllegalAccessException, ApplicationBaseException {
         Account account = new Account("login", "TestPassword", "firstName", "lastName", "test@email.com", "123123123");
         Account account1 = new Account("login1", "TestPassword1", "firstName1", "lastName1", "test1@email.com", "123123124");
@@ -163,6 +172,7 @@ public class ScheduleServiceMockTest {
                 .thenReturn(accountList);
         doNothing().when(accountMOKFacade).edit(any());
         doNothing().when(mailProvider).sendUnblockAccountInfoEmail(any(), any(), any(), any());
+        doNothing().when(historyDataFacade).create(any(AccountHistoryData.class));
 
         scheduleService.unblockAccount();
 

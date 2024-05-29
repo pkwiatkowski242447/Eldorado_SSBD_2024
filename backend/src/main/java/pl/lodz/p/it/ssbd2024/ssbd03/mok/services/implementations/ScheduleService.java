@@ -4,13 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.OperationType;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.ScheduleServiceInterface;
@@ -36,6 +40,7 @@ public class ScheduleService implements ScheduleServiceInterface {
      * AccountMOKFacade used for operations on account entities.
      */
     private final AccountMOKFacade accountMOKFacade;
+    private final AccountHistoryDataFacade historyDataFacade;
 
     /**
      * TokenFacade used for operations on then accounts.
@@ -91,6 +96,7 @@ public class ScheduleService implements ScheduleServiceInterface {
      * Autowired constructor for the service.
      *
      * @param accountMOKFacade Facade used for managing user accounts.
+     * @param historyDataFacade    Facade used for inserting information about account modifications to the database.
      * @param tokenFacade      Facade used for managing tokens used for many account related activities.
      * @param tokenProvider    Component used for automatic generation of action tokens.
      * @param mailProvider     Component used for sending e-mail messages to e-mail addresses connected to certain
@@ -98,10 +104,12 @@ public class ScheduleService implements ScheduleServiceInterface {
      */
     @Autowired
     public ScheduleService(AccountMOKFacade accountMOKFacade,
+                           AccountHistoryDataFacade historyDataFacade,
                            TokenFacade tokenFacade,
                            MailProvider mailProvider,
                            TokenProvider tokenProvider) {
         this.accountMOKFacade = accountMOKFacade;
+        this.historyDataFacade = historyDataFacade;
         this.tokenFacade = tokenFacade;
         this.mailProvider = mailProvider;
         this.tokenProvider = tokenProvider;
@@ -203,6 +211,13 @@ public class ScheduleService implements ScheduleServiceInterface {
             account.unblockAccount();
             try {
                 accountMOKFacade.edit(account);
+                historyDataFacade.create(new AccountHistoryData(account,
+                        OperationType.UNBLOCK,
+                        accountMOKFacade.findByLogin(SecurityContextHolder
+                                        .getContext()
+                                        .getAuthentication()
+                                        .getName())
+                                .orElse(null)));
             } catch (ApplicationBaseException exception) {
                 log.error("Exception of type: {} was throw while activating user: {} after it was blocked for {} hours.",
                         exception.getClass().getSimpleName(), account.getLogin(), this.unblockTime);
@@ -239,6 +254,13 @@ public class ScheduleService implements ScheduleServiceInterface {
             account.setSuspended(true);
             try {
                 accountMOKFacade.edit(account);
+                historyDataFacade.create(new AccountHistoryData(account,
+                        OperationType.SUSPEND,
+                        accountMOKFacade.findByLogin(SecurityContextHolder
+                                        .getContext()
+                                        .getAuthentication()
+                                        .getName())
+                                .orElse(null)));
             } catch (ApplicationBaseException exception) {
                 log.error("Exception of type: {} was throw while suspending user: {}.",
                         exception.getClass().getSimpleName(), account.getLogin());

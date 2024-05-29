@@ -72,7 +72,6 @@ public class TestcontainersConfigFull {
                             );
                         }
                 )
-//                .waitingFor(Wait.forLogMessage(".*MOP_ATOMIKOS_CP: refreshed XAResource.*", 1))
                 .withReuse(true);
 
 

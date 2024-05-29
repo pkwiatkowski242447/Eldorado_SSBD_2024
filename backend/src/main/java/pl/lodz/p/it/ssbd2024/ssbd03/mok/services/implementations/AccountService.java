@@ -109,6 +109,7 @@ public class AccountService implements AccountServiceInterface {
      * Autowired constructor for the service.
      *
      * @param accountFacade   Facade responsible for users accounts management.
+     * @param historyDataFacade    Facade used for inserting information about account modifications to the database.
      * @param passwordEncoder This component is used to generate hashed passwords for user accounts (not to store them in their original form).
      * @param tokenFacade     This facade is responsible for manipulating tokens, used for various, user account related operations.
      * @param mailProvider    This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
@@ -288,9 +289,16 @@ public class AccountService implements AccountServiceInterface {
         }
 
         account.getPreviousPasswords().add(newPassword);
-
         account.setPassword(this.passwordEncoder.encode(newPassword));
+
         this.accountFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.PASSWORD_CHANGE,
+                accountFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
     }
 
     @Override
@@ -315,7 +323,15 @@ public class AccountService implements AccountServiceInterface {
         }
 
         account.setPassword(newPasswordEncoded);
+
         accountFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.PASSWORD_CHANGE,
+                accountFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
     }
 
     // Block & unblock account method
@@ -329,6 +345,7 @@ public class AccountService implements AccountServiceInterface {
         }
 
         account.blockAccount(true);
+
         accountFacade.edit(account);
         historyDataFacade.create(new AccountHistoryData(account,
                 OperationType.BLOCK,
@@ -352,6 +369,7 @@ public class AccountService implements AccountServiceInterface {
         }
 
         account.unblockAccount();
+
         accountFacade.edit(account);
         historyDataFacade.create(new AccountHistoryData(account,
                 OperationType.UNBLOCK,
@@ -394,6 +412,13 @@ public class AccountService implements AccountServiceInterface {
         }
 
         accountFacade.edit(foundAccount);
+        historyDataFacade.create(new AccountHistoryData(foundAccount,
+                OperationType.PERSONAL_DATA_MODIFICATION,
+                accountFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
 
         return foundAccount;
     }
@@ -410,8 +435,8 @@ public class AccountService implements AccountServiceInterface {
                 .orElseThrow(AccountIdNotFoundException::new);
         if (jwtProvider.isTokenValid(tokenFromDB.getTokenValue(), account)) {
             account.setActive(true);
-            accountFacade.edit(account);
 
+            accountFacade.edit(account);
             historyDataFacade.create(new AccountHistoryData(account,
                     OperationType.ACTIVATION,
                     accountFacade.findByLogin(SecurityContextHolder
@@ -445,7 +470,16 @@ public class AccountService implements AccountServiceInterface {
             String email = jwtProvider.extractEmail(decodedTokenValue);
             if (email == null) throw new AccountEmailNullException(I18n.ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION);
             account.setEmail(email);
+
             accountFacade.edit(account);
+            historyDataFacade.create(new AccountHistoryData(account,
+                    OperationType.EMAIL_CHANGE,
+                    accountFacade.findByLogin(SecurityContextHolder
+                                    .getContext()
+                                    .getAuthentication()
+                                    .getName())
+                            .orElse(null)));
+
             tokenFacade.remove(tokenFromDB);
             return true;
         }
@@ -756,7 +790,15 @@ public class AccountService implements AccountServiceInterface {
         }
 
         account.setSuspended(false);
+
         accountFacade.edit(account);
+        historyDataFacade.create(new AccountHistoryData(account,
+                OperationType.RESTORE_ACCESS,
+                accountFacade.findByLogin(SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
+                        .orElse(null)));
 
         mailProvider.sendAccountAccessRestoreInfoEmail(account.getName(),
                 account.getLastname(),

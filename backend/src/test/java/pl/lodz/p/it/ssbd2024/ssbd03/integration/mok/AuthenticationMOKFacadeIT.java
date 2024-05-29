@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.integration.mok;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
 @ExtendWith(SpringExtension.class)
-public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig {
+public class AuthenticationMOKFacadeIT extends TestcontainersConfig {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -61,6 +62,12 @@ public class AuthenticationMOKFacadeIntegrationTest extends TestcontainersConfig
     private final String accountPhoneNumberNo2 = "111111111";
 
     private final String accountPasswordNo1 = "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa";
+
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    void AuthenticationMOKFacadeGetEntityManagerReturnsNotNullTestPositive() {
+        Assertions.assertNotNull(authenticationFacade.getEntityManager());
+    }
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
