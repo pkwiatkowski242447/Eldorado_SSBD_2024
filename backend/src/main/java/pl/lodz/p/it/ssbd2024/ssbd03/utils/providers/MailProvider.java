@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.utils.providers;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.EmailTemplateNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.ImageNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -57,6 +59,7 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the account creation.
      * @param language        Language of the message.
      */
+    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
     public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -88,6 +91,7 @@ public class MailProvider {
      * @param confirmationURL URL used to restore access to the account creation.
      * @param language        Language of the message.
      */
+    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     public void sendAccountAccessRestoreEmailMessage(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -118,6 +122,7 @@ public class MailProvider {
      * @param emailReceiver   E-mail address to which the message will be sent.
      * @param language        Language of the message.
      */
+    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     public void sendAccountAccessRestoreInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -146,6 +151,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @RolesAllowed({Authorities.BLOCK_ACCOUNT, Authorities.LOGIN})
     public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language, boolean adminLock) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -176,6 +182,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
     public void sendUnblockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
@@ -205,6 +212,7 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the e-mail address.
      * @param language        Language of the message.
      */
+    @RolesAllowed({Authorities.CHANGE_USER_MAIL, Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
     public void sendEmailConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -236,6 +244,7 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the account creation.
      * @param language        Language of the message.
      */
+    @RolesAllowed({Authorities.RESET_PASSWORD, Authorities.CHANGE_USER_PASSWORD})
     public void sendPasswordResetEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -267,6 +276,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @RolesAllowed({Authorities.LOGIN})
     public void sendTwoFactorAuthCode(String firstName, String lastName, String authCode, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -296,6 +306,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION})
     public void sendActivationConfirmationEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -325,6 +336,7 @@ public class MailProvider {
      * @param userLevel     Internationalization key indicating the user level that was granted to the user account.
      * @param language      Language of the message.
      */
+    @RolesAllowed({Authorities.ADD_USER_LEVEL})
     public void sendEmailNotificationAboutGrantedUserLevel(String firstName, String lastName, String emailReceiver, String userLevel, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -355,6 +367,7 @@ public class MailProvider {
      * @param userLevel     Internationalization key indicating the user level connected to the account that was revoked.
      * @param language      Language of the message.
      */
+    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     public void sendEmailNotificationAboutRevokedUserLevel(String firstName, String lastName, String emailReceiver, String userLevel, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -385,6 +398,13 @@ public class MailProvider {
      * @param emailSubject  Topic of the e-mail message.
      * @throws MessagingException Exception thrown while the e-mail message is being sent.
      */
+    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER,
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.BLOCK_ACCOUNT,
+            Authorities.LOGIN, Authorities.UNBLOCK_ACCOUNT, Authorities.CHANGE_USER_MAIL,
+            Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
+            Authorities.RESET_PASSWORD, Authorities.CHANGE_USER_PASSWORD,
+            Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.ADD_USER_LEVEL,
+            Authorities.REMOVE_USER_LEVEL})
     private void sendEmail(String emailContent, String emailReceiver, String senderEmail, String emailSubject) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
