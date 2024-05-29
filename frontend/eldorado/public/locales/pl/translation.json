@@ -5,6 +5,12 @@
   "general.english": "Angielski",
   "general.polish": "Polski",
   "general.refresh": "Odśwież dane",
+  "general.sessionAboutToExpire": "Twoja sesja zaraz wygaśnie",
+  "general.sessionAboutToExpire.text": "Twoja sesja zaraz wygaśnie. Naciśnij poniższy przycisk, aby ją przedłużyć.",
+  "general.refreshSession": "Przedłuż sesję",
+  "general.sessionExpired": "Twoja sesja wygasła",
+  "general.sessionExpired.text": "Twoja sesja wygasła. Musisz zalogować się ponownie.",
+  "general.sessionExpired.text.button": "Zaloguj się ponownie",
 
   "landingPage.title": "Wkrótce dostępne",
   "landingPage.text": "Najprawdopodobniej",
