@@ -4,7 +4,7 @@
   "general.confirm": "Potwierdzenie",
   "general.english": "Angielski",
   "general.polish": "Polski",
-  "general.refresh": "Odśwież informacje o koncie",
+  "general.refresh": "Odśwież dane",
 
   "landingPage.title": "Wkrótce dostępne",
   "landingPage.text": "Najprawdopodobniej",
@@ -12,6 +12,8 @@
   "landingPage.register": "Zarejestruj się",
 
   "adminAddUserPage.confirmUserCreation": "Czy na pewno chcesz utworzyć konto?",
+  "account.user_levels.conflict.exception": "Konflikt poziomów dostępu - użytkownik nie może posiadać jednocześnie poziomu pracownika i klienta",
+
 
   "loginPage.title": "Logowanie",
   "loginPage.info": "Wprowadź swoje dane logowania, aby kontynuować",
@@ -115,7 +117,7 @@
   "accountSettings.login": "Login",
   "accountSettings.active": "Aktywny",
   "accountSettings.blocked": "Zablokowany",
-  "accountSettings.verified": "Zweryfikowany",
+  "accountSettings.suspended": "Konto wygaszone",
   "accountSettings.phone": "Telefon",
   "accountSettings.accountLanguage": "Język konta",
   "accountSettings.2fa": "Uwierzytelnianie dwuetapowe",
@@ -131,7 +133,7 @@
   "accountSettings.users.table.header.lastName": "Nazwisko",
   "accountSettings.users.table.header.active": "Aktywny",
   "accountSettings.users.table.header.blocked": "Zablokowany",
-  "accountSettings.users.table.header.verified": "Zweryfikowany",
+  "accountSettings.users.table.header.suspended": "Konto wygaszone",
   "accountSettings.users.table.header.userLevels": "Poziomy użytkownika",
   "accountSettings.users.table.pagination.next": "Następna",
   "accountSettings.users.table.pagination.previous": "Poprzednia",
@@ -143,6 +145,9 @@
   "accountSettings.confirmUserDataChange": "Czy na pewno chcesz zmienić dane użytkownika?",
   "accountSettings.confirmEmailChange": "Czy na pewno chcesz zmienić adres e-mail?",
   "accountSettings.twoFactorAuth": "Uwierzytelnianie dwuskładnikowe",
+  "accountSettings.popUp.resendEmailConfirmationOK.title": "Sukces!",
+  "accountSettings.popUp.resendEmailConfirmationOK.text": "E-mail z linkiem do zmiany adresu E-Mail został wysłany ponownie.",
+  "accountSettings.popUp.resendEmailConfirmationOK.button": "Wyślij ponownie mail potwierdzający.",
 
 
   "accountSettings.users.table.settings.account.title": "Modyfikuj konto - ",
@@ -162,7 +167,7 @@
   "accountSettings.users.table.settings.block.confirm1": "Czy na pewno chcesz ",
   "accountSettings.users.table.settings.block.confirm2": " tego użytkownika?",
   "accountSettings.users.table.settings.block.confirm3": "Czy na pewno chcesz ",
-  "accountSettings.users.table.settings.block.level": "poziom",
+  "accountSettings.users.table.settings.block.level": " poziom",
   "accountSettings.users.table.settings.block.to": " do konta",
   "accountSettings.users.table.settings.block.from": " z konta",
 
@@ -176,7 +181,7 @@
   "confirmEmailPage.title": "Prawie gotowe!",
   "confirmEmailPage.info": "Potwierdź zmianę adresu e-mail w Eldorado, klikając przycisk poniżej.",
   "confirmEmailPage.button": "Zmień Email",
-
+  "confirmEmailPage.popUp": "Czy na pewno chcesz zmienić adres e-mail?",
 
   "resetPasswordPage.title": "Zresetuj hasło",
   "resetPasswordPage.info": "Wprowadź nowe hasło",
@@ -185,8 +190,7 @@
   "resetPasswordPage.password": "Hasło",
   "resetPasswordPage.button": "Zmień Hasło",
   "resetPasswordPage.resetPassword": "Czy na pewno chcesz zresetować hasło?",
-
-
+  "resetPasswordPage.popUp": "Czy na pewno chcesz zmienić hasło?",
 
   "activateAccountPage.title": "Już prawie gotowe!",
   "activateAccountPage.info": "Aktywuj swoje konto Eldorado, naciskając przycisk poniżej.",
@@ -209,8 +213,8 @@
   "accountSettings.popUp.changeEmailOK.text": "Mail potwierdzający został wysłany na podany adres.",
   "accountSettings.popUp.changeUserDataOK.title": "Sukces!",
   "accountSettings.popUp.changeUserDataOK.text": "Twoje dane osobowe zostały pomyślnie zmienione.",
-  "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "Poziom użytkownika został pomyślnie usunięty.",
-  "accountSettings.popUp.changeUserDataOK.userLevelAdded": "Poziom użytkownika został pomyślnie dodany.",
+  "accountSettings.popUp.changeUserDataOK.userLevelRemoved": "Poziom użytkownika został pomyślnie usunięty. Proszę wcisnąć przycisk 'Odśwież dane' albo odświeżyć stronę aby zobaczyć zmiany.",
+  "accountSettings.popUp.changeUserDataOK.userLevelAdded": "Poziom użytkownika został pomyślnie dodany. Proszę wcisnąć przycisk 'Odśwież dane' albo odświeżyć stronę aby zobaczyć zmiany.",
   "accountSettings.popUp.changeOtherUserDataOK.text": "Dane użytkownika zostały pomyślnie zmienione.",
 
   "confirmEmailPage.popUp.confirmEmailOK.title": "Sukces!",
@@ -294,7 +298,7 @@
   "account.service.admin.account.not.created.exception" : "Nie udało się utworzyć konta administratora",
   "account.service.admin.remove.own.admin.user.level.exception" : "Nie można usunąć własnego poziomu użytkownika administratora",
   "user_level.no.such.user.level.exception" : "Brak takiego poziomu użytkownika",
-  "user_level.one.user.level" : "Dozwolony jest tylko jeden poziom użytkownika",
+  "user_level.one.user.level" : "Użytkownik nie może mieć mniej niż jeden poziom użytkownika",
   "user_level.client.client_type.unexpected.exception" : "Nieoczekiwany typ klienta",
   "user_level.type.duplicated.exception" : "Duplikacja poziomu użytkownika",
 
@@ -309,7 +313,7 @@
   "account.service.account.email.collision.exception" : "Wykryto kolizję adresu e-mail",
   "account.service.account.try_to_block_own.exception" : "Nie można zablokować własnego konta",
   "account.service.email_from_token_null.exception" : "Adres e-mail z tokenu jest pusty",
-  "token.not.found.exception" : "Token nie znaleziony",
+  "token.not.found.exception" : "Operacja nie może być wykonana bo nie została wcześniej zainicjalizowana.",
 
   "account.controller.token.invalid.or.expired" : "Token jest nieprawidłowy lub wygasł",
   "account.controller.uuid.invalid" : "Nieprawidłowy UUID",

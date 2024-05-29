@@ -95,7 +95,7 @@ function ConfirmEmailChangePage() {
                 <CardHeader>
                     <CardTitle>{t("confirmEmailPage.title")}</CardTitle>
                     <CardDescription>{t("confirmEmailPage.info")}</CardDescription>
-                    <Button onClick={onClickButton}
+                    <Button onClick={openAlert}
                             className='mx-auto h-auto w-auto' disabled={isLoading}>
                         {isLoading ? (
                             <>
@@ -111,9 +111,9 @@ function ConfirmEmailChangePage() {
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {t("adminAddUserPage.confirmUserCreation")}
+                        {t("confirmEmailPage.popUp")}
                     </AlertDialogDescription>
-                    <AlertDialogAction onClick={openAlert}>
+                    <AlertDialogAction onClick={onClickButton}>
                         {t("general.ok")}
                     </AlertDialogAction>
                     <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>

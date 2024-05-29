@@ -53,8 +53,6 @@ export const PublicRoutes: RouteType[] = [
         path: Pathnames.public.confirmEmailChange,
         Component: ConfirmEmailChangePage
     },
-
-
 ]
 
 export const AdminRoutes: RouteType[] = [

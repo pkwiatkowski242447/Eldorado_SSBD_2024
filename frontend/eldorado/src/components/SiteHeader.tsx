@@ -22,7 +22,6 @@ const SiteHeader = () => {
     const {account} = useAccountState();
     const navigate = useNavigate();
     const {t} = useTranslation();
-
     const accountLS = localStorage.getItem('account');
     const tokenLS = localStorage.getItem('token');
     const {logOut} = useAccount();
@@ -49,7 +48,7 @@ const SiteHeader = () => {
 
     let headerColor = 'bg-gray-200 border-gray-200';
     if (account) {
-        switch (account.activeUserLevel.roleName) {
+        switch (account?.activeUserLevel?.roleName) {
             case RolesEnum.ADMIN:
                 headerColor = 'bg-red-200 border-red-200';
                 break;
@@ -67,19 +66,19 @@ const SiteHeader = () => {
 
     return (
         <header
-            className={`sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
+            className={`top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 border-2 rounded-xl ${headerColor}`}>
             <nav className="flex items-center gap-4">
                 <a href="/home" className="flex items-center">
                     <img src={eldoLogo} alt="Eldorado" className="h-25 w-8/12"/>
                     <span className="sr-only">Eldorado</span>
                 </a>
-                {account?.activeUserLevel.roleName === RolesEnum.ADMIN && (
+                {account?.activeUserLevel?.roleName === RolesEnum.ADMIN && (
                     <Button variant="link" onClick={() => navigate("/manage-users")}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
                         {t("siteHeader.users")}
                     </Button>
                 )}
-                {account?.activeUserLevel.roleName === RolesEnum.ADMIN && (
+                {account?.activeUserLevel?.roleName === RolesEnum.ADMIN && (
                     <Button variant="link" onClick={() => navigate("/manage-users/create")}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
                         {/*{t("siteHeader.users")}*/}

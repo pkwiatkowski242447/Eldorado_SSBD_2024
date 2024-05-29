@@ -140,6 +140,10 @@ export const api = {
         }).post(`/accounts/confirm-email/${token}`)
     },
 
+    resendEmailConfirmation: () => {
+        return apiWithConfig.post('/accounts/resend-email-confirmation')
+    },
+
     getAccounts: (details: string) => {
         return apiWithConfig.get('/accounts' + details)
     },

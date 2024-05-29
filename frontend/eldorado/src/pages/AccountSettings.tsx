@@ -1,11 +1,10 @@
 import {SetStateAction, useEffect, useState} from 'react';
-import SiteHeader from "@/components/SiteHeader.tsx";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Controller, useForm} from "react-hook-form";
-import {Card, CardContent} from "@/components/ui/card.tsx";
+import {Card, CardContent, CardTitle} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {isValidPhoneNumber} from "react-phone-number-input/min";
 import {PhoneInput} from "@/components/ui/phone-input.tsx";
@@ -49,6 +48,7 @@ function AccountSettings() {
     const [formType, setFormType] = useState(null);
     const {getCurrentAccount} = useAccount();
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingReset, setIsLoadingReset] = useState(false);
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -169,6 +169,20 @@ function AccountSettings() {
         });
     };
 
+    const resendEmailConfirmation = () => {
+        setIsLoadingReset(true)
+        api.resendEmailConfirmation().then(() => {
+            toast({
+                title: t("accountSettings.popUp.resendEmailConfirmationOK.title"),
+                description: t("accountSettings.popUp.resendEmailConfirmationOK.text"),
+            });
+        }).catch((error) => {
+            handleApiError(error);
+        }).finally(() => {
+            setIsLoadingReset(false)
+        });
+    }
+
     const SubmitUserData = (values: z.infer<typeof userDataSchema>) => {
         setIsLoading(true)
         const etag = window.localStorage.getItem('etag');
@@ -201,7 +215,6 @@ function AccountSettings() {
 
     return (
         <div>
-            <SiteHeader/>
             <div className="flex justify-between items-center pt-2">
                 <Breadcrumb className="pl-2">
                     <BreadcrumbList>
@@ -290,6 +303,19 @@ function AccountSettings() {
                                             }
                                         </Form>
                                     </CardContent>
+                                    <div className={"flex mb-5 justify-center "}>
+                                        <Button onClick={resendEmailConfirmation} variant={"outline"}  className="w-auto pb-2"
+                                                disabled={isLoadingReset}>
+                                            {isLoadingReset ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                </>
+                                            ) : (
+                                                t("accountSettings.popUp.resendEmailConfirmationOK.button")
+                                            )}
+                                        </Button>
+                                    </div>
+
                                 </Card>
                                 <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
                                     <AlertDialogContent>
@@ -534,8 +560,10 @@ function AccountSettings() {
                         {activeForm === 'Details' && (
                             <div>
                                 <Card className="mx-10 w-auto text-left">
-                                    <CardContent>
-                                        <h2 className="text-lg font-bold text-center p-5">{t("accountSettings.accountInfo")}</h2>
+                                    <CardTitle className={"flex justify-center mt-5"}>
+                                        {t("accountSettings.accountInfo")}
+                                    </CardTitle>
+                                    <CardContent className={"mt-5"}>
                                         <p>
                                             <strong>{t("accountSettings.name")}:</strong> {account?.name} {account?.lastname}
                                         </p>
@@ -554,11 +582,11 @@ function AccountSettings() {
                                         </p>
                                         <p>
                                             <strong>{t("accountSettings.blocked")}:</strong> {account?.blocked ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                            <FiCheck color="red"/> : <FiX color="green"/>}
                                         </p>
                                         <p>
-                                            <strong>{t("accountSettings.verified")}:</strong> {account?.verified ?
-                                            <FiCheck color="green"/> : <FiX color="red"/>}
+                                            <strong>{t("accountSettings.suspended")}:</strong> {account?.suspended ?
+                                            <FiCheck color="red"/> : <FiX color="green"/>}
                                         </p>
                                         <p>
                                             <strong>{t("accountSettings.2fa")}:</strong> {account?.twoFactorAuth ?

@@ -145,7 +145,7 @@ export const useAccount = () => {
                     phoneNumber: token.data.phoneNumber,
                     userLevelsDto: token.data.userLevelsDto,
                     activeUserLevel: activeUserLevel,
-                    verified: token.data.verified,
+                    suspended: token.data.suspended,
                     version: token.data.version,
                     twoFactorAuth: token.data.twoFactorAuth,
                     lastSuccessfulLoginIp: token.data.lastSuccessfulLoginIp,

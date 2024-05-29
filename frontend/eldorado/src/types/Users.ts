@@ -37,7 +37,7 @@ export interface UserType {
     phoneNumber: string
     userLevelsDto: UserLevelType[]
     activeUserLevel: UserLevelType | null
-    verified: boolean
+    suspended: boolean
     version: number
     twoFactorAuth: boolean
     lastSuccessfulLoginTime: string | null
@@ -53,7 +53,7 @@ export interface ManagedUserType {
     lastName: string
     active: boolean
     blocked: boolean
-    verified: boolean
+    suspended: boolean
     lastSuccessfulLoginTime: string | null
     lastUnsuccessfulLoginTime: string | null
     userLevels: AccountTypeEnum[]

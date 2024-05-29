@@ -9,6 +9,7 @@ import NotFoundPage from "@/pages/NotFoundPage.tsx";
 import StaffLayout from "@/components/layouts/StaffLayout";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
+import {Pathnames} from "@/router/pathnames.ts";
 
 export const RoutesComponents = () => {
     const {isAuthenticated, account, getCurrentAccount} = useAccount();
@@ -25,7 +26,7 @@ export const RoutesComponents = () => {
                     </PublicLayout>
                 }/>}
 
-            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.ADMIN && AdminRoutes.map(({
+            {isAuthenticated && account?.activeUserLevel?.roleName === RolesEnum.ADMIN && AdminRoutes.map(({
                                                                                                               path,
                                                                                                               Component
                                                                                                           }) => (
@@ -35,44 +36,44 @@ export const RoutesComponents = () => {
                     </AdminLayout>}/>
             ))}
 
-            {isAuthenticated && account?.activeUserLevel.roleName
+            {isAuthenticated && account?.activeUserLevel?.roleName
                 === RolesEnum.CLIENT && ClientRoutes.map(({path, Component}) => (
-                <Route key={path} path={path} element={
-                    <ClientLayout>
-                        <Component/>
-                    </ClientLayout>}/>
-            ))}
+                    <Route key={path} path={path} element={
+                        <ClientLayout>
+                            <Component/>
+                        </ClientLayout>}/>
+                ))}
 
-            {isAuthenticated && account?.activeUserLevel.roleName
-                === RolesEnum.STAFF && StaffRoutes.map(({path, Component }) => (
-                <Route key={path} path={path} element={
-                    <StaffLayout>
-                        <Component/>
-                    </StaffLayout>}/>
-            ))}
+            {isAuthenticated && account?.activeUserLevel?.roleName
+                === RolesEnum.STAFF && StaffRoutes.map(({path, Component}) => (
+                    <Route key={path} path={path} element={
+                        <StaffLayout>
+                            <Component/>
+                        </StaffLayout>}/>
+                ))}
 
             {!isAuthenticated && PublicRoutes.map(({path, Component}) => (
                 <Route key={path} path={path} element={
-                    <PublicLayout>
+                    <PublicLayout hideHeader={location.pathname !== Pathnames.public.home}>
                         <Component/>
                     </PublicLayout>}/>
             ))}
 
-            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.ADMIN &&
+            {isAuthenticated && account?.activeUserLevel?.roleName === RolesEnum.ADMIN &&
                 <Route path="*" element={
                     <AdminLayout>
                         <NotFoundPage/>
                     </AdminLayout>
                 }/>}
 
-            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.STAFF &&
+            {isAuthenticated && account?.activeUserLevel?.roleName === RolesEnum.STAFF &&
                 <Route path="*" element={
                     <StaffLayout>
                         <NotFoundPage/>
                     </StaffLayout>
                 }/>}
 
-            {isAuthenticated && account?.activeUserLevel.roleName === RolesEnum.CLIENT &&
+            {isAuthenticated && account?.activeUserLevel?.roleName === RolesEnum.CLIENT &&
                 <Route path="*" element={
                     <ClientLayout>
                         <NotFoundPage/>
