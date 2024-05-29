@@ -835,4 +835,9 @@ public class AccountService implements AccountServiceInterface {
                 .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
         return tokenFacade.findByTypeAndAccount(Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD,account.getId()).isPresent();
     }
+
+    @Override
+    public List<AccountHistoryData> getHistoryDataByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return historyDataFacade.findByAccountId(id, pageNumber, pageSize);
+    }
 }

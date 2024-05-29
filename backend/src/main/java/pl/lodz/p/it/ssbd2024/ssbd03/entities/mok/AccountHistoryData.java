@@ -28,6 +28,7 @@ import java.util.UUID;
                 query = """
                         SELECT a FROM AccountHistoryData a
                         WHERE a.id = :id
+                        ORDER BY a.modificationTime DESC
                         """
         ),
         @NamedQuery(

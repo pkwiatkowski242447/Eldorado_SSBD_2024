@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
@@ -326,4 +327,15 @@ public interface AccountServiceInterface {
     void restoreAccountAccess(String token) throws ApplicationBaseException;
 
     boolean getPasswordAdminResetStatus() throws ApplicationBaseException;
+
+    /**
+     * Retrieve historic data of a given account.
+     *
+     * @param id ID of the account which history data is requested.
+     * @param pageNumber The page number of the results to return.
+     * @param pageSize   The number of results to return per page.
+     * @return A list history data entries, ordered by modification time from newest, with pagination applied.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<AccountHistoryData> getHistoryDataByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException;
 }
