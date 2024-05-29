@@ -191,7 +191,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         parkingFacade.create(parkingNo1);
 
         List<Sector.SectorType> sectorTypes = List.of(Sector.SectorType.COVERED);
-        List<Parking> listOfParkingLots = parkingFacade.findParkingsBySectorTypes(sectorTypes, 0, 5, true);
+        List<Parking> listOfParkingLots = parkingFacade.findParkingBySectorTypes(sectorTypes, 0, 5, true);
         assertEquals(2, listOfParkingLots.size());
     }
 

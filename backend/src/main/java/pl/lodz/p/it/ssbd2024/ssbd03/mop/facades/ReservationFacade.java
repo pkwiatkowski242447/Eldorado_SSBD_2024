@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -7,6 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 
 import java.util.List;
@@ -50,8 +53,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * Invokes superclass create method on passed Reservation entity
      * @param entity Reservation entity
      */
-    @Transactional
     @Override
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void create(Reservation entity) throws ApplicationBaseException {
         super.create(entity);
     }
@@ -60,8 +63,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * Invokes superclass edit method on passed Reservation entity
      * @param entity Reservation entity
      */
-    @Transactional
     @Override
+    @RolesAllowed({Authorities.ENTER_PARKING_WITHOUT_RESERVATION, Authorities.EXIT_PARKING})
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
     }
@@ -70,8 +73,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * Invokes superclass remove method on passed Reservation entity
      * @param entity Reservation entity
      */
-    @Transactional
     @Override
+    @RolesAllowed(Authorities.CANCEL_RESERVATION)
     public void remove(Reservation entity) throws ApplicationBaseException {
         super.remove(entity);
     }
@@ -81,8 +84,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
-    @Transactional
     @Override
+    @DenyAll
     public Optional<Reservation> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
@@ -92,8 +95,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
-    @Transactional
     @Override
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -102,8 +105,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * Invokes superclass find all method.
      * @return All Reservation entities
      */
-    @Transactional
     @Override
+    @DenyAll
     public List<Reservation> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
@@ -114,7 +117,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param pageSize defines the maximum number of entities per page
      * @return All Reservation entities from selected page
      */
-    @Transactional
+    @RolesAllowed({Authorities.GET_ALL_RESERVATIONS, Authorities.CANCEL_RESERVATION})
     public List<Reservation> findAllWithPagination(int page, int pageSize) throws ApplicationBaseException {
         var list = getEntityManager()
                 .createNamedQuery("Reservation.findAll", Reservation.class)
@@ -131,7 +134,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param pageSize defines the maximum number of entities per page
      * @return All active Reservation entities from selected page
      */
-    @Transactional
+    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
     public List<Reservation> findActiveReservationsWithPagination(UUID clientId, int page, int pageSize)
             throws ApplicationBaseException {
         var list = getEntityManager()
@@ -150,7 +153,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param pageSize defines the maximum number of entities per page
      * @return All historical Reservation entities from selected page
      */
-    @Transactional
+    @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
     public List<Reservation> findHistoricalReservationsWithPagination(UUID clientId, int page, int pageSize)
             throws ApplicationBaseException {
         var list = getEntityManager()
@@ -171,7 +174,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param pageSize defines the maximum number of entities per page
      * @return All Reservation entities for selected Sector and page
      */
-    @Transactional
+    @DenyAll
     public List<Reservation> findSectorReservationsWithPagination(UUID sectorId, int page, int pageSize)
             throws ApplicationBaseException {
         var list = getEntityManager()
@@ -188,8 +191,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * Invokes superclass count method.
      * @return Returns the total number of Reservation entities
      */
-    @Transactional
     @Override
+    @DenyAll
     public int count() throws ApplicationBaseException {
         return super.count();
     }
