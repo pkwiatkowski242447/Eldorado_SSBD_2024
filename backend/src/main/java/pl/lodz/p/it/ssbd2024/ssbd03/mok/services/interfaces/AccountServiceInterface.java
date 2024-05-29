@@ -79,7 +79,7 @@ public interface AccountServiceInterface {
 
     /**
      * This method is used to initiate process of resetting current user account password. This method basically
-     * generates a token of type CHANGE_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
+     * generates a token of type RESET_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
      * specified by the user in the form and send to the application with the usage of DTO object.
      *
      * @param userEmail Email address that will be used to search for the existing account, and then used for sending
@@ -88,6 +88,18 @@ public interface AccountServiceInterface {
      *                                  method.
      */
     void forgetAccountPassword(String userEmail) throws ApplicationBaseException;
+
+    /**
+     * This method is used to initiate process of resetting current user account password by an admin. This method basically
+     * generates a token of type CHANGE_OVERWRITTEN_PASSWORD and writes it to the database, and then sends a password change URL to the e-mail address
+     * specified by the user in the form and send to the application with the usage of DTO object.
+     *
+     * @param userEmail Email address that will be used to search for the existing account, and then used for sending
+     *                  e-mail message with password change URL.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by the aspects intercepting that
+     *                                  method.
+     */
+    void forgetAccountPasswordByAdmin(String userEmail) throws ApplicationBaseException;
 
     /**
      * This method is used to change password of the user. This method does read RESET PASSWORD token with
@@ -312,4 +324,6 @@ public interface AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     void restoreAccountAccess(String token) throws ApplicationBaseException;
+
+    boolean getPasswordAdminResetStatus() throws ApplicationBaseException;
 }

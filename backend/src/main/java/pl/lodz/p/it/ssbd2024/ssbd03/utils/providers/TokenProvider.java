@@ -48,6 +48,11 @@ public class TokenProvider {
         return new Token(tokenValue, account, Token.TokenType.RESET_PASSWORD);
     }
 
+    public Token generateAdminPasswordResetToken(Account account) {
+        String tokenValue = jwtProvider.generateActionToken(account, passwordResetTokenTTL, ChronoUnit.MINUTES);
+        return new Token(tokenValue, account, Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD);
+    }
+
     public Token generateAccountActivationToken(Account account) {
         String tokenValue = jwtProvider.generateActionToken(account, accountActivationTokenTTL, ChronoUnit.HOURS);
         return new Token(tokenValue, account, Token.TokenType.REGISTER);

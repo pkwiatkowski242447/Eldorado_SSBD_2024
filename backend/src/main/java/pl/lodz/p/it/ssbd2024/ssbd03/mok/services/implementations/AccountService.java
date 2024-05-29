@@ -246,7 +246,7 @@ public class AccountService implements AccountServiceInterface {
 
     // Password change methods
 
-    @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
+    @RolesAllowed({Roles.ANONYMOUS})
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPassword(String userEmail) throws ApplicationBaseException {
         Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
@@ -804,5 +804,35 @@ public class AccountService implements AccountServiceInterface {
                 account.getLastname(),
                 account.getEmail(),
                 account.getAccountLanguage());
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
+    public void forgetAccountPasswordByAdmin(String userEmail) throws ApplicationBaseException {
+        Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
+
+        if (account.getBlocked()) throw new AccountBlockedException();
+        else if (!account.getActive()) throw new AccountNotActivatedException();
+
+        tokenFacade.removeByTypeAndAccount(Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD, account.getId());
+
+        Token passwordResetToken = tokenProvider.generateAdminPasswordResetToken(account);
+        this.tokenFacade.create(passwordResetToken);
+
+        String encodedTokenValue = new String(Base64.getUrlEncoder().encode(passwordResetToken.getTokenValue().getBytes()));
+        String passwordResetURL = this.accountPasswordResetUrl + encodedTokenValue;
+
+        this.mailProvider.sendPasswordResetEmail(account.getName(),
+                account.getLastname(),
+                userEmail,
+                passwordResetURL,
+                account.getAccountLanguage());
+    }
+
+    @Override
+    public boolean getPasswordAdminResetStatus() throws ApplicationBaseException {
+        Account account = accountFacade.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        return tokenFacade.findByTypeAndAccount(Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD,account.getId()).isPresent();
     }
 }
