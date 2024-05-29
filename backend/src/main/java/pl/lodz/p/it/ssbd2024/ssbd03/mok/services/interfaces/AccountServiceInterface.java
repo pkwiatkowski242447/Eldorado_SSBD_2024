@@ -216,7 +216,7 @@ public interface AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     List<Account> getAccountsByMatchingLoginFirstNameAndLastName(
-            String login, String firstName, String lastName, boolean active, boolean order, int pageNumber, int pageSize)
+            String login, String firstName, String lastName, boolean order, int pageNumber, int pageSize)
             throws ApplicationBaseException;
 
     /**

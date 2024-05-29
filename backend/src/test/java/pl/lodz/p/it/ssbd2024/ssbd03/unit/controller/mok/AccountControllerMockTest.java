@@ -599,7 +599,7 @@ public class AccountControllerMockTest {
         List<Account> listOfAccounts = List.of(accountNo1, accountNo2, accountNo3);
 
         when(accountService.getAccountsByMatchingLoginFirstNameAndLastName(anyString(), anyString(), anyString(),
-                anyBoolean(), anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
+                anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
 
         mockMvc.perform(get("/api/v1/accounts//match-login-firstname-and-lastname")
                         .queryParam("login", "ExampleLogin")
@@ -617,7 +617,7 @@ public class AccountControllerMockTest {
         List<Account> listOfAccounts = new ArrayList<>();
 
         when(accountService.getAccountsByMatchingLoginFirstNameAndLastName(anyString(), anyString(), anyString(),
-                anyBoolean(), anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
+                anyBoolean(), anyInt(), anyInt())).thenReturn(listOfAccounts);
 
         mockMvc.perform(get("/api/v1/accounts//match-login-firstname-and-lastname")
                         .queryParam("login", "ExampleLogin")

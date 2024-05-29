@@ -472,16 +472,16 @@ public class AccountServiceMockTest {
         int pageSize = 5;
 
         when(accountMOKFacade
-                .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize))
+                .findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize))
                 .thenReturn(accountList);
 
-        var retList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName, lastName, active, order, pageNumber, pageSize);
+        var retList = accountService.getAccountsByMatchingLoginFirstNameAndLastName(login, firstName, lastName, order, pageNumber, pageSize);
 
         assertEquals(account, retList.get(0));
         assertEquals(account1, retList.get(1));
 
         Mockito.verify(accountMOKFacade, Mockito.times(1))
-                .findAllAccountsByActiveAndLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, active, order, pageNumber, pageSize);
+                .findAllAccountsMatchingLoginAndUserFirstNameAndUserLastNameWithPagination(login, firstName, lastName, order, pageNumber, pageSize);
     }
 
     @Test
