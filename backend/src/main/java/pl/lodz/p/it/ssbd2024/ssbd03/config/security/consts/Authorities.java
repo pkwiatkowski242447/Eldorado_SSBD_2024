@@ -96,7 +96,8 @@ public class Authorities {
     // MOP 21
     public static final String ENTER_PARKING_WITH_RESERVATION = "ENTER_PARKING_WITH_RESERVATION";
     // MOP 22
-    public static final String GET_RESERVATION = "GET_RESERVATION";
+    public static final String GET_ALL_RESERVATIONS = "GET_ALL_RESERVATIONS";
     // MOP 23
     public static final String END_RESERVATION = "END_RESERVATION";
+
 }
