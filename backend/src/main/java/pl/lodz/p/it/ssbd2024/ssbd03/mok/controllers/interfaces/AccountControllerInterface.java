@@ -669,7 +669,7 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "204", description = "List of account's history data returned from given page of given size is empty."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> getHistoryDataByAccountId(@RequestParam("id") String id,
+    ResponseEntity<?> getHistoryDataByAccountId(@PathVariable("id") String id,
                                                 @RequestParam("pageNumber") int pageNumber,
                                                 @RequestParam("pageSize") int pageSize)
             throws ApplicationBaseException;
