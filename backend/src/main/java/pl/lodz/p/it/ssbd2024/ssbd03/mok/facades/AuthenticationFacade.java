@@ -61,8 +61,9 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @param id ID of the Account to be retrieved.
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
+    //FIXME
     @Override
-    @DenyAll
+//    @DenyAll
     @Transactional(propagation = Propagation.REQUIRED)
     public Optional<Account> find(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);

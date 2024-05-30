@@ -115,7 +115,8 @@ public class JWTProvider {
      * @param jwtToken Token from which the AccountID will be extracted.
      * @return Returns AccountID from the Token.
      */
-    @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE})
+    //FIXME
+//    @RolesAllowed({Authorities.LOGIN, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE})
     public UUID extractAccountId(String jwtToken) throws TokenDataExtractionException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
@@ -167,9 +168,10 @@ public class JWTProvider {
      * @param account  Account for which the token was issued.
      * @return Returns true if token is valid, otherwise returns false.
      */
-    @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION,
-            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
-            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.REFRESH_SESSION})
+    //FIXME
+//    @RolesAllowed({Authorities.LOGIN, Authorities.CHANGE_OWN_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION,
+//            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
+//            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.REFRESH_SESSION})
     public boolean isTokenValid(String jwtToken, Account account) {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey()))
