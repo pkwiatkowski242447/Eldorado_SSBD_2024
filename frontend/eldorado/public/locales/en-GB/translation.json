@@ -15,6 +15,7 @@
   "general.sessionExpired.text.button": "Log in again",
   "general.adminInvokedPasswordReset": "Reset password operation was requested by an administrator. Please click the link in the email you received to continue.",
 
+
   "account.status.suspended.exception": "Account has been suspended due to inactivity.",
   "account.restore.access.exception": "Account that isn't suspended cannot be restored.",
   "loginPage.accountSuspended": "Account suspended? ",
@@ -124,7 +125,8 @@
 
 
   "siteHeader.hello": "Hello, ",
-  "siteHeader.users": "Users",
+  "siteHeader.users": "Manage Users",
+  "siteHeader.addUser": "Create User",
   "siteHeader.parkings": "Parkings",
   "siteHeader.logout": "Logout",
   "siteHeader.myAccount": "My Account",
@@ -153,6 +155,8 @@
   "accountSettings.wrongEmail": "The email address is not valid",
   "accountSettings.twoFactorAuth": "Two-factor authentication",
   "operation.type.login": "Logging in",
+  "accountSettings.popUp.changeOtherUsersPasswordOK.text": "An email with a link to reset the password has been sent to the user's E-Mail address.",
+
 
   "accountSettings.accountInfo": "Account Information",
   "accountSettings.name": "Name",
@@ -201,10 +205,10 @@
   "accountSettings.confirmUserDataChange": "Are you sure you want to change user data?",
   "accountSettings.confirmEmailChange": "Are you sure you want to change the email address?",
   "accountSettings.popUp.resendEmailConfirmationOK.title": "Success!",
-  "accountSettings.popUp.resendEmailConfirmationOK.text": "The email confirmation message has been successfully resent. Check your email to continue.",
+  "accountSettings.popUp.resendEmailConfirmationOK.text": "The email confirmation message has been successfully resent. Check the provided email to continue.",
   "accountSettings.popUp.resendEmailConfirmationOK.button": "Resend email confirmation",
 
-  "accountSettings.users.table.settings.account.title": "Modify account - ",
+  "accountSettings.users.table.settings.account.title": "Account settings - ",
   "accountSettings.users.table.settings.account.userLevels": "User Levels",
   "accountSettings.users.table.settings.account.authentication": "Authentication",
   "accountSettings.users.table.settings.account.personalInfo": "Personal Info",
@@ -213,7 +217,7 @@
   "accountSettings.users.table.settings.account.userLevels.remove": "Remove Role",
   "accountSettings.users.table.settings.account.userLevels.remove2": "remove the ",
   "accountSettings.users.table.settings.account.authentication.email": "E-mail",
-  "accountSettings.users.table.settings.account.authentication.email.change": "Change your email",
+  "accountSettings.users.table.settings.account.authentication.email.change": "Change E-Mail Address",
   "accountSettings.users.table.settings.account.personalInfo.firstName": "First Name",
   "accountSettings.users.table.settings.account.personalInfo.lastName": "Last Name",
   "accountSettings.users.table.settings.account.personalInfo.phoneNumber": "Phone Number",
@@ -385,53 +389,6 @@
   "controller.data.integrity.compromised.exception" : "Data integrity compromised",
 
   "controller.data.integrity.user_level.missing.exception" : "User level is missing",
-
-  "mail.confirm.register.greeting.message" : "Welcome to our service!",
-  "mail.confirm.register.message.subject" : "Confirm your registration",
-  "mail.confirm.register.result_message" : "Thank you for registering. Please confirm your email address.",
-  "mail.confirm.register.action_description" : "Click the link below to confirm your registration.",
-  "mail.confirm.register.note_title" : "Note",
-
-  "mail.login.auth.code.greeting.message" : "Hello!",
-  "mail.login.auth.code.message.subject" : "Your authentication code",
-  "mail.login.auth.code.result_message" : "Here is your authentication code.",
-  "mail.login.auth.code.action_description" : "Enter the code to log in.",
-  "mail.login.auth.code.note_title" : "Note",
-
-  "mail.confirm.account.activation.greeting.message" : "Congratulations!",
-  "mail.confirm.account.activation.message.subject" : "Activate your account",
-  "mail.confirm.account.activation.result_message" : "Your account has been created. Please activate it.",
-  "mail.confirm.account.activation.action_description" : "Click the link below to activate your account.",
-  "mail.confirm.account.activation.note_title" : "Note",
-
-  "mail.confirm.email.greeting.message" : "Hello!",
-  "mail.confirm.email.message.subject" : "Confirm your email address",
-  "mail.confirm.email.result_message" : "Please confirm your email address.",
-  "mail.confirm.email.action_description" : "Click the link below to confirm your email.",
-  "mail.confirm.email.note_title" : "Note",
-  "account.controller.account.not.found" : "Account not found",
-
-  "mail.block.account.greeting.message" : "Important notice",
-  "mail.block.account.message.subject" : "Your account has been blocked",
-  "mail.block.account.result_message_auto" : "Your account has been automatically blocked.",
-  "mail.block.account.result_message_admin" : "Your account has been blocked by an admin.",
-  "mail.block.account.action_description_auto" : "Please contact support for assistance.",
-  "mail.block.account.action_description_admin" : "Please contact support for assistance.",
-  "mail.block.account.note_title" : "Note",
-
-  "mail.unblock.account.greeting.message" : "Good news!",
-  "mail.unblock.account.message.subject" : "Your account has been unblocked",
-  "mail.unblock.account.result_message" : "Your account has been unblocked.",
-  "mail.unblock.account.action_description" : "You can now log in.",
-  "mail.unblock.account.note_title" : "Note",
-
-  "mail.reset.password.greeting.message" : "Password reset request",
-  "mail.reset.password.message.subject" : "Reset your password",
-  "mail.reset.password.result_message" : "Click the link below to reset your password.",
-  "mail.reset.password.action_description" : "Reset your password",
-  "mail.reset.password.note_title" : "Note",
-
-  "mail.auto.generate.message.note" : "This is an auto-generated message. Please do not reply.",
 
   "bean.validation.account.login.dto.login.blank" : "Login cannot be blank",
   "bean.validation.account.login.dto.login.regex.not.met" : "Login does not meet format requirements",

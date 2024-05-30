@@ -29,7 +29,7 @@ function ActivateAccountPage() {
                             <Button onClick={() => {
                                 navigate('/login', {replace: true});
                             }}>
-                                Log in
+                                {t("activateAccountPage.popUp.button")}
                             </Button>
                         </div>
                     ),

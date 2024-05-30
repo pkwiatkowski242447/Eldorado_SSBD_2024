@@ -29,5 +29,6 @@ export const Pathnames = {
         home: '/home',
         accountSettings: '/account-settings',
         changeUserLevel: '/change-user-level',
+        confirmEmailChange: '/confirm-email/:token',
     }
 }

@@ -72,6 +72,10 @@ export const AdminRoutes: RouteType[] = [
         Component: HomePage
     },
     {
+        path: Pathnames.public.confirmEmailChange,
+        Component: ConfirmEmailChangePage
+    },
+    {
         path: Pathnames.loggedIn.accountSettings,
         Component: AccountSettings
     },
@@ -99,6 +103,10 @@ export const StaffRoutes: RouteType[] = [
         Component: HomePage
     },
     {
+        path: Pathnames.public.confirmEmailChange,
+        Component: ConfirmEmailChangePage
+    },
+    {
         path: Pathnames.loggedIn.accountSettings,
         Component: AccountSettings
     },
@@ -112,6 +120,10 @@ export const ClientRoutes: RouteType[] = [
     {
         path: Pathnames.public.home,
         Component: HomePage
+    },
+    {
+        path: Pathnames.public.confirmEmailChange,
+        Component: ConfirmEmailChangePage
     },
     {
         path: Pathnames.loggedIn.accountSettings,

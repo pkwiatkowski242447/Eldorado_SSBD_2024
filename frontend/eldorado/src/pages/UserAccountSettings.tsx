@@ -301,7 +301,7 @@ function UserAccountSettings() {
                 getCurrentAccount();
                 toast({
                     title: t("accountSettings.popUp.changePasswordOK.title"),
-                    description: t("accountSettings.popUp.changePasswordOK.text"),
+                    description: t("accountSettings.popUp.changeOtherUsersPasswordOK.text"),
                 });
                 setFormType(null);
                 setFormValues(null);
@@ -424,8 +424,15 @@ function UserAccountSettings() {
                             <div>
                                 <Card className="mx-10 w-auto">
                                     <CardContent className={"flex items-center justify-center pt-5"}>
-                                        <Button onClick={onSubmitPassword} className="w-full pb-2">
-                                            {t("resetPasswordPage.title")}
+                                        <Button onClick={onSubmitPassword} className="w-full pb-2"
+                                                disabled={isLoading}>
+                                            {isLoading ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                                                </>
+                                            ) : (
+                                                t("resetPasswordPage.title")
+                                            )}
                                         </Button>
                                     </CardContent>
                                 </Card>

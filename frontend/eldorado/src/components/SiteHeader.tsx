@@ -1,5 +1,3 @@
-"use client"
-
 import eldoLogo from "@/assets/eldorado.png";
 import {
     DropdownMenu,
@@ -81,15 +79,10 @@ const SiteHeader = () => {
                 {account?.activeUserLevel?.roleName === RolesEnum.ADMIN && (
                     <Button variant="link" onClick={() => navigate("/manage-users/create")}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                        {/*{t("siteHeader.users")}*/}
-                        Create User
+                        {t("siteHeader.addUser")}
                     </Button>
 
                 )}
-                {/*<Button variant="link" onClick={() => navigate("/home")}*/}
-                {/*        className="text-muted-foreground transition-colors hover:text-foreground">*/}
-                {/*    {t("siteHeader.parkings")}*/}
-                {/*</Button>*/}
             </nav>
             <div className="flex w-full items-center gap-4 justify-end">
                 {(accountLS && tokenLS) && (
