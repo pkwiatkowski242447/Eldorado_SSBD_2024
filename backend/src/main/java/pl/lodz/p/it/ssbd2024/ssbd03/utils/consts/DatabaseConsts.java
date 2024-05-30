@@ -40,6 +40,27 @@ public class DatabaseConsts {
     public static final String ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_IP = "last_unsuccessful_login_ip";
     public static final String UNSUCCESSFUL_LOGIN_COUNTER = "unsuccessful_login_counter";
 
+    public static final String ACCOUNT_ATTRIBUTES = "account_attributes";
+    public static final String ACCOUNT_ID_COLUMN = "account_id";
+    public static final String ATTRIBUTE_ID_COLUMN = "attribute_id";
+
+    // public.attribute_association
+
+    public static final String ATTRIBUTE_ASSOCIATION_TABLE = "attribute_association";
+    public static final String ATTRIBUTE_RECORD_NAME_ID = "attribute_record_id";
+    public static final String ATTRIBUTE_RECORD_VALUE_ID = "attribute_value_id";
+
+    // public.attribute_name
+
+    public static final String ATTRIBUTE_NAME_TABLE = "attribute_name";
+    public static final String ATTRIBUTE_NAME_COLUMN = "attribute_name";
+
+    // public.attribute_value
+
+    public static final String ATTRIBUTE_VALUE_TABLE = "attribute_value";
+    public static final String ATTRIBUTE_VALUE_COLUMN = "attribute_value";
+    public static final String ATTRIBUTE_NAME_ID_COLUMN = "attribute_name_id";
+
     // public.account_history_data
 
     public static final String ACCOUNT_HIST_TABLE = "account_history";
