@@ -104,12 +104,6 @@ public class AccountMOKFacadeIT extends TestcontainersConfig {
 
     @Test
     @Transactional(propagation = Propagation.REQUIRED)
-    public void AccountMOKFacadeGetEntityManagerReturnsNotNullTestPositive() {
-        Assertions.assertNotNull(accountMOKFacade.getEntityManager());
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.ADD_USER_LEVEL})
     public void findMethodReturnExistingAccountTestPositive() throws ApplicationBaseException {
         Optional<Account> account = accountMOKFacade.find(accountIdNo1);

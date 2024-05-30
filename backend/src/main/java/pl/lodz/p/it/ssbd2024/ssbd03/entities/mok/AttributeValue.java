@@ -20,6 +20,18 @@ import java.io.Serializable;
         name = DatabaseConsts.ATTRIBUTE_VALUE_TABLE,
         uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ATTRIBUTE_VALUE_COLUMN, DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN})
 )
+@NamedQueries({
+        // General queries
+        @NamedQuery(
+                name = "AttributeValue.findByAttributeName",
+                query = """
+                        SELECT av FROM AttributeValue av
+                        JOIN AttributeName an ON an.id = av.attributeNameId.id
+                        WHERE an.attributeName = :attributeName
+                        ORDER BY av.attributeValue
+                        """
+        )
+})
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor

@@ -21,6 +21,26 @@ import java.util.List;
         name = DatabaseConsts.ATTRIBUTE_NAME_TABLE,
         uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ATTRIBUTE_NAME_COLUMN})
 )
+@NamedQueries({
+        // General queries
+        @NamedQuery(
+                name = "AttributeName.findAll",
+                query = """
+                        SELECT a FROM AttributeName a
+                        ORDER BY a.attributeName
+                        """
+        )
+//        ,
+//        @NamedQuery(
+//                name = "AttributeName.findByAccount",
+//                query = """
+//                        SELECT an FROM AttributeName an
+//                        JOIN AttributeRecord ar ON ar.attributeName = an.attributeName
+//                        WHERE :account IN ar.setOfAccounts
+//                        ORDER BY an.attributeName
+//                        """
+//        )
+})
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

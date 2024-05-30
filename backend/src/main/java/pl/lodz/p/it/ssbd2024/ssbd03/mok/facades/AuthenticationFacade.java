@@ -54,7 +54,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @return Entity manager associated with the facade.
      */
     @Override
-    public EntityManager getEntityManager() {
+    protected EntityManager getEntityManager() {
         return this.entityManager;
     }
 

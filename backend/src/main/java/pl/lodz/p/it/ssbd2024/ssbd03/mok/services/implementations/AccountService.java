@@ -38,6 +38,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.UserLevelFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.attribute.AttributeNameFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.attribute.AttributeValueFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AccountServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
@@ -108,6 +110,15 @@ public class AccountService implements AccountServiceInterface {
     private final UserLevelFacade userLevelFacade;
 
     /**
+     * Facade component used to manage attributes names in the database.
+     */
+    private final AttributeNameFacade attributeNameFacade;
+    /**
+     * Facade component used to manage attributes values in the database.
+     */
+    private final AttributeValueFacade attributeValueFacade;
+
+    /**
      * Autowired constructor for the service.
      *
      * @param accountFacade   Facade responsible for users accounts management.
@@ -117,6 +128,8 @@ public class AccountService implements AccountServiceInterface {
      * @param mailProvider    This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
      * @param jwtProvider     This component is used to generate token values for token facade.
      * @param userLevelFacade It is used to create new tokens, remove them, etc.
+     * @param attributeNameFacade Facade for handling attribute names.
+     * @param attributeValueFacade Facade for handling attribute values.
      */
     @Autowired
     public AccountService(AccountMOKFacade accountFacade,
@@ -126,7 +139,9 @@ public class AccountService implements AccountServiceInterface {
                           MailProvider mailProvider,
                           JWTProvider jwtProvider,
                           TokenProvider tokenProvider,
-                          UserLevelFacade userLevelFacade) {
+                          UserLevelFacade userLevelFacade,
+                          AttributeNameFacade attributeNameFacade,
+                          AttributeValueFacade attributeValueFacade) {
         this.accountFacade = accountFacade;
         this.historyDataFacade = historyDataFacade;
         this.passwordEncoder = passwordEncoder;
@@ -135,6 +150,8 @@ public class AccountService implements AccountServiceInterface {
         this.jwtProvider = jwtProvider;
         this.tokenProvider = tokenProvider;
         this.userLevelFacade = userLevelFacade;
+        this.attributeNameFacade = attributeNameFacade;
+        this.attributeValueFacade = attributeValueFacade;
     }
 
     // Register user account methods - Client, Staff, Admin
@@ -858,5 +875,30 @@ public class AccountService implements AccountServiceInterface {
     @RolesAllowed({Authorities.GET_OWN_HISTORICAL_DATA, Authorities.GET_ACCOUNT_HISTORICAL_DATA})
     public List<AccountHistoryData> getHistoryDataByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         return historyDataFacade.findByAccountId(id, pageNumber, pageSize);
+    }
+
+    //TODO
+    public List<AttributeName> getAllAttributesNames(int pageNumber, int pageSize) throws ApplicationBaseException {
+        return attributeNameFacade.findAllAttributeNamesWithPagination(pageNumber, pageSize);
+    }
+
+    public List<AttributeValue> getAllAttributeValues(String attributeName, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return attributeValueFacade.findByAttributeName(attributeName, pageNumber, pageSize);
+    }
+
+    public void addAttribute(String attributeName) throws ApplicationBaseException {
+        return;
+    }
+
+    public void removeAttribute(String attributeName) throws ApplicationBaseException {
+        return;
+    }
+
+    public void addAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException {}
+
+    public void removeAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException {}
+
+    public List<AttributeName> getAllAccountAttributes(UUID accountId, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return null;
     }
 }

@@ -187,7 +187,7 @@ INSERT INTO public.client_data (id, type) VALUES ('900cbc37-2a95-4bd6-96f2-897c1
 
 -- Dictionary
 
-INSERT INTO public.attribute_name(id, version, attribute_name) VALUES ('d4772c10-2997-4f64-8ef2-dbd6268aa7eb', 0, 'optional.attribute.motive');
+INSERT INTO public.attribute_name(id, version, attribute_name) VALUES ('d4772c10-2997-4f64-8ef2-dbd6268aa7eb', 0, 'optional.attribute.theme');
 
 INSERT INTO public.attribute_value(id, version, attribute_name_id, attribute_value) VALUES ('acd61f0b-3816-4af9-9544-fb3c9acd1595', 0, 'd4772c10-2997-4f64-8ef2-dbd6268aa7eb', 'light');
 INSERT INTO public.attribute_value(id, version, attribute_name_id, attribute_value) VALUES ('5fa7fe47-7fed-41c3-8bc3-45df811ed949', 0, 'd4772c10-2997-4f64-8ef2-dbd6268aa7eb', 'dark');
