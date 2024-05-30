@@ -49,6 +49,7 @@ function UserManagementPage() {
     const {account} = useAccountState();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const navigator = useNavigate();
+    const [pageSize] = useState(4);
 
     const handleSettingsClick = (userId: string) => {
         navigator(`/manage-users/${userId}`);
@@ -73,7 +74,7 @@ function UserManagementPage() {
     };
 
     const fetchUsers = () => {
-        api.getAccounts(`?pageNumber=${currentPage}&pageSize=4`).then(response => {
+        api.getAccounts(`?pageNumber=${currentPage}&pageSize=${pageSize}`).then(response => {
             if (response.status === 204) {
                 setUsers([]);
             } else {

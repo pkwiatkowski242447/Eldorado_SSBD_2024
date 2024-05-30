@@ -11,7 +11,6 @@ import {
 import { useTranslation } from "react-i18next";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {toast} from "@/components/ui/use-toast.ts";
-import handleApiError from "@/components/HandleApiError.ts";
 
 const SessionHandler = () => {
     const [isRefreshDialogOpen, setRefreshDialogOpen] = useState(false);
@@ -50,11 +49,13 @@ const SessionHandler = () => {
                         title: t("general.refreshSession.popUp1"),
                         description: t("general.refreshSession.popUp2")
                     })
+                    setRefreshDialogOpen(false);
                 }).catch((error) => {
-                handleApiError(error);
+                setRefreshDialogOpen(false);
+                console.error(error);
+                setExpiredDialogOpen(true);
             });
         }
-        setRefreshDialogOpen(false);
     };
 
     const handleLogout = () => {
