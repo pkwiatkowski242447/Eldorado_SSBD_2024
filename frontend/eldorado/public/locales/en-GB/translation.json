@@ -17,6 +17,10 @@
   "general.anonymous": "Anonymous",
   "general.asc": "(Ascending)",
   "general.desc": "(Descending)",
+  "general.filter": "Search",
+  "general.search": "Filter users by phrase",
+  "general.userBlocked": "User has been blocked.",
+  "general.userUnblocked": "User has been unblocked.",
 
   "account.status.suspended.exception": "Account has been suspended due to inactivity.",
   "account.restore.access.exception": "Account that isn't suspended cannot be restored.",

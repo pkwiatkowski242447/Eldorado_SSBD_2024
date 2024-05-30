@@ -17,6 +17,10 @@
   "general.anonymous": "Użytkownik anonimowy",
   "general.asc": "(Rosnąco)",
   "general.desc": "(Malejąco)",
+  "general.filter": "Szukaj",
+  "general.search": "Filtruj użytkowników po frazie",
+  "general.userBlocked": "Użytkownik został zablokowany.",
+  "general.userUnblocked": "Użytkownik został odblokowany.",
 
   "account.status.suspended.exception": "Konto zostało zawieszone w związku z brakiem aktywności.",
   "account.restore.access.exception": "Konto które nie jest zawieszone nie może być przywrócone.",
