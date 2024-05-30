@@ -79,7 +79,7 @@ public class AccountController implements AccountControllerInterface {
     // Block & unblock account methods
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.BLOCK_ACCOUNT})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> blockAccount(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -99,7 +99,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> unblockAccount(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -114,7 +114,7 @@ public class AccountController implements AccountControllerInterface {
     // Password change methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.RESET_PASSWORD})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> forgetAccountPassword(@RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
@@ -127,7 +127,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -147,7 +147,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changeAccountPassword(@PathVariable("token") String token,
@@ -157,7 +157,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
@@ -188,25 +188,12 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
-    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
-            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
-    public ResponseEntity<?> getAccountsMatchingPhraseInNameOrLastname(@RequestParam(name = "phrase", defaultValue = "") String phrase,
-                                                                            @RequestParam(name = "orderBy", defaultValue = "login") String orderBy,
-                                                                            @RequestParam(name = "order", defaultValue = "true") boolean order,
-                                                                            @RequestParam(name = "pageNumber") int pageNumber,
-                                                                            @RequestParam(name = "pageSize") int pageSize) throws ApplicationBaseException {
-        List<AccountListDTO> accountList = accountService.getAccountsMatchingPhraseInNameOrLastname(
-                        phrase, orderBy, order, pageNumber, pageSize)
-                .stream()
-                .map(AccountListMapper::toAccountListDTO)
-                .toList();
-        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
-        else return ResponseEntity.ok(accountList);
+    public ResponseEntity<?> getAccountsMatchingPhraseInNameOrLastname(String phrase, String orderBy, boolean order, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return null;
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.GET_OWN_ACCOUNT})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getSelf() throws ApplicationBaseException {
@@ -221,7 +208,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.GET_USER_ACCOUNT})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getUserById(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -244,7 +231,7 @@ public class AccountController implements AccountControllerInterface {
     // Activate account method
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> activateAccount(@PathVariable("token") String token) throws ApplicationBaseException {
@@ -258,7 +245,7 @@ public class AccountController implements AccountControllerInterface {
     // E-mail change methods
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.CHANGE_OWN_MAIL})
     @TxTracked
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
@@ -271,7 +258,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.CHANGE_OWN_MAIL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changeEmail(@PathVariable("id") UUID id,
@@ -281,7 +268,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.CONFIRM_EMAIL_CHANGE})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> confirmEmail(@PathVariable("token") String token) throws ApplicationBaseException {
@@ -293,7 +280,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> resendEmailConfirmation() throws ApplicationBaseException {
@@ -304,7 +291,7 @@ public class AccountController implements AccountControllerInterface {
     // Modify account methods
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.MODIFY_OWN_ACCOUNT})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> modifyAccountSelf(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
@@ -327,7 +314,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.MODIFY_USER_ACCOUNT})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> modifyUserAccount(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
@@ -349,7 +336,7 @@ public class AccountController implements AccountControllerInterface {
     // Add user level methods - Client, Staff, Admin
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.ADD_USER_LEVEL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> addClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -362,7 +349,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.ADD_USER_LEVEL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> addStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -375,7 +362,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.ADD_USER_LEVEL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> addAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -390,7 +377,7 @@ public class AccountController implements AccountControllerInterface {
     // Remove user level methods - Client, Staff, Admin
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> removeClientUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -403,7 +390,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> removeStaffUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -416,7 +403,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> removeAdminUserLevel(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -431,7 +418,7 @@ public class AccountController implements AccountControllerInterface {
     // Restore access to user account methods
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> sendAccountRestorationEmailMessage(AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
@@ -440,7 +427,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS})
+    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> restoreAccountAccess(String tokenValue) throws ApplicationBaseException {
@@ -449,7 +436,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.GET_ADMIN_PASSWORD_RESET_STATUS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> getPasswordAdminResetStatus() throws ApplicationBaseException {
@@ -457,7 +444,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.AUTHENTICATED})
+    @RolesAllowed({Authorities.GET_OWN_HISTORICAL_DATA})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
     public ResponseEntity<?> getHistoryDataSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
         Account account = accountService.getAccountByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -470,7 +457,7 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.GET_ACCOUNT_HISTORICAL_DATA})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
     public ResponseEntity<?> getHistoryDataByAccountId(String id, int pageNumber, int pageSize) throws ApplicationBaseException {
         List<AccountHistoryDataOutputDTO> accountList = accountService.getHistoryDataByAccountId(UUID.fromString(id), pageNumber, pageSize)
