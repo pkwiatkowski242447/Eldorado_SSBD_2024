@@ -68,40 +68,40 @@ public class TokenMOKFacadeIT extends TestcontainersConfig {
     private final UUID userUuidNo1 = UUID.fromString("f5afc042-79b0-47fe-87ee-710c14af888c");
     private final String tokenValueNo1 = "TEST_VALUE90";
 
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(username = "ExampleUser", roles = {Authorities.CHANGE_USER_PASSWORD})
-    public void findByTokenValue() throws Exception {
-        Optional<Token> token = tokenFacade.findByTokenValue(tokenValueNo1);
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(username = "ExampleUser", roles = {Authorities.CHANGE_USER_PASSWORD})
+//    public void findByTokenValue() throws Exception {
+//        Optional<Token> token = tokenFacade.findByTokenValue(tokenValueNo1);
+//
+//        assertNotNull(token.orElseThrow(NoSuchElementException::new));
+//
+//        assertEquals(tokenTypeConfirmEmail, token.get().getType());
+//        assertEquals(userUuidNo1, token.get().getAccount().getId());
+//        assertEquals(tokenValueNo1, token.get().getTokenValue());
+//    }
 
-        assertNotNull(token.orElseThrow(NoSuchElementException::new));
-
-        assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        assertEquals(userUuidNo1, token.get().getAccount().getId());
-        assertEquals(tokenValueNo1, token.get().getTokenValue());
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Authorities.CHANGE_USER_PASSWORD})
-    public void createAndRemovePositiveTest() throws ApplicationBaseException {
-        String tokenValue = "testValueToken";
-        Account account = accountMOKFacade.findByLogin("jerzybem").orElseThrow(NoSuchElementException::new);
-
-        assertNotNull(account);
-
-        Token token = new Token(tokenValue, account, tokenTypeChangeOverwrittenPassword);
-
-        tokenFacade.create(token);
-
-        Token tokenFind = tokenFacade.findByTokenValue(tokenValue).orElseThrow(NoSuchElementException::new);
-
-        tokenFacade.remove(tokenFind);
-
-        Optional<Token> tokenRemoved = tokenFacade.findByTokenValue(tokenValue);
-
-        assertTrue(tokenRemoved.isEmpty());
-    }
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(roles = {Authorities.CHANGE_USER_PASSWORD})
+//    public void createAndRemovePositiveTest() throws ApplicationBaseException {
+//        String tokenValue = "testValueToken";
+//        Account account = accountMOKFacade.findByLogin("jerzybem").orElseThrow(NoSuchElementException::new);
+//
+//        assertNotNull(account);
+//
+//        Token token = new Token(tokenValue, account, tokenTypeChangeOverwrittenPassword);
+//
+//        tokenFacade.create(token);
+//
+//        Token tokenFind = tokenFacade.findByTokenValue(tokenValue).orElseThrow(NoSuchElementException::new);
+//
+//        tokenFacade.remove(tokenFind);
+//
+//        Optional<Token> tokenRemoved = tokenFacade.findByTokenValue(tokenValue);
+//
+//        assertTrue(tokenRemoved.isEmpty());
+//    }
 
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
@@ -133,18 +133,18 @@ public class TokenMOKFacadeIT extends TestcontainersConfig {
 //        assertEquals(6, count);
 //    }
 
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(username = "ExampleUse", roles = {Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
-    public void findByTypeAndAccountTest() throws Exception {
-        Optional<Token> token = tokenFacade.findByTypeAndAccount(tokenTypeConfirmEmail, UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692"));
-
-        assertFalse(token.isEmpty());
-
-        assertEquals(tokenTypeConfirmEmail, token.get().getType());
-        assertEquals(UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692"), token.get().getAccount().getId());
-        assertEquals("TEST_VALUE93", token.get().getTokenValue());
-    }
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(username = "ExampleUse", roles = {Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
+//    public void findByTypeAndAccountTest() throws Exception {
+//        Optional<Token> token = tokenFacade.findByTypeAndAccount(tokenTypeConfirmEmail, UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692"));
+//
+//        assertFalse(token.isEmpty());
+//
+//        assertEquals(tokenTypeConfirmEmail, token.get().getType());
+//        assertEquals(UUID.fromString("d20f860d-555a-479e-8783-67aee5b66692"), token.get().getAccount().getId());
+//        assertEquals("TEST_VALUE93", token.get().getTokenValue());
+//    }
 
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)

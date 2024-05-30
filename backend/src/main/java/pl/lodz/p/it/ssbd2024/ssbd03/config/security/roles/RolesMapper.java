@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.UnsupportedRoleException;
 
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
 
 @Component
 @PropertySource("classpath:properties/roles.properties")
+@LoggerInterceptor
 public class RolesMapper {
 
     @Value("${role.admin}")
@@ -30,6 +32,9 @@ public class RolesMapper {
     @Value("${role.anonymous}")
     private String[] roleAnonymous;
 
+    @Value("${role.system}")
+    private String[] roleSystem;
+
     public List<String> getAuthoritiesAsStrings(String role) throws UnsupportedRoleException {
         return Stream.of(switch (role.toUpperCase()) {
                     case Roles.ADMIN -> roleAdmin;
@@ -37,13 +42,14 @@ public class RolesMapper {
                     case Roles.CLIENT -> roleClient;
                     case Roles.AUTHENTICATED -> roleAuthenticated;
                     case Roles.ANONYMOUS -> roleAnonymous;
+                    case Roles.SYSTEM -> roleSystem;
                     default -> throw new UnsupportedRoleException();
                 })
                 .map(authority -> "ROLE_" + authority)
                 .collect(Collectors.toList());
     }
 
-    public List<SimpleGrantedAuthority> getAuthorities(String role) throws UnsupportedRoleException{
+    public List<SimpleGrantedAuthority> getAuthorities(String role) throws UnsupportedRoleException {
         return getAuthoritiesAsStrings(role)
                 .stream()
                 .map(SimpleGrantedAuthority::new)

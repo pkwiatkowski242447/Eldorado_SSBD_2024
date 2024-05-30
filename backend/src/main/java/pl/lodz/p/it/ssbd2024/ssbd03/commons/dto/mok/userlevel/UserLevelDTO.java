@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.UserLevelMessages;
 
 import java.util.UUID;
@@ -24,6 +25,7 @@ import java.util.UUID;
 }
 )
 @Getter @Setter
+@LoggerInterceptor
 public abstract class UserLevelDTO {
     //TODO validation, certainly...
     @Schema(description = "UUID identifier linked with user level", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)

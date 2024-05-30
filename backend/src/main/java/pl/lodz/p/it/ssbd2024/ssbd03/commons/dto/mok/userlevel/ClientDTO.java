@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.ClientMessages;
 
 import java.util.UUID;
@@ -12,6 +13,7 @@ import java.util.UUID;
  * Data transfer object used for representing Client user level.
  */
 @Getter @Setter
+@LoggerInterceptor
 public class ClientDTO extends UserLevelDTO {
     @NotNull(message = ClientMessages.CLIENT_TYPE_NULL)
     @Schema(description = "Type of client", example = "BASIC", requiredMode = Schema.RequiredMode.REQUIRED)

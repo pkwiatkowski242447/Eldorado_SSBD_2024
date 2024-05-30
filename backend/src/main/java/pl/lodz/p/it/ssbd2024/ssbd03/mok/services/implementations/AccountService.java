@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
@@ -52,6 +53,7 @@ import java.util.*;
  */
 @Slf4j
 @Service
+@LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AccountService implements AccountServiceInterface {

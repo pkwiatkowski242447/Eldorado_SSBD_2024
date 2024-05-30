@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -31,6 +32,7 @@ import java.util.*;
  */
 @Component
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
+@LoggerInterceptor
 public class JWTProvider {
 
     @Value("${authentication.code.validity.period.length.minutes}")

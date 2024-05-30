@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Repository
+@LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class AccountMOKFacade extends AbstractFacade<Account> {
@@ -305,7 +307,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of accounts that were not activated in time (and therefore could not be activated). In case of
      * persistence exception, empty list is returned.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
     public List<Account> findAllAccountsMarkedForDeletion(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
@@ -376,7 +378,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of all users accounts that were blocked by the logging incorrectly certain amount of time.
      * If persistence exception is thrown, then empty list will be returned.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
     public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(
             long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
@@ -442,7 +444,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *                            login attempts from that date and time, then account is considered without recent activity.
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.BLOCK_ACCOUNT})
     public List<Account> findAllAccountsWithoutRecentActivity(
             LocalDateTime lastSuccessfulLogin) throws ApplicationBaseException {
         try {
@@ -503,7 +505,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param account Account to be removed from the database.
      */
     @Override
-    @DenyAll
+    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
     public void remove(Account account) throws ApplicationBaseException {
         super.remove(account);
     }

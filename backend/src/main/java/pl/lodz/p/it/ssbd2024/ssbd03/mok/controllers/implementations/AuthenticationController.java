@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
@@ -46,6 +47,7 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @RestController
+@LoggerInterceptor
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController implements AuthenticationControllerInterface {
 

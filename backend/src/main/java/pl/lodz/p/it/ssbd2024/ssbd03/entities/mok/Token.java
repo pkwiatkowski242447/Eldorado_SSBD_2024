@@ -6,6 +6,7 @@ import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.TokenMessages;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = DatabaseConsts.TOKEN_TABLE)
+@LoggerInterceptor
 @NoArgsConstructor
 @Getter
 @NamedQueries({

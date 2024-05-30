@@ -11,6 +11,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
@@ -29,6 +30,7 @@ import java.net.URI;
  */
 @Slf4j
 @RestController
+@LoggerInterceptor
 @RequestMapping(value = "/api/v1/register")
 @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
         retryFor = {ApplicationDatabaseException.class, RollbackException.class})

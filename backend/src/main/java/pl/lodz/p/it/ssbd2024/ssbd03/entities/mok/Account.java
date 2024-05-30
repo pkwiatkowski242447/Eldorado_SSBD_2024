@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
@@ -31,6 +32,7 @@ import java.util.Set;
 @Entity
 @Table(name = DatabaseConsts.ACCOUNT_TABLE)
 @SecondaryTable(name = DatabaseConsts.PERSONAL_DATA_TABLE)
+@LoggerInterceptor
 @Getter
 @NoArgsConstructor
 @NamedQueries({

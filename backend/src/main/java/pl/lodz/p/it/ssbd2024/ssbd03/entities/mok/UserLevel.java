@@ -6,6 +6,7 @@ import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ReservationMessages;
@@ -29,6 +30,7 @@ import java.time.LocalDateTime;
                 @UniqueConstraint(columnNames = {DatabaseConsts.USER_LEVEL_ACCOUNT_ID_COLUMN, DatabaseConsts.DISCRIMINATOR_COLUMN})
         }
 )
+@LoggerInterceptor
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = DatabaseConsts.DISCRIMINATOR_COLUMN, discriminatorType = DiscriminatorType.STRING)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.EmailTemplateNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.ImageNotFoundException;
@@ -32,6 +33,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
+@LoggerInterceptor
 public class MailProvider {
 
     @Value("${mail.sender.email}")
@@ -59,7 +61,9 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the account creation.
      * @param language        Language of the message.
      */
-    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
+    @RolesAllowed({
+            Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL
+    })
     public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));

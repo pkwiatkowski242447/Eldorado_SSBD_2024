@@ -4,8 +4,10 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations.IsJsonWebToken;
 
+@LoggerInterceptor
 public class JWTConstraintValidation implements ConstraintValidator<IsJsonWebToken, String> {
 
     @Override

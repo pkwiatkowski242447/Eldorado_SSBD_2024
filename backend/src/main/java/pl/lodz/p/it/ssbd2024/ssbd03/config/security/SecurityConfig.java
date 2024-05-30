@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTAuthenticationFilter;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.filters.JWTRequiredFilter;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Configuration
+@LoggerInterceptor
 @EnableWebSecurity
 @EnableMethodSecurity(
         securedEnabled = true,

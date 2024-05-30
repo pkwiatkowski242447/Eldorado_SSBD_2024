@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
 import java.util.UUID;
@@ -14,6 +15,7 @@ import java.util.UUID;
  * Used to simplify the classes and unify matters related with id generation and version tracking.
  */
 @MappedSuperclass
+@LoggerInterceptor
 @Getter @ToString
 @NoArgsConstructor
 public class AbstractEntity {

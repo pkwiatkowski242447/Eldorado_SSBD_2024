@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
@@ -28,6 +29,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Repository
+@LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {

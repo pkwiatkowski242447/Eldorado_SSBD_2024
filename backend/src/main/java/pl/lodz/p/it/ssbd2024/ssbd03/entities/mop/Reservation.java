@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = DatabaseConsts.RESERVATION_TABLE)
+@LoggerInterceptor
 @NoArgsConstructor
 @Getter
 @NamedQueries({

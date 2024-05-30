@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Table(name = DatabaseConsts.ACCOUNT_HIST_TABLE,
        uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ACCOUNT_HIST_ID_COLUMN, DatabaseConsts.ACCOUNT_HIST_VERSION_COLUMN})
 )
+@LoggerInterceptor
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor

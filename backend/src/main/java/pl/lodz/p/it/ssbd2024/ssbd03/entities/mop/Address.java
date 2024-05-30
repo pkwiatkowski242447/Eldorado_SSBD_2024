@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.AddressConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.AddressMessages;
@@ -19,6 +20,7 @@ import java.io.Serializable;
  * @see Parking
  */
 @Embeddable
+@LoggerInterceptor
 @Getter
 @Setter
 @AllArgsConstructor

@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingEventMessages;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = DatabaseConsts.PARKING_EVENT_TABLE)
+@LoggerInterceptor
 @NoArgsConstructor
 @Getter
 public class ParkingEvent extends AbstractEntity implements Serializable {

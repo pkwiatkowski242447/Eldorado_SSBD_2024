@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel;
 
 import lombok.Getter;
 import lombok.Setter;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import java.util.UUID;
  * Data transfer object used for representing Admin user level.
  */
 @Getter @Setter
+@LoggerInterceptor
 public class AdminDTO extends UserLevelDTO {
 
     /**
