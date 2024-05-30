@@ -57,8 +57,9 @@ export const useAccount = () => {
                 localStorage.setItem('refreshToken', refreshToken);
 
                 const resetStatusResponse = await api.getPasswordAdminResetStatus();
+
                 if (resetStatusResponse.data) {
-                    logOut()
+                    await logOut()
                     toast({
                         variant: "destructive",
                         description: t("general.adminInvokedPasswordReset")
@@ -89,7 +90,7 @@ export const useAccount = () => {
 
                 const resetStatusResponse = await api.getPasswordAdminResetStatus();
                 if (resetStatusResponse.data) {
-                    logOut()
+                    await logOut()
                     toast({
                         variant: "destructive",
                         description: "Reset password operation was requested by an administrator. Please click the link in the email you received to continue."

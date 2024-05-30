@@ -37,7 +37,7 @@ public class AccountHistoryDataMapper {
                 account.getEmail(),
                 account.getOperationType().toString(),
                 account.getModificationTime(),
-                account.getModifiedBy().getLogin()
+                account.getModifiedBy() == null ? "" : account.getModifiedBy().getLogin()
         );
     }
 
