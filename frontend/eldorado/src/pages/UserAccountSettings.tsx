@@ -54,12 +54,12 @@ function UserAccountSettings() {
     const userDataSchema = z.object({
         name: z.string()
             .min(2, {message: t("accountSettings.firstNameTooShort")})
-            .max(50, {message: t("accountSettings.firstNameTooLong")})
+            .max(32, {message: t("accountSettings.firstNameTooLong")})
             .regex(/^[A-Za-z]+$/, {message: t("general.nameInvalid")})
             .optional(),
         lastName: z.string()
             .min(2, {message: t("accountSettings.lastNameTooShort")})
-            .max(50, {message: t("accountSettings.lastNameTooLong")})
+            .max(32, {message: t("accountSettings.lastNameTooLong")})
             .regex(/^[A-Za-z]+$/, {message: t("general.lastNameInvalid")})
             .optional(),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}).optional(),

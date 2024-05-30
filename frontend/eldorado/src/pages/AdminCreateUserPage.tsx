@@ -43,7 +43,7 @@ export function AdminCreateUserPage() {
     const formSchema = z.object({
         email: z.string().min(1, {message: t("registerPage.emptyEmail")})
             .email(t("registerPage.wrongEmail")),
-        login: z.string().min(5, {message: t("registerPage.loginTooShort")})
+        login: z.string().min(4, {message: t("registerPage.loginTooShort")})
             .max(50, {message: t("registerPage.loginTooLong")}),
         password: z.string()
             .min(8, {message: t("registerPage.passwordTooShort")})
@@ -51,15 +51,15 @@ export function AdminCreateUserPage() {
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
         firstName: z.string()
             .min(2, {message: t("accountSettings.firstNameTooShort")})
-            .max(50, {message: t("accountSettings.firstNameTooLong")})
+            .max(32, {message: t("accountSettings.firstNameTooLong")})
             .regex(/^[A-Za-z]+$/, {message: t("general.nameInvalid")}),
         lastName: z.string()
             .min(2, {message: t("accountSettings.lastNameTooShort")})
-            .max(50, {message: t("accountSettings.lastNameTooLong")})
+            .max(32, {message: t("accountSettings.lastNameTooLong")})
             .regex(/^[A-Za-z]+$/, {message: t("general.lastNameInvalid")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("registerPage.phoneNumberInvalid")}),
         newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
-            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .max(60, {message: t("accountSettings.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
         role: z.enum(["client", "admin", "staff"]).default("client")
     }).refine(values => values.password === values.newPasswordRepeat, {

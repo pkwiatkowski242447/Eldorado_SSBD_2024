@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardTitle } from "@/components/ui/card.tsx";
 import { FiCheck, FiX } from "react-icons/fi";
 import { useTranslation } from "react-i18next";

@@ -44,12 +44,12 @@ function AccountSettings() {
     const userDataSchema = z.object({
         name: z.string()
             .min(2, {message: t("accountSettings.firstNameTooShort")})
-            .max(50, {message: t("accountSettings.firstNameTooLong")})
+            .max(32, {message: t("accountSettings.firstNameTooLong")})
             .regex(/^[A-Za-z]+$/, {message: t("general.nameInvalid")})
             .optional(),
         lastName: z.string()
             .min(2, {message: t("accountSettings.lastNameTooShort")})
-            .max(50, {message: t("accountSettings.lastNameTooLong")})
+            .max(32, {message: t("accountSettings.lastNameTooLong")})
             .regex(/^[A-Za-z]+$/, {message: t("general.lastNameInvalid")})
             .optional(),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}).optional(),
@@ -58,13 +58,13 @@ function AccountSettings() {
 
     const passwordSchema = z.object({
         oldPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
-            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .max(60, {message: t("accountSettings.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
         newPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
-            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .max(60, {message: t("accountSettings.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
         newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
-            .max(50, {message: t("accountSettings.passwordTooLong")})
+            .max(60, {message: t("accountSettings.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
     }).refine(values => values.newPassword === values.newPasswordRepeat, {
         message: t("accountSettings.passwordsMustMatch"),
