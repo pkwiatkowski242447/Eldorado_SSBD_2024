@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -115,8 +116,7 @@ public class JWTProvider {
      * @param jwtToken Token from which the AccountID will be extracted.
      * @return Returns AccountID from the Token.
      */
-    //FIXME
-//    @RolesAllowed({Authorities.LOGIN, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE})
+    @PermitAll
     public UUID extractAccountId(String jwtToken) throws TokenDataExtractionException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
@@ -168,10 +168,7 @@ public class JWTProvider {
      * @param account  Account for which the token was issued.
      * @return Returns true if token is valid, otherwise returns false.
      */
-    //FIXME
-//    @RolesAllowed({Authorities.LOGIN, Authorities.CHANGE_OWN_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION,
-//            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
-//            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.REFRESH_SESSION})
+    @PermitAll
     public boolean isTokenValid(String jwtToken, Account account) {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey()))

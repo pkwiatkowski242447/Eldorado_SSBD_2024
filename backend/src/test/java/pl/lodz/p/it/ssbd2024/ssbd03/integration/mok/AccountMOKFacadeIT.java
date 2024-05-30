@@ -17,19 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-import java.lang.reflect.Field;
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = WebConfig.class)
