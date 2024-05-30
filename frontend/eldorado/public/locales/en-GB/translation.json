@@ -17,11 +17,26 @@
   "general.anonymous": "Anonymous",
   "general.asc": "(Ascending)",
   "general.desc": "(Descending)",
+  "general.filter": "Search",
+  "general.search": "Filter users by phrase",
+  "general.userBlocked": "User has been blocked.",
+  "general.userUnblocked": "User has been unblocked.",
+  "general.nameInvalid": "Name contains not permitted characters",
+  "general.lastNameInvalid": "Last name contains not permitted characters",
 
-  "account.status.suspended.exception": "Account has been suspended due to inactivity.",
-  "account.restore.access.exception": "Account that isn't suspended cannot be restored.",
   "loginPage.accountSuspended": "Account suspended? ",
   "loginPage.accountSuspended.text": "Go here",
+
+  "breadcrumb.home": "Home",
+  "breadcrumb.manageUsers": "User management",
+  "breadcrumb.changeUserlevel": "Change access level",
+  "breadcrumb.myAccount": "My account",
+  "breadcrumb.userAccount": "Edit user account",
+  "breadcrumb.createUser": "Create new user",
+
+  "notFound.title": "Page not found",
+  "notFound.description": "The page you are looking for does not exist",
+  "notFound.home": "Go to the home page",
 
   "restoreAccessPage.title": "Restore Access",
   "restoreAccessPage.info": "Enter your email address to restore access to your account",
@@ -67,8 +82,6 @@
   "landingPage.register": "Register",
 
   "adminAddUserPage.confirmUserCreation": "Are you sure you want to create this user?",
-
-  "account.user_levels.conflict.exception": "User levels conflict - the user cannot have both client and staff roles.",
 
   "loginPage.title": "Login",
   "loginPage.info": "Enter your login information to proceed",
@@ -166,14 +179,14 @@
   "accountSettings.active": "Active",
   "accountSettings.blocked": "Blocked",
   "accountSettings.suspended": "Suspended",
-    "accountSettings.phone": "Phone",
-    "accountSettings.accountLanguage": "Account Language",
-    "accountSettings.2fa": "Two Factor Authentication",
-    "accountSettings.creationDate": "Creation Date",
-    "accountSettings.lastSucLoginTime": "Last Successful Login Time",
-    "accountSettings.lastSucLoginIp": "Last Successful Login IP",
-    "accountSettings.lastUnsucLoginTime": "Last Unsuccessful Login Time",
-    "accountSettings.lastUnsucLoginIp": "Last Unsuccessful Login IP",
+  "accountSettings.phone": "Phone",
+  "accountSettings.accountLanguage": "Account Language",
+  "accountSettings.2fa": "Two Factor Authentication",
+  "accountSettings.creationDate": "Creation Date",
+  "accountSettings.lastSucLoginTime": "Last Successful Login Time",
+  "accountSettings.lastSucLoginIp": "Last Successful Login IP",
+  "accountSettings.lastUnsucLoginTime": "Last Unsuccessful Login Time",
+  "accountSettings.lastUnsucLoginIp": "Last Unsuccessful Login IP",
 
 
   "accountSettings.authentication.oldPassword": "Current Password",
@@ -251,6 +264,7 @@
   "resetPasswordPage.resetPassword": "Are you sure you want to reset the password?",
   "resetPasswordPage.popUp": "Are you sure you want to change your password?",
 
+
   "activateAccountPage.title": "Almost there!",
   "activateAccountPage.info": "Activate your Eldorado account by pressing the button below.",
   "activateAccountPage.button": "Activate!",
@@ -282,10 +296,91 @@
   "confirmEmailPage.popUp.confirmEmailOK.loggedOut.button": "Log In",
   "confirmEmailPage.popUp.confirmEmailOK.loggedOut.text": "Your email has been successfully changed. You can log in now.",
 
-
   "resetPasswordPage.popUp.resetPasswordOK.title": "Success!",
   "resetPasswordPage.popUp.resetPasswordOK.text": "Your password has been successfully changed. You can log in now.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Log In",
+
+
+
+  "account.constraint.violation.exception" : "Account constraint violation",
+  "account.with.given.email.not.found.exception" : "Account with the given email not found",
+  "account.with.given.id.not.found.exception" : "Account with the given ID not found",
+  "account.status.blocked.exception" : "Account is blocked",
+  "account.status.inactive.exception" : "Account is inactive",
+  "account.status.suspended.exception": "Account has been suspended due to inactivity.",
+  "account.restore.access.exception": "Account that isn't suspended cannot be restored.",
+  "account.user_levels.conflict.exception": "User levels conflict - the user cannot have both client and staff roles.",
+
+  "account.reset.password.same.passwords.exception" : "New password cannot be the same as the current one",
+  "account.reset.password.incorrect.current.password" : "Incorrect current password",
+  "account.reset.password.password.previously.used.exception" : "New password cannot be the same as any of the previous ones",
+
+  "account.login.already.taken.exception" : "Login is already taken",
+  "account.email.already.taken.exception" : "Email is already taken",
+  "account.blocked.exception" : "Account is blocked",
+  "account.blocked.by.admin.exception" : "Account is blocked by an admin",
+  "account.blocked.by.too.many.failed.attempts.exception" : "Account is blocked due to too many failed login attempts",
+  "account.already.blocked.exception" : "Account is already blocked",
+  "account.already.unblocked.exception" : "Account is already unblocked",
+
+  "token.token.value.not.found.exception" : "Token value not found",
+  "token.token.value.not.valid.exception" : "Token value is not valid",
+  "token.data.extraction.taken.exception" : "Error extracting token data",
+
+  "token.value.already.taken.exception" : "Token value is already taken",
+
+  "application.optimistic.lock.exception" : "Optimistic lock exception",
+  "application.internal.server.error.exception" : "Internal server error",
+  "application.unauthorized.exception": "Operation not allowed due to insufficient permissions. Please refresh the page / log in again.",
+  "application.access.denied.exception" : "Access denied",
+  "application.database.server.exception" : "Unexpected database exception",
+  "application.path.not.found.exception" : "Path not found",
+  "application.unsupported.operation.exception" : "Unsupported operation",
+  "application.unsupported.role.exception" : "Unsupported role",
+  "account.service.admin.remove.own.admin.user.level.exception" : "Cannot remove own admin user level",
+
+  "user_level.no.such.user.level.exception" : "No such user level",
+  "user_level.one.user.level" : "User cannot have less than one user level",
+  "user_level.client.client_type.unexpected.exception" : "Unexpected client type",
+  "user_level.type.duplicated.exception" : "Duplicate user level",
+
+  "account.service.invalid.login.attempt.exception" : "Invalid login attempt",
+  "account.service.account.not.found.exception" : "Account not found",
+  "account.service.account.constraint.validation.exception" : "Account constraint validation failed",
+  "account.service.account.same.email.exception" : "New email is the same as the current email",
+  "account.service.account.email.collision.exception" : "Email collision detected",
+  "account.service.account.try_to_block_own.exception" : "Cannot block own account",
+  "account.service.email_from_token_null.exception" : "Email from token is null",
+  "token.not.found.exception" : "Operation can't be performed due to having not been initialized.",
+
+  "account.controller.token.invalid.or.expired" : "Token is invalid or expired",
+  "account.controller.uuid.invalid" : "Invalid UUID",
+  "account.controller.uuid.invalid.format.exception" : "UUID format is invalid",
+  "account.controller.missing.header.if_match.exception" : "Missing If-Match header",
+
+  "controller.data.integrity.compromised.exception" : "Data integrity compromised",
+
+  "controller.data.integrity.user_level.missing.exception" : "User level is missing",
+
+  "authentication.controller.account.not.active" : "Account is not active",
+  "authentication.controller.account.blocked" : "Account is blocked",
+  "authentication.controller.account.logout" : "Account logout",
+
+  "authentication.service.account.credentials.not.valid.exception" : "Invalid account credentials",
+  "authentication.service.account.login.not.found.exception" : "Account login not found",
+  "authentication.service.activity.log.update.exception" : "Failed to update activity log",
+
+  "account.service.staff.account.not.created.exception" : "Staff account creation failed",
+  "account.service.admin.account.not.created.exception" : "Admin account creation failed",
+
+  "bean.validation.account.login.dto.login.blank" : "Login cannot be blank",
+  "bean.validation.account.login.dto.login.regex.not.met" : "Login does not meet format requirements",
+  "bean.validation.account.login.dto.login.too.short" : "Login is too short",
+  "bean.validation.account.login.dto.login.too.long" : "Login is too long",
+  "bean.validation.account.login.dto.password.blank" : "Password cannot be blank",
+  "bean.validation.account.login.dto.password.regex.not.met" : "Password does not meet format requirements",
+  "bean.validation.account.login.dto.password.too.short" : "Password is too short",
+  "bean.validation.account.login.dto.password.too.long" : "Password is too long",
 
   "bean.validation.account.login.blank" : "Login cannot be blank",
   "bean.validation.account.login.regex.not.met" : "Login does not meet format requirements",
@@ -327,88 +422,5 @@
   "bean.validation.activity.log.unsuccessful.login.ip.not.valid" : "The IP address of the last unsuccessful login is not valid",
   "bean.validation.client.user.level.client.type.null" : "Client type cannot be null",
   "jwt.auth.filter.authorization.header.blank.or.incorrectly.formatted" : "Authorization header is blank or incorrectly formatted",
-  "jwt.auth.filter.access.token.invalid" : "Access token is invalid",
-
-  "account.constraint.violation.exception" : "Account constraint violation",
-  "account.with.given.email.not.found.exception" : "Account with the given email not found",
-  "account.with.given.id.not.found.exception" : "Account with the given ID not found",
-  "account.status.blocked.exception" : "Account is blocked",
-  "account.status.inactive.exception" : "Account is inactive",
-
-  "account.reset.password.same.passwords.exception" : "New password cannot be the same as the current one",
-  "account.reset.password.incorrect.current.password" : "Incorrect current password",
-
-  "account.login.already.taken.exception" : "Login is already taken",
-  "account.email.already.taken.exception" : "Email is already taken",
-  "account.blocked.exception" : "Account is blocked",
-  "account.blocked.by.admin.exception" : "Account is blocked by an admin",
-  "account.blocked.by.too.many.failed.attempts.exception" : "Account is blocked due to too many failed login attempts",
-  "account.already.blocked.exception" : "Account is already blocked",
-  "account.already.unblocked.exception" : "Account is already unblocked",
-
-  "token.token.value.not.found.exception" : "Token value not found",
-  "token.token.value.not.valid.exception" : "Token value is not valid",
-  "token.data.extraction.taken.exception" : "Error extracting token data",
-
-  "token.value.already.taken.exception" : "Token value is already taken",
-
-  "application.optimistic.lock.exception" : "Optimistic lock exception",
-  "application.internal.server.error.exception" : "Internal server error",
-  "application.access.denied.exception" : "Access denied",
-  "application.database.server.exception" : "Unexpected database exception",
-  "application.path.not.found.exception" : "Path not found",
-
-  "authentication.service.account.credentials.not.valid.exception" : "Invalid account credentials",
-  "authentication.service.account.login.not.found.exception" : "Account login not found",
-  "authentication.service.activity.log.update.exception" : "Failed to update activity log",
-
-  "account.service.staff.account.not.created.exception" : "Staff account creation failed",
-  "account.service.admin.account.not.created.exception" : "Admin account creation failed",
-  "account.service.admin.remove.own.admin.user.level.exception" : "Cannot remove own admin user level",
-  "user_level.no.such.user.level.exception" : "No such user level",
-  "user_level.one.user.level" : "User cannot have less than one user level",
-  "user_level.client.client_type.unexpected.exception" : "Unexpected client type",
-  "user_level.type.duplicated.exception" : "Duplicate user level",
-
-  "authentication.controller.account.not.active" : "Account is not active",
-  "authentication.controller.account.blocked" : "Account is blocked",
-  "authentication.controller.account.logout" : "Account logout",
-
-  "account.service.invalid.login.attempt.exception" : "Invalid login attempt",
-  "account.service.account.not.found.exception" : "Account not found",
-  "account.service.account.constraint.validation.exception" : "Account constraint validation failed",
-  "account.service.account.same.email.exception" : "New email is the same as the current email",
-  "account.service.account.email.collision.exception" : "Email collision detected",
-  "account.service.account.try_to_block_own.exception" : "Cannot block own account",
-  "account.service.email_from_token_null.exception" : "Email from token is null",
-  "token.not.found.exception" : "Operation can't be performed due to having not been initialized.",
-
-  "account.controller.token.invalid.or.expired" : "Token is invalid or expired",
-  "account.controller.uuid.invalid" : "Invalid UUID",
-  "account.controller.uuid.invalid.format.exception" : "UUID format is invalid",
-  "account.controller.missing.header.if_match.exception" : "Missing If-Match header",
-
-  "controller.data.integrity.compromised.exception" : "Data integrity compromised",
-
-  "controller.data.integrity.user_level.missing.exception" : "User level is missing",
-
-  "bean.validation.account.login.dto.login.blank" : "Login cannot be blank",
-  "bean.validation.account.login.dto.login.regex.not.met" : "Login does not meet format requirements",
-  "bean.validation.account.login.dto.login.too.short" : "Login is too short",
-  "bean.validation.account.login.dto.login.too.long" : "Login is too long",
-  "bean.validation.account.login.dto.password.blank" : "Password cannot be blank",
-  "bean.validation.account.login.dto.password.regex.not.met" : "Password does not meet format requirements",
-  "bean.validation.account.login.dto.password.too.short" : "Password is too short",
-  "bean.validation.account.login.dto.password.too.long" : "Password is too long",
-
-  "breadcrumb.home": "Home",
-  "breadcrumb.manageUsers": "User management",
-  "breadcrumb.changeUserlevel": "Change access level",
-  "breadcrumb.myAccount": "My account",
-  "breadcrumb.userAccount": "Edit user account",
-  "breadcrumb.createUser": "Create new user",
-
-  "notFound.title": "Page not found",
-  "notFound.description": "The page you are looking for does not exist",
-  "notFound.home": "Go to the home page"
+  "jwt.auth.filter.access.token.invalid" : "Access token is invalid"
 }

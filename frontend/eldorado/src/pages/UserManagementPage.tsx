@@ -40,6 +40,8 @@ import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {toast} from "@/components/ui/use-toast.ts";
 
 function UserManagementPage() {
     // @ts-expect-error no time
@@ -50,6 +52,8 @@ function UserManagementPage() {
     const {t} = useTranslation();
     const {account} = useAccountState();
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [searchPhrase, setSearchPhrase] = useState('');
+    const [isSubmitClicked, setIsSubmitClicked] = useState(false);
     const navigator = useNavigate();
     // @ts-expect-error no time
     const [pageSize, setPageSize] = useState(() => parseInt(localStorage.getItem('pageSize')) || 4);
@@ -74,6 +78,10 @@ function UserManagementPage() {
             apiCall(selectedUser.id).then(() => {
                 fetchUsers();
                 setAlertDialogOpen(false);
+                toast({
+                    title: t("accountSettings.popUp.changeUserDataOK.title"),
+                    description: selectedUser.blocked ? t("general.userUnblocked") : t("general.userBlocked")
+                })
             }).catch((error) => {
                 handleApiError(error);
             });
@@ -83,7 +91,7 @@ function UserManagementPage() {
 
     const fetchUsers = () => {
         const order = sortConfig.direction === 'asc' ? 'true' : 'false';
-        const details = `?phrase=&orderBy=${sortConfig.key}&order=${order}&pageNumber=${currentPage}&pageSize=${pageSize}`;
+        const details = `?phrase=${searchPhrase}&orderBy=${sortConfig.key}&order=${order}&pageNumber=${currentPage}&pageSize=${pageSize}`;
 
         api.getAccountsMatchPhraseInAccount(details)
             .then(response => {
@@ -111,7 +119,8 @@ function UserManagementPage() {
 
     useEffect(() => {
         fetchUsers();
-    }, [currentPage, pageSize, sortConfig]);
+        setIsSubmitClicked(false);
+    }, [currentPage, pageSize, sortConfig, isSubmitClicked]);
 
     useEffect(() => {
         localStorage.setItem('currentPage', currentPage.toString());
@@ -177,7 +186,7 @@ function UserManagementPage() {
                     </SelectContent>
                 </Select>
                 <Select onValueChange={handleSortChange} value={`${sortConfig.key}-${sortConfig.direction}`}>
-                    <SelectTrigger className={"w-auto"}>
+                    <SelectTrigger className={"w-1/4 mr-4 flex"}>
                         <SelectValue placeholder={t("general.sortBy")}/>
                     </SelectTrigger>
                     <SelectContent>
@@ -191,6 +200,13 @@ function UserManagementPage() {
                             value="level-desc">{t("accountSettings.users.table.header.userLevels")} {t("general.desc")}</SelectItem>
                     </SelectContent>
                 </Select>
+                <Input
+                    value={searchPhrase}
+                    onChange={(e) => setSearchPhrase(e.target.value)}
+                    placeholder={t("general.search")}
+                    className="mr-4 w-2/3"
+                />
+                <Button onClick={() => setIsSubmitClicked(true)}>{t("general.filter")}</Button>
             </div>
             <div className={"pt-5"}>
                 <Table className="p-10 flex-grow">
