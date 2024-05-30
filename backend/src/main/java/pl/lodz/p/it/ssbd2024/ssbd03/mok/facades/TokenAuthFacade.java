@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
 import jakarta.annotation.security.DenyAll;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

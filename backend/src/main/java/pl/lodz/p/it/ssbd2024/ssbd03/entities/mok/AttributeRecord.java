@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 
@@ -16,6 +17,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = DatabaseConsts.ATTRIBUTE_ASSOCIATION_TABLE)
+@LoggerInterceptor
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
