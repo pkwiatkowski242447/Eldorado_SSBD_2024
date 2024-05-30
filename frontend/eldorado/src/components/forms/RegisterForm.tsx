@@ -22,7 +22,7 @@ export function RegisterForm() {
     const formSchema = z.object({
         email: z.string().min(1, {message: t("registerPage.emptyEmail")})
             .email(t("registerPage.wrongEmail")),
-        login: z.string().min(3, {message: t("registerPage.loginTooShort")})
+        login: z.string().min(5, {message: t("registerPage.loginTooShort")})
             .max(50, {message: t("registerPage.loginTooLong")}),
         password: z.string()
             .min(8, {message: t("registerPage.passwordTooShort")})
