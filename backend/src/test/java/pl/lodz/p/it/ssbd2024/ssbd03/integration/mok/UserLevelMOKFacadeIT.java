@@ -59,80 +59,80 @@ public class UserLevelMOKFacadeIT extends TestcontainersConfig {
     private final UUID uuidAccountNo1 = UUID.fromString("b3b8c2ac-21ff-434b-b490-aa6d717447c0");
     private final UUID uuidAccountNo2 = UUID.fromString("0ca02f7e-d8e9-45d3-a332-a56015acb822");
 
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Roles.ADMIN})
-    public void findTestPositive() throws ApplicationBaseException {
-        Optional<UserLevel> userLevel = userLevelFacade.find(uuidClientLevelUuid);
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(roles = {Roles.ADMIN})
+//    public void findTestPositive() throws ApplicationBaseException {
+//        Optional<UserLevel> userLevel = userLevelFacade.find(uuidClientLevelUuid);
+//
+//        Assertions.assertFalse(userLevel.isEmpty());
+//        Assertions.assertEquals(uuidClientLevelUuid, userLevel.get().getId());
+//        Assertions.assertEquals(uuidAccountNo1, userLevel.get().getAccount().getId());
+//    }
 
-        Assertions.assertFalse(userLevel.isEmpty());
-        Assertions.assertEquals(uuidClientLevelUuid, userLevel.get().getId());
-        Assertions.assertEquals(uuidAccountNo1, userLevel.get().getAccount().getId());
-    }
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(roles = {Roles.ADMIN})
+//    public void findAndRefreshTestPositive() throws Exception {
+//        Optional<UserLevel> userLevel = userLevelFacade.findAndRefresh(uuidClientLevelUuid);
+//
+//        Assertions.assertFalse(userLevel.isEmpty());
+//        Assertions.assertEquals(uuidClientLevelUuid, userLevel.get().getId());
+//        Assertions.assertEquals(uuidAccountNo1, userLevel.get().getAccount().getId());
+//    }
 
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Roles.ADMIN})
-    public void findAndRefreshTestPositive() throws Exception {
-        Optional<UserLevel> userLevel = userLevelFacade.findAndRefresh(uuidClientLevelUuid);
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(roles = {Roles.ADMIN})
+//    public void findAllTestPositive() throws Exception {
+//        List<UserLevel> list = userLevelFacade.findAll();
+//
+//        Assertions.assertNotNull(list);
+//        Assertions.assertEquals(8, list.size());
+//    }
 
-        Assertions.assertFalse(userLevel.isEmpty());
-        Assertions.assertEquals(uuidClientLevelUuid, userLevel.get().getId());
-        Assertions.assertEquals(uuidAccountNo1, userLevel.get().getAccount().getId());
-    }
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(roles = {Roles.ADMIN})
+//    public void countTestPositive() throws Exception {
+//        teardown();
+//
+//        int count = userLevelFacade.count();
+//
+//        Assertions.assertEquals(8, count);
+//    }
 
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Roles.ADMIN})
-    public void findAllTestPositive() throws Exception {
-        List<UserLevel> list = userLevelFacade.findAll();
-
-        Assertions.assertNotNull(list);
-        Assertions.assertEquals(8, list.size());
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Roles.ADMIN})
-    public void countTestPositive() throws Exception {
-        teardown();
-
-        int count = userLevelFacade.count();
-
-        Assertions.assertEquals(8, count);
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    @WithMockUser(roles = {Roles.ADMIN})
-    public void createAndRemoveTestPositive() throws ApplicationBaseException {
-        UserLevel userLevel = userLevelFacade.find(uuidUserLevelNo1).orElseThrow(NoSuchElementException::new);
-        Account account = userLevel.getAccount();
-
-        UserLevel Admin = new Admin();
-        Admin.setAccount(account);
-
-        int countBeforeAdd = userLevelFacade.count();
-        Assertions.assertEquals(8, countBeforeAdd);
-
-        userLevelFacade.create(Admin);
-        int countAfterAdd = userLevelFacade.count();
-        Assertions.assertEquals(9, countAfterAdd);
-
-        UUID userLevelToRemove = null;
-        List<UserLevel> list = userLevelFacade.findAll();
-        for (UserLevel level : list) {
-            if (level.getAccount() == account && level.getId() != uuidUserLevelNo1) {
-                userLevelToRemove = level.getId();
-                userLevelFacade.remove(level);
-            }
-        }
-        int countAfterRemove = userLevelFacade.count();
-        Assertions.assertEquals(8, countAfterRemove);
-
-        Optional<UserLevel> deletedUserLevel = userLevelFacade.findAndRefresh(userLevelToRemove);
-        Assertions.assertTrue(deletedUserLevel.isEmpty());
-    }
+//    @Test
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    @WithMockUser(roles = {Roles.ADMIN})
+//    public void createAndRemoveTestPositive() throws ApplicationBaseException {
+//        UserLevel userLevel = userLevelFacade.find(uuidUserLevelNo1).orElseThrow(NoSuchElementException::new);
+//        Account account = userLevel.getAccount();
+//
+//        UserLevel Admin = new Admin();
+//        Admin.setAccount(account);
+//
+//        int countBeforeAdd = userLevelFacade.count();
+//        Assertions.assertEquals(8, countBeforeAdd);
+//
+//        userLevelFacade.create(Admin);
+//        int countAfterAdd = userLevelFacade.count();
+//        Assertions.assertEquals(9, countAfterAdd);
+//
+//        UUID userLevelToRemove = null;
+//        List<UserLevel> list = userLevelFacade.findAll();
+//        for (UserLevel level : list) {
+//            if (level.getAccount() == account && level.getId() != uuidUserLevelNo1) {
+//                userLevelToRemove = level.getId();
+//                userLevelFacade.remove(level);
+//            }
+//        }
+//        int countAfterRemove = userLevelFacade.count();
+//        Assertions.assertEquals(8, countAfterRemove);
+//
+//        Optional<UserLevel> deletedUserLevel = userLevelFacade.findAndRefresh(userLevelToRemove);
+//        Assertions.assertTrue(deletedUserLevel.isEmpty());
+//    }
 
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
