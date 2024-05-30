@@ -4,6 +4,9 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
@@ -12,6 +15,8 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 @Slf4j
+@LoggerInterceptor
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class TokenProvider {
 
     @Value("${refresh.token.validity.period.length.minutes}")

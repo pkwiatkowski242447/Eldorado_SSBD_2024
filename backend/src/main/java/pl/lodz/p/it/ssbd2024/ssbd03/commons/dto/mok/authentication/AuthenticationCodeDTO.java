@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 
 /**
  * Data Transfer Object used for the second step in multifactor
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@LoggerInterceptor
 public class AuthenticationCodeDTO {
     private String userLogin;
     private String authCodeValue;

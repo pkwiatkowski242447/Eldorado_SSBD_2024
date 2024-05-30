@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountHistoryDataOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
@@ -7,6 +8,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
 /**
  * Used to handle AccountHistoryData entity-DTO mapping.
  */
+@LoggerInterceptor
 public class AccountHistoryDataMapper {
 
     /**

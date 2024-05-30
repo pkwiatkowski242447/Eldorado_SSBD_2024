@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.AccountSignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
@@ -19,6 +20,7 @@ import java.util.Set;
  */
 @Getter @Setter
 @NoArgsConstructor
+@LoggerInterceptor
 public class AccountModifyDTO extends AccountSignableDTO {
     @NotBlank(message = AccountMessages.NAME_BLANK)
     @Pattern(regexp = AccountsConsts.NAME_REGEX, message = AccountMessages.NAME_REGEX_NOT_MET)

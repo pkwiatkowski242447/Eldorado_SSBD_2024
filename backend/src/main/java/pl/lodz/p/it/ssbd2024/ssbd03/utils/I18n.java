@@ -1,8 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.utils;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+@LoggerInterceptor
 public class I18n {
 
     // Account exceptions

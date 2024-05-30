@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.UserLevelDTO;
@@ -13,6 +14,7 @@ import java.util.Set;
 /**
  * Used to handle Account entity-DTO mapping.
  */
+@LoggerInterceptor
 public class AccountMapper {
 
     /**

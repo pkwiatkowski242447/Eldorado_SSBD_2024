@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.AdminDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.ClientDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.StaffDTO;
@@ -15,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 /**
  * Used to handle UserLevel entity-DTO mapping.
  */
+@LoggerInterceptor
 public class UserLevelMapper {
 
     /**

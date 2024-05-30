@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.ActivityLogConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.ActivityLogMessages;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
  * @see Account
  */
 @Embeddable
+@LoggerInterceptor
 @NoArgsConstructor
 @Getter @Setter
 public class ActivityLog implements Serializable {

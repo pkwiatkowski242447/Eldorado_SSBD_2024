@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountsConsts;
@@ -31,6 +32,7 @@ import java.util.Set;
 @Entity
 @Table(name = DatabaseConsts.ACCOUNT_TABLE)
 @SecondaryTable(name = DatabaseConsts.PERSONAL_DATA_TABLE)
+@LoggerInterceptor
 @Getter
 @NoArgsConstructor
 @NamedQueries({
@@ -338,6 +340,21 @@ public class Account extends AbstractEntity {
     @Getter @Setter
     private String phoneNumber;
 
+    /**
+     * References to all attribute records in the database for a given account.
+     */
+    @ManyToMany
+    @JoinTable(
+            name = DatabaseConsts.ACCOUNT_ATTRIBUTES,
+            joinColumns = @JoinColumn(name = DatabaseConsts.ACCOUNT_ID_COLUMN),
+            inverseJoinColumns = @JoinColumn(name = DatabaseConsts.ATTRIBUTE_ID_COLUMN)
+    )
+    private final Set<AttributeRecord> attributeRecords = new HashSet<>();
+
+    /**
+     * Time, which the user account was activated at - either after the registration
+     * or after restoring the access to the account.
+     */
     @Column(name = DatabaseConsts.ACCOUNT_ACTIVATION_TIMESTAMP)
     @PastOrPresent(message = AccountMessages.ACTIVATION_TIMESTAMP_FUTURE)
     @Temporal(TemporalType.TIMESTAMP)

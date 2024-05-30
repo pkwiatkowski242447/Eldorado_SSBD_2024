@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@LoggerInterceptor
 public class ParkingCreateDTO {
     @Schema(description = "The City where parking is located", example = "Warsaw", requiredMode = Schema.RequiredMode.REQUIRED)
     private String city;

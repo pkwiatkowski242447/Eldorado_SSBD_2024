@@ -9,6 +9,7 @@ import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
@@ -25,6 +26,7 @@ import java.util.UUID;
  * @see Account
  */
 @Repository
+@LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class AccountMOPFacade extends AbstractFacade<Account> {

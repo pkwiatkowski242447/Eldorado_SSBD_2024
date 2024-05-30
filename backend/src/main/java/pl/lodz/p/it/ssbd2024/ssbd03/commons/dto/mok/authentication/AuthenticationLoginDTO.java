@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DTOConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
 
@@ -21,6 +22,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@LoggerInterceptor
 public class AuthenticationLoginDTO {
 
     @NotBlank(message = DTOMessages.LOGIN_BLANK)

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 
 /**
  * Data transfer object used for passing the allocation code, generated
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@LoggerInterceptor
 public class AllocationCodeDTO {
 
     @Schema(description = "Allocation code, generated when entering parking in a given reservation, used for ending it.", example = "76491929", requiredMode = Schema.RequiredMode.REQUIRED)

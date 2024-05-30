@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountEmailDTO;
@@ -32,8 +33,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.PasswordPreviouslyUsedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AccountControllerInterface;
@@ -49,7 +52,10 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/accounts")
+@LoggerInterceptor
+@RequestMapping(value = "/api/v1/accounts")
+@TxTracked
+@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
 public class AccountController implements AccountControllerInterface {
 
     /**
@@ -128,8 +134,6 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
-    @TxTracked
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> resetAccountPassword(@PathVariable("id") String id) throws ApplicationBaseException {
@@ -147,7 +151,8 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
+    @RolesAllowed({Authorities.RESET_PASSWORD})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = PasswordPreviouslyUsedException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changeAccountPassword(@PathVariable("token") String token,
@@ -158,6 +163,7 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = PasswordPreviouslyUsedException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
@@ -260,8 +266,6 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.CHANGE_OWN_MAIL})
-    @TxTracked
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changeEmailSelf(@Valid @RequestBody AccountEmailDTO accountEmailDTO) throws ApplicationBaseException {
@@ -295,6 +299,7 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {TokenBaseException.class})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> resendEmailConfirmation() throws ApplicationBaseException {

@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
 import jakarta.annotation.security.DenyAll;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -11,11 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -34,6 +33,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Repository
+@LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class AccountMOKFacade extends AbstractFacade<Account> {
@@ -102,7 +102,8 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     @Override
     @RolesAllowed({
             Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT, Authorities.UNBLOCK_ACCOUNT,
-            Authorities.GET_USER_ACCOUNT, Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT
+            Authorities.GET_USER_ACCOUNT, Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT,
+            Authorities.RESET_PASSWORD
     })
     public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
@@ -231,7 +232,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT, Authorities.CONFIRM_ACCOUNT_CREATION,
             Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL, Authorities.GET_OWN_HISTORICAL_DATA,
             Authorities.GET_OWN_ACCOUNT, Authorities.CHANGE_OWN_MAIL, Authorities.REMOVE_USER_LEVEL,
-            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.GET_ADMIN_PASSWORD_RESET_STATUS
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.GET_ADMIN_PASSWORD_RESET_STATUS, Authorities.RESET_PASSWORD
     })
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
@@ -305,7 +306,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of accounts that were not activated in time (and therefore could not be activated). In case of
      * persistence exception, empty list is returned.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
     public List<Account> findAllAccountsMarkedForDeletion(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
@@ -376,7 +377,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return List of all users accounts that were blocked by the logging incorrectly certain amount of time.
      * If persistence exception is thrown, then empty list will be returned.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
     public List<Account> findAllBlockedAccountsThatWereBlockedByLoginIncorrectlyCertainAmountOfTimes(
             long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
@@ -442,7 +443,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      *                            login attempts from that date and time, then account is considered without recent activity.
      * @return List of all user accounts without recent activity. In case of persistence exception, empty list is returned.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.BLOCK_ACCOUNT})
     public List<Account> findAllAccountsWithoutRecentActivity(
             LocalDateTime lastSuccessfulLogin) throws ApplicationBaseException {
         try {
@@ -489,7 +490,8 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             Authorities.CHANGE_USER_PASSWORD, Authorities.CHANGE_OWN_PASSWORD, Authorities.BLOCK_ACCOUNT,
             Authorities.UNBLOCK_ACCOUNT, Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT,
             Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE,
-            Authorities.ADD_USER_LEVEL, Authorities.REMOVE_USER_LEVEL, Authorities.RESTORE_ACCOUNT_ACCESS
+            Authorities.ADD_USER_LEVEL, Authorities.REMOVE_USER_LEVEL, Authorities.RESTORE_ACCOUNT_ACCESS,
+            Authorities.RESET_PASSWORD
     })
     public void edit(Account account) throws ApplicationBaseException {
         super.edit(account);
@@ -503,7 +505,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @param account Account to be removed from the database.
      */
     @Override
-    @DenyAll
+    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
     public void remove(Account account) throws ApplicationBaseException {
         super.remove(account);
     }

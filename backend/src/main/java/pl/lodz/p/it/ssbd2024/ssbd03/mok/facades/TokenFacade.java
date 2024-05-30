@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
@@ -29,6 +30,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Repository
+@LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class TokenFacade extends AbstractFacade<Token> {
@@ -65,7 +67,8 @@ public class TokenFacade extends AbstractFacade<Token> {
     @RolesAllowed({
             Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.RESET_PASSWORD,
             Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
-            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.CHANGE_USER_PASSWORD
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.CHANGE_USER_PASSWORD,
+            Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
     })
     public void create(Token entity) throws ApplicationBaseException {
         super.create(entity);
@@ -92,6 +95,7 @@ public class TokenFacade extends AbstractFacade<Token> {
     @RolesAllowed({
             Authorities.CHANGE_USER_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE,
             Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL, Authorities.RESTORE_ACCOUNT_ACCESS,
+            Authorities.RESET_PASSWORD
     })
     public void remove(Token entity) throws ApplicationBaseException {
         super.remove(entity);
@@ -164,7 +168,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @RolesAllowed({
             Authorities.CHANGE_USER_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE,
-            Authorities.RESTORE_ACCOUNT_ACCESS
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.RESET_PASSWORD
     })
     public Optional<Token> findByTokenValue(String tokenValue) throws ApplicationBaseException {
         try {
@@ -186,7 +190,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      *
      * @return List of tokens of the specified token type.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
     public List<Token> findByTokenType(Token.TokenType tokenType) throws ApplicationBaseException {
         try {
             TypedQuery<Token> query = getEntityManager()
@@ -205,7 +209,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      *
      * @param accountId ID of the Account which Token are to be removed.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
     public void removeByAccount(UUID accountId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Token.removeByAccount")
                 .setParameter("accountId", accountId)
@@ -220,7 +224,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @RolesAllowed({
             Authorities.RESET_PASSWORD, Authorities.CHANGE_OWN_MAIL, Authorities.RESTORE_ACCOUNT_ACCESS,
-            Authorities.CHANGE_USER_PASSWORD
+            Authorities.CHANGE_USER_PASSWORD, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL
     })
     public void removeByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Token.removeByTypeAndAccount")

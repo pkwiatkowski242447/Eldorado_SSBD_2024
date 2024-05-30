@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
@@ -46,7 +47,10 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @RestController
+@LoggerInterceptor
 @RequestMapping("/api/v1/auth")
+@TxTracked
+@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
 public class AuthenticationController implements AuthenticationControllerInterface {
 
     @Value("${account.maximum.failed.login.attempt.counter}")
@@ -80,8 +84,11 @@ public class AuthenticationController implements AuthenticationControllerInterfa
 
     @Override
     @RolesAllowed(Authorities.LOGIN)
-    @TxTracked
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {
+            InvalidLoginAttemptException.class, AccountNotActivatedException.class,
+            AccountBlockedByAdminException.class, AccountBlockedByFailedLoginAttemptsException.class,
+            AccountSuspendedException.class
+    })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
@@ -134,8 +141,10 @@ public class AuthenticationController implements AuthenticationControllerInterfa
 
     @Override
     @RolesAllowed(Authorities.LOGIN)
-    @TxTracked
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {
+            AccountNotActivatedException.class, AccountBlockedByAdminException.class,
+            AccountBlockedByFailedLoginAttemptsException.class, 
+    })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,

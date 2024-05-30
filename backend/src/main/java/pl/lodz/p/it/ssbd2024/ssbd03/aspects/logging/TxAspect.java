@@ -61,7 +61,7 @@ public class TxAspect {
 
     @Around(value = "txPointcut()")
     private Object aroundTxPointcut(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        String transactionKey;
+        String transactionKey = null;
         StringBuilder message = new StringBuilder("Method call: ");
         message.append(proceedingJoinPoint.getSignature().getName());
         message.append(" | Class: ").append(proceedingJoinPoint.getTarget().getClass().getSimpleName());
@@ -73,18 +73,18 @@ public class TxAspect {
             Method getTransactionKey = transactionSynchronizationRegistry.getMethod("getTransactionKey", (Class<?>[]) null);
             Transaction transaction = (Transaction) getTransactionKey.invoke(transactionSynchronizationRegistry.getDeclaredConstructor().newInstance());
 
-            if (transaction.toString() != null) transactionKey = transaction.toString();
-            else transactionKey = "NULL";
+            if (transaction != null) transactionKey = transaction.toString();
 
-            if (!transactionIds.contains(transactionKey)) {
+            if (transactionKey != null && !transactionIds.contains(transactionKey)) {
                 Method registerSynchronization = transactionSynchronizationRegistry.getMethod("registerInterposedSynchronization", Synchronization.class);
                 registerSynchronization.invoke(transactionSynchronizationRegistry.getDeclaredConstructor().newInstance(), new TransactionSynchronization(transactionKey));
                 transactionIds.add(transactionKey);
             }
 
             try {
-                message.append(" | Transaction key: ").append(transactionKey != null ? transactionKey : "NULL");
-                message.append(" | User: ").append(null != SecurityContextHolder.getContext().getAuthentication() ? SecurityContextHolder.getContext().getAuthentication().getName() : "GUEST");
+                if (transactionKey == null) message.append(" | This method is not called in the transactional context.");
+                else message.append(" | Transaction key: ").append(transactionKey);
+                message.append(" | User: ").append(null != SecurityContextHolder.getContext().getAuthentication() ? SecurityContextHolder.getContext().getAuthentication().getName() : "ANONYMOUS");
             } catch (Exception exception) {
                 log.error(" | Unexpected exception: {} within aspect occurred due to: ", exception.getClass().getSimpleName(), exception.getCause());
                 throw exception;
