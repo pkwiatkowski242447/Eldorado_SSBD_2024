@@ -1,6 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
-import jakarta.annotation.security.RolesAllowed;
+import jakarta.annotation.security.DenyAll;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -62,7 +61,7 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * @param userLevel UserLevel to be modified.
      */
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public void edit(UserLevel userLevel) throws ApplicationBaseException {
         super.edit(userLevel);
     }
@@ -74,7 +73,7 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
      */
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public Optional<UserLevel> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
@@ -86,7 +85,7 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
      */
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @DenyAll
     public Optional<UserLevel> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -98,7 +97,7 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * @return All user levels associated with given account.
      * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
      */
-    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    @DenyAll
     public List<UserLevel> findUserLevelsForGivenAccount(UUID accountId) throws ApplicationBaseException {
         TypedQuery<UserLevel> findUserLevelsForGivenAccount = entityManager.createNamedQuery("UserLevel.findAllUserLevelsForGivenAccount", UserLevel.class);
         findUserLevelsForGivenAccount.setParameter("accountId", accountId);
@@ -115,7 +114,7 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * @return Certain user level, of given class, connected to the user account.
      * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
      */
-    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    @DenyAll
     public Optional<UserLevel> findGivenUserLevelForGivenAccount(UUID accountId, Class<? extends UserLevel> searchedUserLevel) throws ApplicationBaseException {
         TypedQuery<UserLevel> findGivenUserLevelForGivenAccount = entityManager.createNamedQuery("UserLevel.findGivenUserLevelsForGivenAccount", UserLevel.class);
         findGivenUserLevelForGivenAccount.setParameter("accountId", accountId);

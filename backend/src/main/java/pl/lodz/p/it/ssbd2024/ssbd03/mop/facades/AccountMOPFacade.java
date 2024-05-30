@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -54,8 +57,8 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      * @param id ID of the Account to be retrieved.
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
-    @Transactional
     @Override
+    @DenyAll
     public Optional<Account> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
@@ -66,8 +69,8 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      * @param id ID of the Account to be retrieved.
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
-    @Transactional
     @Override
+    @DenyAll
     public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -78,7 +81,9 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      * @param login Login of the Account to be retrieved.
      * @return If Account with the given login was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
-    @Transactional
+    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.CANCEL_RESERVATION,
+            Authorities.GET_ACTIVE_RESERVATIONS, Authorities.GET_HISTORICAL_RESERVATIONS}
+    )
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);
@@ -98,8 +103,8 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      *
      * @param account Account to be modified.
      */
-    @Transactional
     @Override
+    @DenyAll
     public void edit(Account account) throws ApplicationBaseException{
         super.edit(account);
     }

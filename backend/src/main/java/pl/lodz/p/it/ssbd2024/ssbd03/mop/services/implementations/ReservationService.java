@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
@@ -29,30 +30,31 @@ import java.util.UUID;
 public class ReservationService implements ReservationServiceInterface {
 
     @Override
-    @RolesAllowed(Roles.CLIENT)
+    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
     public List<Reservation> getAllActiveReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed(Roles.CLIENT)
+    @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
     public List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed(Roles.CLIENT)
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void makeReservation(String clientLogin, UUID sectorId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.CLIENT, Roles.STAFF})
+    @RolesAllowed(Authorities.CANCEL_RESERVATION)
     public void cancelReservation(UUID reservationId) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
+    @RolesAllowed(Authorities.GET_ALL_RESERVATIONS)
     public List<Reservation> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }

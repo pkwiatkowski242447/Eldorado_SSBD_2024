@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
@@ -32,96 +32,97 @@ import java.util.UUID;
 public class ParkingService implements ParkingServiceInterface {
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed(Authorities.ADD_PARKING)
     public void createParking(String city, String zipCode, String street) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed({Authorities.ADD_SECTOR, Authorities.GET_PARKING})
     public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed(Authorities.GET_ALL_PARKING)
     public List<Account> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
+    @RolesAllowed(Authorities.GET_SECTOR)
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT, Roles.STAFF})
+    @RolesAllowed(Authorities.GET_PARKING)
     public Parking getParkingById(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed(Authorities.ACTIVATE_SECTOR)
     public void activateSector(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
     public void deactivateSector(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed(Authorities.GET_ALL_SECTORS)
     public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed(Authorities.DELETE_PARKING)
     public void removeParkingById(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.CLIENT})
+    @RolesAllowed(Authorities.ENTER_PARKING_WITH_RESERVATION)
     public AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed(Roles.STAFF)
+    @RolesAllowed(Authorities.EDIT_PARKING)
     public void editParking(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
+    @RolesAllowed(Authorities.EDIT_SECTOR)
     public void editSector(UUID id) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.STAFF})
+    @RolesAllowed(Authorities.DELETE_SECTOR)
     public void removeSectorById(UUID id) throws ApplicationBaseException{
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
-    public List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.GET_ALL_AVAILABLE_PARKING)
+    public List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
     public AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.CLIENT})
+    @RolesAllowed(Authorities.EXIT_PARKING)
     public void exitParking(UUID reservationId, String exitCode) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }

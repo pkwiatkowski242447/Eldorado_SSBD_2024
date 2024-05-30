@@ -142,7 +142,7 @@ public interface ParkingServiceInterface {
      * @return If there are available parkings returns these parkings.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Parking> getAvailableParkingsWithPagination (int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Uses parking's spot assignment algorithm to choose a parking spot for the requested entry. Then in creates

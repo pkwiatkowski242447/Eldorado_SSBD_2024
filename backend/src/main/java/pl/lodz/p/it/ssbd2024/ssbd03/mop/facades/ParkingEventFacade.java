@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -8,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -52,6 +55,9 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @param entity ParkingEvent to be persisted.
      */
     @Override
+    @RolesAllowed({Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
+            Authorities.EXIT_PARKING}
+    )
     public void create(ParkingEvent entity) throws ApplicationBaseException {
         super.create(entity);
     }
@@ -62,6 +68,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @param entity ParkingEvent to be modified.
      */
     @Override
+    @DenyAll
     public void edit(ParkingEvent entity) throws ApplicationBaseException {
         super.edit(entity);
     }
@@ -72,6 +79,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @param entity ParkingEvent to be removed from the database.
      */
     @Override
+    @DenyAll
     public void remove(ParkingEvent entity) throws ApplicationBaseException {
         super.remove(entity);
     }
@@ -83,6 +91,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return If an ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
      */
     @Override
+    @DenyAll
     public Optional<ParkingEvent> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
     }
@@ -94,6 +103,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return If a ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
      */
     @Override
+    @DenyAll
     public Optional<ParkingEvent> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -104,6 +114,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return List containing all ParkingEvents.
      */
     @Override
+    @DenyAll
     public List<ParkingEvent> findAll() throws ApplicationBaseException {
         return super.findAll();
     }
@@ -114,6 +125,7 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      * @return Number of ParkingEvents in the database.
      */
     @Override
+    @DenyAll
     public int count() throws ApplicationBaseException {
         return super.count();
     }
