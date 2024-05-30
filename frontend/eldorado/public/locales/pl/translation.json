@@ -11,6 +11,9 @@
   "general.sessionExpired": "Twoja sesja wygasła",
   "general.sessionExpired.text": "Twoja sesja wygasła. Musisz zalogować się ponownie.",
   "general.sessionExpired.text.button": "Zaloguj się ponownie",
+  "general.adminInvokedPasswordReset": "Reset hasła został zainicjowany przez administratora. Wejdź w link wysłany na Twój adres e-mail, aby kontynuować.",
+
+
 
   "account.status.suspended.exception": "Konto zostało zawieszone w związku z brakiem aktywności.",
   "account.restore.access.exception": "Konto które nie jest zawieszone nie może być przywrócone.",
