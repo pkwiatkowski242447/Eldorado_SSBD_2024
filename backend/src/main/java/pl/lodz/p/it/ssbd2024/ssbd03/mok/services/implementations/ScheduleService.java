@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.util.RunAsSystem;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.OperationType;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
@@ -117,6 +118,7 @@ public class ScheduleService implements ScheduleServiceInterface {
         this.tokenProvider = tokenProvider;
     }
 
+    @RunAsSystem
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void deleteNotActivatedAccounts() {
@@ -148,6 +150,7 @@ public class ScheduleService implements ScheduleServiceInterface {
         }
     }
 
+    @RunAsSystem
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void resendConfirmationEmail() {
@@ -189,6 +192,7 @@ public class ScheduleService implements ScheduleServiceInterface {
         }
     }
 
+    @RunAsSystem
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void unblockAccount() {

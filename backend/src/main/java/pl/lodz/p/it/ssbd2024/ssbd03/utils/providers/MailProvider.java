@@ -61,7 +61,9 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the account creation.
      * @param language        Language of the message.
      */
-    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
+    @RolesAllowed({
+            Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL
+    })
     public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
