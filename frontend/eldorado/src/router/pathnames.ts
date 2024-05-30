@@ -9,6 +9,8 @@ export const Pathnames = {
         forgotPassword: '/forgot-password/',
         resetPassword: '/reset-password/:token',
         confirmEmailChange: '/confirm-email/:token',
+        restoreAccess: '/restore-access',
+        restoreToken: '/restore-token/:token',
     },
     admin: {
         landingPage: '/',

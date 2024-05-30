@@ -14,6 +14,26 @@
   "general.sessionExpired.text": "Your session has expired. You need to log in again.",
   "general.sessionExpired.text.button": "Log in again",
 
+  "account.status.suspended.exception": "Account has been suspended due to inactivity.",
+  "account.restore.access.exception": "Account that isn't suspended cannot be restored.",
+  "loginPage.accountSuspended": "Account suspended? ",
+  "loginPage.accountSuspended.text": "Go here",
+
+  "restoreAccessPage.title": "Restore Access",
+  "restoreAccessPage.info": "Enter your email address to restore access to your account",
+  "restoreAccessPage.email": "E-mail",
+  "restoreAccessPage.submit": "Send restore link",
+  "restoreAccessPage.popUp.restoreAccessOK.title": "Success!",
+  "restoreAccessPage.popUp.restoreAccessOK.text": "We have sent you an email with a link to restore access to your account. Please check your inbox and click the link to complete the process.",
+
+  "restoreTokenPage.title": "Restore Access",
+  "restoreTokenPage.info": "Confirm the restoration of access to your account by pressing the button below.",
+  "restoreTokenPage.button": "Restore Access",
+  "restoreTokenPage.popUp": "Are you sure you want to restore access to your account?",
+  "restoreTokenPage.popUpOK.restoreOK.title": "Success!",
+  "restoreTokenPage.popUpOK.restoreOK.text": "Access to your account has been successfully restored. You can log in now.",
+  "restoreTokenPage.popUpOK.restoreOK.button": "Log In",
+
   "userHistory.title": "User History",
   "userHistory.version": "Version",
   "userHistory.id": "User ID",

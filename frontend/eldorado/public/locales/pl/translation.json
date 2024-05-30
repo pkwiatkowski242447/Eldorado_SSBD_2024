@@ -12,6 +12,26 @@
   "general.sessionExpired.text": "Twoja sesja wygasła. Musisz zalogować się ponownie.",
   "general.sessionExpired.text.button": "Zaloguj się ponownie",
 
+  "account.status.suspended.exception": "Konto zostało zawieszone w związku z brakiem aktywności.",
+  "account.restore.access.exception": "Konto które nie jest zawieszone nie może być przywrócone.",
+  "loginPage.accountSuspended": "Konto zawieszone? ",
+  "loginPage.accountSuspended.text": " Przejdź tutaj",
+
+  "restoreAccessPage.title": "Przywróć dostęp",
+  "restoreAccessPage.info": "Wprowadź swój adres e-mail, aby przywrócić dostęp do konta",
+  "restoreAccessPage.email": "E-mail",
+  "restoreAccessPage.submit": "Wyślij link do przywrócenia",
+  "restoreAccessPage.popUp.restoreAccessOK.title": "Sukces!",
+  "restoreAccessPage.popUp.restoreAccessOK.text": "Wysłaliśmy do Ciebie e-mail z linkiem do przywrócenia dostępu do konta. Sprawdź swoją skrzynkę odbiorczą i kliknij link, aby dokończyć proces.",
+
+  "restoreTokenPage.title": "Przywróć dostęp",
+  "restoreTokenPage.info": "Potwierdź przywrócenie dostępu do swojego konta, naciskając przycisk poniżej.",
+  "restoreTokenPage.button": "Przywróć dostęp",
+  "restoreTokenPage.popUp": "Czy na pewno chcesz przywrócić dostęp do swojego konta?",
+  "restoreTokenPage.popUpOK.restoreOK.title": "Sukces!",
+  "restoreTokenPage.popUpOK.restoreOK.text": "Dostęp do Twojego konta został pomyślnie przywrócony. Możesz się teraz zalogować.",
+  "restoreTokenPage.popUpOK.restoreOK.button": "Zaloguj się",
+
   "userHistory.title": "Historia użytkownika",
   "userHistory.id": "ID użytkownika",
   "userHistory.version": "Wersja",

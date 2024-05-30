@@ -14,6 +14,8 @@ import ConfirmEmailChangePage from "@/pages/ConfirmEmailChangePage.tsx";
 import UserAccountSettings from "@/pages/UserAccountSettings.tsx";
 import TwoFactorAuthPage from "@/pages/TwoFactorAuthPage.tsx";
 import AdminCreateUserPage from "@/pages/AdminCreateUserPage.tsx";
+import RestoreAccessPage from "@/pages/RestoreAccessPage.tsx";
+import RestoreTokenPage from "@/pages/RestoreTokenPage.tsx";
 
 
 export const PublicRoutes: RouteType[] = [
@@ -53,6 +55,15 @@ export const PublicRoutes: RouteType[] = [
         path: Pathnames.public.confirmEmailChange,
         Component: ConfirmEmailChangePage
     },
+    {
+        path: Pathnames.public.restoreAccess,
+        Component: RestoreAccessPage
+    },
+    {
+        path: Pathnames.public.restoreToken,
+        Component: RestoreTokenPage
+    },
+
 ]
 
 export const AdminRoutes: RouteType[] = [
