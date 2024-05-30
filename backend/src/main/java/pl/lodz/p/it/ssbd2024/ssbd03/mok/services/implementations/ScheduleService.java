@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations;
 
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.util.RunAsSystem;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.OperationType;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
@@ -121,6 +123,7 @@ public class ScheduleService implements ScheduleServiceInterface {
     @RunAsSystem
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
     public void deleteNotActivatedAccounts() {
         log.info("Method: deleteNotActivatedAccount(), used for removing not activated accounts, was invoked.");
 
@@ -153,6 +156,7 @@ public class ScheduleService implements ScheduleServiceInterface {
     @RunAsSystem
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    @RolesAllowed({Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
     public void resendConfirmationEmail() {
         log.info("Method: resendConfirmationEmail(), used for sending account activation message, was invoked.");
 
@@ -195,6 +199,7 @@ public class ScheduleService implements ScheduleServiceInterface {
     @RunAsSystem
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
     public void unblockAccount() {
         log.info("Method: unblockAccount(), used for unblocking accounts blocked by incorrect login attempts, was invoked.");
 
@@ -238,6 +243,7 @@ public class ScheduleService implements ScheduleServiceInterface {
 
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    @RolesAllowed({Authorities.BLOCK_ACCOUNT})
     public void suspendAccountWithoutAuthenticationForSpecifiedTime() {
         log.info("Method: suspendAccountWithoutAuthenticationForSpecifiedTime() was invoked.");
 
