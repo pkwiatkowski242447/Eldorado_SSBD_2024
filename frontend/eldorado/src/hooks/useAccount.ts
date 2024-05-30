@@ -181,10 +181,8 @@ export const useAccount = () => {
                 localStorage.setItem('account', JSON.stringify(user));
             }
         } catch (e) {
-            if (account !== null) {
-                //@ts-expect-error idk
-                handleApiError(e);
-            }
+            //@ts-expect-error idk
+            handleApiError(e)
         }
     };
 

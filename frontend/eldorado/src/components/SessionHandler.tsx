@@ -28,7 +28,8 @@ const SessionHandler = () => {
                 if (currentTime > expiryTime) {
                     setExpiredDialogOpen(true);
                 } else {
-                    const timeoutDuration = (expiryTime - currentTime - 60) * 1000; //1 minute before expiration
+                    const timeoutDuration = (expiryTime - currentTime - 120) * 1000; // 2 minutes before expiration
+                    console.log(timeoutDuration)
                     const timeoutId = setTimeout(() => {
                         setRefreshDialogOpen(true);
                     }, timeoutDuration);

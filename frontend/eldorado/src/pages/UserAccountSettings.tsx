@@ -44,6 +44,7 @@ function UserAccountSettings() {
     const [formValues, setFormValues] = useState(null);
     const [formType, setFormType] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingButton, setIsLoadingButton] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const emailSchema = z.object({
@@ -150,84 +151,58 @@ function UserAccountSettings() {
         setAlertDialogOpen(true);
     };
 
-    //TODO you have to manually refresh the page to see the changes
-    //TODO gray out the admin button for the admin that is editing his own account
     const confirmChangeUserLevel = () => {
         if (levelToChange && managedUser) {
+            setIsLoadingButton(true)
             if (managedUser?.userLevelsDto.some(userLevel => userLevel.roleName === levelToChange.toUpperCase())) {
+                let apiCall;
                 switch (levelToChange) {
                     case AccountTypeEnum.ADMIN:
-                        api.removeLevelAdmin(managedUser.id).then(() => {
-                            setAlertDialogOpen(false);
-                            toast({
-                                title: t("accountSettings.popUp.changeUserDataOK.title"),
-                                description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
-                            })
-                        }).catch((error) => {
-                            handleApiError(error);
-                        });
+                        apiCall = api.removeLevelAdmin(managedUser.id);
                         break;
                     case AccountTypeEnum.STAFF:
-                        api.removeLevelStaff(managedUser.id).then(() => {
-                            setAlertDialogOpen(false);
-                            toast({
-                                title: t("accountSettings.popUp.changeUserDataOK.title"),
-                                description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
-                            })
-                        }).catch((error) => {
-                            handleApiError(error);
-                        });
+                        apiCall = api.removeLevelStaff(managedUser.id);
                         break;
                     case AccountTypeEnum.CLIENT:
-                        api.removeLevelClient(managedUser.id).then(() => {
-                            setAlertDialogOpen(false);
-                            toast({
-                                title: t("accountSettings.popUp.changeUserDataOK.title"),
-                                description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
-                            })
-                        }).catch((error) => {
-                            handleApiError(error);
-                        });
+                        apiCall = api.removeLevelClient(managedUser.id);
                         break;
                 }
+                apiCall.then(() => {
+                    setAlertDialogOpen(false);
+                    toast({
+                        title: t("accountSettings.popUp.changeUserDataOK.title"),
+                        description: t("accountSettings.popUp.changeUserDataOK.userLevelRemoved")
+                    })
+                }).catch((error) => {
+                    handleApiError(error);
+                }).finally(() => {
+                    setIsLoadingButton(false);
+                });
             } else {
+                let apiCall;
                 switch (levelToChange) {
                     case AccountTypeEnum.ADMIN:
-                        api.addLevelAdmin(managedUser.id).then(() => {
-                            setAlertDialogOpen(false);
-                            toast({
-                                title: t("accountSettings.popUp.changeUserDataOK.title"),
-                                description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
-                            })
-                        }).catch((error) => {
-                            handleApiError(error);
-                        });
+                        apiCall = api.addLevelAdmin(managedUser.id);
                         break;
                     case AccountTypeEnum.STAFF:
-                        api.addLevelStaff(managedUser.id).then(() => {
-                            setAlertDialogOpen(false);
-                            toast({
-                                title: t("accountSettings.popUp.changeUserDataOK.title"),
-                                description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
-                            })
-                        }).catch((error) => {
-                            handleApiError(error);
-                        });
+                        apiCall = api.addLevelStaff(managedUser.id);
                         break;
                     case AccountTypeEnum.CLIENT:
-                        api.addLevelClient(managedUser.id).then(() => {
-                            setAlertDialogOpen(false);
-                            toast({
-                                title: t("accountSettings.popUp.changeUserDataOK.title"),
-                                description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
-                            })
-                        }).catch((error) => {
-                            handleApiError(error);
-                        });
+                        apiCall = api.addLevelClient(managedUser.id);
                         break;
                 }
-                setAlertDialogOpen(false);
-                setLevelToChange(null);
+                apiCall.then(() => {
+                    setAlertDialogOpen(false);
+                    toast({
+                        title: t("accountSettings.popUp.changeUserDataOK.title"),
+                        description: t("accountSettings.popUp.changeUserDataOK.userLevelAdded")
+                    })
+                }).catch((error) => {
+                    handleApiError(error);
+                }).finally(() => {
+                    setIsLoadingButton(false);
+                    setLevelToChange(null);
+                });
             }
         }
     }
@@ -408,7 +383,7 @@ function UserAccountSettings() {
                                                     isAlertDialogOpen={isAlertDialogOpen}
                                                     setAlertDialogOpen={setAlertDialogOpen}
                                                     confirmChangeUserLevel={confirmChangeUserLevel}
-                                                    levelToChange={levelToChange}/>
+                                                    levelToChange={levelToChange} isLoading={isLoadingButton}/>
                                 )}
                             </div>
                         )}
