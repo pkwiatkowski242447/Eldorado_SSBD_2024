@@ -46,7 +46,7 @@ function EmailForm({formEmail, onSubmitEmail, isLoading, account, isAlertDialogO
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                                             </>
                                         ) : (
-                                            t("accountSettings.authentication.email.change")
+                                            t("accountSettings.users.table.settings.account.authentication.email.change")
                                         )}
                                     </Button>
                                 </div>

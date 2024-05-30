@@ -11,6 +11,8 @@
   "general.sessionExpired": "Twoja sesja wygasła",
   "general.sessionExpired.text": "Twoja sesja wygasła. Musisz zalogować się ponownie.",
   "general.sessionExpired.text.button": "Zaloguj się ponownie",
+  "general.adminInvokedPasswordReset": "Reset hasła został zainicjowany przez administratora. Wejdź w link wysłany na Twój adres e-mail, aby kontynuować.",
+
 
   "account.status.suspended.exception": "Konto zostało zawieszone w związku z brakiem aktywności.",
   "account.restore.access.exception": "Konto które nie jest zawieszone nie może być przywrócone.",
@@ -122,6 +124,7 @@
 
   "siteHeader.hello": "Witaj, ",
   "siteHeader.users": "Użytkownicy",
+  "siteHeader.addUser": "Utwórz Użytkownika",
   "siteHeader.parkings": "Parkingi",
   "siteHeader.logout": "Wyloguj się",
   "siteHeader.myAccount": "Moje konto",
@@ -161,6 +164,7 @@
   "accountSettings.popUp.changePasswordOK.title": "Sukces!",
   "accountSettings.popUp.changePasswordOK.text": "Twoje hasło zostało pomyślnie zmienione.",
   "accountSettings.details": "Szczegóły",
+  "accountSettings.popUp.changeOtherUsersPasswordOK.text": "Mail do zmiany hasła został wysłany na adres E-Mail przypisany do konta użytkownika.",
 
   "accountSettings.accountInfo": "Informacje o koncie",
   "accountSettings.name": "Imię",
@@ -197,10 +201,10 @@
   "accountSettings.twoFactorAuth": "Uwierzytelnianie dwuskładnikowe",
   "accountSettings.popUp.resendEmailConfirmationOK.title": "Sukces!",
   "accountSettings.popUp.resendEmailConfirmationOK.text": "E-mail z linkiem do zmiany adresu E-Mail został wysłany ponownie.",
-  "accountSettings.popUp.resendEmailConfirmationOK.button": "Wyślij ponownie mail potwierdzający.",
+  "accountSettings.popUp.resendEmailConfirmationOK.button": "Wyślij ponownie mail potwierdzający",
 
 
-  "accountSettings.users.table.settings.account.title": "Modyfikuj konto - ",
+  "accountSettings.users.table.settings.account.title": "Ustawienia konta - ",
   "accountSettings.users.table.settings.account.userLevels": "Poziomy użytkownika",
   "accountSettings.users.table.settings.account.authentication": "Uwierzytelnianie",
   "accountSettings.users.table.settings.account.personalInfo": "Dane osobowe",
@@ -209,7 +213,7 @@
   "accountSettings.users.table.settings.account.userLevels.remove": "Usuń",
   "accountSettings.users.table.settings.account.userLevels.remove2": "usunąć",
   "accountSettings.users.table.settings.account.authentication.email": "E-mail",
-  "accountSettings.users.table.settings.account.authentication.email.change": "Zmień swój e-mail",
+  "accountSettings.users.table.settings.account.authentication.email.change": "Zmień adres e-mail",
   "accountSettings.users.table.settings.account.personalInfo.firstName": "Imię",
   "accountSettings.users.table.settings.account.personalInfo.lastName": "Nazwisko",
   "accountSettings.users.table.settings.account.personalInfo.phoneNumber": "Numer telefonu",

@@ -210,6 +210,9 @@ export const api = {
 
     restoreAccessToken: (token: string) => {
         return apiWithConfig.post(`/accounts/restore-token/${token}`)
-    }
+    },
 
+    getPasswordAdminResetStatus:()=>{
+        return apiWithConfig.get('/accounts/admin-password-reset-status')
+    }
 }

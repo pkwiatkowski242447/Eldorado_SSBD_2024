@@ -8,12 +8,13 @@ import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {localDateTimeToDate, UserType} from "@/types/Users.ts";
+import {useTranslation} from "react-i18next";
 
 export const useAccount = () => {
 
     const {account, setAccount} = useAccountState()
     const isAuthenticated = !!account
-
+    const {t} = useTranslation();
     const navigate = useNavigate()
     const {toast} = useToast()
 
@@ -54,8 +55,18 @@ export const useAccount = () => {
                 const refreshToken = response.data.refreshToken;
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
-                await getCurrentAccount()
-                navigate(Pathnames.public.home)
+
+                const resetStatusResponse = await api.getPasswordAdminResetStatus();
+                if (resetStatusResponse.data) {
+                    logOut()
+                    toast({
+                        variant: "destructive",
+                        description: t("general.adminInvokedPasswordReset")
+                    })
+                } else {
+                    await getCurrentAccount()
+                    navigate(Pathnames.public.home)
+                }
             } else if (response.status === 204) {
                 navigate(`/login/2fa/${login}`);
             }
@@ -75,8 +86,18 @@ export const useAccount = () => {
                 const refreshToken = response.data.refreshToken;
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
-                await getCurrentAccount()
-                navigate(Pathnames.public.home)
+
+                const resetStatusResponse = await api.getPasswordAdminResetStatus();
+                if (resetStatusResponse.data) {
+                    logOut()
+                    toast({
+                        variant: "destructive",
+                        description: "Reset password operation was requested by an administrator. Please click the link in the email you received to continue."
+                    })
+                } else {
+                    await getCurrentAccount()
+                    navigate(Pathnames.public.home)
+                }
             }
         } catch (e) {
             toast({
@@ -155,15 +176,13 @@ export const useAccount = () => {
                     lastSuccessfulLoginTime: lastSuccessfulLoginTime,
                     lastUnsuccessfulLoginTime: lastUnsuccessfulLoginTime
                 };
-                
+
                 setAccount(user);
                 localStorage.setItem('account', JSON.stringify(user));
             }
         } catch (e) {
-            if (account !== null) {
-                //@ts-expect-error idk
-                handleApiError(e);
-            }
+            //@ts-expect-error idk
+            handleApiError(e)
         }
     };
 
