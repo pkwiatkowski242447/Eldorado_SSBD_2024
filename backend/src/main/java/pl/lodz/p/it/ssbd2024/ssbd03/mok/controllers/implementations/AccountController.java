@@ -188,8 +188,22 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    public ResponseEntity<?> getAccountsMatchingPhraseInNameOrLastname(String phrase, String orderBy, boolean order, int pageNumber, int pageSize) throws ApplicationBaseException {
-        return null;
+    @RolesAllowed({Authorities.GET_ALL_USER_ACCOUNTS})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
+    public ResponseEntity<?> getAccountsMatchingPhraseInNameOrLastname(@RequestParam(name = "phrase", defaultValue = "") String phrase,
+                                                                       @RequestParam(name = "orderBy", defaultValue = "login") String orderBy,
+                                                                       @RequestParam(name = "order", defaultValue = "true") boolean order,
+                                                                       @RequestParam(name = "pageNumber") int pageNumber,
+                                                                       @RequestParam(name = "pageSize") int pageSize)
+            throws ApplicationBaseException {
+        List<AccountListDTO> accountList = accountService.getAccountsMatchingPhraseInNameOrLastname(
+                        phrase, orderBy, order, pageNumber, pageSize)
+                .stream()
+                .map(AccountListMapper::toAccountListDTO)
+                .toList();
+        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(accountList);
     }
 
     @Override

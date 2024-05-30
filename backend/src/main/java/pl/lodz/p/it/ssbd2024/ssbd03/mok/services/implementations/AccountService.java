@@ -667,12 +667,17 @@ public class AccountService implements AccountServiceInterface {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
-        UserLevel clientUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Client).findFirst().orElse(null);
+        UserLevel clientUserLevel = account.getUserLevels()
+                .stream()
+                .filter(userLevel -> userLevel instanceof Client)
+                .findFirst()
+                .orElse(null);
 
-        userLevelFacade.remove(clientUserLevel);
 
         account.removeUserLevel(clientUserLevel);
         accountFacade.edit(account);
+
+        userLevelFacade.remove(clientUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),
@@ -695,12 +700,17 @@ public class AccountService implements AccountServiceInterface {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
-        UserLevel staffUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Staff).findFirst().orElse(null);
+        UserLevel staffUserLevel = account.getUserLevels()
+                .stream()
+                .filter(userLevel -> userLevel instanceof Staff)
+                .findFirst()
+                .orElse(null);
 
-        userLevelFacade.remove(staffUserLevel);
 
         account.removeUserLevel(staffUserLevel);
         accountFacade.edit(account);
+
+        userLevelFacade.remove(staffUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),
@@ -731,12 +741,17 @@ public class AccountService implements AccountServiceInterface {
             throw new AccountUserLevelException(I18n.ONE_USER_LEVEL);
         }
 
-        UserLevel adminUserLevel = account.getUserLevels().stream().filter(userLevel -> userLevel instanceof Admin).findFirst().orElse(null);
+        UserLevel adminUserLevel = account.getUserLevels()
+                .stream()
+                .filter(userLevel -> userLevel instanceof Admin)
+                .findFirst()
+                .orElse(null);
 
-        userLevelFacade.remove(adminUserLevel);
 
         account.removeUserLevel(adminUserLevel);
         accountFacade.edit(account);
+
+        userLevelFacade.remove(adminUserLevel);
 
         mailProvider.sendEmailNotificationAboutRevokedUserLevel(account.getName(),
                 account.getLastname(),

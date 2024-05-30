@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
 import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -62,7 +63,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
     @Override
-    @DenyAll
+    @PermitAll
     @Transactional(propagation = Propagation.REQUIRED)
     public Optional<Account> find(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
