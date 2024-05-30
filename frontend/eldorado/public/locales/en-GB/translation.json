@@ -14,7 +14,9 @@
   "general.sessionExpired.text": "Your session has expired. You need to log in again.",
   "general.sessionExpired.text.button": "Log in again",
   "general.adminInvokedPasswordReset": "Reset password operation was requested by an administrator. Please click the link in the email you received to continue.",
-
+  "general.anonymous": "Anonymous",
+  "general.asc": "(Ascending)",
+  "general.desc": "(Descending)",
 
   "account.status.suspended.exception": "Account has been suspended due to inactivity.",
   "account.restore.access.exception": "Account that isn't suspended cannot be restored.",

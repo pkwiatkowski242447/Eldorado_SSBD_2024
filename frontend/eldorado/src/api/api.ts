@@ -152,6 +152,10 @@ export const api = {
         return apiWithConfig.get('/accounts' + details)
     },
 
+    getAccountsMatchPhraseInAccount: (details: string) => {
+        return apiWithConfig.get('/accounts/match-phrase-in-account' + details)
+    },
+
     removeLevelClient: (id: string) => {
         return apiWithConfig.post(`/accounts/${id}/remove-level-client`)
     },
