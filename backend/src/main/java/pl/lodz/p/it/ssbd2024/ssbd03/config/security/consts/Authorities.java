@@ -104,7 +104,7 @@ public class Authorities {
 
     public static final String REFRESH_SESSION = "REFRESH_SESSION";
     public static final String RESTORE_ACCOUNT_ACCESS = "RESTORE_ACCOUNT_ACCESS";
-    public static final String GET_ADMIN_PASSWORD_RESET_STATUS = "RESTORE_ACCOUNT_ACCESS";
+    public static final String GET_ADMIN_PASSWORD_RESET_STATUS = "GET_ADMIN_PASSWORD_RESET_STATUS";
     public static final String GET_ACCOUNT_HISTORICAL_DATA = "GET_ACCOUNT_HISTORICAL_DATA";
     public static final String GET_OWN_HISTORICAL_DATA = "GET_OWN_HISTORICAL_DATA";
 }
