@@ -461,7 +461,7 @@ function UserAccountSettings() {
                             <DetailsForm account={managedUser}/>
                         )}
                         {activeForm === 'History' && (
-                            <UserHistoryPage userId={managedUser?.id} />
+                            <UserHistoryPage userId={managedUser?.id}/>
                         )}
                     </div>
                 </div>
