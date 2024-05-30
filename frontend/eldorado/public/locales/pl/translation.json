@@ -22,10 +22,19 @@
   "general.userBlocked": "Użytkownik został zablokowany.",
   "general.userUnblocked": "Użytkownik został odblokowany.",
 
-  "account.status.suspended.exception": "Konto zostało zawieszone w związku z brakiem aktywności.",
-  "account.restore.access.exception": "Konto które nie jest zawieszone nie może być przywrócone.",
   "loginPage.accountSuspended": "Konto zawieszone? ",
   "loginPage.accountSuspended.text": " Przejdź tutaj",
+
+  "breadcrumb.home": "Strona główna",
+  "breadcrumb.manageUsers": "Zarządzanie użytkownikami",
+  "breadcrumb.changeUserlevel": "Zmień poziom dostępu",
+  "breadcrumb.myAccount": "Moje konto",
+  "breadcrumb.userAccount": "Edytuj konto",
+  "breadcrumb.createUser" : "Utwórz nowe konto",
+
+  "notFound.title": "Strona nie znaleziona",
+  "notFound.description": "Strona, której szukasz, nie istnieje",
+  "notFound.home": "Przejdź do strony głównej",
 
   "restoreAccessPage.title": "Przywróć dostęp",
   "restoreAccessPage.info": "Wprowadź swój adres e-mail, aby przywrócić dostęp do konta",
@@ -71,8 +80,6 @@
   "landingPage.register": "Zarejestruj się",
 
   "adminAddUserPage.confirmUserCreation": "Czy na pewno chcesz utworzyć konto?",
-  "account.user_levels.conflict.exception": "Konflikt poziomów dostępu - użytkownik nie może posiadać jednocześnie poziomu pracownika i klienta",
-
 
   "loginPage.title": "Logowanie",
   "loginPage.info": "Wprowadź swoje dane logowania, aby kontynuować",
@@ -291,6 +298,88 @@
   "resetPasswordPage.popUp.resetPasswordOK.button": "Zaloguj się",
 
 
+
+
+  "account.constraint.violation.exception" : "Naruszenie ograniczeń konta",
+  "account.with.given.email.not.found.exception" : "Konto z podanym adresem e-mail nie znalezione",
+  "account.with.given.id.not.found.exception" : "Konto z podanym ID nie znalezione",
+  "account.status.blocked.exception" : "Konto jest zablokowane",
+  "account.status.inactive.exception" : "Konto jest nieaktywne",
+  "account.status.suspended.exception": "Konto zostało zawieszone w związku z brakiem aktywności.",
+  "account.restore.access.exception": "Konto które nie jest zawieszone nie może być przywrócone.",
+  "account.user_levels.conflict.exception": "Konflikt poziomów dostępu - użytkownik nie może posiadać jednocześnie poziomu pracownika i klienta",
+
+  "account.reset.password.same.passwords.exception" : "Nowe hasło nie może być takie samo jak bieżące",
+  "account.reset.password.incorrect.current.password" : "Nieprawidłowe bieżące hasło",
+  "account.reset.password.password.previously.used.exception" : "Nowe hasło nie może się powtarzać z żadnym z poprzednich haseł",
+
+  "account.login.already.taken.exception" : "Login jest już zajęty",
+  "account.email.already.taken.exception" : "Adres e-mail jest już zajęty",
+  "account.blocked.exception" : "Konto jest zablokowane",
+  "account.blocked.by.admin.exception" : "Konto jest zablokowane przez administratora",
+  "account.blocked.by.too.many.failed.attempts.exception" : "Konto jest zablokowane z powodu zbyt wielu nieudanych prób logowania",
+  "account.already.blocked.exception" : "Konto jest już zablokowane",
+  "account.already.unblocked.exception" : "Konto jest już odblokowane",
+
+  "token.token.value.not.found.exception" : "Wartość tokenu nie znaleziona",
+  "token.token.value.not.valid.exception" : "Wartość tokenu jest nieprawidłowa",
+  "token.data.extraction.taken.exception" : "Błąd podczas ekstrakcji danych tokenu",
+
+  "token.value.already.taken.exception" : "Wartość tokenu jest już zajęta",
+
+  "application.optimistic.lock.exception" : "Wyjątek blokady optymistycznej",
+  "application.internal.server.error.exception" : "Błąd wewnętrzny serwera",
+  "application.unauthorized.exception": "Operacja niedozwolona ze względu na brak autoryzacji. Odśwież stronę / zaloguj się ponownie.",
+  "application.access.denied.exception" : "Dostęp zabroniony",
+  "application.database.server.exception" : "Nieoczekiwany błąd bazy danych",
+  "application.path.not.found.exception" : "Ścieżka nie znaleziona",
+  "application.unsupported.operation.exception" : "Nieobsługiwana operacja",
+  "application.unsupported.role.exception" : "Nieobsługiwana rola",
+  "account.service.admin.remove.own.admin.user.level.exception" : "Nie można usunąć własnego poziomu użytkownika administratora",
+
+  "user_level.no.such.user.level.exception" : "Brak takiego poziomu użytkownika",
+  "user_level.one.user.level" : "Użytkownik nie może mieć mniej niż jeden poziom użytkownika",
+  "user_level.client.client_type.unexpected.exception" : "Nieoczekiwany typ klienta",
+  "user_level.type.duplicated.exception" : "Duplikacja poziomu użytkownika",
+
+  "account.service.invalid.login.attempt.exception" : "Nieprawidłowa próba logowania",
+  "account.service.account.not.found.exception" : "Konto nie znalezione",
+  "account.service.account.constraint.validation.exception" : "Niepowodzenie walidacji ograniczeń konta",
+  "account.service.account.same.email.exception" : "Nowy adres e-mail jest taki sam jak bieżący",
+  "account.service.account.email.collision.exception" : "Wykryto kolizję adresu e-mail",
+  "account.service.account.try_to_block_own.exception" : "Nie można zablokować własnego konta",
+  "account.service.email_from_token_null.exception" : "Adres e-mail z tokenu jest pusty",
+  "token.not.found.exception" : "Operacja nie może być wykonana bo nie została wcześniej zainicjalizowana.",
+
+  "account.controller.token.invalid.or.expired" : "Token jest nieprawidłowy lub wygasł",
+  "account.controller.uuid.invalid" : "Nieprawidłowy UUID",
+  "account.controller.uuid.invalid.format.exception" : "Format UUID jest nieprawidłowy",
+  "account.controller.missing.header.if_match.exception" : "Brak nagłówka If-Match",
+
+  "controller.data.integrity.compromised.exception" : "Naruszenie integralności danych",
+
+  "controller.data.integrity.user_level.missing.exception" : "Brak poziomu użytkownika",
+
+  "authentication.controller.account.not.active" : "Konto jest nieaktywne",
+  "authentication.controller.account.blocked" : "Konto jest zablokowane",
+  "authentication.controller.account.logout" : "Wylogowanie z konta",
+
+  "authentication.service.account.credentials.not.valid.exception" : "Nieprawidłowe dane uwierzytelniające konta",
+  "authentication.service.account.login.not.found.exception" : "Login konta nie znaleziony",
+  "authentication.service.activity.log.update.exception" : "Nie udało się zaktualizować dziennika aktywności",
+
+  "account.service.staff.account.not.created.exception" : "Nie udało się utworzyć konta personelu",
+  "account.service.admin.account.not.created.exception" : "Nie udało się utworzyć konta administratora",
+
+  "bean.validation.account.login.dto.login.blank": "Login nie może być pusty",
+  "bean.validation.account.login.dto.login.regex.not.met": "Login nie spełnia wymagań dotyczących formatu",
+  "bean.validation.account.login.dto.login.too.short": "Login jest za krótki",
+  "bean.validation.account.login.dto.login.too.long": "Login jest za długi",
+  "bean.validation.account.login.dto.password.blank": "Hasło nie może być puste",
+  "bean.validation.account.login.dto.password.regex.not.met": "Hasło nie spełnia wymagań dotyczących formatu",
+  "bean.validation.account.login.dto.password.too.short": "Hasło jest za krótkie",
+  "bean.validation.account.login.dto.password.too.long": "Hasło jest za długie",
+
   "bean.validation.account.login.blank": "Login nie może być pusty",
   "bean.validation.account.login.regex.not.met": "Format loginu nie jest prawidłowy",
   "bean.validation.account.login.too.short": "Login musi mieć co najmniej 3 znaki",
@@ -322,134 +411,6 @@
   "bean.validation.activity.log.unsuccessful.login.ip.not.valid" : "Adres IP ostatniego nieudanego logowania jest nieprawidłowy",
   "bean.validation.client.user.level.client.type.null" : "Typ klienta nie może być pusty",
   "jwt.auth.filter.authorization.header.blank.or.incorrectly.formatted" : "Nagłówek autoryzacji jest pusty lub nieprawidłowo sformatowany",
-  "jwt.auth.filter.access.token.invalid" : "Token dostępu jest nieprawidłowy",
-  "account.constraint.violation.exception" : "Naruszenie ograniczeń konta",
-  "account.with.given.email.not.found.exception" : "Konto z podanym adresem e-mail nie znalezione",
-  "account.with.given.id.not.found.exception" : "Konto z podanym ID nie znalezione",
-  "account.status.blocked.exception" : "Konto jest zablokowane",
-  "account.status.inactive.exception" : "Konto jest nieaktywne",
+  "jwt.auth.filter.access.token.invalid" : "Token dostępu jest nieprawidłowy"
 
-  "account.reset.password.same.passwords.exception" : "Nowe hasło nie może być takie samo jak bieżące",
-  "account.reset.password.incorrect.current.password" : "Nieprawidłowe bieżące hasło",
-
-  "account.login.already.taken.exception" : "Login jest już zajęty",
-  "account.email.already.taken.exception" : "Adres e-mail jest już zajęty",
-  "account.blocked.exception" : "Konto jest zablokowane",
-  "account.blocked.by.admin.exception" : "Konto jest zablokowane przez administratora",
-  "account.blocked.by.too.many.failed.attempts.exception" : "Konto jest zablokowane z powodu zbyt wielu nieudanych prób logowania",
-  "account.already.blocked.exception" : "Konto jest już zablokowane",
-  "account.already.unblocked.exception" : "Konto jest już odblokowane",
-
-  "token.token.value.not.found.exception" : "Wartość tokenu nie znaleziona",
-  "token.token.value.not.valid.exception" : "Wartość tokenu jest nieprawidłowa",
-  "token.data.extraction.taken.exception" : "Błąd podczas ekstrakcji danych tokenu",
-
-  "token.value.already.taken.exception" : "Wartość tokenu jest już zajęta",
-
-  "application.optimistic.lock.exception" : "Wyjątek blokady optymistycznej",
-  "application.internal.server.error.exception" : "Błąd wewnętrzny serwera",
-  "application.access.denied.exception" : "Dostęp zabroniony",
-  "application.database.server.exception" : "Nieoczekiwany błąd bazy danych",
-  "application.path.not.found.exception" : "Ścieżka nie znaleziona",
-
-  "authentication.service.account.credentials.not.valid.exception" : "Nieprawidłowe dane uwierzytelniające konta",
-  "authentication.service.account.login.not.found.exception" : "Login konta nie znaleziony",
-  "authentication.service.activity.log.update.exception" : "Nie udało się zaktualizować dziennika aktywności",
-
-  "account.service.staff.account.not.created.exception" : "Nie udało się utworzyć konta personelu",
-  "account.service.admin.account.not.created.exception" : "Nie udało się utworzyć konta administratora",
-  "account.service.admin.remove.own.admin.user.level.exception" : "Nie można usunąć własnego poziomu użytkownika administratora",
-  "user_level.no.such.user.level.exception" : "Brak takiego poziomu użytkownika",
-  "user_level.one.user.level" : "Użytkownik nie może mieć mniej niż jeden poziom użytkownika",
-  "user_level.client.client_type.unexpected.exception" : "Nieoczekiwany typ klienta",
-  "user_level.type.duplicated.exception" : "Duplikacja poziomu użytkownika",
-
-  "authentication.controller.account.not.active" : "Konto jest nieaktywne",
-  "authentication.controller.account.blocked" : "Konto jest zablokowane",
-  "authentication.controller.account.logout" : "Wylogowanie z konta",
-
-  "account.service.invalid.login.attempt.exception" : "Nieprawidłowa próba logowania",
-  "account.service.account.not.found.exception" : "Konto nie znalezione",
-  "account.service.account.constraint.validation.exception" : "Niepowodzenie walidacji ograniczeń konta",
-  "account.service.account.same.email.exception" : "Nowy adres e-mail jest taki sam jak bieżący",
-  "account.service.account.email.collision.exception" : "Wykryto kolizję adresu e-mail",
-  "account.service.account.try_to_block_own.exception" : "Nie można zablokować własnego konta",
-  "account.service.email_from_token_null.exception" : "Adres e-mail z tokenu jest pusty",
-  "token.not.found.exception" : "Operacja nie może być wykonana bo nie została wcześniej zainicjalizowana.",
-
-  "account.controller.token.invalid.or.expired" : "Token jest nieprawidłowy lub wygasł",
-  "account.controller.uuid.invalid" : "Nieprawidłowy UUID",
-  "account.controller.uuid.invalid.format.exception" : "Format UUID jest nieprawidłowy",
-  "account.controller.missing.header.if_match.exception" : "Brak nagłówka If-Match",
-
-  "controller.data.integrity.compromised.exception" : "Naruszenie integralności danych",
-
-  "controller.data.integrity.user_level.missing.exception" : "Brak poziomu użytkownika",
-
-  "mail.confirm.register.greeting.message" : "Witamy w naszej usłudze!",
-  "mail.confirm.register.message.subject" : "Potwierdź rejestrację",
-  "mail.confirm.register.result_message" : "Dziękujemy za rejestrację. Proszę potwierdź swój adres e-mail.",
-  "mail.confirm.register.action_description" : "Kliknij link poniżej, aby potwierdzić rejestrację.",
-  "mail.confirm.register.note_title" : "Uwaga",
-
-  "mail.login.auth.code.greeting.message" : "Witaj!",
-  "mail.login.auth.code.message.subject" : "Twój kod uwierzytelniający",
-  "mail.login.auth.code.result_message" : "Oto Twój kod uwierzytelniający.",
-  "mail.login.auth.code.action_description" : "Wprowadź kod, aby się zalogować.",
-  "mail.login.auth.code.note_title" : "Uwaga",
-
-  "mail.confirm.account.activation.greeting.message" : "Gratulacje!",
-  "mail.confirm.account.activation.message.subject" : "Aktywuj swoje konto",
-  "mail.confirm.account.activation.result_message" : "Twoje konto zostało utworzone. Proszę aktywować je.",
-  "mail.confirm.account.activation.action_description" : "Kliknij link poniżej, aby aktywować swoje konto.",
-  "mail.confirm.account.activation.note_title" : "Uwaga",
-
-  "mail.confirm.email.greeting.message" : "Witaj!",
-  "mail.confirm.email.message.subject" : "Potwierdź swój adres e-mail",
-  "mail.confirm.email.result_message" : "Proszę potwierdź swój adres e-mail.",
-  "mail.confirm.email.action_description" : "Kliknij link poniżej, aby potwierdzić swój adres e-mail.",
-  "mail.confirm.email.note_title" : "Uwaga",
-  "account.controller.account.not.found" : "Konto nie znalezione",
-
-  "mail.block.account.greeting.message" : "Ważne powiadomienie",
-  "mail.block.account.message.subject" : "Twoje konto zostało zablokowane",
-  "mail.block.account.result_message_auto" : "Twoje konto zostało automatycznie zablokowane.",
-  "mail.block.account.result_message_admin" : "Twoje konto zostało zablokowane przez administratora.",
-  "mail.block.account.action_description_auto" : "Proszę skontaktować się z pomocą techniczną.",
-  "mail.block.account.action_description_admin" : "Proszę skontaktować się z pomocą techniczną.",
-  "mail.block.account.note_title" : "Uwaga",
-
-  "mail.unblock.account.greeting.message" : "Dobre wiadomości!",
-  "mail.unblock.account.message.subject" : "Twoje konto zostało odblokowane",
-  "mail.unblock.account.result_message" : "Twoje konto zostało odblokowane.",
-  "mail.unblock.account.action_description" : "Możesz teraz się zalogować.",
-  "mail.unblock.account.note_title" : "Uwaga",
-
-  "mail.reset.password.greeting.message" : "Prośba o zresetowanie hasła",
-  "mail.reset.password.message.subject" : "Zresetuj swoje hasło",
-  "mail.reset.password.result_message" : "Kliknij link poniżej, aby zresetować swoje hasło.",
-  "mail.reset.password.action_description" : "Zresetuj swoje hasło",
-  "mail.reset.password.note_title" : "Uwaga",
-
-  "mail.auto.generate.message.note" : "To jest automatycznie wygenerowana wiadomość. Proszę nie odpowiadać.",
-
-  "bean.validation.account.login.dto.login.blank": "Login nie może być pusty",
-  "bean.validation.account.login.dto.login.regex.not.met": "Login nie spełnia wymagań dotyczących formatu",
-  "bean.validation.account.login.dto.login.too.short": "Login jest za krótki",
-  "bean.validation.account.login.dto.login.too.long": "Login jest za długi",
-  "bean.validation.account.login.dto.password.blank": "Hasło nie może być puste",
-  "bean.validation.account.login.dto.password.regex.not.met": "Hasło nie spełnia wymagań dotyczących formatu",
-  "bean.validation.account.login.dto.password.too.short": "Hasło jest za krótkie",
-  "bean.validation.account.login.dto.password.too.long": "Hasło jest za długie",
-
-  "breadcrumb.home": "Strona główna",
-  "breadcrumb.manageUsers": "Zarządzanie użytkownikami",
-  "breadcrumb.changeUserlevel": "Zmień poziom dostępu",
-  "breadcrumb.myAccount": "Moje konto",
-  "breadcrumb.userAccount": "Edytuj konto",
-  "breadcrumb.createUser" : "Utwórz nowe konto",
-
-  "notFound.title": "Strona nie znaleziona",
-  "notFound.description": "Strona, której szukasz, nie istnieje",
-  "notFound.home": "Przejdź do strony głównej"
 }
