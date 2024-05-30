@@ -93,7 +93,7 @@ export const useAccount = () => {
                     await logOut()
                     toast({
                         variant: "destructive",
-                        description: "Reset password operation was requested by an administrator. Please click the link in the email you received to continue."
+                        description: t("general.adminInvokedPasswordReset")
                     })
                 } else {
                     await getCurrentAccount()
@@ -101,10 +101,8 @@ export const useAccount = () => {
                 }
             }
         } catch (e) {
-            toast({
-                variant: "destructive",
-                description: "Something went wrong. Please try again later.",
-            })
+            // @ts-expect-error idk
+            handleApiError(e);
             if (isAuthenticated) await logOut();
         } finally { /* empty */
         }
