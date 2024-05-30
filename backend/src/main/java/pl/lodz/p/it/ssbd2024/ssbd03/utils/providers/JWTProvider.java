@@ -7,11 +7,14 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenDataExtractionException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
@@ -53,6 +56,7 @@ public class JWTProvider {
      * @param account Account used to create the payload.
      * @return Returns new JSON Web Token.
      */
+    @RolesAllowed({Authorities.LOGIN, Authorities.REFRESH_SESSION})
     public String generateJWTToken(Account account) {
         List<String> listOfRoles = new LinkedList<>();
         account.getUserLevels().forEach(userLevel -> listOfRoles.add("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase()));
@@ -75,6 +79,7 @@ public class JWTProvider {
      * @param chronoUnit Unit of time, that will be used to determine how long should the token live.
      * @return Returns a signed Json Web Token.
      */
+    @RolesAllowed({Authorities.REFRESH_SESSION, Authorities.RESET_PASSWORD})
     public String generateActionToken(Account account, int tokenTTL, ChronoUnit chronoUnit) {
         return JWT.create()
                 .withSubject(account.getLogin())
@@ -92,6 +97,7 @@ public class JWTProvider {
      * @param tokenTTL Token's time to live in hours.
      * @return Returns a signed Json Web Token.
      */
+    @RolesAllowed({Authorities.CHANGE_OWN_MAIL, Authorities.CHANGE_USER_MAIL})
     public String generateEmailToken(Account account, String email, int tokenTTL) {
         return JWT.create()
                 .withSubject(account.getLogin())
@@ -109,6 +115,7 @@ public class JWTProvider {
      * @param jwtToken Token from which the AccountID will be extracted.
      * @return Returns AccountID from the Token.
      */
+    @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE})
     public UUID extractAccountId(String jwtToken) throws TokenDataExtractionException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
@@ -125,6 +132,7 @@ public class JWTProvider {
      * @param jwtToken Token from which the username will be extracted.
      * @return Returns username from the Token.
      */
+    @DenyAll
     public String extractUsername(String jwtToken) throws TokenDataExtractionException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
@@ -141,6 +149,7 @@ public class JWTProvider {
      * @param jwtToken Token from which the email will be extracted.
      * @return String containing new email.
      */
+    @RolesAllowed({Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
     public String extractEmail(String jwtToken) throws TokenDataExtractionException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
@@ -158,6 +167,9 @@ public class JWTProvider {
      * @param account  Account for which the token was issued.
      * @return Returns true if token is valid, otherwise returns false.
      */
+    @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION,
+            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.REFRESH_SESSION})
     public boolean isTokenValid(String jwtToken, Account account) {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey()))
@@ -179,6 +191,7 @@ public class JWTProvider {
      * (default: 5 minutes), containing code used for second step in two factor
      * authentication.
      */
+    @RolesAllowed(Authorities.LOGIN)
     public String generateMultiFactorAuthToken(String codeValue) {
         return JWT.create()
                 .withClaim(JWTConsts.CODE_VALUE, codeValue)
@@ -188,6 +201,7 @@ public class JWTProvider {
                 .sign(Algorithm.HMAC256(this.getSignInKey()));
     }
 
+    @RolesAllowed(Authorities.LOGIN)
     public String extractHashedCodeValueFromToken(String token) throws TokenDataExtractionException, TokenNotValidException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
@@ -200,6 +214,7 @@ public class JWTProvider {
         }
     }
 
+    @RolesAllowed(Authorities.LOGIN)
     public boolean isMultiFactorAuthTokenValid(String multiFactorAuthToken) {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey()))
@@ -230,6 +245,7 @@ public class JWTProvider {
      * @param signableDTO Object that should be signed.
      * @return Returns a signed Json Web Token.
      */
+    @RolesAllowed({Authorities.GET_OWN_ACCOUNT, Authorities.GET_USER_ACCOUNT, Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT})
     public String generateObjectSignature(SignableDTO signableDTO) {
         return JWT
                 .create()

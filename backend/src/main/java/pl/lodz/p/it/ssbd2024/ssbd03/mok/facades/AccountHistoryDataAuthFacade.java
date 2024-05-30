@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
@@ -66,7 +67,7 @@ public class AccountHistoryDataAuthFacade extends AbstractFacade<AccountHistoryD
      * @param account Entity to be persisted.
      */
     @Override
-    @PermitAll
+    @RolesAllowed({Authorities.LOGIN})
     public void create(AccountHistoryData account) throws ApplicationBaseException {
         super.create(account);
     }

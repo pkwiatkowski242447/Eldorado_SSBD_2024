@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -54,7 +55,7 @@ public class RegistrationController implements RegistrationControllerInterface {
     // Register methods - Client, Staff, Admin
 
     @Override
-    @RolesAllowed({Roles.ANONYMOUS, Roles.ADMIN})
+    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
     public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
         Account clientAccount = this.accountService.registerClient(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
@@ -67,7 +68,7 @@ public class RegistrationController implements RegistrationControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REGISTER_USER})
     public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
         Account staffAccount = this.accountService.registerStaff(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
@@ -80,7 +81,7 @@ public class RegistrationController implements RegistrationControllerInterface {
     }
 
     @Override
-    @RolesAllowed({Roles.ADMIN})
+    @RolesAllowed({Authorities.REGISTER_USER})
     public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
         Account adminAccount = this.accountService.registerAdmin(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
