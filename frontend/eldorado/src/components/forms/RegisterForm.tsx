@@ -28,10 +28,14 @@ export function RegisterForm() {
             .min(8, {message: t("registerPage.passwordTooShort")})
             .max(60, {message: t("registerPage.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
-        firstName: z.string().min(2, {message: t("registerPage.firstNameTooShort")})
-            .max(50, {message: t("registerPage.firstNameTooLong")}),
-        lastName: z.string().min(2, {message: t("registerPage.lastNameTooShort")})
-            .max(50, {message: t("registerPage.lastNameTooLong")}),
+        firstName: z.string()
+            .min(2, {message: t("accountSettings.firstNameTooShort")})
+            .max(50, {message: t("accountSettings.firstNameTooLong")})
+            .regex(/^[A-Za-z]+$/, {message: t("general.nameInvalid")}),
+        lastName: z.string()
+            .min(2, {message: t("accountSettings.lastNameTooShort")})
+            .max(50, {message: t("accountSettings.lastNameTooLong")})
+            .regex(/^[A-Za-z]+$/, {message: t("general.lastNameInvalid")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("registerPage.phoneNumberInvalid")}),
         newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
             .max(50, {message: t("accountSettings.passwordTooLong")})

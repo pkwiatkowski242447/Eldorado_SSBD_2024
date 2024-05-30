@@ -21,6 +21,8 @@
   "general.search": "Filtruj użytkowników po frazie",
   "general.userBlocked": "Użytkownik został zablokowany.",
   "general.userUnblocked": "Użytkownik został odblokowany.",
+  "general.nameInvalid": "Imię zawiera niedozwolone znaki",
+  "general.lastNameInvalid": "Nazwisko zawiera niedozwolone znaki",
 
   "loginPage.accountSuspended": "Konto zawieszone? ",
   "loginPage.accountSuspended.text": " Przejdź tutaj",

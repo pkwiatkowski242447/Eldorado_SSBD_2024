@@ -21,6 +21,8 @@
   "general.search": "Filter users by phrase",
   "general.userBlocked": "User has been blocked.",
   "general.userUnblocked": "User has been unblocked.",
+  "general.nameInvalid": "Name contains not permitted characters",
+  "general.lastNameInvalid": "Last name contains not permitted characters",
 
   "loginPage.accountSuspended": "Account suspended? ",
   "loginPage.accountSuspended.text": "Go here",
