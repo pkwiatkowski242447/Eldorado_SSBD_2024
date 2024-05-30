@@ -1,9 +1,12 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+
 /**
  * Enum class used to represent operation types and
  * their corresponding internationalization keys.
  */
+@LoggerInterceptor
 public enum OperationType {
 
     REGISTRATION("operation.type.registration"),

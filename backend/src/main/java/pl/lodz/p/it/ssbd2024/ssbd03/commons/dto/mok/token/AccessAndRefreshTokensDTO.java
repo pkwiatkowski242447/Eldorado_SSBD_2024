@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 
 /**
  * Data transfer object, used for sending JWT access token and refresh token
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@LoggerInterceptor
 public class AccessAndRefreshTokensDTO {
 
     private String accessToken;

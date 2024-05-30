@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
 /**
@@ -16,6 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@LoggerInterceptor
 public class AllocationCodeWithSectorDTO {
 
     @Schema(description = "Allocation code, generated when entering parking in a given reservation, used for ending it.", example = "76491929", requiredMode = Schema.RequiredMode.REQUIRED)

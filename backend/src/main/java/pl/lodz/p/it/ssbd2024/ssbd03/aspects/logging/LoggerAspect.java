@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,28 +22,13 @@ import java.util.List;
 public class LoggerAspect {
 
     /**
-     * Pointcut definition for every method that is inside mok package (pl.lodz.p.it.ssbd2024.ssbd03.mok)
-     * effectively executing corresponding advice method for every method called from mok package (from
-     * any facade, controller or service component).
+     * Pointcut for all methods and classes annotated with @LoggerInterceptor annotation.
+     * Used to enable logging for certain methods and entire classes.
+     * @see LoggerInterceptor
      */
-    @Pointcut(value = "within(pl.lodz.p.it.ssbd2024.ssbd03.mok..*)")
-    private void mokPointcut() {}
-
-    /**
-     * Pointcut definition for every method that is inside mop package (pl.lodz.p.it.ssbd2024.ssbd03.mop)
-     * effectively executing corresponding advice method for every method called from mop package (from
-     * any facade, controller or service component).
-     */
-    @Pointcut(value = "within(pl.lodz.p.it.ssbd2024.ssbd03.mop..*)")
-    private void mopPointcut() {}
-
-    /**
-     * Pointcut definition for every method that is inside provider package (pl.lodz.p.it.ssbd2024.ssbd03.utils.provider)
-     * effectively executing corresponding advice method for every method called from utils package (from
-     * any provider).
-     */
-    @Pointcut(value = "within(pl.lodz.p.it.ssbd2024.ssbd03.utils.providers..*)")
-    private void utilsPointcut() {}
+    @Pointcut(value = "@annotation(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor) || " +
+            "@within(pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor)")
+    private void loggingInterceptorPointcut() {}
 
     /**
      * The main responsibility of this method is to log method call information like:
@@ -65,14 +51,14 @@ public class LoggerAspect {
      * @throws Throwable If any exception is thrown during this methods execution, then it should be propagated to the
      * next aspect (depending on the type of the component) that will handle this exception.
      */
-    @Around(value = "mokPointcut() || mokPointcut() || utilsPointcut()")
+    @Around(value = "loggingInterceptorPointcut()")
     private Object methodLoggerAdvice(ProceedingJoinPoint point) throws Throwable {
         StringBuilder stringBuilder = new StringBuilder("Method: ");
-        Object result = null;
+        Object result;
         try {
             try {
                 String callerIdentity = "Anonymous";
-                List<String> callerRoleList = List.of("GUEST");
+                List<String> callerRoleList = List.of(Roles.ANONYMOUS);
 
                 if (SecurityContextHolder.getContext().getAuthentication() != null) {
                     Authentication authenticationObj = SecurityContextHolder.getContext().getAuthentication();
@@ -84,7 +70,7 @@ public class LoggerAspect {
                         .append(" | Class: ")
                         .append(point.getTarget().getClass().getSimpleName())
                         .append('\n')
-                        .append("Invoked by user authenticated as:  ")
+                        .append("Invoked by user authenticated as: ")
                         .append(callerIdentity)
                         .append(" | List of users levels: ")
                         .append(callerRoleList)
@@ -107,7 +93,9 @@ public class LoggerAspect {
             stringBuilder.append("Exception: ")
                     .append(throwable.getClass().getSimpleName())
                     .append(" was thrown during method execution, since: ")
-                    .append(throwable.getMessage());
+                    .append(throwable.getMessage())
+                    .append(". Cause: ")
+                    .append(throwable.getCause());
             log.error(stringBuilder.toString());
             throw throwable;
         }

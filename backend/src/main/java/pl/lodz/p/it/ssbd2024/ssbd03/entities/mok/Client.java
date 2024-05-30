@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.ClientMessages;
 
@@ -22,6 +23,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = DatabaseConsts.CLIENT_DATA_TABLE)
 @DiscriminatorValue(value = DatabaseConsts.CLIENT_DISCRIMINATOR)
+@LoggerInterceptor
 @NoArgsConstructor
 public class Client extends UserLevel implements Serializable {
 

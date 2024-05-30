@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.UnsupportedRoleException;
 
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
 
 @Component
 @PropertySource("classpath:properties/roles.properties")
+@LoggerInterceptor
 public class RolesMapper {
 
     @Value("${role.admin}")

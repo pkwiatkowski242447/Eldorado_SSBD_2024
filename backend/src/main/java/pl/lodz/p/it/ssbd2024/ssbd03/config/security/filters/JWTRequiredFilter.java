@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.SecurityConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -21,6 +22,7 @@ import java.io.OutputStream;
 
 @Slf4j
 @Component
+@LoggerInterceptor
 public class JWTRequiredFilter extends OncePerRequestFilter {
 
     private static final String[] WHITELIST = {

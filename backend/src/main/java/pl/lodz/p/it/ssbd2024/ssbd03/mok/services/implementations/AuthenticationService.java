@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
@@ -51,6 +52,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = AccountConstraintViolationException.class)
 public class AuthenticationService implements AuthenticationServiceInterface {

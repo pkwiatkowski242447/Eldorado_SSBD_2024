@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.AdminDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.ClientDTO;
@@ -31,6 +32,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
+@LoggerInterceptor
 public abstract class AccountSignableDTO implements SignableDTO {
     @NotBlank(message = AccountMessages.LOGIN_BLANK)
     @Pattern(regexp = AccountsConsts.LOGIN_REGEX, message = AccountMessages.LOGIN_REGEX_NOT_MET)
