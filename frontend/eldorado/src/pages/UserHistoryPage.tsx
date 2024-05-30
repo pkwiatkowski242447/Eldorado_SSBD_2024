@@ -67,9 +67,11 @@ function UserHistoryPage({userId}: { userId?: string }) {
                                     <strong>{t("userHistory.blocked")}:</strong> {history.blocked ?
                                     <FiCheck color="red"/> : <FiX color="green"/>}
                                 </p>
-                                <p><strong>{t("userHistory.twoFactorAuth")}:</strong> {history.twoFactorAuth.toString()}
+                                <p>
+                                    <strong>{t("userHistory.twoFactorAuth")}:</strong> {history.twoFactorAuth ?
+                                    <FiCheck color="green"/> : <FiX color="red"/>}
                                 </p>
-                                <p><strong>{t("userHistory.blockedTime")}:</strong> {history.blockedTime}</p>
+                                <p><strong>{t("userHistory.blockedTime")}:</strong> {history.blockedTime || 'N/A'}</p>
                                 <p>
                                     <strong>{t("userHistory.lastSuccessfulLoginTime")}:</strong> {history.lastSuccessfulLoginTime ? localDateTimeToDate(history.lastSuccessfulLoginTime) : 'N/A'}
                                 </p>
@@ -96,7 +98,7 @@ function UserHistoryPage({userId}: { userId?: string }) {
                                 <p>
                                     <strong>{t("userHistory.modificationTime")}:</strong> {localDateTimeToDate(history.modificationTime)}
                                 </p>
-                                <p><strong>{t("userHistory.modifiedBy")}:</strong> {history.modifiedBy}</p>
+                                <p><strong>{t("userHistory.modifiedBy")}:</strong> {history.modifiedBy || t("general.anonymous")}</p>
                             </CardContent>
                         </Card>
                     ))}
@@ -105,7 +107,7 @@ function UserHistoryPage({userId}: { userId?: string }) {
             <div className={"pt-5"}>
                 <Pagination>
                     <PaginationContent>
-                        <PaginationItem>
+                    <PaginationItem>
                             <PaginationPrevious
                                 onClick={() => {
                                     if (currentPage > 0) setCurrentPage(currentPage - 1)

@@ -39,9 +39,11 @@ import handleApiError from "@/components/HandleApiError.ts";
 import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 function UserManagementPage() {
-    const [currentPage, setCurrentPage] = useState(0);
+    // @ts-expect-error no time
+    const [currentPage, setCurrentPage] = useState(() => parseInt(localStorage.getItem('currentPage')) || 0);
     const [users, setUsers] = useState<ManagedUserType[]>([]);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<ManagedUserType | null>(null);
@@ -49,7 +51,13 @@ function UserManagementPage() {
     const {account} = useAccountState();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const navigator = useNavigate();
-    const [pageSize] = useState(4);
+    // @ts-expect-error no time
+    const [pageSize, setPageSize] = useState(() => parseInt(localStorage.getItem('pageSize')) || 4);
+    // @ts-expect-error no time
+    const [sortConfig, setSortConfig] = useState(() => JSON.parse(localStorage.getItem('sortConfig')) || {
+        key: 'login',
+        direction: 'asc'
+    });
 
     const handleSettingsClick = (userId: string) => {
         navigator(`/manage-users/${userId}`);
@@ -74,18 +82,54 @@ function UserManagementPage() {
     };
 
     const fetchUsers = () => {
-        api.getAccounts(`?pageNumber=${currentPage}&pageSize=${pageSize}`).then(response => {
-            if (response.status === 204) {
-                setUsers([]);
-            } else {
-                setUsers(response.data);
-            }
+        const order = sortConfig.direction === 'asc' ? 'true' : 'false';
+        const details = `?phrase=&orderBy=${sortConfig.key}&order=${order}&pageNumber=${currentPage}&pageSize=${pageSize}`;
+
+        api.getAccountsMatchPhraseInAccount(details)
+            .then(response => {
+                if (response.status === 204) {
+                    setUsers([]);
+                } else {
+                    const sortedUsers = sortUsers(response.data);
+                    setUsers(sortedUsers);
+                }
+            })
+            .catch(error => {
+                handleApiError(error);
+            });
+    };
+
+    // @ts-expect-error no time
+    const sortUsers = (users) => {
+        const {key, direction} = sortConfig;
+        return [...users].sort((a, b) => {
+            if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
+            if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+            return 0;
         });
     };
 
     useEffect(() => {
         fetchUsers();
-    }, [currentPage]);
+    }, [currentPage, pageSize, sortConfig]);
+
+    useEffect(() => {
+        localStorage.setItem('currentPage', currentPage.toString());
+        localStorage.setItem('pageSize', pageSize.toString());
+        localStorage.setItem('sortConfig', JSON.stringify(sortConfig));
+    }, [currentPage, pageSize, sortConfig]);
+
+    // @ts-expect-error no time
+    const handleSortChange = (value) => {
+        const [key, direction] = value.split('-');
+        setSortConfig({key, direction});
+    };
+
+    // @ts-expect-error no time
+    const handlePageSizeChange = (value) => {
+        setPageSize(parseInt(value));
+        setCurrentPage(0);
+    };
 
     function refresh() {
         setIsRefreshing(true);
@@ -119,28 +163,34 @@ function UserManagementPage() {
                     )}
                 </Button>
             </div>
-            <div>
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={() => {
-                                    if (currentPage > 0) setCurrentPage(currentPage - 1)
-                                }}
-                            />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink>{currentPage + 1}</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={() => {
-                                    if (users.length == 4) setCurrentPage(currentPage + 1)
-                                }}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+            <div className="flex justify-items-start p-2 mt-4">
+                <Select onValueChange={handlePageSizeChange} value={pageSize.toString()}>
+                    <SelectTrigger className={"w-auto mr-4"}>
+                        <SelectValue placeholder={t("general.itemsPerPage")}/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="2">2</SelectItem>
+                        <SelectItem value="4">4</SelectItem>
+                        <SelectItem value="6">6</SelectItem>
+                        <SelectItem value="8">8</SelectItem>
+                        <SelectItem value="10">10</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select onValueChange={handleSortChange} value={`${sortConfig.key}-${sortConfig.direction}`}>
+                    <SelectTrigger className={"w-auto"}>
+                        <SelectValue placeholder={t("general.sortBy")}/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem
+                            value="login-asc">{t("accountSettings.users.table.header.login")} {t("general.asc")}</SelectItem>
+                        <SelectItem
+                            value="login-desc">{t("accountSettings.users.table.header.login")} {t("general.desc")}</SelectItem>
+                        <SelectItem
+                            value="level-asc">{t("accountSettings.users.table.header.userLevels")} {t("general.asc")}</SelectItem>
+                        <SelectItem
+                            value="level-desc">{t("accountSettings.users.table.header.userLevels")} {t("general.desc")}</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
             <div className={"pt-5"}>
                 <Table className="p-10 flex-grow">
@@ -180,7 +230,7 @@ function UserManagementPage() {
                                 </TableCell>
                                 <TableCell>
                                     {user.userLevels.map(level => {
-                                        return <Badge variant={"secondary"}>{level} </Badge>;
+                                        return <Badge key={level} variant={"secondary"}>{level} </Badge>;
                                     })}
                                 </TableCell>
                                 <TableCell>
@@ -217,6 +267,29 @@ function UserManagementPage() {
                         </AlertDialogContent>
                     </AlertDialog>
                 </Table>
+                <div className={"pt-5"}>
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() => {
+                                        if (currentPage > 0) setCurrentPage(currentPage - 1)
+                                    }}
+                                />
+                            </PaginationItem>
+                            <PaginationItem>
+                                <PaginationLink>{currentPage + 1}</PaginationLink>
+                            </PaginationItem>
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() => {
+                                        if (users.length === pageSize) setCurrentPage(currentPage + 1)
+                                    }}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
             </div>
         </div>
     );

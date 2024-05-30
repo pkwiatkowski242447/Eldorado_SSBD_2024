@@ -8,11 +8,15 @@
   "general.sessionAboutToExpire": "Twoja sesja zaraz wygaśnie",
   "general.sessionAboutToExpire.text": "Twoja sesja zaraz wygaśnie. Naciśnij poniższy przycisk, aby ją przedłużyć.",
   "general.refreshSession": "Przedłuż sesję",
+  "general.refreshSession.popUp1": "Sukces!",
+  "general.refreshSession.popUp2": "Sesja została przedłużona pomyślnie.",
   "general.sessionExpired": "Twoja sesja wygasła",
   "general.sessionExpired.text": "Twoja sesja wygasła. Musisz zalogować się ponownie.",
   "general.sessionExpired.text.button": "Zaloguj się ponownie",
   "general.adminInvokedPasswordReset": "Reset hasła został zainicjowany przez administratora. Wejdź w link wysłany na Twój adres e-mail, aby kontynuować.",
-
+  "general.anonymous": "Użytkownik anonimowy",
+  "general.asc": "(Rosnąco)",
+  "general.desc": "(Malejąco)",
 
   "account.status.suspended.exception": "Konto zostało zawieszone w związku z brakiem aktywności.",
   "account.restore.access.exception": "Konto które nie jest zawieszone nie może być przywrócone.",
