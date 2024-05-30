@@ -95,6 +95,7 @@ public class TokenFacade extends AbstractFacade<Token> {
     @RolesAllowed({
             Authorities.CHANGE_USER_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE,
             Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL, Authorities.RESTORE_ACCOUNT_ACCESS,
+            Authorities.RESET_PASSWORD
     })
     public void remove(Token entity) throws ApplicationBaseException {
         super.remove(entity);
@@ -167,7 +168,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @RolesAllowed({
             Authorities.CHANGE_USER_PASSWORD, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE,
-            Authorities.RESTORE_ACCOUNT_ACCESS
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.RESET_PASSWORD
     })
     public Optional<Token> findByTokenValue(String tokenValue) throws ApplicationBaseException {
         try {

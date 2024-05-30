@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @LoggerInterceptor
 @TxTracked
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
 public class ScheduleService implements ScheduleServiceInterface {
 
     /**
