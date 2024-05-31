@@ -243,6 +243,7 @@ public class ScheduleService implements ScheduleServiceInterface {
         }));
     }
 
+    @RunAsSystem
     @Override
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     @RolesAllowed({Authorities.BLOCK_ACCOUNT})
