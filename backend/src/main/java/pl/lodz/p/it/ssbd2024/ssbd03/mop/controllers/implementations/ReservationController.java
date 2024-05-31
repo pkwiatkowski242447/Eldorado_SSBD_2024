@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ReservationControllerInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 /**
@@ -25,6 +28,16 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 @TxTracked
 @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
 public class ReservationController implements ReservationControllerInterface {
+
+    private final ReservationServiceInterface reservationService;
+    private final ParkingServiceInterface parkingService;
+
+    @Autowired
+    public ReservationController(ReservationServiceInterface reservationService,
+                                 ParkingServiceInterface parkingService) {
+        this.reservationService = reservationService;
+        this.parkingService = parkingService;
+    }
 
     @Override
     @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)

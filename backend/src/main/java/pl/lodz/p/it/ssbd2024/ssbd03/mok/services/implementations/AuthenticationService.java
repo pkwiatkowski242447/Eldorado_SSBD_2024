@@ -123,7 +123,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     }
 
     @PostConstruct
-    public void generateKey() throws NoSuchAlgorithmException {
+    private void generateKey() throws NoSuchAlgorithmException {
         final KeyGenerator keyGenerator = KeyGenerator.getInstance(totp.getAlgorithm());
 
         // Key length should match the length of the HMAC output (160 bits for SHA-1, 256 bits

@@ -31,6 +31,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
@@ -309,8 +311,11 @@ public class AuthenticationServiceMockTest {
     }
 
     @Test
-    public void registerSuccessfulLoginAttemptFor2FATestPositive() throws ApplicationBaseException, NoSuchAlgorithmException {
-        authenticationService.generateKey();
+    public void registerSuccessfulLoginAttemptFor2FATestPositive() throws ApplicationBaseException, NoSuchAlgorithmException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = AuthenticationService.class.getDeclaredMethod("generateKey");
+        method.setAccessible(true);
+        method.invoke(authenticationService);
+
         Account account = new Account("exampleLogin", "examplePassword", "exampleFirstname", "exampleLastname", "exampleEmail", "examplePhoneNumber");
         String exampleIpAddress = "ExampleIpAddress";
         String exampleLanguage = "ExampleLanguage";

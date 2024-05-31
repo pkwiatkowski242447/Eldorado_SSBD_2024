@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingEventFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
@@ -29,6 +32,15 @@ import java.util.UUID;
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class ReservationService implements ReservationServiceInterface {
+
+    private final ReservationFacade reservationFacade;
+    private final ParkingEventFacade parkingEventFacade;
+
+    @Autowired
+    public ReservationService(ReservationFacade reservationFacade, ParkingEventFacade parkingEventFacade) {
+        this.reservationFacade = reservationFacade;
+        this.parkingEventFacade = parkingEventFacade;
+    }
 
     @Override
     @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
