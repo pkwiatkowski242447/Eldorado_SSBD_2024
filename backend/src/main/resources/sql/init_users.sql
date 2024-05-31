@@ -28,6 +28,13 @@ GRANT SELECT                         ON TABLE public.personal_data          TO s
 GRANT SELECT                         ON TABLE public.user_level             TO ssbd03mop;
 GRANT SELECT                , UPDATE ON TABLE public.client_data            TO ssbd03mop;
 
+GRANT SELECT                         ON TABLE public.account_attributes     TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.account_attributes     TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.attribute_association  TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.attribute_name         TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.attribute_value        TO ssbd03mop;
+
+
 GRANT SELECT, UPDATE                 ON TABLE public.account                TO ssbd03auth;
 GRANT SELECT                         ON TABLE public.personal_data          TO ssbd03auth;
 GRANT SELECT                         ON TABLE public.user_level             TO ssbd03auth;
