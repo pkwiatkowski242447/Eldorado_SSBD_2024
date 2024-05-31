@@ -1,4 +1,4 @@
-import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
+import {API_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
 
@@ -138,7 +138,7 @@ export const api = {
 
     confirmEmail: (token: string) => {
         return axios.create({
-            baseURL: API_TEST_URL,
+            baseURL: API_URL,
             timeout: TIMEOUT_IN_MS,
             headers: DEFAULT_HEADERS,
         }).post(`/accounts/confirm-email/${token}`)

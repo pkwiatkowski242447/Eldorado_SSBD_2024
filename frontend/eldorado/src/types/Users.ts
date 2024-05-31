@@ -19,11 +19,11 @@ export function localDateTimeToDate(localDateTime: number[]): string {
         let date = new Date(year, month - 1, day, hour, minute, second, millisecond);
 
         const userTimezone = localStorage.getItem('timezone');
-        const gmtPlus2Offset = 2 * 60;
+        const gmtOffset = 0;
 
-        if (userTimezone !== 'GMT+2') {
+        if (userTimezone !== 'GMT+0') {
             const userTimezoneOffset = date.getTimezoneOffset();
-            const timezoneDifference = gmtPlus2Offset - userTimezoneOffset;
+            const timezoneDifference = gmtOffset - userTimezoneOffset;
             date = new Date(date.getTime() + timezoneDifference * 60 * 1000);
         }
 
