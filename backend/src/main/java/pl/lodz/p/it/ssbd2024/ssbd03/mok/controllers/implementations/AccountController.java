@@ -156,7 +156,6 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.RESET_PASSWORD})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = PasswordPreviouslyUsedException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changeAccountPassword(@PathVariable("token") String token,
@@ -167,7 +166,6 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = PasswordPreviouslyUsedException.class)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {

@@ -57,22 +57,42 @@ export const useAccount = () => {
                 localStorage.setItem('refreshToken', refreshToken);
 
                 const attributesResponse = await api.getMyAttributes();
-                const themeAttribute = attributesResponse.data.find((attr: { attributeName: string; }) => attr.attributeName === 'optional.attribute.theme');
-                const timezoneAttribute = attributesResponse.data.find((attr: { attributeName: string; }) => attr.attributeName === 'optional.attribute.timezone');
-
                 const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-                if (!themeAttribute && prefersDarkScheme.matches) {
-                    await api.addAttributes('optional.attribute.theme', "dark");
-                } else if (!themeAttribute) {
-                    await api.addAttributes('optional.attribute.theme', "light");
-                }
 
-                const date = new Date();
-                const offset = date.getTimezoneOffset();
-                const utcOffset = offset / -60;
-                localStorage.setItem('timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
+                if (attributesResponse.status !== 204) {
+                    const themeAttribute = attributesResponse.data.find((attr: {
+                        attributeName: string;
+                    }) => attr.attributeName === 'optional.attribute.theme');
+                    const timezoneAttribute = attributesResponse.data.find((attr: {
+                        attributeName: string;
+                    }) => attr.attributeName === 'optional.attribute.timezone');
 
-                if (!timezoneAttribute) {
+                    if (!themeAttribute && prefersDarkScheme.matches) {
+                        await api.addAttributes('optional.attribute.theme', "dark");
+                    } else if (!themeAttribute) {
+                        await api.addAttributes('optional.attribute.theme', "light");
+                    }
+
+                    const date = new Date();
+                    const offset = date.getTimezoneOffset();
+                    const utcOffset = offset / -60;
+                    localStorage.setItem('timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
+
+                    if (!timezoneAttribute) {
+                        await api.addAttributes('optional.attribute.timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
+                    }
+
+                } else if (attributesResponse.status === 204) {
+                    if (prefersDarkScheme.matches) {
+                        await api.addAttributes('optional.attribute.theme', "dark");
+                    } else {
+                        await api.addAttributes('optional.attribute.theme', "light");
+                    }
+                    const date = new Date();
+                    const offset = date.getTimezoneOffset();
+                    const utcOffset = offset / -60;
+                    localStorage.setItem('timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
+
                     await api.addAttributes('optional.attribute.timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
                 }
 
@@ -102,17 +122,23 @@ export const useAccount = () => {
     const logIn2fa = async (userLogin: string, authCodeValue: string) => {
         try {
             const response = await api.logIn2fa(userLogin, authCodeValue);
-            if (response.status === 200) {
-                const accessToken = response.data.accessToken;
-                const refreshToken = response.data.refreshToken;
-                localStorage.setItem('token', accessToken);
-                localStorage.setItem('refreshToken', refreshToken);
 
-                const attributesResponse = await api.getMyAttributes();
-                const themeAttribute = attributesResponse.data.find((attr: { attributeName: string; }) => attr.attributeName === 'optional.attribute.theme');
-                const timezoneAttribute = attributesResponse.data.find((attr: { attributeName: string; }) => attr.attributeName === 'optional.attribute.timezone');
+            const accessToken = response.data.accessToken;
+            const refreshToken = response.data.refreshToken;
+            localStorage.setItem('token', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
 
-                const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+            const attributesResponse = await api.getMyAttributes();
+            const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+            if (attributesResponse.status !== 204) {
+                const themeAttribute = attributesResponse.data.find((attr: {
+                    attributeName: string;
+                }) => attr.attributeName === 'optional.attribute.theme');
+                const timezoneAttribute = attributesResponse.data.find((attr: {
+                    attributeName: string;
+                }) => attr.attributeName === 'optional.attribute.timezone');
+
                 if (!themeAttribute && prefersDarkScheme.matches) {
                     await api.addAttributes('optional.attribute.theme', "dark");
                 } else if (!themeAttribute) {
@@ -128,18 +154,34 @@ export const useAccount = () => {
                     await api.addAttributes('optional.attribute.timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
                 }
 
-                const resetStatusResponse = await api.getPasswordAdminResetStatus();
-                if (resetStatusResponse.data) {
-                    await logOut()
-                    toast({
-                        variant: "destructive",
-                        description: t("general.adminInvokedPasswordReset")
-                    })
+            } else if (attributesResponse.status === 204) {
+                console.log("204")
+                if (prefersDarkScheme.matches) {
+                    await api.addAttributes('optional.attribute.theme', "dark");
                 } else {
-                    await getCurrentAccount()
-                    navigate(Pathnames.public.home)
+                    await api.addAttributes('optional.attribute.theme', "light");
                 }
+                const date = new Date();
+                const offset = date.getTimezoneOffset();
+                const utcOffset = offset / -60;
+                localStorage.setItem('timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
+
+                await api.addAttributes('optional.attribute.timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
             }
+
+            const resetStatusResponse = await api.getPasswordAdminResetStatus();
+
+            if (resetStatusResponse.data) {
+                await logOut()
+                toast({
+                    variant: "destructive",
+                    description: t("general.adminInvokedPasswordReset")
+                })
+            } else {
+                await getCurrentAccount()
+                navigate(Pathnames.public.home)
+            }
+
         } catch (e) {
             // @ts-expect-error idk
             handleApiError(e);

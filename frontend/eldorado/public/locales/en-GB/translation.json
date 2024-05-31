@@ -128,8 +128,8 @@
   "registerPage.role": "User Level",
 
   "registerPage.admin.popUp.registerOK.title": "Account successfully created",
-  "registerPage.admin.popUp.registerOK.text": "Please check the provided E-Mail address' inbox and click the link to complete the registration process.",
-  "registerPage.admin.popUp.registerOK.button": "Ok",
+  "registerPage.admin.popUp.registerOK.text": "Please check the inbox and click the link to activate the account.",
+  "registerPage.admin.popUp.registerOK.button": "OK",
 
   "forgotPasswordPage.title": "Forgot Password",
   "forgotPasswordPage.info": "Enter your email address to reset your password",
@@ -434,5 +434,8 @@
   "optional.attribute.timezone": "Timezone",
   "optional.attribute.theme": "Preferred theme",
   "accountSettings.attributes": "Attributes",
-  "accountSettings.history": "History"
+  "accountSettings.history": "History",
+
+  "adminCreateUserPage.title": "Create a new User",
+  "operation.type.email.change": "E-Mail address change"
 }
