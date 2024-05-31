@@ -1,13 +1,9 @@
 import {RolesEnum} from "./TokenPayload";
-import roles from "../../roles.json";
-
 export enum AccountTypeEnum {
     ADMIN = "Admin",
     CLIENT = "Client",
     STAFF = "Staff",
 }
-
-console.log(roles);
 
 export interface UserLevelType {
     id: string

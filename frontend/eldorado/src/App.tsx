@@ -9,7 +9,7 @@ function App() {
     return (
         <AccountStateContextProvider>
             <Router>
-                <SessionHandler />
+                <SessionHandler/>
                 <RoutesComponents/>
             </Router>
         </AccountStateContextProvider>

@@ -417,6 +417,13 @@
   "bean.validation.activity.log.unsuccessful.login.ip.not.valid" : "Adres IP ostatniego nieudanego logowania jest nieprawidłowy",
   "bean.validation.client.user.level.client.type.null" : "Typ klienta nie może być pusty",
   "jwt.auth.filter.authorization.header.blank.or.incorrectly.formatted" : "Nagłówek autoryzacji jest pusty lub nieprawidłowo sformatowany",
-  "jwt.auth.filter.access.token.invalid" : "Token dostępu jest nieprawidłowy"
+  "jwt.auth.filter.access.token.invalid" : "Token dostępu jest nieprawidłowy",
 
+  "attribute.not.found.exception" : "Nie znaleziono atrybutu",
+  "attribute.repeated.exception" : "Atrybut został powtórzony",
+  "attributes.title": "Atrybuty",
+  "optional.attribute.timezone": "Strefa czasowa",
+  "optional.attribute.theme": "Preferowany motyw",
+  "accountSettings.attributes": "Atrybuty",
+  "accountSettings.history": "Historia"
 }

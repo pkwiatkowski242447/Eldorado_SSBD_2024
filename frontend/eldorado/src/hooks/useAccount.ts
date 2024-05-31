@@ -56,6 +56,27 @@ export const useAccount = () => {
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
 
+                const attributesResponse = await api.getMyAttributes();
+                console.log(attributesResponse);
+
+                const themeAttribute = attributesResponse.data.find((attr: { attributeName: string; }) => attr.attributeName === 'optional.attribute.theme');
+
+                const timezoneAttribute = attributesResponse.data.find((attr: { attributeName: string; }) => attr.attributeName === 'optional.attribute.timezone');
+
+                const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+                if (!themeAttribute && prefersDarkScheme.matches) {
+                    await api.addAttributes('optional.attribute.theme', "dark");
+                } else if (!themeAttribute) {
+                    await api.addAttributes('optional.attribute.theme', "light");
+                }
+
+                const date = new Date();
+                const offset = date.getTimezoneOffset();
+                const utcOffset = offset / -60;
+                if (!timezoneAttribute) {
+                    await api.addAttributes('optional.attribute.timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
+                }
+
                 const resetStatusResponse = await api.getPasswordAdminResetStatus();
 
                 if (resetStatusResponse.data) {
