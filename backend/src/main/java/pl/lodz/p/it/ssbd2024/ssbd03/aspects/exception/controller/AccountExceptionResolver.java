@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundExcep
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.ResetOwnPasswordException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountStatusException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.attribute.AttributeException;
 
 /**
  * General exception handling component in a form of @ControllerAdvice for Account exceptions.
@@ -179,5 +180,12 @@ public class AccountExceptionResolver {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(accountRestoreAccessException));
+    }
+
+    @ExceptionHandler(value = {AttributeException.class})
+    public ResponseEntity<?> handleAttributeException(AttributeException attributeException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(attributeException));
     }
 }

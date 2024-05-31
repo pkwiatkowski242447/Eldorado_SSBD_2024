@@ -2,6 +2,8 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AttributeName;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AttributeValue;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
@@ -337,4 +339,20 @@ public interface AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     List<AccountHistoryData> getHistoryDataByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    List<AttributeName> getAllAttributesNames(int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    List<AttributeValue> getAllAttributeValues(String attributeName, int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    void addAttribute(String attributeName) throws ApplicationBaseException;
+
+    void removeAttribute(String attributeName) throws ApplicationBaseException;
+
+    void addAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException;
+
+    void removeAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException;
+
+    void assignAttribute(String userLogin, String attributeName, String attributeValue) throws ApplicationBaseException;
+
+    void removeAttribute(String userLogin, String attributeName) throws ApplicationBaseException;
 }

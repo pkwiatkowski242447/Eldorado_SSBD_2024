@@ -62,12 +62,6 @@ public class AuthenticationMOKFacadeIT extends TestcontainersConfig {
 
     private final String accountPasswordNo1 = "$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa";
 
-    @Test
-    @Transactional(propagation = Propagation.REQUIRED)
-    void AuthenticationMOKFacadeGetEntityManagerReturnsNotNullTestPositive() {
-        Assertions.assertNotNull(authenticationFacade.getEntityManager());
-    }
-
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
 //    public void findAndRefreshTestPositive() throws Exception {

@@ -57,7 +57,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      * @return Entity manager associated with the facade.
      */
     @Override
-    public EntityManager getEntityManager() {
+    protected EntityManager getEntityManager() {
         return this.entityManager;
     }
 
@@ -85,7 +85,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     @Override
     @RolesAllowed({
             Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE, Authorities.CHANGE_OWN_MAIL,
-            Authorities.ADD_USER_LEVEL, Authorities.REMOVE_USER_LEVEL, Authorities.RESTORE_ACCOUNT_ACCESS
+            Authorities.ADD_USER_LEVEL, Authorities.REMOVE_USER_LEVEL, Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.CHANGE_USER_MAIL
     })
     public Optional<Account> find(UUID id) throws ApplicationBaseException {
         Optional<Account> optionalAccount = super.find(id);
@@ -255,7 +255,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
      */
     @RolesAllowed({
             Authorities.RESET_PASSWORD, Authorities.CHANGE_OWN_MAIL,
-            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.CHANGE_USER_PASSWORD
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.CHANGE_USER_PASSWORD, Authorities.CHANGE_USER_MAIL
     })
     public Optional<Account> findByEmail(String email) throws ApplicationBaseException {
         try {

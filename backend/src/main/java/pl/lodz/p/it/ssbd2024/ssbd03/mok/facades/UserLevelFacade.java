@@ -98,7 +98,6 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
      */
     @Override
-    // @RolesAllowed({Roles.ADMIN})
     @DenyAll
     public Optional<UserLevel> find(UUID id) throws ApplicationBaseException {
         return super.find(id);
@@ -111,7 +110,6 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
      */
     @Override
-    // @RolesAllowed({Roles.ADMIN})
     @DenyAll
     public Optional<UserLevel> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
@@ -123,7 +121,6 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return List containing all UserLevels.
      */
     @Override
-    // @RolesAllowed({Roles.ADMIN})
     @DenyAll
     public List<UserLevel> findAll() throws ApplicationBaseException {
         return super.findAll();
@@ -135,7 +132,6 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
      * @return Number of UserLevels in the database.
      */
     @Override
-    // @RolesAllowed({Roles.ADMIN})
     @DenyAll
     public int count() throws ApplicationBaseException {
         return super.count();

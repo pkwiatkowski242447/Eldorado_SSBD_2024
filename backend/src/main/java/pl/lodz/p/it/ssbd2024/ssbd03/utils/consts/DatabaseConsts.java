@@ -60,6 +60,7 @@ public class DatabaseConsts {
     public static final String ATTRIBUTE_VALUE_TABLE = "attribute_value";
     public static final String ATTRIBUTE_VALUE_COLUMN = "attribute_value";
     public static final String ATTRIBUTE_NAME_ID_COLUMN = "attribute_name_id";
+    public static final String ATTRIBUTE_VALUE_ID_COLUMN = "attribute_value_id";
 
     // public.account_history_data
 

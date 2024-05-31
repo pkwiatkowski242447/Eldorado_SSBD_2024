@@ -77,6 +77,9 @@ public class I18n {
 
     // Util
     public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
+    public static final String ATTRIBUTE_NOT_FOUND_EXCEPTION = "attribute.not.found.exception";
+    public static final String ATTRIBUTE_REPEATED_EXCEPTION = "attribute.repeated.exception";
+
 
     // Mail provider
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";
@@ -128,6 +131,18 @@ public class I18n {
     public static final String UNBLOCK_ACCOUNT_RESULT_MESSAGE = "mail.unblock.account.result_message";
     public static final String UNBLOCK_ACCOUNT_ACTION_DESCRIPTION = "mail.unblock.account.action_description";
     public static final String UNBLOCK_ACCOUNT_NOTE_TITLE = "mail.unblock.account.note_title";
+
+    public static final String REMOVE_ACCOUNT_GREETING_MESSAGE = "mail.remove.account.greeting.message";
+    public static final String REMOVE_ACCOUNT_MESSAGE_SUBJECT = "mail.remove.account.message.subject";
+    public static final String REMOVE_ACCOUNT_RESULT_MESSAGE = "mail.remove.account.result_message";
+    public static final String REMOVE_ACCOUNT_ACTION_DESCRIPTION = "mail.remove.account.action_description";
+    public static final String REMOVE_ACCOUNT_NOTE_TITLE = "mail.remove.account.note_title";
+
+    public static final String SUSPEND_ACCOUNT_GREETING_MESSAGE = "mail.suspend.account.greeting.message";
+    public static final String SUSPEND_ACCOUNT_MESSAGE_SUBJECT = "mail.suspend.account.message.subject";
+    public static final String SUSPEND_ACCOUNT_RESULT_MESSAGE = "mail.suspend.account.result_message";
+    public static final String SUSPEND_ACCOUNT_ACTION_DESCRIPTION = "mail.suspend.account.action_description";
+    public static final String SUSPEND_ACCOUNT_NOTE_TITLE = "mail.suspend.account.note_title";
 
     public static final String ACCESS_LEVEL_GRANTED_GREETING_MESSAGE = "mail.granted.user.level.greeting.message";
     public static final String ACCESS_LEVEL_GRANTED_MESSAGE_SUBJECT = "mail.granted.user.level.message.subject";

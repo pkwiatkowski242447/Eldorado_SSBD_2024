@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -12,6 +13,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -63,7 +65,7 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * @param userLevel UserLevel to be modified.
      */
     @Override
-    @DenyAll
+    @RolesAllowed(Authorities.CHANGE_CLIENT_TYPE)
     public void edit(UserLevel userLevel) throws ApplicationBaseException {
         super.edit(userLevel);
     }

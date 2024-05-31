@@ -68,7 +68,7 @@ public class TokenFacade extends AbstractFacade<Token> {
             Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.RESET_PASSWORD,
             Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
             Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.CHANGE_USER_PASSWORD,
-            Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
+            Authorities.RESEND_EMAIL_CONFIRMATION_MAIL, Authorities.CHANGE_USER_MAIL
     })
     public void create(Token entity) throws ApplicationBaseException {
         super.create(entity);
@@ -224,7 +224,7 @@ public class TokenFacade extends AbstractFacade<Token> {
      */
     @RolesAllowed({
             Authorities.RESET_PASSWORD, Authorities.CHANGE_OWN_MAIL, Authorities.RESTORE_ACCOUNT_ACCESS,
-            Authorities.CHANGE_USER_PASSWORD, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL
+            Authorities.CHANGE_USER_PASSWORD, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL, Authorities.CHANGE_USER_MAIL
     })
     public void removeByTypeAndAccount(Token.TokenType tokenType, UUID accountId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Token.removeByTypeAndAccount")

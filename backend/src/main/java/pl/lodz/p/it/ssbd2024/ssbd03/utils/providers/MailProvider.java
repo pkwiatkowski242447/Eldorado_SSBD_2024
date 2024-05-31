@@ -208,6 +208,64 @@ public class MailProvider {
     }
 
     /**
+     * Sends an account removing notification e-mail to the specified e-mail address.
+     *
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language      Language of the message.
+     */
+    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
+    public void sendRemoveAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.REMOVE_ACCOUNT_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.REMOVE_ACCOUNT_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.REMOVE_ACCOUNT_ACTION_DESCRIPTION, language))
+                    .replace("$note_title", I18n.getMessage(I18n.REMOVE_ACCOUNT_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.REMOVE_ACCOUNT_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending account unblock e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
+        }
+    }
+
+    /**
+     * Sends an account suspending notification e-mail to the specified e-mail address.
+     *
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language      Language of the message.
+     */
+    @RolesAllowed({Authorities.BLOCK_ACCOUNT})
+    public void sendSuspendAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.SUSPEND_ACCOUNT_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.SUSPEND_ACCOUNT_RESULT_MESSAGE, language))
+                    .replace("$action_description", I18n.getMessage(I18n.SUSPEND_ACCOUNT_ACTION_DESCRIPTION, language))
+                    .replace("$note_title", I18n.getMessage(I18n.SUSPEND_ACCOUNT_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.SUSPEND_ACCOUNT_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending account unblock e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
+        }
+    }
+
+    /**
      * Sends an e-mail change confirmation e-mail to the specified e-mail address.
      *
      * @param firstName       User's first name.
