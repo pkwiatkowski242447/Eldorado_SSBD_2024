@@ -670,4 +670,33 @@ public interface AccountControllerInterface {
                                                 @RequestParam("pageNumber") int pageNumber,
                                                 @RequestParam("pageSize") int pageSize)
             throws ApplicationBaseException;
+
+    @GetMapping(value = "/attributes", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllAttributesNames(@RequestParam("pageNumber") int pageNumber,
+                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+    @GetMapping(value = "/attributes/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllAttributeValues(@PathVariable("name") String attributeName,
+                                                   @RequestParam("pageNumber") int pageNumber,
+                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+
+    @PostMapping(value = "/attributes/add-attribute/{attributeName}")
+    ResponseEntity<?> addAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException;
+
+    @DeleteMapping(value = "/attributes/remove-attribute/{attributeName}")
+    ResponseEntity<?> removeAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException;
+
+    @PostMapping(value = "/attributes/add-value/{attributeName}/{attributeValue}")
+    ResponseEntity<?> addAttributeValue(@PathVariable("attributeName") String attributeName,
+                                        @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;
+
+    @DeleteMapping(value = "/attributes/remove-value/{attributeName}/{attributeValue}")
+    ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName,
+                                                  @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;
+    @GetMapping(value = "/attributes/account/me/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getAllAccountAttributes() throws ApplicationBaseException;
+    @PostMapping(value = "/attributes/account/me/assign/{attributeName}/{attributeValue}")
+    ResponseEntity<?> assignAttribute(@PathVariable("attributeName") String attributeName,
+                                             @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;
+    @DeleteMapping(value = "/attributes/account/me/remove/{attributeName}")
+    ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException;
 }

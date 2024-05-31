@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.AttributeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountChangePasswordDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountEmailDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountModifyDTO;
@@ -25,9 +26,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutp
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountHistoryDataMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AttributeMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AttributeValue;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AttributeName;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
@@ -46,6 +49,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Controller used for manipulating user accounts in the system.
@@ -485,5 +489,106 @@ public class AccountController implements AccountControllerInterface {
                 .toList();
         if (accountList.isEmpty()) return ResponseEntity.noContent().build();
         else return ResponseEntity.ok(accountList);
+    }
+
+    @Override
+    @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> getAllAttributesNames(@RequestParam("pageNumber") int pageNumber,
+                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException {
+        List<String> accountList = accountService.getAllAttributesNames(pageNumber, pageSize)
+                .stream()
+                .map(AttributeName::getAttributeName)
+                .toList();
+        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(accountList);
+    }
+
+    @Override
+    @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> getAllAttributeValues(@PathVariable("name") String attributeName,
+                                                   @RequestParam("pageNumber") int pageNumber,
+                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException {
+        List<String> accountList = accountService.getAllAttributeValues(attributeName, pageNumber, pageSize)
+                .stream()
+                .map(AttributeValue::getAttributeValue)
+                .toList();
+        if (accountList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(accountList);
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> addAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException {
+        accountService.addAttribute(attributeName);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> removeAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException {
+        accountService.removeAttribute(attributeName);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> addAttributeValue(@PathVariable("attributeName") String attributeName,
+                                               @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException {
+        accountService.addAttributeValue(attributeName, attributeValue);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName,
+                                                  @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException {
+        accountService.removeAttributeValue(attributeName, attributeValue);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_OWN_ATTRIBUTES)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> getAllAccountAttributes() throws ApplicationBaseException {
+        Account account = accountService.getAccountByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        List<AttributeDTO> attributeDTOList = account.getAttributeRecords()
+                .stream()
+                .map(AttributeMapper::toAttributeDTO)
+                .collect(Collectors.toList());
+
+        if (attributeDTOList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(attributeDTOList);
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_OWN_ATTRIBUTES)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> assignAttribute(@PathVariable("attributeName") String attributeName,
+                                             @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.assignAttribute(login, attributeName, attributeValue);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_OWN_ATTRIBUTES)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.removeAttribute(login, attributeName);
+
+        return ResponseEntity.noContent().build();
     }
 }
