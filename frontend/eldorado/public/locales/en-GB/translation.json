@@ -426,5 +426,13 @@
   "bean.validation.activity.log.unsuccessful.login.ip.not.valid" : "The IP address of the last unsuccessful login is not valid",
   "bean.validation.client.user.level.client.type.null" : "Client type cannot be null",
   "jwt.auth.filter.authorization.header.blank.or.incorrectly.formatted" : "Authorization header is blank or incorrectly formatted",
-  "jwt.auth.filter.access.token.invalid" : "Access token is invalid"
+  "jwt.auth.filter.access.token.invalid" : "Access token is invalid",
+
+  "attribute.not.found.exception" : "Attribute not found",
+  "attribute.repeated.exception" : "Attribute repeated",
+  "attributes.title": "Attributes",
+  "optional.attribute.timezone": "Timezone",
+  "optional.attribute.theme": "Preferred theme",
+  "accountSettings.attributes": "Attributes",
+  "accountSettings.history": "History"
 }

@@ -24,6 +24,7 @@ import PasswordForm from "@/components/forms/PasswordForm.tsx";
 import EmailForm from "@/components/forms/EmailForm.tsx";
 import DetailsForm from "@/components/forms/DetailsForm.tsx";
 import UserHistoryPage from "@/pages/UserHistoryPage.tsx";
+import AttributesPage from "@/pages/AttributesPage.tsx";
 
 
 function AccountSettings() {
@@ -257,7 +258,12 @@ function AccountSettings() {
                         <Button variant={`${activeForm === 'History' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('History')}
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                            History
+                            {t("accountSettings.history")}
+                        </Button>
+                        <Button variant={`${activeForm === 'Attributes' ? 'outline' : 'ghost'}`}
+                                onClick={() => setActiveForm('Attributes')}
+                                className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                            {t("accountSettings.attributes")}
                         </Button>
                     </nav>
                     <div className="grid gap-6">
@@ -286,6 +292,9 @@ function AccountSettings() {
                         )}
                         {activeForm === 'History' && (
                             <UserHistoryPage/>
+                        )}
+                        {activeForm === 'Attributes' && (
+                            <AttributesPage/>
                         )}
                     </div>
                 </div>

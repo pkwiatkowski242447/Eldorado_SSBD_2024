@@ -1,13 +1,10 @@
 import {RolesEnum} from "./TokenPayload";
-import roles from "../../roles.json";
 
 export enum AccountTypeEnum {
     ADMIN = "Admin",
     CLIENT = "Client",
     STAFF = "Staff",
 }
-
-console.log(roles);
 
 export interface UserLevelType {
     id: string
@@ -19,7 +16,17 @@ export function localDateTimeToDate(localDateTime: number[]): string {
     if (localDateTime) {
         const [year, month, day, hour, minute, second, nanosecond] = localDateTime;
         const millisecond = Math.floor(nanosecond / 1000000);
-        const date = new Date(year, month - 1, day, hour, minute, second, millisecond);
+        let date = new Date(year, month - 1, day, hour, minute, second, millisecond);
+
+        const userTimezone = localStorage.getItem('timezone');
+        const gmtPlus2Offset = 2 * 60;
+
+        if (userTimezone !== 'GMT+2') {
+            const userTimezoneOffset = date.getTimezoneOffset();
+            const timezoneDifference = gmtPlus2Offset - userTimezoneOffset;
+            date = new Date(date.getTime() + timezoneDifference * 60 * 1000);
+        }
+
         return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
     } else {
         return new Date(0).toLocaleString();

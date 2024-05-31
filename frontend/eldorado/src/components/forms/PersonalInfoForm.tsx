@@ -23,7 +23,6 @@ function PersonalInfoForm({ formUserData, onSubmitUserData, isLoading, account, 
             <Card className="mx-10 w-auto">
                 <CardContent>
                     <Form {...formUserData}>
-
                             <form onSubmit={formUserData.handleSubmit(onSubmitUserData)}
                                   className="space-y-4">
                                 <div className="grid gap-4 p-5">

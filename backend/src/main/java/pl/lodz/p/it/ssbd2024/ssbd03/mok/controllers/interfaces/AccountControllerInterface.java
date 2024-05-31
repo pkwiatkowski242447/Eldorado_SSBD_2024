@@ -694,6 +694,7 @@ public interface AccountControllerInterface {
                                                   @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;
     @GetMapping(value = "/attributes/account/me/get", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAllAccountAttributes() throws ApplicationBaseException;
+
     @PostMapping(value = "/attributes/account/me/assign/{attributeName}/{attributeValue}")
     ResponseEntity<?> assignAttribute(@PathVariable("attributeName") String attributeName,
                                              @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;

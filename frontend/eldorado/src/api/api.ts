@@ -218,5 +218,18 @@ export const api = {
 
     getPasswordAdminResetStatus:()=>{
         return apiWithConfig.get('/accounts/admin-password-reset-status')
-    }
+    },
+
+    getAllAttributes:()=>{
+        return apiWithConfig.get('/accounts/attributes?pageNumber=0&pageSize=2')
+    },
+
+    getMyAttributes:()=>{
+        return apiWithConfig.get('/accounts/attributes/account/me/get')
+    },
+
+    addAttributes: (attributeName: string, attributeValue: string) => {
+        return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
+    },
+
 }
