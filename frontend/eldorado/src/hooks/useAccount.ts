@@ -73,6 +73,8 @@ export const useAccount = () => {
                 const date = new Date();
                 const offset = date.getTimezoneOffset();
                 const utcOffset = offset / -60;
+                localStorage.setItem('timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
+
                 if (!timezoneAttribute) {
                     await api.addAttributes('optional.attribute.timezone', `GMT${utcOffset >= 0 ? '+' : ''}${utcOffset}`);
                 }
