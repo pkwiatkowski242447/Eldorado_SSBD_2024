@@ -45,9 +45,9 @@ function TwoFactorAuthPage() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            <a href="/home" className="flex items-center">
-                <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2 mb-8"/>
+        <div className="flex flex-col items-center">
+            <a href="/home" className="flex items-center justify-center">
+                <img src={eldoLogo} alt="Eldorado" className="h-auto w-1/2 mb-8 flex"/>
                 <span className="sr-only">Eldorado</span>
             </a>
             <Form {...form}>

@@ -49,6 +49,8 @@ import java.time.LocalDateTime;
 @RestController
 @LoggerInterceptor
 @RequestMapping("/api/v1/auth")
+@TxTracked
+@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
 public class AuthenticationController implements AuthenticationControllerInterface {
 
     @Value("${account.maximum.failed.login.attempt.counter}")
@@ -82,8 +84,11 @@ public class AuthenticationController implements AuthenticationControllerInterfa
 
     @Override
     @RolesAllowed(Authorities.LOGIN)
-    @TxTracked
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {
+            InvalidLoginAttemptException.class, AccountNotActivatedException.class,
+            AccountBlockedByAdminException.class, AccountBlockedByFailedLoginAttemptsException.class,
+            AccountSuspendedException.class
+    })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
@@ -136,8 +141,10 @@ public class AuthenticationController implements AuthenticationControllerInterfa
 
     @Override
     @RolesAllowed(Authorities.LOGIN)
-    @TxTracked
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {
+            AccountNotActivatedException.class, AccountBlockedByAdminException.class,
+            AccountBlockedByFailedLoginAttemptsException.class, 
+    })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,

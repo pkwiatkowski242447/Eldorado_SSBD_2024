@@ -30,8 +30,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.Incorrec
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.PasswordPreviouslyUsedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.attribute.AttributeNotFoundException;
@@ -59,7 +57,7 @@ import java.util.*;
 @Service
 @LoggerInterceptor
 @TxTracked
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.MANDATORY)
 public class AccountService implements AccountServiceInterface {
 
     @Value("${mail.account.creation.confirmation.url}")
@@ -160,7 +158,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public Account registerClient(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language)
             throws ApplicationBaseException {
         Account newClientAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
@@ -197,7 +194,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.REGISTER_USER})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public Account registerStaff(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newStaffAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newStaffAccount.setAccountLanguage(language);
@@ -232,7 +228,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.REGISTER_USER})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public Account registerAdmin(String login, String password, String firstName, String lastName, String email, String phoneNumber, String language) throws ApplicationBaseException {
         Account newAdminAccount = new Account(login, passwordEncoder.encode(password), firstName, lastName, email, phoneNumber);
         newAdminAccount.setAccountLanguage(language);
@@ -269,7 +264,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.RESET_PASSWORD})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPassword(String userEmail) throws ApplicationBaseException {
         Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
 
@@ -292,8 +286,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class, noRollbackFor = PasswordPreviouslyUsedException.class)
+    @RolesAllowed({Authorities.RESET_PASSWORD})
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(TokenNotFoundException::new);
@@ -311,8 +304,9 @@ public class AccountService implements AccountServiceInterface {
             if (passwordEncoder.matches(newPassword, passwordHash)) throw new PasswordPreviouslyUsedException();
         }
 
-        account.getPreviousPasswords().add(newPassword);
-        account.setPassword(this.passwordEncoder.encode(newPassword));
+        String hashedPassword = passwordEncoder.encode(newPassword);
+        account.getPreviousPasswords().add(hashedPassword);
+        account.setPassword(hashedPassword);
 
         this.accountFacade.edit(account);
         historyDataFacade.create(new AccountHistoryData(account,
@@ -326,7 +320,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD})
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationBaseException.class)
     public void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException {
 
         String newPasswordEncoded = passwordEncoder.encode(newPassword);
@@ -411,7 +404,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = AccountConstraintViolationException.class)
     public Account modifyAccount(Account modifiedAccount, String userLogin) throws ApplicationBaseException {
         Account foundAccount = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
 
@@ -450,7 +442,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean activateAccount(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_VALUE_NOT_FOUND_EXCEPTION));
@@ -481,7 +472,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.CONFIRM_EMAIL_CHANGE})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public boolean confirmEmail(String token) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenFromDB = tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(() -> new TokenNotFoundException(I18n.TOKEN_NOT_FOUND_EXCEPTION));
@@ -518,7 +508,6 @@ public class AccountService implements AccountServiceInterface {
      */
     @Override
     @RolesAllowed({Authorities.CHANGE_OWN_MAIL, Authorities.CHANGE_USER_MAIL})
-    @Transactional(propagation = Propagation.REQUIRED)
     public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
         if (Objects.equals(account.getEmail(), newEmail))
@@ -539,7 +528,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = TokenBaseException.class)
     public void resendEmailConfirmation() throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -584,7 +572,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.GET_OWN_HISTORICAL_DATA, Authorities.GET_OWN_ACCOUNT, Authorities.CHANGE_OWN_MAIL})
-    @Transactional(propagation = Propagation.REQUIRED)
     public Account getAccountByLogin(String login) throws ApplicationBaseException {
         return accountFacade.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
@@ -599,7 +586,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addClientUserLevel(String id) throws ApplicationBaseException {
 
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
@@ -626,7 +612,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
@@ -652,7 +637,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void addAdminUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
@@ -676,7 +660,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeClientUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
@@ -709,7 +692,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeStaffUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
@@ -742,7 +724,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeAdminUserLevel(String id) throws ApplicationBaseException {
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
@@ -786,7 +767,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void generateAccessRestoreTokenAndSendEmailMessage(String email) throws ApplicationBaseException {
         Account account = accountFacade.findByEmail(email).orElseThrow(AccountEmailNotFoundException::new);
         tokenFacade.removeByTypeAndAccount(Token.TokenType.RESTORE_ACCESS_TOKEN, account.getId());
@@ -810,7 +790,6 @@ public class AccountService implements AccountServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void restoreAccountAccess(String token) throws ApplicationBaseException {
         Token tokenObject = tokenFacade.findByTokenValue(new String(Base64.getUrlDecoder().decode(token))).orElseThrow(TokenNotFoundException::new);
         Account account = accountFacade.find(tokenObject.getAccount().getId()).orElseThrow(AccountIdNotFoundException::new);
@@ -843,7 +822,6 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @RolesAllowed({Authorities.CHANGE_USER_PASSWORD})
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
     public void forgetAccountPasswordByAdmin(String userEmail) throws ApplicationBaseException {
         Account account = this.accountFacade.findByEmail(userEmail).orElseThrow(AccountEmailNotFoundException::new);
 
@@ -944,7 +922,7 @@ public class AccountService implements AccountServiceInterface {
                 .stream()
                 .anyMatch(attributeRecord -> attributeRecord.getAttributeName().getAttributeName().equals(attributeName))) {
             throw new AttributeRepeatedException();
-        };
+        }
 
         AttributeName attributeNameObject = attributeNameFacade.findByName(attributeName).orElseThrow(AttributeNotFoundException::new);
         AttributeValue attributeValueObject = attributeNameObject.getListOfAttributeValues()

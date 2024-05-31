@@ -30,7 +30,7 @@ import java.util.UUID;
 @Service
 @LoggerInterceptor
 @TxTracked
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.MANDATORY)
 public class ParkingService implements ParkingServiceInterface {
 
     @Override

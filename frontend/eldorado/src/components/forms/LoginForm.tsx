@@ -18,7 +18,7 @@ function LoginForm() {
     const [isLoading, setIsLoading] = useState(false);
 
     const formSchema = z.object({
-        login: z.string().min(5, {message: t("loginPage.loginTooShort")})
+        login: z.string().min(4, {message: t("loginPage.loginTooShort")})
             .max(32, {message: t("loginPage.loginTooLong")}),
         password: z.string().min(8, {message: t("loginPage.passwordTooShort")})
             .max(60, {message: t("loginPage.passwordTooLong")})
