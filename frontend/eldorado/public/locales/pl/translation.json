@@ -128,8 +128,8 @@
   "registerPage.role": "Poziom Użytkownika",
 
   "registerPage.admin.popUp.registerOK.title": "Konto zostało pomyślnie utworzone.",
-  "registerPage.admin.popUp.registerOK.text": "Należy sprawdzić skrzynkę odbiorczą podanego adresu e-mail i kliknąć w link aktywacyjny, aby zakończyć rejestrację.",
-  "registerPage.admin.popUp.registerOK.button": "Powrót do strony zarządzania użytkownikami",
+  "registerPage.admin.popUp.registerOK.text": "Aby aktywować konto należy kliknąć w przesłany link.",
+  "registerPage.admin.popUp.registerOK.button": "OK",
 
   "forgotPasswordPage.title": "Zapomniałem hasła",
   "forgotPasswordPage.info": "Wprowadź swój adres e-mail, aby zresetować hasło",
@@ -425,5 +425,8 @@
   "optional.attribute.timezone": "Strefa czasowa",
   "optional.attribute.theme": "Preferowany motyw",
   "accountSettings.attributes": "Atrybuty",
-  "accountSettings.history": "Historia"
+  "accountSettings.history": "Historia",
+
+  "adminCreateUserPage.title": "Utwórz nowe konto",
+  "operation.type.email.change": "Zmiana adresu e-mail"
 }
