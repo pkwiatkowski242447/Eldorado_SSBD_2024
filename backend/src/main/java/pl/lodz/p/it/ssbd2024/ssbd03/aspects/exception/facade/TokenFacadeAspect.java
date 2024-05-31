@@ -43,7 +43,7 @@ public class TokenFacadeAspect {
         } catch (PersistenceException | PSQLException exception) {
             Throwable exceptionCopy = exception;
             do {
-                if (exceptionCopy.getMessage().contains("token_tokenValue_key")) {
+                if (exceptionCopy.getMessage().contains("token_token_value_key")) {
                     throw new TokenValueAlreadyTakenException();
                 }
                 exceptionCopy = exceptionCopy.getCause();

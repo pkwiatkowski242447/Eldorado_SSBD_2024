@@ -34,6 +34,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstra
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.attribute.AttributeNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.attribute.AttributeRepeatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -121,14 +123,14 @@ public class AccountService implements AccountServiceInterface {
     /**
      * Autowired constructor for the service.
      *
-     * @param accountFacade   Facade responsible for users accounts management.
+     * @param accountFacade        Facade responsible for users accounts management.
      * @param historyDataFacade    Facade used for inserting information about account modifications to the database.
-     * @param passwordEncoder This component is used to generate hashed passwords for user accounts (not to store them in their original form).
-     * @param tokenFacade     This facade is responsible for manipulating tokens, used for various, user account related operations.
-     * @param mailProvider    This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
-     * @param jwtProvider     This component is used to generate token values for token facade.
-     * @param userLevelFacade It is used to create new tokens, remove them, etc.
-     * @param attributeNameFacade Facade for handling attribute names.
+     * @param passwordEncoder      This component is used to generate hashed passwords for user accounts (not to store them in their original form).
+     * @param tokenFacade          This facade is responsible for manipulating tokens, used for various, user account related operations.
+     * @param mailProvider         This component is used to send e-mail messages to e-mail address of users (where message depends on their actions).
+     * @param jwtProvider          This component is used to generate token values for token facade.
+     * @param userLevelFacade      It is used to create new tokens, remove them, etc.
+     * @param attributeNameFacade  Facade for handling attribute names.
      * @param attributeValueFacade Facade for handling attribute values.
      */
     @Autowired
@@ -371,9 +373,9 @@ public class AccountService implements AccountServiceInterface {
         historyDataFacade.create(new AccountHistoryData(account,
                 OperationType.BLOCK,
                 accountFacade.findByLogin(SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName())
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
                         .orElse(null)));
 
         // Sending information email
@@ -395,9 +397,9 @@ public class AccountService implements AccountServiceInterface {
         historyDataFacade.create(new AccountHistoryData(account,
                 OperationType.UNBLOCK,
                 accountFacade.findByLogin(SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName())
+                                .getContext()
+                                .getAuthentication()
+                                .getName())
                         .orElse(null)));
 
         // Sending information email
@@ -515,7 +517,7 @@ public class AccountService implements AccountServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by exception handling aspects in facade layer.
      */
     @Override
-    @RolesAllowed({Authorities.CHANGE_OWN_MAIL})
+    @RolesAllowed({Authorities.CHANGE_OWN_MAIL, Authorities.CHANGE_USER_MAIL})
     @Transactional(propagation = Propagation.REQUIRED)
     public void changeEmail(UUID accountId, String newEmail) throws ApplicationBaseException {
         Account account = accountFacade.find(accountId).orElseThrow(AccountNotFoundException::new);
@@ -566,10 +568,10 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @RolesAllowed({Authorities.GET_ALL_USER_ACCOUNTS})
     public List<Account> getAccountsMatchingPhraseInNameOrLastname(String phrase,
-                                                                        String orderBy,
-                                                                        boolean order,
-                                                                        int pageNumber,
-                                                                        int pageSize) throws ApplicationBaseException {
+                                                                   String orderBy,
+                                                                   boolean order,
+                                                                   int pageNumber,
+                                                                   int pageSize) throws ApplicationBaseException {
         return accountFacade.findAccountsMatchingPhraseInNameOrLastnameWithPagination(
                 phrase, orderBy, order, pageNumber, pageSize);
     }
@@ -868,7 +870,7 @@ public class AccountService implements AccountServiceInterface {
     public boolean getPasswordAdminResetStatus() throws ApplicationBaseException {
         Account account = accountFacade.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
-        return tokenFacade.findByTypeAndAccount(Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD,account.getId()).isPresent();
+        return tokenFacade.findByTypeAndAccount(Token.TokenType.CHANGE_OVERWRITTEN_PASSWORD, account.getId()).isPresent();
     }
 
     @Override
@@ -877,28 +879,96 @@ public class AccountService implements AccountServiceInterface {
         return historyDataFacade.findByAccountId(id, pageNumber, pageSize);
     }
 
-    //TODO
+    @Override
+    @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
     public List<AttributeName> getAllAttributesNames(int pageNumber, int pageSize) throws ApplicationBaseException {
         return attributeNameFacade.findAllAttributeNamesWithPagination(pageNumber, pageSize);
     }
 
+    @Override
+    @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
     public List<AttributeValue> getAllAttributeValues(String attributeName, int pageNumber, int pageSize) throws ApplicationBaseException {
         return attributeValueFacade.findByAttributeName(attributeName, pageNumber, pageSize);
     }
 
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
     public void addAttribute(String attributeName) throws ApplicationBaseException {
-        return;
+        attributeNameFacade.create(new AttributeName(attributeName));
     }
 
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
     public void removeAttribute(String attributeName) throws ApplicationBaseException {
-        return;
+        attributeNameFacade.removeByName(attributeName);
     }
 
-    public void addAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException {}
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void addAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException {
+        AttributeName attributeNameObject = attributeNameFacade.findByName(attributeName).orElseThrow(AttributeNotFoundException::new);
 
-    public void removeAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException {}
+        AttributeValue attributeValueObject = new AttributeValue();
+        attributeValueObject.setAttributeValue(attributeValue);
+        attributeValueObject.setAttributeNameId(attributeNameObject);
 
-    public List<AttributeName> getAllAccountAttributes(UUID accountId, int pageNumber, int pageSize) throws ApplicationBaseException {
-        return null;
+        attributeNameObject.getListOfAttributeValues().add(attributeValueObject);
+
+        attributeValueFacade.create(attributeValueObject);
+        attributeNameFacade.edit(attributeNameObject);
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void removeAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException {
+        AttributeName attributeNameObject = attributeNameFacade.findByName(attributeName).orElseThrow(AttributeNotFoundException::new);
+
+        AttributeValue attributeValueObject = attributeNameObject.getListOfAttributeValues()
+                .stream()
+                .filter(obj -> obj.getAttributeValue().equals(attributeValue))
+                .findAny()
+                .orElse(null);
+
+        attributeNameObject.getListOfAttributeValues().remove(attributeValueObject);
+
+        attributeValueFacade.remove(attributeValueObject);
+        attributeNameFacade.edit(attributeNameObject);
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_OWN_ATTRIBUTES)
+    public void assignAttribute(String userLogin, String attributeName, String attributeValue) throws ApplicationBaseException {
+        Account account = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+
+        if (account.getAttributeRecords()
+                .stream()
+                .anyMatch(attributeRecord -> attributeRecord.getAttributeName().getAttributeName().equals(attributeName))) {
+            throw new AttributeRepeatedException();
+        };
+
+        AttributeName attributeNameObject = attributeNameFacade.findByName(attributeName).orElseThrow(AttributeNotFoundException::new);
+        AttributeValue attributeValueObject = attributeNameObject.getListOfAttributeValues()
+                .stream()
+                .filter(obj -> obj.getAttributeValue().equals(attributeValue))
+                .findAny()
+                .orElseThrow(AttributeNotFoundException::new);
+
+        AttributeRecord attributeRecord = new AttributeRecord();
+        attributeRecord.setAttributeName(attributeNameObject);
+        attributeRecord.setAttributeValue(attributeValueObject);
+
+        account.getAttributeRecords().add(attributeRecord);
+
+        accountFacade.edit(account);
+    }
+
+    @Override
+    @RolesAllowed(Authorities.MANAGE_OWN_ATTRIBUTES)
+    public void removeAttribute(String userLogin, String attributeName) throws ApplicationBaseException {
+        Account account = accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+
+        account.getAttributeRecords().removeIf(attributeRecord -> attributeRecord.getAttributeName().getAttributeName().equals(attributeName));
+
+        accountFacade.edit(account);
     }
 }

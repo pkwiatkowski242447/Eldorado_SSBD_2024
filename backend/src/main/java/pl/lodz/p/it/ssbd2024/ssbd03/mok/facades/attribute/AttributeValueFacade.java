@@ -1,6 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.attribute;
 
-import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
@@ -13,6 +13,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AttributeValue;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -62,8 +63,8 @@ public class AttributeValueFacade extends AbstractFacade<AttributeValue> {
      * @param attributeValue AttributeValue to be persisted.
      */
     @Override
-    @DenyAll
-    protected void create(AttributeValue attributeValue) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void create(AttributeValue attributeValue) throws ApplicationBaseException {
         super.create(attributeValue);
     }
 
@@ -73,8 +74,8 @@ public class AttributeValueFacade extends AbstractFacade<AttributeValue> {
      * @param attributeValue AttributeValue to be modified.
      */
     @Override
-    @DenyAll
-    protected void edit(AttributeValue attributeValue) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void edit(AttributeValue attributeValue) throws ApplicationBaseException {
         super.edit(attributeValue);
     }
 
@@ -84,8 +85,8 @@ public class AttributeValueFacade extends AbstractFacade<AttributeValue> {
      * @param attributeValue AttributeValue to be removed from the database.
      */
     @Override
-    @DenyAll
-    protected void remove(AttributeValue attributeValue) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void remove(AttributeValue attributeValue) throws ApplicationBaseException {
         super.remove(attributeValue);
     }
 
@@ -96,8 +97,8 @@ public class AttributeValueFacade extends AbstractFacade<AttributeValue> {
      * @return If AttributeValue with the given ID was found returns an Optional containing the AttributeValue, otherwise returns an empty Optional.
      */
     @Override
-    @DenyAll
-    protected Optional<AttributeValue> findAndRefresh(UUID id) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public Optional<AttributeValue> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
@@ -110,7 +111,7 @@ public class AttributeValueFacade extends AbstractFacade<AttributeValue> {
      * If a persistence exception is thrown, then empty list is returned.
      * @note. Accounts are be default ordered (in the returned list) by the login.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
     public List<AttributeValue> findByAttributeName(String attributeName, int pageNumber, int pageSize)
             throws ApplicationBaseException {
         try {

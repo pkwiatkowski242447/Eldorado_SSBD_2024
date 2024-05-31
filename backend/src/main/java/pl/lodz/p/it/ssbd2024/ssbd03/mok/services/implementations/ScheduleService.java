@@ -13,10 +13,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.util.RunAsSystem;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.OperationType;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Token;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
@@ -100,12 +100,12 @@ public class ScheduleService implements ScheduleServiceInterface {
     /**
      * Autowired constructor for the service.
      *
-     * @param accountMOKFacade Facade used for managing user accounts.
-     * @param historyDataFacade    Facade used for inserting information about account modifications to the database.
-     * @param tokenFacade      Facade used for managing tokens used for many account related activities.
-     * @param tokenProvider    Component used for automatic generation of action tokens.
-     * @param mailProvider     Component used for sending e-mail messages to e-mail addresses connected to certain
-     *                         user accounts.
+     * @param accountMOKFacade  Facade used for managing user accounts.
+     * @param historyDataFacade Facade used for inserting information about account modifications to the database.
+     * @param tokenFacade       Facade used for managing tokens used for many account related activities.
+     * @param tokenProvider     Component used for automatic generation of action tokens.
+     * @param mailProvider      Component used for sending e-mail messages to e-mail addresses connected to certain
+     *                          user accounts.
      */
     @Autowired
     public ScheduleService(AccountMOKFacade accountMOKFacade,
@@ -146,6 +146,8 @@ public class ScheduleService implements ScheduleServiceInterface {
             try {
                 tokenFacade.removeByAccount(account.getId());
                 accountMOKFacade.remove(account);
+
+                mailProvider.sendRemoveAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage());
             } catch (ApplicationBaseException exception) {
                 log.error("Exception: {} occurred while removing account with id: {}. Cause: {}.",
                         exception.getClass().getSimpleName(), account.getId(), exception.getMessage());
@@ -268,17 +270,14 @@ public class ScheduleService implements ScheduleServiceInterface {
                 accountMOKFacade.edit(account);
                 historyDataFacade.create(new AccountHistoryData(account,
                         OperationType.SUSPEND,
-                        accountMOKFacade.findByLogin(SecurityContextHolder
-                                        .getContext()
-                                        .getAuthentication()
-                                        .getName())
-                                .orElse(null)));
+                        null)
+                );
             } catch (ApplicationBaseException exception) {
                 log.error("Exception of type: {} was throw while suspending user: {}.",
                         exception.getClass().getSimpleName(), account.getLogin());
             }
 
-            //TODO mail handle
+            mailProvider.sendSuspendAccountInfoEmail(account.getName(), account.getLastname(), account.getEmail(), account.getAccountLanguage());
         }));
     }
 }

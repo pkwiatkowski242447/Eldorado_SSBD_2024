@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.attribute;
 
 import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
@@ -13,7 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AttributeName;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -63,8 +64,8 @@ public class AttributeNameFacade extends AbstractFacade<AttributeName> {
      * @param attributeName AttributeName to be persisted.
      */
     @Override
-    @DenyAll
-    protected void create(AttributeName attributeName) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void create(AttributeName attributeName) throws ApplicationBaseException {
         super.create(attributeName);
     }
 
@@ -74,8 +75,8 @@ public class AttributeNameFacade extends AbstractFacade<AttributeName> {
      * @param attributeName AttributeName to be modified.
      */
     @Override
-    @DenyAll
-    protected void edit(AttributeName attributeName) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void edit(AttributeName attributeName) throws ApplicationBaseException {
         super.edit(attributeName);
     }
 
@@ -85,9 +86,14 @@ public class AttributeNameFacade extends AbstractFacade<AttributeName> {
      * @param attributeName AttributeName to be removed from the database.
      */
     @Override
-    @DenyAll
-    protected void remove(AttributeName attributeName) throws ApplicationBaseException {
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void remove(AttributeName attributeName) throws ApplicationBaseException {
         super.remove(attributeName);
+    }
+
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
+    public void removeByName(String attributeName) throws ApplicationBaseException {
+        super.remove(this.findByName(attributeName).orElse(null));
     }
 
     /**
@@ -97,9 +103,22 @@ public class AttributeNameFacade extends AbstractFacade<AttributeName> {
      * @return If AttributeName with the given ID was found returns an Optional containing the AttributeName, otherwise returns an empty Optional.
      */
     @Override
-    @DenyAll
+    @RolesAllowed(Authorities.MANAGE_ATTRIBUTES)
     protected Optional<AttributeName> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
+    }
+
+    @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
+    public Optional<AttributeName> findByName(String attributeName) throws ApplicationBaseException {
+        try {
+            TypedQuery<AttributeName> findAttributeByName = entityManager.createNamedQuery("AttributeName.findByName", AttributeName.class);
+            findAttributeByName.setParameter("attributeName", attributeName);
+            AttributeName foundAttributeByName = findAttributeByName.getSingleResult();
+            entityManager.refresh(foundAttributeByName);
+            return Optional.of(foundAttributeByName);
+        } catch (PersistenceException exception) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -110,7 +129,7 @@ public class AttributeNameFacade extends AbstractFacade<AttributeName> {
      * @return List of all attributes names from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
      */
-    @DenyAll
+    @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
     public List<AttributeName> findAllAttributeNamesWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<AttributeName> findAllAttributeNames = entityManager.createNamedQuery("AttributeName.findAll", AttributeName.class);
@@ -123,28 +142,4 @@ public class AttributeNameFacade extends AbstractFacade<AttributeName> {
             return new ArrayList<>();
         }
     }
-
-//    /**
-//     * This method is used to retrieve all attributes names assigned to the account, including pagination.
-//     *
-//     * @param account Searched attribute names account
-//     * @param pageNumber Number of the page with attributes names to be retrieved.
-//     * @param pageSize   Number of attribute name per page.
-//     * @return List of all attributes names from a specified page, of a given page size.
-//     * If a persistence exception is thrown, then empty list is returned.
-//     */
-//    @DenyAll
-//    public List<AttributeName> findByAccountWithPagination(Account account, int pageNumber, int pageSize) throws ApplicationBaseException {
-//        try {
-//            TypedQuery<AttributeName> findAllAttributeNames = entityManager.createNamedQuery("AttributeName.findByAccount", AttributeName.class);
-//            findAllAttributeNames.setFirstResult(pageNumber * pageSize);
-//            findAllAttributeNames.setMaxResults(pageSize);
-//            findAllAttributeNames.setParameter("account", account);
-//            List<AttributeName> list = findAllAttributeNames.getResultList();
-//            super.refreshAll(list);
-//            return list;
-//        } catch (PersistenceException exception) {
-//            return new ArrayList<>();
-//        }
-//    }
 }

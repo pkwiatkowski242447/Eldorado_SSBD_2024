@@ -343,7 +343,7 @@ public class Account extends AbstractEntity {
     /**
      * References to all attribute records in the database for a given account.
      */
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = DatabaseConsts.ACCOUNT_ATTRIBUTES,
             joinColumns = @JoinColumn(name = DatabaseConsts.ACCOUNT_ID_COLUMN),

@@ -29,17 +29,14 @@ import java.util.List;
                         SELECT a FROM AttributeName a
                         ORDER BY a.attributeName
                         """
+        ),
+        @NamedQuery(
+                name = "AttributeName.findByName",
+                query = """
+                        SELECT a FROM AttributeName a
+                        WHERE a.attributeName = :attributeName
+                        """
         )
-//        ,
-//        @NamedQuery(
-//                name = "AttributeName.findByAccount",
-//                query = """
-//                        SELECT an FROM AttributeName an
-//                        JOIN AttributeRecord ar ON ar.attributeName = an.attributeName
-//                        WHERE :account IN ar.setOfAccounts
-//                        ORDER BY an.attributeName
-//                        """
-//        )
 })
 @Getter
 @NoArgsConstructor
