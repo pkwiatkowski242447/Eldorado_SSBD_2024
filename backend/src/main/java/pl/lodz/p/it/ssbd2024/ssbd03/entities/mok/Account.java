@@ -347,7 +347,7 @@ public class Account extends AbstractEntity {
     @JoinTable(
             name = DatabaseConsts.ACCOUNT_ATTRIBUTES,
             joinColumns = @JoinColumn(name = DatabaseConsts.ACCOUNT_ID_COLUMN),
-            inverseJoinColumns = @JoinColumn(name = DatabaseConsts.ATTRIBUTE_ID_COLUMN)
+            inverseJoinColumns = @JoinColumn(name = DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN)
     )
     private final Set<AttributeRecord> attributeRecords = new HashSet<>();
 
