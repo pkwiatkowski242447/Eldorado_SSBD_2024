@@ -1,8 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.persistence.RollbackException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +24,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.integrity.SectorDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingListMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -73,8 +79,15 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.GET_ALL_PARKING)
-    public ResponseEntity<?> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
+    public ResponseEntity<?> getAllParkingsWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+        List<ParkingOutputListDTO> parkingList = parkingService.getAllParkingWithPagination(pageNumber, pageSize)
+                .stream()
+                .map(ParkingListMapper::toParkingListDTO)
+                .toList();
+        if (parkingList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(parkingList);
     }
 
     @Override
