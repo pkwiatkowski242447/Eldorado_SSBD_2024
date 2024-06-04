@@ -58,6 +58,12 @@ import java.time.LocalDateTime;
                         SELECT s FROM Sector s
                         WHERE s.type IN :sectorTypes AND :parkingId = s.parking AND (:showOnlyActive != true OR s.weight>0) 
                         ORDER BY s.parking.address.city, s.parking.address.city"""
+        ),
+        @NamedQuery(
+                name = "Sector.findByParkingIdAndName",
+                query = """
+                        SELECT s FROM Sector s
+                        WHERE s.parking.id = :parkingId AND s.name = :name"""
         )
 })
 public class Sector extends AbstractEntity implements Serializable {
