@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -52,7 +53,10 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed({Authorities.ADD_SECTOR, Authorities.GET_PARKING})
     public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Parking parking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
+        Sector sector = new Sector(parking, name, type, maxPlaces, weight);
+
+        parkingFacade.createSector(sector);
     }
 
     @Override
@@ -88,7 +92,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_ALL_SECTORS)
     public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        return parkingFacade.findSectorsInParking(id, true);
     }
 
     @Override

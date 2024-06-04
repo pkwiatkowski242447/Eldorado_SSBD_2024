@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,10 +12,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.integrity.SectorDataIntegrityCompromisedException;
@@ -26,6 +27,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterf
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
+import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller used for manipulating parking in the system.
@@ -60,7 +64,11 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.ADD_SECTOR)
     public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        parkingService.createSector(UUID.fromString(parkingId),
+            sectorCreateDTO.getName(), sectorCreateDTO.getType(),
+            sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight());
+
+        return ResponseEntity.ok().build();
     }
 
     @Override
@@ -96,7 +104,12 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.GET_ALL_SECTORS)
     public ResponseEntity<?> getSectorsByParkingId(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        List<SectorListDTO> sectorList = parkingService.getSectorsByParkingId(UUID.fromString(id))
+            .stream()
+            .map(SectorListMapper::toSectorListDTO)
+            .toList();
+        if (sectorList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(sectorList);
     }
 
     @Override
