@@ -4,6 +4,8 @@ import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,10 +14,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -283,6 +287,28 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     protected void refreshAllSectors(List<Sector> list) throws ApplicationBaseException {
         if (list != null && !list.isEmpty()) {
             list.forEach(getEntityManager()::refresh);
+        }
+    }
+
+    /***
+     * Get all parkings from database
+     *
+     * @param pageNumber Number of the page with parkins to be retrieved.
+     * @param pageSize Number of parkings per page.
+     * @return List of all parkings from a specified page, of a given page size.
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    public List<Parking> findAllParkingsWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            TypedQuery<Parking> findAllParkings = entityManager.createNamedQuery("Parking.findAllParkings", Parking.class);
+            findAllParkings.setFirstResult(pageNumber * pageSize);
+            findAllParkings.setMaxResults(pageSize);
+            List<Parking> list = findAllParkings.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
         }
     }
 }
