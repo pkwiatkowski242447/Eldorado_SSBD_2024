@@ -45,6 +45,13 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
         @NamedQuery(
+                name = "Parking.findAllParkings",
+                query = """
+                        SELECT p FROM Parking p
+                        ORDER BY p.address.city
+                        """
+        ),
+        @NamedQuery(
                 name = "Parking.findBySectorTypes",
                 query = """
                         SELECT s.parking FROM Sector s
@@ -132,8 +139,8 @@ public class Parking extends AbstractEntity {
      * @param maxPlaces Total number of parking spots in the sector.
      * @param weight    Sector's weight in the spot assigning algorithms. If set to 0, the sector is disabled.
      */
-    public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
-        sectors.add(new Sector(this, name, type, maxPlaces, weight));
+    public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight, Boolean active) {
+        sectors.add(new Sector(this, name, type, maxPlaces, weight, active));
     }
 
     /**

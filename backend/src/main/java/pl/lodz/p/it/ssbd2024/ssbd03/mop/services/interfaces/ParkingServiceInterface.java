@@ -6,6 +6,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorAlreadyActiveException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorNotFoundException;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +39,7 @@ public interface ParkingServiceInterface {
      * @throws ParkingConstraintViolationException Throws when database constraints are not followed
      * @throws ParkingAddressAlreadyTakenException Throws when database constraint unique on (zip-code, city, street) is not followed
      */
-    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException;
+    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException;
 
     /**
      * Retrieve all parking spaces in the system.
@@ -47,7 +49,7 @@ public interface ParkingServiceInterface {
      * @return A list of all parking in the system, with pagination applied.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Account> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database sector by id.
@@ -77,10 +79,11 @@ public interface ParkingServiceInterface {
     Parking getParkingById(UUID id) throws ApplicationBaseException;
 
     /**
-     * Activates sector with given id.
+     * Activates sector with given id, by setting active field to true.
      *
      * @param id Sector's id.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     * @throws SectorNotFoundException Thrown when sector with given id cannot be found in the database.
+     * @throws SectorAlreadyActiveException Thrown when trying to activate an active sector.
      */
     void activateSector(UUID id) throws ApplicationBaseException;
 
@@ -126,7 +129,7 @@ public interface ParkingServiceInterface {
      * @param id Identifier of the sector to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void editSector(UUID id) throws ApplicationBaseException;
+    Sector editSector(Sector modifiedSector, UUID parkingId, String name) throws ApplicationBaseException;
 
     /**
      * Removes sector from the database by its id.

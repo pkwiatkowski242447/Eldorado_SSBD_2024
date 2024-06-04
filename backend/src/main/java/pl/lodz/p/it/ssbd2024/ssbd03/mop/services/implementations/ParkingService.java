@@ -11,11 +11,14 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorAlreadyActiveException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -55,14 +58,17 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_SECTOR, Authorities.GET_PARKING})
-    public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException {
+        Parking parking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
+        Sector sector = new Sector(parking, name, type, maxPlaces, weight, active);
+
+        parkingFacade.createSector(sector);
     }
 
     @Override
     @RolesAllowed(Authorities.GET_ALL_PARKING)
-    public List<Account> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+        return parkingFacade.findAllParkingsWithPagination(pageNumber, pageSize);
     }
 
     @Override
@@ -80,7 +86,10 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
     public void activateSector(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
+        if(sector.getActive()) throw new SectorAlreadyActiveException();
+        sector.setActive(true);
+        parkingFacade.editSector(sector);
     }
 
     @Override
@@ -92,7 +101,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_ALL_SECTORS)
     public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        return parkingFacade.findSectorsInParking(id, true);
     }
 
     @Override
@@ -115,8 +124,20 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
-    public void editSector(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public Sector editSector(Sector modifiedSector, UUID parkingId, String name) throws ApplicationBaseException {
+        Sector foundSector = parkingFacade.findSectorByParkingIdAndName(parkingId, name);
+
+        if (!modifiedSector.getVersion().equals(foundSector.getVersion())) {
+            throw new ApplicationOptimisticLockException();
+        }
+
+        foundSector.setType(modifiedSector.getType());
+        foundSector.setMaxPlaces(modifiedSector.getMaxPlaces());
+        foundSector.setWeight(modifiedSector.getWeight());
+
+        parkingFacade.editSector(foundSector);
+
+        return foundSector;
     }
 
     @Override

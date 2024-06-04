@@ -15,7 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @NoArgsConstructor
 @AllArgsConstructor
 @LoggerInterceptor
-public class SectorCreateDTO {
+public class SectorListDTO {
 
     @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
@@ -23,10 +23,10 @@ public class SectorCreateDTO {
     private Sector.SectorType type;
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
+    @Schema(description = "The current number of available parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer availablePlaces;
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
-    @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Boolean active;
 
     /**
      * Custom toString() method implementation that
@@ -38,6 +38,6 @@ public class SectorCreateDTO {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .toString();
+            .toString();
     }
 }

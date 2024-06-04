@@ -167,4 +167,5 @@ public class DatabaseConsts {
     public static final String SECTOR_MAX_PLACES_COLUMN = "max_places";
     public static final String SECTOR_AVAILABLE_PLACES_COLUMN = "available_places";
     public static final String SECTOR_WEIGHT_COLUMN = "weight";
+    public static final String SECTOR_ACTIVE_COLUMN = "active";
 }

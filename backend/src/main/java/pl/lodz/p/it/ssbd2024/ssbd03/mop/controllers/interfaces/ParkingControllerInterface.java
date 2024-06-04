@@ -67,7 +67,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
+    @Operation(summary = "Get all parkings", description = "The endpoint is used retrieve list of parkings from given page of given size.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of parkings returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of parkings returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getAllParkingsWithPagination(@RequestParam("pageNumber") int pageNumber,
                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
@@ -115,7 +121,14 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @PostMapping(value = "/sectors/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/sectors/{id}/activate")
+    @Operation(summary = "Activate sector", description = "The endpoint is used to activate a sector with a given id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The account has been activated correctly."),
+            @ApiResponse(responseCode = "400", description = "The account has not been activated due to it being already " +
+                    "activated or because the sector is not available in the database"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> activateSector(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
