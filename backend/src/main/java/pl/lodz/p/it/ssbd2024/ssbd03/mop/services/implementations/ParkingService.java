@@ -12,6 +12,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -44,8 +45,19 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.ADD_PARKING)
-    public void createParking(String city, String zipCode, String street) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException {
+        Address address = new Address(city, zipCode, street);
+        Parking parking = new Parking(address);
+        log.error(parking.getSectors().toString());
+        this.parkingFacade.create(parking);
+        //Jakie wyjatki:
+        //1. Wyjatek o niepoprawnym miescie (I18n.ADDRESS_INVALID_CITY)
+        //2. Wyjotek o niepoprawnym kodzie (I18n.ADDRESS_INVALID_ZIP_CODE)
+        //3. Wyjatek o niepoprawnej ulicy (I18n.ADDRESS_INVALID_STREET)
+        //4. Wyjatek o nieunikalnej kombinacji (miasto, kod, ulica) (I18n.ADDRESS_UNIQUE_CONSTRAINT)
+        //5. Wyjątek o niepoprawnej roli
+        //6. Wyjatek o niespodziewanym bledzie bazy
+        return parking;
     }
 
     @Override

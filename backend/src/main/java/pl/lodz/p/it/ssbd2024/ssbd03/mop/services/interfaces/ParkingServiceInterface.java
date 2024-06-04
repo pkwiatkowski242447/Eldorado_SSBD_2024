@@ -23,7 +23,7 @@ public interface ParkingServiceInterface {
      * @param street Address - street.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void createParking(String city, String zipCode, String street) throws ApplicationBaseException;
+    Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException;
 
     /**
      * Create sector in the given parking.
