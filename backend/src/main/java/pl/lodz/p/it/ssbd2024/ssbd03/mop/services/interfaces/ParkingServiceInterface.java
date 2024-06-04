@@ -127,7 +127,7 @@ public interface ParkingServiceInterface {
      * @param id Identifier of the sector to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void editSector(UUID id) throws ApplicationBaseException;
+    Sector editSector(Sector modifiedSector, UUID parkingId, String name) throws ApplicationBaseException;
 
     /**
      * Removes sector from the database by its id.
