@@ -132,8 +132,8 @@ public class Parking extends AbstractEntity {
      * @param maxPlaces Total number of parking spots in the sector.
      * @param weight    Sector's weight in the spot assigning algorithms. If set to 0, the sector is disabled.
      */
-    public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
-        sectors.add(new Sector(this, name, type, maxPlaces, weight));
+    public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight, Boolean active) {
+        sectors.add(new Sector(this, name, type, maxPlaces, weight, active));
     }
 
     /**

@@ -67,7 +67,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     public void setup() {
         address = new Address("dd","casc","wqc");
         parking = new Parking(address);
-        sector = new Sector(parking,"dd", Sector.SectorType.COVERED,23,11);
+        sector = new Sector(parking,"dd", Sector.SectorType.COVERED,23,11, true);
         reservation = new Reservation(sector);
         reservation1 = new Reservation(sector);
     }
