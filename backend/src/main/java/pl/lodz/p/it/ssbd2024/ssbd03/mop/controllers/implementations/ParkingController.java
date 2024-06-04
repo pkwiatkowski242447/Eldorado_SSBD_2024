@@ -4,6 +4,7 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,12 +14,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.integrity.SectorDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 
 /**
@@ -34,9 +40,15 @@ public class ParkingController implements ParkingControllerInterface {
 
     private final ParkingServiceInterface parkingService;
 
+    /**
+     * JWTProvider used for operations on JWT TOKEN.
+     */
+    private final JWTProvider jwtProvider;
+
     @Autowired
-    public ParkingController(ParkingServiceInterface parkingService) {
+    public ParkingController(ParkingServiceInterface parkingService, JWTProvider jwtProvider) {
         this.parkingService = parkingService;
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
@@ -114,7 +126,18 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
     public ResponseEntity<?> editSector(String ifMatch, SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        if (ifMatch == null || ifMatch.isBlank()) {
+            throw new InvalidRequestHeaderIfMatchException();
+        }
+
+        if (!ifMatch.equals(jwtProvider.generateObjectSignature(sectorModifyDTO))) {
+            throw new SectorDataIntegrityCompromisedException();
+        }
+
+        SectorOutputDTO sectorOutputDTO = SectorMapper.toSectorOutputDTO(
+                parkingService.editSector(SectorMapper.toSector(sectorModifyDTO), sectorModifyDTO.getParkingId(), sectorModifyDTO.getName())
+        );
+        return ResponseEntity.ok().body(sectorOutputDTO);
     }
 
     @Override

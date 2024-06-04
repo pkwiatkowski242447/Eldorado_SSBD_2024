@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop;
 
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -10,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
@@ -19,7 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @NoArgsConstructor
 @AllArgsConstructor
 @LoggerInterceptor
-public class SectorModifyDTO implements SignableDTO {
+public class SectorOutputDTO {
 
     @Schema(description = "The name of the sector", example = "BC-69", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
@@ -31,28 +29,17 @@ public class SectorModifyDTO implements SignableDTO {
     private Integer maxPlaces;
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
-    @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long version;
 
     /**
      * Custom toString() method implementation that
      * does not return any information relating to the business
      * data.
      *
-     * @return String representation of the SectorModifyDTO object.
+     * @return String representation of the SectorOutputDTO object.
      */
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-        .toString();
-    }
-
-    @Override
-    public Map<String, ?> getSigningFields() {
-        return Map.ofEntries(
-                Map.entry("name", name),
-                Map.entry("parkingId", parkingId.toString()),
-                Map.entry("version", version)
-        );
+            .toString();
     }
 }
