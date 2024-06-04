@@ -65,7 +65,8 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         parkingService.createSector(UUID.fromString(parkingId),
             sectorCreateDTO.getName(), sectorCreateDTO.getType(),
-            sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight());
+            sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
+            sectorCreateDTO.getActive());
 
         return ResponseEntity.ok().build();
     }

@@ -37,7 +37,7 @@ public interface ParkingServiceInterface {
      * @param weight    The weight of the sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException;
+    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException;
 
     /**
      * Retrieve all parking spaces in the system.

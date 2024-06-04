@@ -54,9 +54,9 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_SECTOR, Authorities.GET_PARKING})
-    public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException {
+    public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException {
         Parking parking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
-        Sector sector = new Sector(parking, name, type, maxPlaces, weight);
+        Sector sector = new Sector(parking, name, type, maxPlaces, weight, active);
 
         parkingFacade.createSector(sector);
     }

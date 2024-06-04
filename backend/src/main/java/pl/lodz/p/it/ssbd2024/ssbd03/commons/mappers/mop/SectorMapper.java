@@ -21,7 +21,8 @@ public class SectorMapper {
             sector.getParking().getId(),
             sector.getType(),
             sector.getMaxPlaces(),
-            sector.getWeight()
+            sector.getWeight(),
+            sector.getActive()
         );
     }
 
@@ -35,7 +36,8 @@ public class SectorMapper {
             sectorModifyDTO.getName(),
             sectorModifyDTO.getType(),
             sectorModifyDTO.getMaxPlaces(),
-            sectorModifyDTO.getWeight()
+            sectorModifyDTO.getWeight(),
+            sectorModifyDTO.getActive()
         );
     }
 }
