@@ -131,6 +131,14 @@ public class Sector extends AbstractEntity implements Serializable {
     @Setter
     private Integer weight;
 
+    /**
+     * Determines whether the sector is active.
+     */
+    @NotNull(message = SectorMessages.SECTOR_ACTIVE_NULL)
+    @Column(name = DatabaseConsts.SECTOR_ACTIVE_COLUMN, nullable = false)
+    @Setter
+    private Boolean active;
+
     // Other fields - used for access control, and storing historical data
 
     /**

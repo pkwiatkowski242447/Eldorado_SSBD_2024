@@ -20,6 +20,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingController
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.util.UUID;
+
 
 /**
  * Controller used for manipulating parking in the system.
@@ -72,7 +74,8 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
     public ResponseEntity<?> activateSector(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        parkingService.activateSector(UUID.fromString(id));
+        return ResponseEntity.noContent().build();
     }
 
     @Override

@@ -41,6 +41,10 @@ public class I18n {
     // Token internationalization keys
     public static final String TOKEN_VALUE_ALREADY_TAKEN = "token.value.already.taken.exception";
 
+    // Sector exceptions
+    public static final String SECTOR_NOT_FOUND = "sector.not.found.exception";
+    public static final String SECTOR_ALREADY_ACTIVE = "sector.already.active.exception";
+
     // General exception messages
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "application.optimistic.lock.exception";
     public static final String INTERNAL_SERVER_ERROR = "application.internal.server.error.exception";

@@ -194,8 +194,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @RolesAllowed({Authorities.GET_SECTOR, Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR,
             Authorities.CANCEL_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.EXIT_PARKING})
-    protected Optional<Sector> findAndRefreshSectorById(UUID id) throws ApplicationBaseException {
+            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.EXIT_PARKING, Authorities.ACTIVATE_SECTOR})
+    public Optional<Sector> findAndRefreshSectorById(UUID id) throws ApplicationBaseException {
         Optional<Sector> optEntity = findSectorById(id);
         optEntity.ifPresent(t -> getEntityManager().refresh(t));
         return optEntity;
@@ -268,7 +268,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param sector Sector to be modified.
      */
-    @RolesAllowed(Authorities.EDIT_SECTOR)
+    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR})
     public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
         getEntityManager().flush();

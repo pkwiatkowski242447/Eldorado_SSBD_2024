@@ -15,6 +15,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorAlreadyActiveException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -75,7 +77,10 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
     public void activateSector(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
+        if(sector.getActive()) throw new SectorAlreadyActiveException();
+        sector.setActive(true);
+        parkingFacade.editSector(sector);
     }
 
     @Override
