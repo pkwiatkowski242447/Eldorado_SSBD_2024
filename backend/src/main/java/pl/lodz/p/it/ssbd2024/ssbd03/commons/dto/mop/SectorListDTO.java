@@ -15,7 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @NoArgsConstructor
 @AllArgsConstructor
 @LoggerInterceptor
-public class SectorModifyDTO {
+public class SectorListDTO {
 
     @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
@@ -23,6 +23,8 @@ public class SectorModifyDTO {
     private Sector.SectorType type;
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
+    @Schema(description = "The current number of available parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer availablePlaces;
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
 
