@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
@@ -114,8 +115,20 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
-    public void editSector(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public Sector editSector(Sector modifiedSector, UUID parkingId, String name) throws ApplicationBaseException {
+        Sector foundSector = parkingFacade.findSectorByParkingIdAndName(parkingId, name);
+
+        if (!modifiedSector.getVersion().equals(foundSector.getVersion())) {
+            throw new ApplicationOptimisticLockException();
+        }
+
+        foundSector.setType(modifiedSector.getType());
+        foundSector.setMaxPlaces(modifiedSector.getMaxPlaces());
+        foundSector.setWeight(modifiedSector.getWeight());
+
+        parkingFacade.editSector(foundSector);
+
+        return foundSector;
     }
 
     @Override
