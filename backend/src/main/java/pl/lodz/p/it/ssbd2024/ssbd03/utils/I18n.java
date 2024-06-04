@@ -172,7 +172,9 @@ public class I18n {
     public static final String STAFF_USER_LEVEL = "user.level.staff";
     public static final String ADMIN_USER_LEVEL = "user.level.admin";
 
-    public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.service.account.not.found.exception";
+    public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
+    public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
+    public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.not.found.exception";
 
     public static String getMessage(String messageKey, String language) {
         Locale locale = new Locale.Builder().setLanguage(language).build();

@@ -25,7 +25,7 @@ public interface ParkingServiceInterface {
      * @param street Address - street.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void createParking(String city, String zipCode, String street) throws ApplicationBaseException;
+    Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException;
 
     /**
      * Create sector in the given parking.
@@ -36,6 +36,8 @@ public interface ParkingServiceInterface {
      * @param maxPlaces The maximum number of parking spots in the sector.
      * @param weight    The weight of the sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     * @throws ParkingConstraintViolationException Throws when database constraints are not followed
+     * @throws ParkingAddressAlreadyTakenException Throws when database constraint unique on (zip-code, city, street) is not followed
      */
     void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException;
 

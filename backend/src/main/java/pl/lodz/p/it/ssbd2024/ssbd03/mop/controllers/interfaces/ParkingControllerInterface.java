@@ -23,14 +23,21 @@ public interface ParkingControllerInterface {
      * This method is used to create new system.
      *
      * @param parkingCreateDTO Data transfer object, containing parking data.
-     * @return It returns HTTP response 204 NO CONTENT when parking creation is successful,
+     * @return It returns HTTP response 201 CREATED when parking creation is successful,
      *         It returns HTTP response 400 BAD REQUEST when persistence exception is being thrown.
      *         It returns HTTP response 409 CONFLICT when parking with specific data exits.
      *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create parking", description = "Create new parking with specified address.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "New parking successfully created."),
+            @ApiResponse(responseCode = "400", description = "Persistence exception was thrown."),
+            @ApiResponse(responseCode = "409", description = "Parking with specified address already exist."),
+            @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
+    })
     ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException;
 
     /**
