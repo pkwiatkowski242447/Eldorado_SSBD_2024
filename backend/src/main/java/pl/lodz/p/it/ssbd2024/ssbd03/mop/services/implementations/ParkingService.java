@@ -50,13 +50,6 @@ public class ParkingService implements ParkingServiceInterface {
         Parking parking = new Parking(address);
         log.error(parking.getSectors().toString());
         this.parkingFacade.create(parking);
-        //Jakie wyjatki:
-        //1. Wyjatek o niepoprawnym miescie (I18n.ADDRESS_INVALID_CITY)
-        //2. Wyjotek o niepoprawnym kodzie (I18n.ADDRESS_INVALID_ZIP_CODE)
-        //3. Wyjatek o niepoprawnej ulicy (I18n.ADDRESS_INVALID_STREET)
-        //4. Wyjatek o nieunikalnej kombinacji (miasto, kod, ulica) (I18n.ADDRESS_UNIQUE_CONSTRAINT)
-        //5. Wyjątek o niepoprawnej roli
-        //6. Wyjatek o niespodziewanym bledzie bazy
         return parking;
     }
 
