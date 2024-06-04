@@ -47,7 +47,7 @@ public interface ParkingServiceInterface {
      * @return A list of all parking in the system, with pagination applied.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Account> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database sector by id.

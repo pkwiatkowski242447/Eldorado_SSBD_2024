@@ -60,7 +60,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
+    @Operation(summary = "Get all parkings", description = "The endpoint is used retrieve list of parkings from given page of given size.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of parkings returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of parkings returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getAllParkingsWithPagination(@RequestParam("pageNumber") int pageNumber,
                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**

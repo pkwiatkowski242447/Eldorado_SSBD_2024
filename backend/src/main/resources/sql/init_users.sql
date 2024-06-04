@@ -109,9 +109,16 @@ INSERT INTO public.client_data (id, type) VALUES ('248a31fa-7fef-41d5-8042-e70a3
 
 -- Parking
 INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, '00-000', 'BoatCity', 'Palki', 0);
+INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a3-41b8-9c3c-b6bef04ce6d1', current_timestamp, '00-000', 'BoatCity', 'Palki1', 0);
 
 -- First Sector S1
 INSERT INTO public.sector (id, creation_timestamp, active,available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, true, 20, 50, 1, 'SA-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+
+INSERT INTO public.sector (id, creation_timestamp, available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, 20, 50, 1, 'S1', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d752-4549-bbb7-9705f0b2fa6b', current_timestamp, 20, 50, 1, 'S2', '96a36faa-f2a3-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d753-4549-bbb7-9705f0b2fa6b', current_timestamp, 20, 50, 1, 'S3', '96a36faa-f2a3-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d754-4549-bbb7-9705f0b2fa6b', current_timestamp, 20, 50, 1, 'S4', '96a36faa-f2a3-41b8-9c3c-b6bef04ce6d1', 'COVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d755-4549-bbb7-9705f0b2fa6b', current_timestamp, 20, 50, 1, 'S5', '96a36faa-f2a3-41b8-9c3c-b6bef04ce6d1', 'UNDERGROUND', 0);
 
 -- Second Sector S2
 INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('4ce920a0-6f4d-4e95-ba24-99ba32b66491', current_timestamp, true, 30, 60, 2, 'SA-02', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
