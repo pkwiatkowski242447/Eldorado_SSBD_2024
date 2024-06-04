@@ -6,6 +6,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorAlreadyActiveException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorNotFoundException;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +37,7 @@ public interface ParkingServiceInterface {
      * @param weight    The weight of the sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException;
+    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException;
 
     /**
      * Retrieve all parking spaces in the system.
@@ -75,10 +77,11 @@ public interface ParkingServiceInterface {
     Parking getParkingById(UUID id) throws ApplicationBaseException;
 
     /**
-     * Activates sector with given id.
+     * Activates sector with given id, by setting active field to true.
      *
      * @param id Sector's id.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     * @throws SectorNotFoundException Thrown when sector with given id cannot be found in the database.
+     * @throws SectorAlreadyActiveException Thrown when trying to activate an active sector.
      */
     void activateSector(UUID id) throws ApplicationBaseException;
 

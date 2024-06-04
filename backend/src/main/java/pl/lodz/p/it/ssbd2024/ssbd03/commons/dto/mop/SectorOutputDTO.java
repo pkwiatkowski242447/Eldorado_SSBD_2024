@@ -29,6 +29,8 @@ public class SectorOutputDTO {
     private Integer maxPlaces;
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
+    @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Boolean active;
 
     /**
      * Custom toString() method implementation that

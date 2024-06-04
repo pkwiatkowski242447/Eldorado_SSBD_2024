@@ -3,7 +3,6 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,9 +26,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterf
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Controller used for manipulating parking in the system.
@@ -66,7 +65,8 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         parkingService.createSector(UUID.fromString(parkingId),
             sectorCreateDTO.getName(), sectorCreateDTO.getType(),
-            sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight());
+            sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
+            sectorCreateDTO.getActive());
 
         return ResponseEntity.ok().build();
     }
@@ -92,7 +92,8 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
     public ResponseEntity<?> activateSector(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        parkingService.activateSector(UUID.fromString(id));
+        return ResponseEntity.noContent().build();
     }
 
     @Override

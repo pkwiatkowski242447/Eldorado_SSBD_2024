@@ -137,6 +137,14 @@ public class Sector extends AbstractEntity implements Serializable {
     @Setter
     private Integer weight;
 
+    /**
+     * Determines whether the sector is active.
+     */
+    @NotNull(message = SectorMessages.SECTOR_ACTIVE_NULL)
+    @Column(name = DatabaseConsts.SECTOR_ACTIVE_COLUMN, nullable = false)
+    @Setter
+    private Boolean active;
+
     // Other fields - used for access control, and storing historical data
 
     /**
@@ -179,13 +187,14 @@ public class Sector extends AbstractEntity implements Serializable {
      * @param maxPlaces Total number of parking spots in the sector.
      * @param weight Sector's weight in the spot assigning algorithms. If set to 0, the sector is disabled.
      */
-    public Sector(Parking parking, String name, SectorType type, Integer maxPlaces, Integer weight) {
+    public Sector(Parking parking, String name, SectorType type, Integer maxPlaces, Integer weight, Boolean active) {
         this.parking = parking;
         this.name = name;
         this.type = type;
         this.maxPlaces = maxPlaces;
         this.availablePlaces = maxPlaces;
         this.weight = weight;
+        this.active = active;
     }
 
     /**

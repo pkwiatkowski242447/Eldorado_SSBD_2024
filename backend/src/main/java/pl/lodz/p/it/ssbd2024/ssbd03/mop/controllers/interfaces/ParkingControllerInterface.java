@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -105,7 +108,14 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @PostMapping(value = "/sectors/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/sectors/{id}/activate")
+    @Operation(summary = "Activate sector", description = "The endpoint is used to activate a sector with a given id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The account has been activated correctly."),
+            @ApiResponse(responseCode = "400", description = "The account has not been activated due to it being already " +
+                    "activated or because the sector is not available in the database"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> activateSector(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**

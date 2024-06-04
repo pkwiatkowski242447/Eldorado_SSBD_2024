@@ -31,6 +31,8 @@ public class SectorModifyDTO implements SignableDTO {
     private Integer maxPlaces;
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
+    @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Boolean active;
     @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long version;
 
