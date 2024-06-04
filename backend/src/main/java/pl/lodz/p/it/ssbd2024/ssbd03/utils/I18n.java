@@ -168,6 +168,8 @@ public class I18n {
     public static final String STAFF_USER_LEVEL = "user.level.staff";
     public static final String ADMIN_USER_LEVEL = "user.level.admin";
 
+    public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.service.account.not.found.exception";
+
     public static String getMessage(String messageKey, String language) {
         Locale locale = new Locale.Builder().setLanguage(language).build();
         ResourceBundle resourceBundle = ResourceBundle.getBundle("Messages", locale);

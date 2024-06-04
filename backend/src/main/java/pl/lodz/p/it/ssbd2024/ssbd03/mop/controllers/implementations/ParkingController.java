@@ -1,11 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,6 +21,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingController
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller used for manipulating parking in the system.
@@ -54,7 +52,11 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.ADD_SECTOR)
     public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        parkingService.createSector(UUID.fromString(parkingId),
+            sectorCreateDTO.getName(), sectorCreateDTO.getType(),
+            sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight());
+
+        return ResponseEntity.ok().build();
     }
 
     @Override
