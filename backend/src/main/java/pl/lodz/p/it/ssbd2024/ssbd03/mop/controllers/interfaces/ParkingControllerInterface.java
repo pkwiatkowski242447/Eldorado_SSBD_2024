@@ -173,11 +173,18 @@ public interface ParkingControllerInterface {
      *
      * @param id Identifier of the parking to be removed.
      * @return This method returns 204 NO CONTENT if the parking is removed successfully. Otherwise, if the parking
-     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * could not be found in the database then 400 BAD REQUEST is returned (when the parking could not be found or
+     * parking does have sectors attached). 500 INTERNAL SERVER ERROR is returned
      * when other unexpected exception is encountered while processing the request.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
+    @Operation(summary = "Remove parking", description = "The endpoint is used to remove parking with a given id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The parking has been removed successfully."),
+            @ApiResponse(responseCode = "400", description = "The parking could not be removed due to existing sectors of a given parking or the parking not existing in the database."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     @DeleteMapping(value = "/{id}")
     ResponseEntity<?> removeParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 

@@ -9,12 +9,13 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountLoginAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.validation.AccountConstraintViolationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountEmailAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountLoginAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.sql.SQLException;
@@ -54,8 +55,8 @@ public class AccountFacadeAspect {
     private Object handleAccountRelatedMethodsExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
         try {
             return proceedingJoinPoint.proceed();
-        } catch (OptimisticLockException optimisticLockException) {
-            throw optimisticLockException;
+        } catch (OptimisticLockException | AccessDeniedException exception) {
+            throw exception;
         } catch (PersistenceException | SQLException exception) {
             Throwable exceptionCopy = exception;
             do {

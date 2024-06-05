@@ -31,7 +31,13 @@ import java.util.List;
  * @see Client
  */
 @Entity
-@Table(name = DatabaseConsts.RESERVATION_TABLE)
+@Table(
+        name = DatabaseConsts.RESERVATION_TABLE,
+        indexes = {
+                @Index(name = DatabaseConsts.RESERVATION_CLIENT_ID_INDEX, columnList = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN),
+                @Index(name = DatabaseConsts.RESERVATION_SECTOR_ID_INDEX, columnList = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN)
+        }
+)
 @LoggerInterceptor
 @NoArgsConstructor
 @Getter
@@ -86,7 +92,12 @@ public class Reservation extends AbstractEntity implements Serializable {
      * The client associated with this reservation.
      */
     @ManyToOne
-    @JoinColumn(name = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, updatable = false)
+    @JoinColumn(
+            name = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.RESERVATION_CLIENT_ID_FK),
+            updatable = false
+    )
     private Client client;
 
     /**
@@ -94,7 +105,12 @@ public class Reservation extends AbstractEntity implements Serializable {
      */
     @NotNull(message = ReservationMessages.SECTOR_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
+    @JoinColumn(
+            name = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.RESERVATION_SECTOR_ID_FK),
+            nullable = false, updatable = false
+    )
     private Sector sector;
 
     /**

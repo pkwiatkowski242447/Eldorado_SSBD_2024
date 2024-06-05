@@ -20,7 +20,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.SectorConsts;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.SectorMessages;
 
 import java.io.Serial;
@@ -33,7 +32,12 @@ import java.time.LocalDateTime;
  * @see Reservation
  */
 @Entity
-@Table(name = DatabaseConsts.SECTOR_TABLE)
+@Table(
+        name = DatabaseConsts.SECTOR_TABLE,
+        indexes = {
+                @Index(name = DatabaseConsts.SECTOR_PARKING_ID_INDEX, columnList = DatabaseConsts.SECTOR_PARKING_ID_COLUMN)
+        }
+)
 @LoggerInterceptor
 @NoArgsConstructor
 @Getter
@@ -87,7 +91,12 @@ public class Sector extends AbstractEntity implements Serializable {
      */
     @NotNull(message = SectorMessages.PARKING_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = DatabaseConsts.SECTOR_PARKING_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
+    @JoinColumn(
+            name = DatabaseConsts.SECTOR_PARKING_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.SECTOR_PARKING_ID_FK),
+            nullable = false, updatable = false
+    )
     private Parking parking;
 
     /**

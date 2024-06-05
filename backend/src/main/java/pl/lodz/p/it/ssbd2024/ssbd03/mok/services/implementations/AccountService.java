@@ -15,25 +15,25 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountRestoreAccessException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountAlreadyUnblockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountEmailAlreadyTakenException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountSameEmailException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.UserLevelMissingException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountEmailNullException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountIdNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.IncorrectPasswordException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.PasswordPreviouslyUsedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.read.TokenNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.attribute.AttributeNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.attribute.AttributeRepeatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.AccountRestoreAccessException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.AccountUserLevelException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountAlreadyBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountAlreadyUnblockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountEmailAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountSameEmailException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.integrity.UserLevelMissingException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountEmailNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountEmailNullException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountIdNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.resetOwnPassword.IncorrectPasswordException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.resetOwnPassword.PasswordPreviouslyUsedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountBlockedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.read.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.attribute.AttributeNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.attribute.AttributeRepeatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.AccountMOKFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.facades.TokenFacade;
@@ -588,7 +588,7 @@ public class AccountService implements AccountServiceInterface {
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
     public void addClientUserLevel(String id) throws ApplicationBaseException {
 
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
@@ -613,7 +613,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
     public void addStaffUserLevel(String id) throws ApplicationBaseException {
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Staff)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);
@@ -638,7 +638,7 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
     public void addAdminUserLevel(String id) throws ApplicationBaseException {
-        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
+        Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Admin)) {
             throw new AccountUserLevelException(I18n.USER_LEVEL_DUPLICATED);

@@ -7,11 +7,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.*;
 
 import java.sql.SQLException;
 
@@ -46,6 +44,8 @@ public class GenericFacadeAspect {
             return proceedingJoinPoint.proceed();
         } catch (OptimisticLockException optimisticLockException) {
             throw new ApplicationOptimisticLockException();
+        } catch (AccessDeniedException accessDeniedException) {
+            throw new ApplicationAccessDeniedException();
         } catch (PersistenceException | SQLException exception) {
             throw new ApplicationDatabaseException(exception);
         } catch (ApplicationBaseException applicationBaseException) {

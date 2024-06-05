@@ -1,7 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.schedule.ScheduleBadPropertiesException;
-
 /**
  * Interface used for managing execution of scheduled tasks.
  */
@@ -27,8 +25,6 @@ public interface ScheduleServiceInterface {
 
     /**
      * Block Accounts without authentication for the last N days, where N is specified in the file consts.properties.
-     *
-     * @throws ScheduleBadPropertiesException Threw when problem with properties occurs.
      */
-    void suspendAccountWithoutAuthenticationForSpecifiedTime() throws ScheduleBadPropertiesException;
+    void suspendAccountWithoutAuthenticationForSpecifiedTime();
 }

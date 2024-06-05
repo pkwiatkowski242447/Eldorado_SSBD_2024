@@ -18,10 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(
-        name = DatabaseConsts.ATTRIBUTE_NAME_TABLE,
-        uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ATTRIBUTE_NAME_COLUMN})
-)
+@Table(name = DatabaseConsts.ATTRIBUTE_NAME_TABLE)
 @NamedQueries({
         // General queries
         @NamedQuery(
@@ -55,7 +52,7 @@ public class AttributeName extends AbstractEntity implements Serializable {
      * Name of the attribute.
      */
     @NotBlank(message = AttributeMessages.ATTRIBUTE_NAME_BLANK)
-    @Column(name = DatabaseConsts.ATTRIBUTE_NAME_COLUMN, nullable = false, updatable = false)
+    @Column(name = DatabaseConsts.ATTRIBUTE_NAME_COLUMN, nullable = false, updatable = false, unique = true)
     @Setter
     private String attributeName;
 
