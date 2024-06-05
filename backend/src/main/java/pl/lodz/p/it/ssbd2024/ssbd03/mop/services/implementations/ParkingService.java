@@ -101,7 +101,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_ALL_SECTORS)
     public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
-        return parkingFacade.findSectorsInParking(id, true);
+        return parkingFacade.findSectorsInParking(id);
     }
 
     @Override

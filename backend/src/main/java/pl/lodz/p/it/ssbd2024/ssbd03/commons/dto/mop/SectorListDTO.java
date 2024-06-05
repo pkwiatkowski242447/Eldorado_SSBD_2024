@@ -17,8 +17,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @LoggerInterceptor
 public class SectorListDTO {
 
-    @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The name of the sector", example = "SA-02", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
+    @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)
+    private boolean active;
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)

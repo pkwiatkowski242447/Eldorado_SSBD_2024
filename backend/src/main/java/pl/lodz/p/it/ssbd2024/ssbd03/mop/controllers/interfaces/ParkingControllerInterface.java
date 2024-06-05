@@ -90,6 +90,7 @@ public interface ParkingControllerInterface {
 
     /**
      * This method is used to find all sectors from parking with a given id.
+     * Both active and inactive sectors are returned.
      *
      * @param id Identifier of parking containing the sectors to find.
      * @return It returns HTTP response 200 OK with information about sectors of a given parking. If parking with the
