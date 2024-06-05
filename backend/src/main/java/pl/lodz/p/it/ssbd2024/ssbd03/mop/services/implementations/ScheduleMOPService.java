@@ -76,9 +76,6 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
 
         for (Reservation reservation : reservationsWhichLastMoreThan24h) {
             try {
-                log.error("JESTEM W REZERWAZCJI " + reservation.getId());
-                log.error("USUWAM DLA NIEJ MIEJSCA PARKONGOWE");
-                //parkingEventFacade.removeByReservation(reservation.getId());
                 reservationFacade.remove(reservation);
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while removing reservation with id: {}. Cause: {}.",

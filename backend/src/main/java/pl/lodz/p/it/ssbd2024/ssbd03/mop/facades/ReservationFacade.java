@@ -14,7 +14,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 
 import java.time.LocalDateTime;
@@ -86,9 +85,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @Override
     @RolesAllowed(Authorities.END_RESERVATION)
     public void remove(Reservation entity) throws ApplicationBaseException {
-        log.error("USUWAM REZERWACJE");
         super.remove(entity);
-        log.error("USUNALEM REZERWACJE");
     }
 
     /**

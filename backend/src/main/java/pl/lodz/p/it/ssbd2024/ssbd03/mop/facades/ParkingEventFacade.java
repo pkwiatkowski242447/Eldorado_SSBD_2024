@@ -141,10 +141,8 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
      */
     @RolesAllowed({Authorities.END_RESERVATION})
     public void removeByReservation(UUID reservationId) {
-        log.error("USUWAM POWIAZANE PARKING_EVENTY");
         getEntityManager().createNamedQuery("ParkingEvent.removeByReservation")
                 .setParameter("reservationId", reservationId)
                 .executeUpdate();
-        log.error("USUNALEM PARKING EVENTY");
     }
 }
