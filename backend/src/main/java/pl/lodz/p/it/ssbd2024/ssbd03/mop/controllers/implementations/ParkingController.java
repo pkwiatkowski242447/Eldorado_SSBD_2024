@@ -9,16 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.integrity.ParkingDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.integrity.SectorDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
@@ -134,7 +132,18 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
     public ResponseEntity<?> editParking(String ifMatch, ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        if (ifMatch == null || ifMatch.isBlank()) {
+            throw new InvalidRequestHeaderIfMatchException();
+        }
+
+        if (!ifMatch.equals(jwtProvider.generateObjectSignature(parkingModifyDTO))) {
+            throw new ParkingDataIntegrityCompromisedException();
+        }
+        ParkingOutputDTO parkingOutputDTO = ParkingMapper.toParkingOutputDto(
+                parkingService.editParking(ParkingMapper.toParking(parkingModifyDTO), parkingModifyDTO.getParkingId())
+        );
+
+        return ResponseEntity.ok().body(parkingOutputDTO);
     }
 
     @Override
