@@ -4,6 +4,9 @@ import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,11 +14,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -30,6 +37,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 @LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
+@Slf4j
 public class ReservationFacade extends AbstractFacade<Reservation> {
 
     @PersistenceContext(unitName = DatabaseConfigConstants.MOP_PU)
@@ -76,9 +84,11 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param entity Reservation entity
      */
     @Override
-    @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    @RolesAllowed(Authorities.END_RESERVATION)
     public void remove(Reservation entity) throws ApplicationBaseException {
+        log.error("USUWAM REZERWACJE");
         super.remove(entity);
+        log.error("USUNALEM REZERWACJE");
     }
 
     /**
@@ -197,5 +207,26 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @DenyAll
     public int count() throws ApplicationBaseException {
         return super.count();
+    }
+
+    /***
+     * This method is used to find all reservations, that last more than 24 hours
+     *
+     * @param amount Length of the specified time window, used to end reservations that last more than 24 hours.
+     * @param timeUnit Time unit, indicating size of the reservation ending time window.
+     * @return List of reservation that last more than 24 hours, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForEnding(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForEnding", Reservation.class);
+            findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
+            List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
     }
 }

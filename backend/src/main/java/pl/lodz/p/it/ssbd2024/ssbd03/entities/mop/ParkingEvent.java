@@ -28,6 +28,15 @@ import java.time.LocalDateTime;
 @LoggerInterceptor
 @NoArgsConstructor
 @Getter
+@NamedQueries({
+        @NamedQuery(
+                name = "ParkingEvent.removeByReservation",
+                query = """
+                        DELETE FROM ParkingEvent p
+                        WHERE p.reservation.id = :reservationId
+                        """
+        )
+})
 public class ParkingEvent extends AbstractEntity implements Serializable {
 
     /**
