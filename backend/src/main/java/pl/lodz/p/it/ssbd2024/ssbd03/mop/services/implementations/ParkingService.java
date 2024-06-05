@@ -74,7 +74,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_SECTOR)
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        return parkingFacade.findSectorById(id).orElseThrow(SectorNotFoundException::new);
     }
 
     @Override
@@ -124,8 +124,8 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
-    public Sector editSector(Sector modifiedSector, UUID parkingId, String name) throws ApplicationBaseException {
-        Sector foundSector = parkingFacade.findSectorByParkingIdAndName(parkingId, name);
+    public Sector editSector(Sector modifiedSector) throws ApplicationBaseException {
+        Sector foundSector = parkingFacade.findSectorById(modifiedSector.getId()).orElseThrow(SectorNotFoundException::new);
 
         if (!modifiedSector.getVersion().equals(foundSector.getVersion())) {
             throw new ApplicationOptimisticLockException();
