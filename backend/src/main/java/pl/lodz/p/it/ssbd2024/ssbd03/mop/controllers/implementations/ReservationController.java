@@ -1,9 +1,13 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.persistence.RollbackException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,12 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.MakeReservationDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.UserReservationOutputListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserActiveReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ReservationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+
+import java.util.List;
 
 /**
  * Controller used for manipulating reservations and parking events in the system.
@@ -41,8 +50,16 @@ public class ReservationController implements ReservationControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllActiveReservationSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<UserReservationOutputListDTO> reservationList = reservationService.getAllActiveReservationsByUserLoginWthPagination(login, pageNumber, pageSize)
+                .stream()
+                .map(UserActiveReservationListMapper::toSectorListDTO)
+                .toList();
+        if (reservationList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(reservationList);
     }
 
     @Override
