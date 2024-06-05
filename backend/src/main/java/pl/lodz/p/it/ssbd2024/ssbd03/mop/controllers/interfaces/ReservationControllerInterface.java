@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,12 @@ public interface ReservationControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/active/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get your own active reservation", description = "The endpoint is used to get user's all active reservations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of reservations returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of reservations returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> getAllActiveReservationSelf(@RequestParam("pageNumber") int pageNumber,
                                     @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
