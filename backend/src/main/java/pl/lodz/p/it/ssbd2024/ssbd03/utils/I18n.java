@@ -45,11 +45,17 @@ public class I18n {
     public static final String SECTOR_ALREADY_ACTIVE = "sector.already.active.exception";
 
     // Parking exceptions
-
     public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.not.found.exception";
     public static final String PARKING_DELETE_EXCEPTION = "parking.delete.exception";
     public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
     public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
+
+    // Reservation exceptions
+    public static final String RESERVATION_NOT_FOUND_EXCEPTION = "reservation.not.found.exception";
+    public static final String USER_NOT_RESERVATION_OWNER_EXCEPTION = "user.not.reservation.owner.exception";
+    public static final String RESERVATION_NOT_STARTED_EXCEPTION = "reservation.not.started.exception";
+    public static final String RESERVATION_EXPIRED_EXCEPTION = "reservation.expired.exception";
+    public static final String RESERVATION_SECTOR_NO_AVAILABLE_PLACES_EXCEPTION = "reservation.sector.no.available.places.exception";
 
     // Account service
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";

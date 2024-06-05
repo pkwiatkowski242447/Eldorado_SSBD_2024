@@ -218,6 +218,12 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
+    @Operation(summary = "Enter parking with reservation", description = "The endpoint is used to generate entry code for user entering parking with reservation.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Entry code generated and place from sector allocated successfully."),
+            @ApiResponse(responseCode = "400", description = "Reservation could not be found or is expired / not started. This response is returned when user is not the owner of the reservation or when there are no available places in the sector."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     @PostMapping(value = "/reservations/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 
