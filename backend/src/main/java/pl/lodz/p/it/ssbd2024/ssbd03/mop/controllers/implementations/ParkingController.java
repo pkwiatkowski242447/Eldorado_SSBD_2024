@@ -14,22 +14,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingOutputMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.integrity.ParkingDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.integrity.SectorDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
@@ -108,7 +109,14 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.GET_PARKING)
     public ResponseEntity<?> getParkingById(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        try {
+            Parking parking = parkingService.getParkingById(UUID.fromString(id));
+            return ResponseEntity.ok(ParkingOutputMapper.toParkingOutputDTO(parking));
+        } catch (ParkingNotFoundException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
     }
 
     @Override
@@ -161,7 +169,18 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
     public ResponseEntity<?> editParking(String ifMatch, ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        if (ifMatch == null || ifMatch.isBlank()) {
+            throw new InvalidRequestHeaderIfMatchException();
+        }
+
+        if (!ifMatch.equals(jwtProvider.generateObjectSignature(parkingModifyDTO))) {
+            throw new ParkingDataIntegrityCompromisedException();
+        }
+        ParkingOutputDTO parkingOutputDTO = ParkingMapper.toParkingOutputDto(
+                parkingService.editParking(ParkingMapper.toParking(parkingModifyDTO), parkingModifyDTO.getParkingId())
+        );
+
+        return ResponseEntity.ok().body(parkingOutputDTO);
     }
 
     @Override
@@ -176,7 +195,7 @@ public class ParkingController implements ParkingControllerInterface {
         }
 
         SectorOutputDTO sectorOutputDTO = SectorMapper.toSectorOutputDTO(
-                parkingService.editSector(SectorMapper.toSector(sectorModifyDTO), sectorModifyDTO.getParkingId(), sectorModifyDTO.getName())
+                parkingService.editSector(parkingService.getSectorById(sectorModifyDTO.getId()))
         );
         return ResponseEntity.ok().body(sectorOutputDTO);
     }

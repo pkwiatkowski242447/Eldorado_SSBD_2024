@@ -5,6 +5,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingAddressAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.validation.ParkingConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
 
@@ -73,7 +76,7 @@ public interface ParkingServiceInterface {
      *
      * @param id Parking's id.
      * @return If parking with the given id was found returns Parking.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     * @throws ParkingNotFoundException Thrown when parking with given id cannot be found in the database.
      */
     Parking getParkingById(UUID id) throws ApplicationBaseException;
 
@@ -117,18 +120,19 @@ public interface ParkingServiceInterface {
     /**
      * Edits parking in the database by its id.
      *
+     * @param modifiedParking Parking with potentially modified properties: city, zipCode, street.
      * @param id Identifier of the parking to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void editParking (UUID id) throws ApplicationBaseException;
+    Parking editParking (Parking modifiedParking, UUID id) throws ApplicationBaseException;
 
     /**
      * Edits sector in the database by its id.
      *
-     * @param id Identifier of the sector to be edited.
+     * @param modifiedSector Sector to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Sector editSector(Sector modifiedSector, UUID parkingId, String name) throws ApplicationBaseException;
+    Sector editSector(Sector modifiedSector) throws ApplicationBaseException;
 
     /**
      * Removes sector from the database by its id.

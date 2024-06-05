@@ -53,6 +53,14 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @PostMapping(value = "/{id}/sectors")
+    @Operation(summary = "Add sector", description = "The endpoint is used to add sector to parking identified with the given identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The sector was created successfully"),
+            @ApiResponse(responseCode = "400", description = "Persistence exception was thrown."),
+            @ApiResponse(responseCode = "404", description = "Parking with the given identifier does not exist"),
+            @ApiResponse(responseCode = "409", description = "Parking with specified data already exists"),
+            @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
+    })
     ResponseEntity<?> createSector(@PathVariable("id") String parkingId, @RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
 
     /**
@@ -90,6 +98,7 @@ public interface ParkingControllerInterface {
 
     /**
      * This method is used to find all sectors from parking with a given id.
+     * Both active and inactive sectors are returned.
      *
      * @param id Identifier of parking containing the sectors to find.
      * @return It returns HTTP response 200 OK with information about sectors of a given parking. If parking with the
@@ -98,6 +107,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/{id}/sectors", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get sectors", description = "The endpoint is used to get sectors from parking identified with the given identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of sectors in the given parking was found successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid format of parking uuid"),
+            @ApiResponse(responseCode = "404", description = "Parking with the given uuid does not exist"),
+            @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
+    })
     ResponseEntity<?> getSectorsByParkingId(@PathVariable("id") String parkingId) throws ApplicationBaseException;
 
     /**
@@ -110,6 +126,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with fiven id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Parking with list of sectors."),
+            @ApiResponse(responseCode = "400", description = "Invalid UUID"),
+            @ApiResponse(responseCode = "404", description = "Parking with given id doesn't exist"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
@@ -214,7 +237,7 @@ public interface ParkingControllerInterface {
                                   @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException;
 
     /**
-     * This method is used to edit sector, that is identified with the given identifier.
+     * This method is used to edit sector, that is identified with the given identifier and name.
      *
      * @param ifMatch          Value of If-Match header
      * @param sectorModifyDTO  Sector properties with potentially changed values.
@@ -225,6 +248,12 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @PutMapping(value = "/sectors", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Edit sector", description = "The endpoint is used to edit sector identified with the given identifier and name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The sector was successfully edited"),
+            @ApiResponse(responseCode = "400", description = "Persistence exception was thrown."),
+            @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
+    })
     ResponseEntity<?> editSector(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                  @Valid @RequestBody SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException;
 
