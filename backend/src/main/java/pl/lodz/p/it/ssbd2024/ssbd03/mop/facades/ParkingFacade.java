@@ -14,7 +14,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -185,8 +184,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @param id ID of the Sector to be retrieved.
      * @return If a Sector with the given ID was found returns an Optional containing the Sector, otherwise returns an empty Optional.
      */
-    @DenyAll
-    protected Optional<Sector> findSectorById(UUID id) throws ApplicationBaseException {
+    @RolesAllowed({Authorities.EDIT_SECTOR})
+    public Optional<Sector> findSectorById(UUID id) throws ApplicationBaseException {
         return Optional.ofNullable(getEntityManager().find(Sector.class, id));
     }
 
@@ -205,22 +204,12 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         return optEntity;
     }
 
-    @RolesAllowed({Authorities.GET_SECTOR, Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR})
-    public Sector findSectorByParkingIdAndName(UUID parkingId, String name)
-            throws ApplicationBaseException {
-        var sector = getEntityManager().createNamedQuery("Sector.findByParkingIdAndName", Sector.class)
-                .setParameter("parkingId", parkingId)
-                .setParameter("name", name)
-                .getSingleResult();
-        return sector;
-    }
-
     @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public List<Sector> findSectorsInParking(UUID parkingId, boolean showOnlyActive)
+    public List<Sector> findSectorsInParking(UUID parkingId)
             throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
-                .setParameter("showOnlyActive", showOnlyActive)
+                .setParameter("showOnlyActive", false)
                 .getResultList();
         refreshAllSectors(list);
         return list;
