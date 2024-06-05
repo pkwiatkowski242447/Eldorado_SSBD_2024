@@ -56,7 +56,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     @RunAsSystem
     @Override
     @RolesAllowed({Authorities.END_RESERVATION})
-    @Scheduled(fixedRate = 5L, timeUnit = TimeUnit.MINUTES, initialDelay = 1L)
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void endReservation() {
         log.info("Method: endReservation(), used for removing reservations which last more than 24 hours");
         List<Reservation> reservationsWhichLastMoreThan24h = new ArrayList<>();
