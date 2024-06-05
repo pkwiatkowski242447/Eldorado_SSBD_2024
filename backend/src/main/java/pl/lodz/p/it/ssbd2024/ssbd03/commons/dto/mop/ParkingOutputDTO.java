@@ -1,12 +1,21 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+
 import java.util.UUID;
 
 /**
  * Data transfer object used in returning parking.
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@LoggerInterceptor
 public class ParkingOutputDTO extends ParkingSignableDTO {
 
 
