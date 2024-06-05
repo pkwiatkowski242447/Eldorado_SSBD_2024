@@ -21,10 +21,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @LoggerInterceptor
 public class SectorModifyDTO implements SignableDTO {
 
-    @Schema(description = "The name of the sector", example = "BC-69", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The identifier of the sector", example = "4ce920a0-6f4d-4e95-ba24-99ba32b66491", requiredMode = Schema.RequiredMode.REQUIRED)
+    private UUID id;
+    @Schema(description = "The name of the sector", example = "SA-02", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
-    @Schema(description = "The identifier of the parking containing this sector", requiredMode = Schema.RequiredMode.REQUIRED)
-    private UUID parkingId;
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -52,8 +52,8 @@ public class SectorModifyDTO implements SignableDTO {
     @Override
     public Map<String, ?> getSigningFields() {
         return Map.ofEntries(
+                Map.entry("id", id.toString()),
                 Map.entry("name", name),
-                Map.entry("parkingId", parkingId.toString()),
                 Map.entry("version", version)
         );
     }

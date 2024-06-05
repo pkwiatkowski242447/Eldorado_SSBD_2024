@@ -1,10 +1,15 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.persistence.RollbackException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
@@ -12,18 +17,26 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingOutputMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.integrity.ParkingDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.integrity.SectorDataIntegrityCompromisedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingListMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
+import java.net.URI;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
@@ -38,6 +51,9 @@ import java.util.List;
 @TxTracked
 @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
 public class ParkingController implements ParkingControllerInterface {
+
+    @Value("${created.parking.resource.url}")
+    private String createdParkingResourceURL;
 
     private final ParkingServiceInterface parkingService;
 
@@ -54,8 +70,10 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.ADD_PARKING)
-    public ResponseEntity<?> createParking(ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
+        Parking parking = parkingService.createParking(parkingCreateDTO.getCity(), parkingCreateDTO.getZipCode(),
+                parkingCreateDTO.getStreet());
+        return ResponseEntity.created(URI.create(this.createdParkingResourceURL + parking.getId())).build();
     }
 
     @Override
@@ -71,8 +89,15 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.GET_ALL_PARKING)
-    public ResponseEntity<?> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
+    public ResponseEntity<?> getAllParkingsWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+        List<ParkingOutputListDTO> parkingList = parkingService.getAllParkingWithPagination(pageNumber, pageSize)
+                .stream()
+                .map(ParkingListMapper::toParkingListDTO)
+                .toList();
+        if (parkingList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(parkingList);
     }
 
     @Override
@@ -84,7 +109,14 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.GET_PARKING)
     public ResponseEntity<?> getParkingById(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        try {
+            Parking parking = parkingService.getParkingById(UUID.fromString(id));
+            return ResponseEntity.ok(ParkingOutputMapper.toParkingOutputDTO(parking));
+        } catch (ParkingNotFoundException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
     }
 
     @Override
@@ -158,7 +190,7 @@ public class ParkingController implements ParkingControllerInterface {
         }
 
         SectorOutputDTO sectorOutputDTO = SectorMapper.toSectorOutputDTO(
-                parkingService.editSector(SectorMapper.toSector(sectorModifyDTO), sectorModifyDTO.getParkingId(), sectorModifyDTO.getName())
+                parkingService.editSector(parkingService.getSectorById(sectorModifyDTO.getId()))
         );
         return ResponseEntity.ok().body(sectorOutputDTO);
     }
