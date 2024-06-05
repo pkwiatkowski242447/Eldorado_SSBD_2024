@@ -73,7 +73,6 @@ public class I18n {
     // Account controller
     public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
     public static final String UUID_INVALID = "account.controller.uuid.invalid";
-    public static final String BAD_UUID_INVALID_FORMAT_EXCEPTION = "account.controller.uuid.invalid.format.exception";
     public static final String MISSING_HEADER_IF_MATCH = "account.controller.missing.header.if_match.exception";
 
     // JWT
@@ -83,6 +82,7 @@ public class I18n {
     public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
     public static final String ATTRIBUTE_NOT_FOUND_EXCEPTION = "attribute.not.found.exception";
     public static final String ATTRIBUTE_REPEATED_EXCEPTION = "attribute.repeated.exception";
+    public static final String BAD_UUID_INVALID_FORMAT_EXCEPTION = "uuid.invalid.format.exception";
 
 
     // Mail provider

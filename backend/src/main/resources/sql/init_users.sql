@@ -109,7 +109,7 @@ INSERT INTO public.client_data (id, type) VALUES ('248a31fa-7fef-41d5-8042-e70a3
 
 -- Parking
 INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, '00-000', 'BoatCity', 'Palki', 0);
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a3-41b8-9c3c-b6bef04ce6d1', current_timestamp, '00-000', 'BoatCity', 'Palki1', 0);
+INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a3-41b8-9c3c-b6bef04ce6d1', current_timestamp, '00-001', 'BoatCity', 'Palki1', 0);
 
 -- First Sector S1
 INSERT INTO public.sector (id, creation_timestamp, active ,available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, true, 20, 50, 1, 'SA-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);

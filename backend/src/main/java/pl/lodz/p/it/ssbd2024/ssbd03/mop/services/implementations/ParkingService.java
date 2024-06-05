@@ -80,7 +80,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_PARKING)
     public Parking getParkingById(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        return parkingFacade.findAndRefresh(id).orElseThrow(ParkingNotFoundException::new);
     }
 
     @Override
