@@ -129,7 +129,8 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
     public ResponseEntity<?> deactivateSector(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        parkingService.deactivateSector(UUID.fromString(id));
+        return ResponseEntity.noContent().build();
     }
 
     @Override
