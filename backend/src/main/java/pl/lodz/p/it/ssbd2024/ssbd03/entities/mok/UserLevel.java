@@ -28,6 +28,9 @@ import java.time.LocalDateTime;
         name = DatabaseConsts.USER_LEVEL_TABLE,
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {DatabaseConsts.USER_LEVEL_ACCOUNT_ID_COLUMN, DatabaseConsts.DISCRIMINATOR_COLUMN})
+        },
+        indexes = {
+                @Index(name = DatabaseConsts.USER_LEVEL_ACCOUNT_ID_INDEX, columnList = DatabaseConsts.USER_LEVEL_ACCOUNT_ID_COLUMN)
         }
 )
 @LoggerInterceptor
@@ -63,7 +66,10 @@ public abstract class UserLevel extends AbstractEntity implements Serializable {
      * The account associated with this user level.
      */
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = DatabaseConsts.USER_LEVEL_ACCOUNT_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
+    @JoinColumn(name = DatabaseConsts.USER_LEVEL_ACCOUNT_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.USER_LEVEL_ACCOUNT_ID_FK),
+            nullable = false, updatable = false)
     @Setter
     private Account account;
 

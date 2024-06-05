@@ -31,7 +31,12 @@ import java.util.Set;
  */
 @Entity
 @Table(name = DatabaseConsts.ACCOUNT_TABLE)
-@SecondaryTable(name = DatabaseConsts.PERSONAL_DATA_TABLE)
+@SecondaryTable(name = DatabaseConsts.PERSONAL_DATA_TABLE,
+        foreignKey = @ForeignKey(name = DatabaseConsts.PERSONAL_DATA_ACCOUNT_ID_FK),
+        indexes = {
+            @Index(name = DatabaseConsts.PERSONAL_DATA_ACCOUNT_ID_INDEX, columnList = DatabaseConsts.PK_COLUMN, unique = true),
+        }
+)
 @LoggerInterceptor
 @Getter
 @NoArgsConstructor
@@ -228,8 +233,18 @@ public class Account extends AbstractEntity {
      */
     @Column(name = DatabaseConsts.ACCOUNT_PAST_PASSWORD_COLUMN)
     @ElementCollection(targetClass = String.class)
-    @CollectionTable(name = DatabaseConsts.PAST_PASSWORD_TABLE,
-            joinColumns = @JoinColumn(name = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN)
+    @CollectionTable(
+            name = DatabaseConsts.PAST_PASSWORD_TABLE,
+            joinColumns = @JoinColumn(
+                    name = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN,
+                    referencedColumnName = DatabaseConsts.PK_COLUMN,
+                    foreignKey = @ForeignKey(name = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_FK)
+            ),
+            indexes = {
+                @Index(name = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_INDEX, columnList = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN)
+            },
+            foreignKey = @ForeignKey(name = DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_FK),
+            uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.PAST_PASSWORD_ACCOUNT_ID_COLUMN, DatabaseConsts.PAST_PASSWORD_COLUMN})
     )
     @Getter
     private final Set<String> previousPasswords = new HashSet<>();
@@ -346,8 +361,20 @@ public class Account extends AbstractEntity {
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = DatabaseConsts.ACCOUNT_ATTRIBUTES,
-            joinColumns = @JoinColumn(name = DatabaseConsts.ACCOUNT_ID_COLUMN),
-            inverseJoinColumns = @JoinColumn(name = DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN)
+            joinColumns = @JoinColumn(
+                    name = DatabaseConsts.ACCOUNT_ID_COLUMN,
+                    referencedColumnName = DatabaseConsts.PK_COLUMN,
+                    foreignKey = @ForeignKey(name = DatabaseConsts.ACCOUNT_ATTRIBUTE_ATTRIBUTE_NAME_ID_FK)
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN,
+                    referencedColumnName = DatabaseConsts.PK_COLUMN,
+                    foreignKey = @ForeignKey(name = DatabaseConsts.ACCOUNT_ATTRIBUTE_ACCOUNT_ID_FK)
+            ),
+            indexes = {
+                    @Index(name = DatabaseConsts.ACCOUNT_ATTRIBUTE_ACCOUNT_ID_INDEX, columnList = DatabaseConsts.ACCOUNT_ID_COLUMN),
+                    @Index(name = DatabaseConsts.ACCOUNT_ATTRIBUTE_ATTRIBUTE_NAME_ID_INDEX, columnList = DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN)
+            }
     )
     private final Set<AttributeRecord> attributeRecords = new HashSet<>();
 

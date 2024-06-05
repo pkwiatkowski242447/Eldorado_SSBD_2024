@@ -8,10 +8,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.postgresql.util.PSQLException;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.conflict.TokenValueAlreadyTakenException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.conflict.TokenValueAlreadyTakenException;
 
 @Aspect
 @Order(10)
@@ -38,8 +39,8 @@ public class TokenFacadeAspect {
     private Object handleTokenFacadeMethodExceptions(ProceedingJoinPoint proceedingJoinPoint) throws Exception {
         try {
             return proceedingJoinPoint.proceed();
-        } catch (OptimisticLockException optimisticLockException) {
-            throw optimisticLockException;
+        } catch (OptimisticLockException | AccessDeniedException exception) {
+            throw exception;
         } catch (PersistenceException | PSQLException exception) {
             Throwable exceptionCopy = exception;
             do {

@@ -6,7 +6,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutp
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.userlevel.UserLevelDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.mapper.MapperBaseException;
 
 import java.util.HashSet;
 import java.util.Set;
