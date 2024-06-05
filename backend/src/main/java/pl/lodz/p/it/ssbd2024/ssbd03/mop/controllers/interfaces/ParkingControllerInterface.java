@@ -126,6 +126,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with fiven id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Parking with list of sectors."),
+            @ApiResponse(responseCode = "400", description = "Invalid UUID"),
+            @ApiResponse(responseCode = "404", description = "Parking with given id doesn't exist"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**

@@ -6,6 +6,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mopExceptions.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.sector.SectorNotFoundException;
 
@@ -74,7 +75,7 @@ public interface ParkingServiceInterface {
      *
      * @param id Parking's id.
      * @return If parking with the given id was found returns Parking.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     * @throws ParkingNotFoundException Thrown when parking with given id cannot be found in the database.
      */
     Parking getParkingById(UUID id) throws ApplicationBaseException;
 
