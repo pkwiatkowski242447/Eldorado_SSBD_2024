@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,8 +119,16 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
-    public void editParking(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public Parking editParking(Parking modifiedParking, UUID id) throws ApplicationBaseException {
+        Parking foundParking = parkingFacade.findAndRefresh(id).orElseThrow(()-> new ParkingNotFoundException(I18n.PARKING_NOT_FOUND_EXCEPTION));
+
+        if (!modifiedParking.getVersion().equals(foundParking.getVersion())){
+            throw new OptimisticLockException();
+        }
+        Address address = new Address(modifiedParking.getAddress().getCity(),modifiedParking.getAddress().getZipCode(),modifiedParking.getAddress().getStreet());
+        foundParking.setAddress(address);
+        parkingFacade.edit(foundParking);
+        return foundParking;
     }
 
     @Override
