@@ -43,6 +43,7 @@ public class I18n {
     // Sector exceptions
     public static final String SECTOR_NOT_FOUND = "sector.not.found.exception";
     public static final String SECTOR_ALREADY_ACTIVE = "sector.already.active.exception";
+    public static final String SECTOR_ALREADY_INACTIVE = "sector.already.inactive.exception";
 
     // Parking exceptions
     public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.not.found.exception";

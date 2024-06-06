@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Data transfer object used in returning parking .
+ * Data transfer object used in returning parking.
  */
 @Getter
 @Setter
