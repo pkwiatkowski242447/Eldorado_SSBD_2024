@@ -4,6 +4,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -98,7 +99,7 @@ public class ParkingController implements ParkingControllerInterface {
     @RolesAllowed(Authorities.GET_ALL_PARKING)
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
-    public ResponseEntity<?> getAllParkingsWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+    public ResponseEntity<?> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         List<ParkingOutputListDTO> parkingList = parkingService.getAllParkingWithPagination(pageNumber, pageSize)
                 .stream()
                 .map(ParkingListMapper::toParkingListDTO)
@@ -112,7 +113,12 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> getSectorById(String id) throws ApplicationBaseException {
         try {
             Sector sector = parkingService.getSectorById(UUID.fromString(id));
-            return ResponseEntity.ok(sector);
+            SectorOutputDTO sectorOutputDTO = SectorMapper.toSectorOutputDTO(sector);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(sectorOutputDTO)));
+
+            return ResponseEntity.ok().headers(headers).body(sectorOutputDTO);
         } catch (SectorNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException iae) {

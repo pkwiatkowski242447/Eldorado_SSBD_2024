@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public abstract class SectorSignableDTO implements SignableDTO {
     @Schema(description = "The name of the sector", example = "BC-69", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
+    @JsonIgnore
     @Override
     public Map<String, ?> getSigningFields() {
         return Map.ofEntries(
