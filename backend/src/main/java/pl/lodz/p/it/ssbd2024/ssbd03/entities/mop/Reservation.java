@@ -63,7 +63,7 @@ import java.util.List;
                 query = """
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
-                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP >= r.endTime)
+                          AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
                         ORDER BY r.beginTime"""
         ),
         @NamedQuery(
