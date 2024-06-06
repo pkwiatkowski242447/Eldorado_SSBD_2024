@@ -199,7 +199,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @param id ID of the Sector to be retrieved.
      * @return If a Sector with the given ID was found returns an Optional containing the Sector, otherwise returns an empty Optional.
      */
-    @RolesAllowed({Authorities.EDIT_SECTOR})
+    @DenyAll
     public Optional<Sector> findSectorById(UUID id) throws ApplicationBaseException {
         return Optional.ofNullable(getEntityManager().find(Sector.class, id));
     }

@@ -1,6 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
 public class SectorListMapper {

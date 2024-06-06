@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
 /**
  * Data transfer object used for passing the allocation code, generated
@@ -18,12 +17,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @NoArgsConstructor
 @AllArgsConstructor
 @LoggerInterceptor
-public class AllocationCodeWithSectorDTO {
+public class AllocationCodeDTO {
 
     @Schema(description = "Allocation code, generated when entering parking in a given reservation, used for ending it.", example = "76491929", requiredMode = Schema.RequiredMode.REQUIRED)
     private String allocationCode;
-    @Schema(description = "Sector chosen for the given reservation", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Sector sector;
+
     /**
      * Custom toString() method implementation that
      * does not return any information relating to the business

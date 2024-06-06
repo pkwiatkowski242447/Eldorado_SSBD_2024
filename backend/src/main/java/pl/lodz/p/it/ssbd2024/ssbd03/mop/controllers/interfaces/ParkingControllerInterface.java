@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -100,7 +100,7 @@ public interface ParkingControllerInterface {
      * This method is used to find all sectors from parking with a given id.
      * Both active and inactive sectors are returned.
      *
-     * @param id Identifier of parking containing the sectors to find.
+     * @param parkingId Identifier of parking containing the sectors to find.
      * @return It returns HTTP response 200 OK with information about sectors of a given parking. If parking with the
      * given uuid doesn't exist, returns 404. If the uuid has invalid format, returns 400.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
