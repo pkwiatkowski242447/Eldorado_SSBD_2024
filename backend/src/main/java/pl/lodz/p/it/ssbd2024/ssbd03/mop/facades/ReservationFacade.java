@@ -71,7 +71,10 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param entity Reservation entity
      */
     @Override
-    @RolesAllowed({Authorities.ENTER_PARKING_WITHOUT_RESERVATION, Authorities.EXIT_PARKING})
+    @RolesAllowed({
+            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
+            Authorities.EXIT_PARKING
+    })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
     }
@@ -103,7 +106,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
     @Override
-    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    @RolesAllowed({
+            Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION
+    })
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }

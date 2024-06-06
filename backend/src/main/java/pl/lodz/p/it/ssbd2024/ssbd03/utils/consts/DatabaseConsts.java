@@ -224,4 +224,13 @@ public class DatabaseConsts {
 
     public static final String SECTOR_PARKING_ID_INDEX = "idx_sector_parking_id";
     public static final String SECTOR_PARKING_ID_FK = "sector_parking_id_fk";
+
+    // public.entry_code
+
+    public static final String ENTRY_CODE_TABLE = "entry_code";
+    public static final String ENTRY_CODE_VALUE_COLUMN = "entry_code";
+    public static final String ENTRY_CODE_RESERVATION_ID_COLUMN = "reservation_id";
+
+    public static final String ENTRY_CODE_RESERVATION_ID_INDEX = "idx_entry_code_reservation_id";
+    public static final String ENTRY_CODE_RESERVATION_ID_FK = "entry_code_reservation_id_fk";
 }

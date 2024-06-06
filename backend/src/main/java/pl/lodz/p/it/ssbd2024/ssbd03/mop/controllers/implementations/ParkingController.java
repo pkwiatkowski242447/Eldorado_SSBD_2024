@@ -4,9 +4,12 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingMapper;
@@ -150,7 +154,9 @@ public class ParkingController implements ParkingControllerInterface {
         try {
             this.parkingService.removeParkingById(UUID.fromString(id));
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest().body(I18n.UUID_INVALID);
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ExceptionDTO(I18n.UUID_INVALID));
         }
         return ResponseEntity.noContent().build();
     }
@@ -164,7 +170,15 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.ENTER_PARKING_WITH_RESERVATION)
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        try {
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            AllocationCodeDTO allocationCode = this.parkingService.enterParkingWithReservation(UUID.fromString(reservationId), userName);
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(allocationCode);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+        }
     }
 
     @Override
