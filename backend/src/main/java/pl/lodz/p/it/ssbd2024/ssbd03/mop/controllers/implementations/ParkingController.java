@@ -221,9 +221,7 @@ public class ParkingController implements ParkingControllerInterface {
         try {
             this.parkingService.removeSectorById(UUID.fromString(id));
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
         return ResponseEntity.noContent().build();
     }
