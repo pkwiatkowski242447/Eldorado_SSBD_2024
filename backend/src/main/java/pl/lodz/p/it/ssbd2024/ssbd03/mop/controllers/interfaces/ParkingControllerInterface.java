@@ -239,6 +239,12 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Edit parking", description = "The endpoint is used to edit parking identified with the given identifier and name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The parking was successfully edited"),
+            @ApiResponse(responseCode = "400", description = "Persistence exception was thrown."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> editParking(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                   @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException;
 
@@ -257,7 +263,7 @@ public interface ParkingControllerInterface {
     @Operation(summary = "Edit sector", description = "The endpoint is used to edit sector identified with the given identifier and name")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The sector was successfully edited"),
-            @ApiResponse(responseCode = "400", description = "Persistence exception was thrown."),
+            @ApiResponse(responseCode = "400", description = "The parking could not be edited."),
             @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
     })
     ResponseEntity<?> editSector(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
