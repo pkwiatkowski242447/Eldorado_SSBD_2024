@@ -274,6 +274,14 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
+
+    @Operation(summary = "Remove sector", description = "The endpoint is used to remove sector with a given id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The sector has been removed successfully."),
+            @ApiResponse(responseCode = "400", description = "The sector could not be remove."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+
     @DeleteMapping(value = "/sectors/{id}")
     ResponseEntity<?> removeSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 

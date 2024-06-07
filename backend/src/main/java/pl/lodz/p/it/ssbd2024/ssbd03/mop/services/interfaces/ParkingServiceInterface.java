@@ -123,10 +123,9 @@ public interface ParkingServiceInterface {
      * Edits parking in the database by its id.
      *
      * @param modifiedParking Parking with potentially modified properties: city, zipCode, street.
-     * @param id Identifier of the parking to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Parking editParking (Parking modifiedParking, UUID id) throws ApplicationBaseException;
+    Parking editParking (Parking modifiedParking) throws ApplicationBaseException;
 
     /**
      * Edits sector in the database by its id.

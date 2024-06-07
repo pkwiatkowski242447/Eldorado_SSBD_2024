@@ -176,8 +176,8 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
-    public Parking editParking(Parking modifiedParking, UUID id) throws ApplicationBaseException {
-        Parking foundParking = parkingFacade.findAndRefresh(id).orElseThrow(()-> new ParkingNotFoundException(I18n.PARKING_NOT_FOUND_EXCEPTION));
+    public Parking editParking(Parking modifiedParking) throws ApplicationBaseException {
+        Parking foundParking = parkingFacade.findAndRefresh(modifiedParking.getId()).orElseThrow(ParkingNotFoundException::new);
 
         if (!modifiedParking.getVersion().equals(foundParking.getVersion())){
             throw new OptimisticLockException();
@@ -209,7 +209,8 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.DELETE_SECTOR)
     public void removeSectorById(UUID id) throws ApplicationBaseException{
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Sector sector = this.parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
+        this.parkingFacade.removeSector(sector);
     }
 
     @Override
