@@ -248,7 +248,8 @@ public class JWTProvider {
      * @param signableDTO Object that should be signed.
      * @return Returns a signed Json Web Token.
      */
-    @RolesAllowed({Authorities.GET_OWN_ACCOUNT, Authorities.GET_USER_ACCOUNT, Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT})
+    @RolesAllowed({Authorities.GET_OWN_ACCOUNT, Authorities.GET_USER_ACCOUNT,
+            Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT, Authorities.GET_SECTOR})
     public String generateObjectSignature(SignableDTO signableDTO) {
         return JWT
                 .create()

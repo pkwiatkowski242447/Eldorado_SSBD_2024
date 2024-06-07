@@ -1,14 +1,12 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorClientListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorOutputDTO;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,16 +14,44 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-@AllArgsConstructor
-public class ParkingOutputDTO {
-    @Schema(description = "UUID identifier linked with parking", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
-    private UUID id;
-    @Schema(description = "City where parking is located", example = "BoatCity", requiredMode = Schema.RequiredMode.REQUIRED)
+@NoArgsConstructor
+@LoggerInterceptor
+public class ParkingOutputDTO extends ParkingSignableDTO {
+
+
+    @Schema(description = "City in which the parking is located", example = "LA", requiredMode = Schema.RequiredMode.REQUIRED)
     private String city;
-    @Schema(description = "Zip code related to City", example = "00-000", requiredMode = Schema.RequiredMode.REQUIRED)
+
+    @Schema(description = "ZipCode of the city in which the parking is located", example = "11-111", requiredMode = Schema.RequiredMode.REQUIRED)
     private String zipCode;
-    @Schema(description = "Street where parking is located", example = "Palki", requiredMode = Schema.RequiredMode.REQUIRED)
+
+    @Schema(description = "Street of the city in which the parking is located", example = "white", requiredMode = Schema.RequiredMode.REQUIRED)
     private String street;
-    @Schema(description = "Sectors in the parking", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<SectorClientListDTO> sectors;
+
+    /***
+     * All arguments constructor for ParkingOutputDTO - with calling constructor of superclass.
+     */
+    public ParkingOutputDTO (Long version, UUID parkingId, String city, String zipCode, String street ){
+        super(version, parkingId);
+        this.city = city;
+        this.zipCode = zipCode;
+        this.street = street;
+    }
+
+    /**
+     * Custom toString() method implementation that
+     * does not return any information relating to the business
+     * data.
+     *
+     * @return String representation of the ParkingOutputDTO object.
+     */
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("city: ", city)
+                .append("zipCode: ", zipCode)
+                .append("street: ", street)
+                .append(super.toString())
+                .toString();
+    }
 }

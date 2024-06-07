@@ -1,15 +1,12 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 
 import java.util.UUID;
 

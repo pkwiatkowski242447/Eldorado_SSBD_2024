@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -75,13 +75,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get all parkings", description = "The endpoint is used retrieve list of parkings from given page of given size.")
+    @Operation(summary = "Get all parking", description = "The endpoint is used retrieve list of parking from given page of given size.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of parkings returned from given page of given size is not empty."),
-            @ApiResponse(responseCode = "204", description = "List of parkings returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "200", description = "List of parking returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of parking returned from given page of given size is empty."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> getAllParkingsWithPagination(@RequestParam("pageNumber") int pageNumber,
+    ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
@@ -93,14 +93,14 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/sectors/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/sectors/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
      * This method is used to find all sectors from parking with a given id.
      * Both active and inactive sectors are returned.
      *
-     * @param id Identifier of parking containing the sectors to find.
+     * @param parkingId Identifier of parking containing the sectors to find.
      * @return It returns HTTP response 200 OK with information about sectors of a given parking. If parking with the
      * given uuid doesn't exist, returns 404. If the uuid has invalid format, returns 400.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by

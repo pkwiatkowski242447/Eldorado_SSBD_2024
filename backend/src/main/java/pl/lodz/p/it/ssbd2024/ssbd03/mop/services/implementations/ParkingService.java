@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.AllocationCodeWithSectorDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
@@ -94,7 +94,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_SECTOR)
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
-        return parkingFacade.findSectorById(id).orElseThrow(SectorNotFoundException::new);
+        return parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
     }
 
     @Override
@@ -191,7 +191,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
     public Sector editSector(Sector modifiedSector) throws ApplicationBaseException {
-        Sector foundSector = parkingFacade.findSectorById(modifiedSector.getId()).orElseThrow(SectorNotFoundException::new);
+        Sector foundSector = parkingFacade.findAndRefreshSectorById(modifiedSector.getId()).orElseThrow(SectorNotFoundException::new);
 
         if (!modifiedSector.getVersion().equals(foundSector.getVersion())) {
             throw new ApplicationOptimisticLockException();
