@@ -104,7 +104,7 @@ public class Reservation extends AbstractEntity implements Serializable {
      * The sector in which the parking spot is allocated for this reservation.
      */
     @NotNull(message = ReservationMessages.SECTOR_NULL)
-    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(
             name = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN,
             referencedColumnName = DatabaseConsts.PK_COLUMN,
@@ -133,7 +133,7 @@ public class Reservation extends AbstractEntity implements Serializable {
      * The list of parking events associated with this reservation.
      */
     @NotNull(message = ReservationMessages.LIST_OF_PARKING_EVENTS_NULL)
-    @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     @Getter
     private final List<ParkingEvent> parkingEvents = new ArrayList<>();
 

@@ -10,6 +10,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundE
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.validation.ParkingConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
 
 import java.util.List;
 import java.util.UUID;
@@ -90,10 +91,11 @@ public interface ParkingServiceInterface {
     void activateSector(UUID id) throws ApplicationBaseException;
 
     /**
-     * Deactivates sector with given id.
+     * Deactivates sector with given id, by setting active field to false.
      *
      * @param id Sector's id.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     * @throws SectorNotFoundException Thrown when sector with given id cannot be found in the database.
+     * @throws SectorAlreadyInactiveException Thrown when trying to deactivate an inactive sector.
      */
     void deactivateSector(UUID id) throws ApplicationBaseException;
 

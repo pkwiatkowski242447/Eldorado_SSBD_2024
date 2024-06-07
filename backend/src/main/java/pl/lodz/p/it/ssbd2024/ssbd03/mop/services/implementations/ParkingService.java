@@ -12,18 +12,28 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.integrity.UserLevelMissingException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationExpiredException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationNotStartedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.EntryCodeFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,10 +51,19 @@ import java.util.UUID;
 public class ParkingService implements ParkingServiceInterface {
 
     private final ParkingFacade parkingFacade;
+    private final ReservationFacade reservationFacade;
+    private final AccountMOPFacade accountFacade;
+    private final EntryCodeFacade entryCodeFacade;
 
     @Autowired
-    public ParkingService(ParkingFacade parkingFacade) {
+    public ParkingService(ParkingFacade parkingFacade,
+                          ReservationFacade reservationFacade,
+                          AccountMOPFacade accountFacade,
+                          EntryCodeFacade entryCodeFacade) {
         this.parkingFacade = parkingFacade;
+        this.reservationFacade = reservationFacade;
+        this.accountFacade = accountFacade;
+        this.entryCodeFacade = entryCodeFacade;
     }
 
     @Override
@@ -96,7 +115,10 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
     public void deactivateSector(UUID id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
+        if(!sector.getActive()) throw new SectorAlreadyInactiveException();
+        sector.setActive(false);
+        parkingFacade.editSector(sector);
     }
 
     @Override
@@ -113,9 +135,43 @@ public class ParkingService implements ParkingServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.ENTER_PARKING_WITH_RESERVATION)
+    @RolesAllowed({Authorities.ENTER_PARKING_WITH_RESERVATION})
     public AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
+        Account account = this.accountFacade.findByLogin(userName).orElseThrow(AccountNotFoundException::new);
+
+        if (reservation.getBeginTime().isAfter(LocalDateTime.now())) {
+            throw new ReservationNotStartedException();
+        } else if (reservation.getEndTime().isBefore(LocalDateTime.now())) {
+            throw new ReservationExpiredException();
+        }
+
+        if (reservation.getSector().getAvailablePlaces() == 0) {
+            throw new ReservationNoAvailablePlaceException();
+        }
+
+        // Current user is not the owner of the reservation
+        if (account.getUserLevels().stream().noneMatch(userLevel -> reservation.getClient().getId().equals(userLevel.getId()))) {
+            throw new UserLevelMissingException(I18n.USER_NOT_RESERVATION_OWNER_EXCEPTION);
+        }
+
+        EntryCode entryCode;
+        if (reservation.getParkingEvents().stream().anyMatch(parkingEvent -> parkingEvent.getType().equals(ParkingEvent.EventType.ENTRY))) {
+            // Entry code was already generated for that reservation
+            entryCode = this.entryCodeFacade.findEntryCodeByReservationId(reservationId).orElseThrow();
+        } else {
+            // Entry code generation
+            int entryCodeValue = (int) ((Math.random() * 90000000) + 1000000);
+            entryCode = new EntryCode(String.valueOf(entryCodeValue), reservation);
+            this.entryCodeFacade.create(entryCode);
+
+            reservation.getSector().setAvailablePlaces(reservation.getSector().getAvailablePlaces() - 1);
+        }
+
+        ParkingEvent entryEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
+        reservation.addParkingEvent(entryEvent);
+        this.reservationFacade.edit(reservation);
+        return new AllocationCodeDTO(entryCode.getEntryCode());
     }
 
     @Override
