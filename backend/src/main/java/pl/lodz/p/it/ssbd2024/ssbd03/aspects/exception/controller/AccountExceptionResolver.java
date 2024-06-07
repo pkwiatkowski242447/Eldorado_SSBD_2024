@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountAuthenticationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountRestoreAccessException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.AccountUserLevelException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.integrity.AccountDataIntegrityCompromisedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.conflict.AccountConflictException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.read.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.resetOwnPassword.ResetOwnPasswordException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountStatusException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.attribute.AttributeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.AccountAuthenticationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.AccountRestoreAccessException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.AccountUserLevelException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.integrity.AccountDataIntegrityCompromisedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.InvalidLoginAttemptException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountConflictException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.resetOwnPassword.ResetOwnPasswordException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountStatusException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.validation.AccountConstraintViolationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.attribute.AttributeException;
 
 /**
  * General exception handling component in a form of @ControllerAdvice for Account exceptions.

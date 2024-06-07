@@ -11,7 +11,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.stream.Collectors;

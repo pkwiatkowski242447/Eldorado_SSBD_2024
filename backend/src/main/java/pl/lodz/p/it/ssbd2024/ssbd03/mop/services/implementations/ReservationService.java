@@ -44,8 +44,8 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
-    public List<Reservation> getAllActiveReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public List<Reservation> getAllActiveReservationsByUserLoginWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return reservationFacade.findAllActiveUserReservationByLoginWithPagination(login, pageNumber, pageSize);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_ALL_RESERVATIONS)
     public List<Reservation> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        return reservationFacade.findAllWithPagination(pageNumber, pageSize);
     }
 
 }

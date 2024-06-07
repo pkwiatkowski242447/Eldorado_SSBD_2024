@@ -70,7 +70,10 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param entity Reservation entity
      */
     @Override
-    @RolesAllowed({Authorities.ENTER_PARKING_WITHOUT_RESERVATION, Authorities.EXIT_PARKING})
+    @RolesAllowed({
+            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
+            Authorities.EXIT_PARKING
+    })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
     }
@@ -102,7 +105,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
     @Override
-    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    @RolesAllowed({
+            Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION
+    })
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -229,5 +234,31 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @DenyAll
     public int count() throws ApplicationBaseException {
         return super.count();
+    }
+
+    /***
+     * Returns all active reservation for user with specified login
+     *
+     * @param login The user login.
+     * @param pageNumber page number.
+     * @param pageSize defines the maximum number of entities per page.
+     * @return All Reservation entities for selected Sector and page.
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    public List<Reservation> findAllActiveUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            var list = getEntityManager()
+                    .createNamedQuery("Reservation.findActiveReservationsByLogin", Reservation.class)
+                    .setParameter("clientLogin", login)
+                    .setFirstResult(pageNumber * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+            refreshAll(list);
+            log.error(list.toString());
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
     }
 }

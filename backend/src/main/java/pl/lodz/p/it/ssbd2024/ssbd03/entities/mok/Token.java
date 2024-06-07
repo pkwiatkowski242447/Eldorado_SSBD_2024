@@ -18,7 +18,12 @@ import java.time.LocalDateTime;
  * @see Account
  */
 @Entity
-@Table(name = DatabaseConsts.TOKEN_TABLE)
+@Table(
+        name = DatabaseConsts.TOKEN_TABLE,
+        indexes = {
+                @Index(name = DatabaseConsts.TOKEN_ACCOUNT_ID_INDEX, columnList = DatabaseConsts.TOKEN_ACCOUNT_ID_COLUMN)
+        }
+)
 @LoggerInterceptor
 @NoArgsConstructor
 @Getter
@@ -81,6 +86,10 @@ public class Token extends AbstractEntity {
      * The account associated with this token.
      */
     @ManyToOne(cascade = {CascadeType.REFRESH})
+    @JoinColumn(name = DatabaseConsts.TOKEN_ACCOUNT_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.TOKEN_ACCOUNT_ID_FK)
+            , nullable = false, updatable = false)
     private Account account;
 
     /**

@@ -26,17 +26,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.Authenticatio
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.RefreshTokenDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.InvalidLoginAttemptException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByAdminException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountBlockedByFailedLoginAttemptsException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountSuspendedException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.validation.AccountConstraintViolationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.InvalidLoginAttemptException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountBlockedByAdminException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountBlockedByFailedLoginAttemptsException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountSuspendedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AuthenticationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
 

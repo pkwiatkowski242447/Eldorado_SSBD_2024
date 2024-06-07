@@ -24,7 +24,12 @@ import java.time.LocalDateTime;
  * @see Reservation
  */
 @Entity
-@Table(name = DatabaseConsts.PARKING_EVENT_TABLE)
+@Table(
+        name = DatabaseConsts.PARKING_EVENT_TABLE,
+        indexes = {
+                @Index(name = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_INDEX, columnList = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_COLUMN)
+        }
+)
 @LoggerInterceptor
 @NoArgsConstructor
 @Getter
@@ -46,7 +51,12 @@ public class ParkingEvent extends AbstractEntity implements Serializable {
      */
     @NotNull(message = ParkingEventMessages.RESERVATION_NULL)
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
+    @JoinColumn(
+            name = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.PARKING_EVENT_RESERVATION_ID_FK),
+            nullable = false, updatable = false
+    )
     @Setter
     private Reservation reservation;
 

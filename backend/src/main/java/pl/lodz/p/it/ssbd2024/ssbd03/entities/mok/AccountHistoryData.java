@@ -16,8 +16,12 @@ import java.util.UUID;
  * performed on the account object.
  */
 @Entity
-@Table(name = DatabaseConsts.ACCOUNT_HIST_TABLE,
-       uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ACCOUNT_HIST_ID_COLUMN, DatabaseConsts.ACCOUNT_HIST_VERSION_COLUMN})
+@Table(
+        name = DatabaseConsts.ACCOUNT_HIST_TABLE,
+        uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ACCOUNT_HIST_ID_COLUMN, DatabaseConsts.ACCOUNT_HIST_VERSION_COLUMN}),
+        indexes = {
+                @Index(name = DatabaseConsts.ACCOUNT_HIST_ACCOUNT_ID_INDEX ,columnList = DatabaseConsts.ACCOUNT_HIST_MODIFIED_BY_COLUMN)
+        }
 )
 @LoggerInterceptor
 @Getter @Setter
@@ -114,7 +118,12 @@ public class AccountHistoryData {
     private LocalDateTime modificationTime;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = DatabaseConsts.ACCOUNT_HIST_MODIFIED_BY_COLUMN, updatable = false)
+    @JoinColumn(
+            name = DatabaseConsts.ACCOUNT_HIST_MODIFIED_BY_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.ACCOUNT_HIST_ACCOUNT_ID_FK),
+            updatable = false
+    )
     private Account modifiedBy;
 
     @PrePersist

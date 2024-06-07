@@ -12,9 +12,15 @@ public class DatabaseConsts {
     public static final String CREATED_BY = "created_by";
     public static final String UPDATED_BY = "updated_by";
 
+    // public.token table
+
     public static final String TOKEN_TABLE = "token";
     public static final String TOKEN_TOKEN_TYPE_COLUMN = "type";
     public static final String TOKEN_TOKEN_VALUE_COLUMN = "token_value";
+    public static final String TOKEN_ACCOUNT_ID_COLUMN = "account_id";
+
+    public static final String TOKEN_ACCOUNT_ID_INDEX = "idx_token_account_id";
+    public static final String TOKEN_ACCOUNT_ID_FK = "token_account_id_fk";
 
     // MOK
 
@@ -40,15 +46,29 @@ public class DatabaseConsts {
     public static final String ACCOUNT_LAST_UNSUCCESSFUL_LOGIN_IP = "last_unsuccessful_login_ip";
     public static final String UNSUCCESSFUL_LOGIN_COUNTER = "unsuccessful_login_counter";
 
+    // public.account_attribute
+
     public static final String ACCOUNT_ATTRIBUTES = "account_attributes";
     public static final String ACCOUNT_ID_COLUMN = "account_id";
     public static final String ATTRIBUTE_ID_COLUMN = "attribute_id";
+
+    public static final String ACCOUNT_ATTRIBUTE_ACCOUNT_ID_INDEX = "idx_account_attribute_account_id";
+    public static final String ACCOUNT_ATTRIBUTE_ACCOUNT_ID_FK = "account_attribute_account_id_fk";
+
+    public static final String ACCOUNT_ATTRIBUTE_ATTRIBUTE_NAME_ID_INDEX = "idx_account_attribute_attribute_name_id";
+    public static final String ACCOUNT_ATTRIBUTE_ATTRIBUTE_NAME_ID_FK = "account_attribute_attribute_name_id_fk";
 
     // public.attribute_association
 
     public static final String ATTRIBUTE_ASSOCIATION_TABLE = "attribute_association";
     public static final String ATTRIBUTE_RECORD_NAME_ID = "attribute_record_id";
     public static final String ATTRIBUTE_RECORD_VALUE_ID = "attribute_value_id";
+
+    public static final String ATTRIBUTE_RECORD_ATTRIBUTE_NAME_ID_INDEX = "idx_attribute_record_attribute_name_id";
+    public static final String ATTRIBUTE_RECORD_ATTRIBUTE_NAME_ID_FK = "attribute_record_attribute_name_id_fk";
+
+    public static final String ATTRIBUTE_RECORD_ATTRIBUTE_VALUE_ID_INDEX = "idx_attribute_record_attribute_value_id";
+    public static final String ATTRIBUTE_RECORD_ATTRIBUTE_VALUE_ID_FK = "attribute_record_attribute_value_id_fk";
 
     // public.attribute_name
 
@@ -61,6 +81,9 @@ public class DatabaseConsts {
     public static final String ATTRIBUTE_VALUE_COLUMN = "attribute_value";
     public static final String ATTRIBUTE_NAME_ID_COLUMN = "attribute_name_id";
     public static final String ATTRIBUTE_VALUE_ID_COLUMN = "attribute_value_id";
+
+    public static final String ATTRIBUTE_VALUE_ATTRIBUTE_NAME_ID_INDEX = "idx_attribute_value_attribute_name_id";
+    public static final String ATTRIBUTE_VALUE_ATTRIBUTE_NAME_ID_FK = "attribute_value_attribute_name_id_fk";
 
     // public.account_history_data
 
@@ -90,11 +113,17 @@ public class DatabaseConsts {
     public static final String ACCOUNT_HIST_MODIFIED_BY_COLUMN = "modified_by";
     public static final String ACCOUNT_HIST_MODIFICATION_TIME_COLUMN = "modification_time";
 
+    public static final String ACCOUNT_HIST_ACCOUNT_ID_INDEX = "idx_account_hist_account_id";
+    public static final String ACCOUNT_HIST_ACCOUNT_ID_FK = "account_hist_account_id_fk";
+
     // public.past_password table
 
     public static final String PAST_PASSWORD_TABLE = "past_password";
+    public static final String PAST_PASSWORD_COLUMN = "past_password";
     public static final String PAST_PASSWORD_ACCOUNT_ID_COLUMN = "account_id";
-    public static final String PAST_PASSWORD_VALUE_COLUMN = "password";
+
+    public static final String PAST_PASSWORD_ACCOUNT_ID_INDEX = "idx_account_id";
+    public static final String PAST_PASSWORD_ACCOUNT_ID_FK = "past_password_account_id_fk";
 
     // public.personal_data table
 
@@ -104,23 +133,38 @@ public class DatabaseConsts {
     public static final String PERSONAL_DATA_LASTNAME_COLUMN = "lastname";
     public static final String PERSONAL_DATA_EMAIL_COLUMN = "email";
 
+    public static final String PERSONAL_DATA_ACCOUNT_ID_INDEX = "idx_account_id";
+    public static final String PERSONAL_DATA_ACCOUNT_ID_FK = "personal_data_account_id_fk";
+
     // public.user_level table
 
     public static final String USER_LEVEL_TABLE = "user_level";
     public static final String USER_LEVEL_ACCOUNT_ID_COLUMN = "account_id";
 
-    // public.client_level table
+    public static final String USER_LEVEL_ACCOUNT_ID_INDEX = "idx_user_level_account_id";
+    public static final String USER_LEVEL_ACCOUNT_ID_FK = "user_level_account_id_fk";
+
+    // public.client_data table
 
     public static final String CLIENT_DATA_TABLE = "client_data";
     public static final String CLIENT_DATA_TYPE_COLUMN = "type";
 
-    // public.staff_level table
+    public static final String CLIENT_DATA_USER_LEVEL_ID_INDEX = "idx_client_data_user_level_id";
+    public static final String CLIENT_DATA_USER_LEVEL_ID_FK = "client_data_user_level_id_fk";
+
+    // public.staff_data table
 
     public static final String STAFF_DATA_TABLE = "staff_data";
 
-    // public.admin_level table
+    public static final String STAFF_DATA_USER_LEVEL_ID_INDEX = "idx_staff_data_user_level_id";
+    public static final String STAFF_DATA_USER_LEVEL_ID_FK = "staff_data_user_level_id_fk";
+
+    // public.admin_data table
 
     public static final String ADMIN_DATA_TABLE = "admin_data";
+
+    public static final String ADMIN_DATA_USER_LEVEL_ID_INDEX = "idx_admin_data_user_level_id";
+    public static final String ADMIN_DATA_USER_LEVEL_ID_FK = "admin_data_user_level_id_fk";
 
     // Discriminators
 
@@ -148,6 +192,9 @@ public class DatabaseConsts {
     public static final String PARKING_EVENT_DATE_COLUMN = "date";
     public static final String PARKING_EVENT_TYPE_COLUMN = "type";
 
+    public static final String PARKING_EVENT_RESERVATION_ID_INDEX = "idx_parking_event_reservation_id";
+    public static final String PARKING_EVENT_RESERVATION_ID_FK = "parking_event_reservation_id_fk";
+
     // public.reservation table
 
     public static final String RESERVATION_TABLE = "reservation";
@@ -156,6 +203,12 @@ public class DatabaseConsts {
     public static final String RESERVATION_SECTOR_ID_COLUMN = "sector_id";
     public static final String RESERVATION_BEGIN_TIME_COLUMN = "begin_time";
     public static final String RESERVATION_END_TIME_COLUMN = "end_time";
+
+    public static final String RESERVATION_SECTOR_ID_INDEX = "idx_reservation_sector_id";
+    public static final String RESERVATION_SECTOR_ID_FK = "reservation_sector_id_fk";
+
+    public static final String RESERVATION_CLIENT_ID_INDEX = "idx_reservation_client_id";
+    public static final String RESERVATION_CLIENT_ID_FK = "reservation_client_id_fk";
 
     // public.sector table
 
@@ -168,4 +221,16 @@ public class DatabaseConsts {
     public static final String SECTOR_AVAILABLE_PLACES_COLUMN = "available_places";
     public static final String SECTOR_WEIGHT_COLUMN = "weight";
     public static final String SECTOR_ACTIVE_COLUMN = "active";
+
+    public static final String SECTOR_PARKING_ID_INDEX = "idx_sector_parking_id";
+    public static final String SECTOR_PARKING_ID_FK = "sector_parking_id_fk";
+
+    // public.entry_code
+
+    public static final String ENTRY_CODE_TABLE = "entry_code";
+    public static final String ENTRY_CODE_VALUE_COLUMN = "entry_code";
+    public static final String ENTRY_CODE_RESERVATION_ID_COLUMN = "reservation_id";
+
+    public static final String ENTRY_CODE_RESERVATION_ID_INDEX = "idx_entry_code_reservation_id";
+    public static final String ENTRY_CODE_RESERVATION_ID_FK = "entry_code_reservation_id_fk";
 }

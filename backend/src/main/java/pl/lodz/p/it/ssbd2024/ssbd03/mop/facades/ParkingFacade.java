@@ -14,7 +14,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -166,6 +165,21 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
+     * Removes parking with given identifier (in form of UUID)
+     * from the database.
+     *
+     * @param parkingId Identifier (UUID) of the parking to be removed.
+     * @throws ApplicationBaseException General superclass of all the exceptions
+     * that could be thrown by aspects intercepting exceptions in the facade layer.
+     */
+    @RolesAllowed({Authorities.DELETE_PARKING})
+    public void removeParkingById(UUID parkingId) throws ApplicationBaseException {
+        getEntityManager().createNamedQuery("Parking.removeParkingById")
+            .setParameter("parkingId", parkingId)
+            .executeUpdate();
+    }
+
+    /**
      * Counts the number of the Parking in the database.
      *
      * @return Number of Parking in the database.
@@ -185,8 +199,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @param id ID of the Sector to be retrieved.
      * @return If a Sector with the given ID was found returns an Optional containing the Sector, otherwise returns an empty Optional.
      */
-    @DenyAll
-    protected Optional<Sector> findSectorById(UUID id) throws ApplicationBaseException {
+    @RolesAllowed({Authorities.GET_SECTOR})
+    private Optional<Sector> findSectorById(UUID id) throws ApplicationBaseException {
         return Optional.ofNullable(getEntityManager().find(Sector.class, id));
     }
 
@@ -205,22 +219,12 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         return optEntity;
     }
 
-    @RolesAllowed({Authorities.GET_SECTOR, Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR})
-    public Sector findSectorByParkingIdAndName(UUID parkingId, String name)
-            throws ApplicationBaseException {
-        var sector = getEntityManager().createNamedQuery("Sector.findByParkingIdAndName", Sector.class)
-                .setParameter("parkingId", parkingId)
-                .setParameter("name", name)
-                .getSingleResult();
-        return sector;
-    }
-
     @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public List<Sector> findSectorsInParking(UUID parkingId, boolean showOnlyActive)
+    public List<Sector> findSectorsInParking(UUID parkingId)
             throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
-                .setParameter("showOnlyActive", showOnlyActive)
+                .setParameter("showOnlyActive", false)
                 .getResultList();
         refreshAllSectors(list);
         return list;
@@ -312,20 +316,20 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /***
-     * Get all parkings from database
+     * Get all parking from database
      *
-     * @param pageNumber Number of the page with parkins to be retrieved.
-     * @param pageSize Number of parkings per page.
-     * @return List of all parkings from a specified page, of a given page size.
+     * @param pageNumber Number of the page with parking to be retrieved.
+     * @param pageSize Number of parking per page.
+     * @return List of all parking from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
      */
-    public List<Parking> findAllParkingsWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+    public List<Parking> findAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
-            TypedQuery<Parking> findAllParkings = entityManager.createNamedQuery("Parking.findAllParkings", Parking.class);
-            findAllParkings.setFirstResult(pageNumber * pageSize);
-            findAllParkings.setMaxResults(pageSize);
-            List<Parking> list = findAllParkings.getResultList();
+            TypedQuery<Parking> findAllParking = entityManager.createNamedQuery("Parking.findAllParking", Parking.class);
+            findAllParking.setFirstResult(pageNumber * pageSize);
+            findAllParking.setMaxResults(pageSize);
+            List<Parking> list = findAllParking.getResultList();
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {

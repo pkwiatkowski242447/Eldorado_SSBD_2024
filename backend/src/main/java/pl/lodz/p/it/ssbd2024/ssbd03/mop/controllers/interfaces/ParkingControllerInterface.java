@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.ParkingModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.SectorCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -53,6 +53,14 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @PostMapping(value = "/{id}/sectors")
+    @Operation(summary = "Add sector", description = "The endpoint is used to add sector to parking identified with the given identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The sector was created successfully"),
+            @ApiResponse(responseCode = "400", description = "Persistence exception was thrown."),
+            @ApiResponse(responseCode = "404", description = "Parking with the given identifier does not exist"),
+            @ApiResponse(responseCode = "409", description = "Parking with specified data already exists"),
+            @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
+    })
     ResponseEntity<?> createSector(@PathVariable("id") String parkingId, @RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
 
     /**
@@ -67,13 +75,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get all parkings", description = "The endpoint is used retrieve list of parkings from given page of given size.")
+    @Operation(summary = "Get all parking", description = "The endpoint is used retrieve list of parking from given page of given size.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of parkings returned from given page of given size is not empty."),
-            @ApiResponse(responseCode = "204", description = "List of parkings returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "200", description = "List of parking returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of parking returned from given page of given size is empty."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> getAllParkingsWithPagination(@RequestParam("pageNumber") int pageNumber,
+    ResponseEntity<?> getAllParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
@@ -85,19 +93,27 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/sectors/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/sectors/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
      * This method is used to find all sectors from parking with a given id.
+     * Both active and inactive sectors are returned.
      *
-     * @param id Identifier of parking containing the sectors to find.
+     * @param parkingId Identifier of parking containing the sectors to find.
      * @return It returns HTTP response 200 OK with information about sectors of a given parking. If parking with the
      * given uuid doesn't exist, returns 404. If the uuid has invalid format, returns 400.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/{id}/sectors", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get sectors", description = "The endpoint is used to get sectors from parking identified with the given identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of sectors in the given parking was found successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid format of parking uuid"),
+            @ApiResponse(responseCode = "404", description = "Parking with the given uuid does not exist"),
+            @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
+    })
     ResponseEntity<?> getSectorsByParkingId(@PathVariable("id") String parkingId) throws ApplicationBaseException;
 
     /**
@@ -110,6 +126,13 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with fiven id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Parking with list of sectors."),
+            @ApiResponse(responseCode = "400", description = "Invalid UUID"),
+            @ApiResponse(responseCode = "404", description = "Parking with given id doesn't exist"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> getParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
@@ -150,11 +173,18 @@ public interface ParkingControllerInterface {
      *
      * @param id Identifier of the parking to be removed.
      * @return This method returns 204 NO CONTENT if the parking is removed successfully. Otherwise, if the parking
-     * could not be found in the database then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned
+     * could not be found in the database then 400 BAD REQUEST is returned (when the parking could not be found or
+     * parking does have sectors attached). 500 INTERNAL SERVER ERROR is returned
      * when other unexpected exception is encountered while processing the request.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
+    @Operation(summary = "Remove parking", description = "The endpoint is used to remove parking with a given id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The parking has been removed successfully."),
+            @ApiResponse(responseCode = "400", description = "The parking could not be removed due to existing sectors of a given parking or the parking not existing in the database."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     @DeleteMapping(value = "/{id}")
     ResponseEntity<?> removeParkingById(@PathVariable("id") String id) throws ApplicationBaseException;
 
@@ -188,6 +218,12 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
+    @Operation(summary = "Enter parking with reservation", description = "The endpoint is used to generate entry code for user entering parking with reservation.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Entry code generated and place from sector allocated successfully."),
+            @ApiResponse(responseCode = "400", description = "Reservation could not be found or is expired / not started. This response is returned when user is not the owner of the reservation or when there are no available places in the sector."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     @PostMapping(value = "/reservations/{id}/enter")
     ResponseEntity<?> enterParkingWithReservation(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 
@@ -207,7 +243,7 @@ public interface ParkingControllerInterface {
                                   @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException;
 
     /**
-     * This method is used to edit sector, that is identified with the given identifier.
+     * This method is used to edit sector, that is identified with the given identifier and name.
      *
      * @param ifMatch          Value of If-Match header
      * @param sectorModifyDTO  Sector properties with potentially changed values.
@@ -218,6 +254,12 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @PutMapping(value = "/sectors", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Edit sector", description = "The endpoint is used to edit sector identified with the given identifier and name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The sector was successfully edited"),
+            @ApiResponse(responseCode = "400", description = "Persistence exception was thrown."),
+            @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
+    })
     ResponseEntity<?> editSector(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                  @Valid @RequestBody SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException;
 

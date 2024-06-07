@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
@@ -21,7 +20,13 @@ import java.io.Serializable;
  * @see UserLevel
  */
 @Entity
-@Table(name = DatabaseConsts.CLIENT_DATA_TABLE)
+@Table(
+        name = DatabaseConsts.CLIENT_DATA_TABLE,
+        indexes = {
+                @Index(name = DatabaseConsts.CLIENT_DATA_USER_LEVEL_ID_INDEX, columnList = DatabaseConsts.PK_COLUMN)
+        }
+)
+@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = DatabaseConsts.CLIENT_DATA_USER_LEVEL_ID_FK))
 @DiscriminatorValue(value = DatabaseConsts.CLIENT_DISCRIMINATOR)
 @LoggerInterceptor
 @NoArgsConstructor

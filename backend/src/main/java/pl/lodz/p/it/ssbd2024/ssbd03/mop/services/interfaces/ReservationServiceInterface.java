@@ -20,7 +20,7 @@ public interface ReservationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    List<Reservation> getAllActiveReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Reservation> getAllActiveReservationsByUserLoginWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /***
      * Get all historical reservations for client
@@ -49,10 +49,10 @@ public interface ReservationServiceInterface {
     void cancelReservation(UUID reservationId) throws ApplicationBaseException;
 
     /**
-     * Retrieve all reservations for a user in the system.
+     * Retrieve all reservations for in the system.
      * @param pageNumber The page number of the results to return.
      * @param pageSize   The number of results to return per page.
-     * @return A list of all accounts in the system, ordered by account login, with pagination applied.
+     * @return A list of all reservations in the system, with pagination applied.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     List<Reservation> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException;

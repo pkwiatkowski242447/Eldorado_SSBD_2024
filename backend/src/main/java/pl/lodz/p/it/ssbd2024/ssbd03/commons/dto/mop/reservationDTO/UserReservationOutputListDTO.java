@@ -1,4 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Data transfer object used in returning historical reservation list for user.
+ * Data transfer object used in returning reservation list for user.
  */
 @Getter
 @Setter

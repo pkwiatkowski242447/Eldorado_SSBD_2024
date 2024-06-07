@@ -1,8 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
@@ -17,7 +15,13 @@ import java.io.Serializable;
  * @see UserLevel
  */
 @Entity
-@Table(name = DatabaseConsts.ADMIN_DATA_TABLE)
+@Table(
+        name = DatabaseConsts.ADMIN_DATA_TABLE,
+        indexes = {
+                @Index(name = DatabaseConsts.ADMIN_DATA_USER_LEVEL_ID_INDEX, columnList = DatabaseConsts.PK_COLUMN)
+        }
+)
+@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = DatabaseConsts.ADMIN_DATA_USER_LEVEL_ID_FK))
 @DiscriminatorValue(value = DatabaseConsts.ADMIN_DISCRIMINATOR)
 @LoggerInterceptor
 @ToString(callSuper = true)
