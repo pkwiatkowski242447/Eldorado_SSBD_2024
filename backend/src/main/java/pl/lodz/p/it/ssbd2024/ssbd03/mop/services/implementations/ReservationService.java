@@ -50,8 +50,8 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
-    public List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return reservationFacade.findAllHistoricalUserReservationByLoginWithPagination(login, pageNumber, pageSize);
     }
 
     @Override

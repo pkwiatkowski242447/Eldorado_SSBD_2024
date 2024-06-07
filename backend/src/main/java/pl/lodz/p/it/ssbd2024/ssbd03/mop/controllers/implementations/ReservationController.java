@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.UserReservationOutputListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserHistoricalReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.ReservationOutputListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.UserReservationOutputListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserActiveReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
@@ -66,8 +67,16 @@ public class ReservationController implements ReservationControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllHistoricalReservationSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<UserReservationOutputListDTO> reservationList = reservationService.getAllHistoricalReservationsByUserIdWthPagination(login, pageNumber, pageSize)
+                .stream()
+                .map(UserHistoricalReservationListMapper::toSectorListDTO)
+                .toList();
+        if (reservationList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(reservationList);
     }
 
     @Override

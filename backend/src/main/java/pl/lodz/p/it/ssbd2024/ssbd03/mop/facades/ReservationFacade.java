@@ -5,7 +5,6 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -198,6 +197,34 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         refreshAll(list);
         return list;
     }
+
+    /***
+     * Returns all historical reservation for user with specified login
+     *
+     * @param login The user login.
+     * @param pageNumber page number.
+     * @param pageSize defines the maximum number of entities per page.
+     * @return All Reservation entities for selected Sector and page.
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    public List<Reservation> findAllHistoricalUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            var list = getEntityManager()
+                    .createNamedQuery("Reservation.findHistoricalReservationsByLogin", Reservation.class)
+                    .setParameter("clientLogin", login)
+                    .setFirstResult(pageNumber * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+            refreshAll(list);
+            log.error(list.toString());
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
+
 
     /**
      * Invokes superclass count method.

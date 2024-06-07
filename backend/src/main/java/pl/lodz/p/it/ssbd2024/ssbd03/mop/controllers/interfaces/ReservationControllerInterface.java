@@ -48,6 +48,12 @@ public interface ReservationControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/historical/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get your own historical reservation", description = "The endpoint is used to get user's all historical reservations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of reservations returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of reservations returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> getAllHistoricalReservationSelf(@RequestParam("pageNumber") int pageNumber,
                                     @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 

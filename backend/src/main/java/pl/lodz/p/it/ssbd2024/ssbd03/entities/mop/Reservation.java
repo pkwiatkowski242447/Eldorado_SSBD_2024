@@ -73,6 +73,14 @@ import java.util.List;
                         ORDER BY r.beginTime"""
         ),
         @NamedQuery(
+                name = "Reservation.findHistoricalReservationsByLogin",
+                query = """
+                       SELECT r FROM Reservation r
+                        WHERE r.client.account.login = :clientLogin
+                          AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
                 name = "Reservation.findSectorReservations",
                 query = """
                         SELECT r FROM Reservation r
