@@ -30,7 +30,6 @@ import java.util.UUID;
 @LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
-@Slf4j
 public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
 
     @PersistenceContext(unitName = DatabaseConfigConstants.MOP_PU)
