@@ -268,8 +268,17 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.GET_ALL_AVAILABLE_PARKING)
     public ResponseEntity<?> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
-         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        List<ParkingOutputListDTO> parkingList = parkingService.getAvailableParkingWithPagination(pageNumber, pageSize)
+                .stream()
+                .map(ParkingListMapper::toParkingListDTO)
+                .toList();
+        if (parkingList.isEmpty())
+            return ResponseEntity
+                    .noContent()
+                    .build();
+        else return ResponseEntity.ok(parkingList);
     }
+
 
     @Override
     @RolesAllowed(Authorities.EXIT_PARKING)

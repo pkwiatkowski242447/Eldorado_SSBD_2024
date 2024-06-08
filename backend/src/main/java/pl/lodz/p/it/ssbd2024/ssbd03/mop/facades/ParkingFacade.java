@@ -338,4 +338,19 @@ public class ParkingFacade extends AbstractFacade<Parking> {
             return new ArrayList<>();
         }
     }
+
+    public List<Parking> findAllAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            TypedQuery<Parking> findAllAvailableParking = entityManager.createNamedQuery("Parking.findAllAvailableParking", Parking.class);
+            findAllAvailableParking.setFirstResult(pageNumber * pageSize);
+            findAllAvailableParking.setMaxResults(pageSize);
+            findAllAvailableParking.setParameter("active", true);
+            List<Parking> list = findAllAvailableParking.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
 }
