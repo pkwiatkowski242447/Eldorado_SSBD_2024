@@ -5,6 +5,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -12,16 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
-import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
  * Implementation of AbstractFacade that provides CRUD operations
@@ -262,5 +265,18 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         } catch (PersistenceException exception) {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * TODO
+     */
+    public int countAllSectorReservationInTimeframe(Sector sector, LocalDateTime beginTime, int maxReservationHours) throws ApplicationBaseException {
+            TypedQuery<Integer> countAllSectorReservationInTimeframeQuery =
+                    entityManager.createNamedQuery("Reservation.countAllSectorReservationInTimeframe", Integer.class);
+            countAllSectorReservationInTimeframeQuery.setParameter("sectorId", sector.getId());
+            countAllSectorReservationInTimeframeQuery.setParameter("beginTime", beginTime);
+            countAllSectorReservationInTimeframeQuery.setParameter("beginTimeMinusMaxReservationTime", beginTime.minusHours(maxReservationHours));
+            countAllSectorReservationInTimeframeQuery.setParameter("beginTimePlusMaxReservationTime", beginTime.plusHours(maxReservationHours));
+            return Objects.requireNonNullElse(countAllSectorReservationInTimeframeQuery.getSingleResult(), 0);
     }
 }
