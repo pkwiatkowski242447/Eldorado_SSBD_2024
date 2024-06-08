@@ -10,7 +10,9 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -62,6 +64,11 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                         .enablePrettyPrinting(true));
         // Enable global request and response logging filters
         RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+    }
+
+    @AfterEach
+    void resetEnvironment() throws IOException, InterruptedException {
+        this.resetDatabase();
     }
 
     @Test
@@ -326,8 +333,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         assertEquals(list2.get(5), "juleswinnfield");
         assertEquals(list2.get(6), "kamilslimak");
         assertEquals(list2.get(7), "kwotyla");
-        assertEquals(list2.get(8), "loginsuccadmin");
-        assertEquals(list2.get(9), "loginsuccclient");
+        assertEquals(list2.get(8), "michalkowal");
+        assertEquals(list2.get(9), "piotrnowak");
 
         List<String> list3 = RestAssured
                 .given()
@@ -430,7 +437,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("suspended", Matchers.equalTo(false))
                 .body("active", Matchers.equalTo(true))
                 .body("blocked", Matchers.equalTo(false))
-                .body("accountLanguage", Matchers.equalTo("pl"))
+                .body("accountLanguage", Matchers.equalTo("PL"))
                 .extract()
                 .jsonPath().getList("userLevelsDto.roleName");
 

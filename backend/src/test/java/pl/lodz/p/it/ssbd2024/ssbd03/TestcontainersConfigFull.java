@@ -5,12 +5,10 @@ import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
@@ -48,6 +46,8 @@ public class TestcontainersConfigFull {
                 .withDatabaseName(postgresDB)
                 .withCopyFileToContainer(MountableFile.forClasspathResource("sql/init_struct_test.sql"),
                         "/docker-entrypoint-initdb.d/")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("integration_test_scripts/"),
+                        "/scripts/")
                 .withNetwork(network)
                 .withNetworkAliases(postgresHost)
                 .waitingFor(Wait.forListeningPort())
@@ -80,6 +80,10 @@ public class TestcontainersConfigFull {
         postgres.start();
         tomcat.start();
 
+        // Enable logging Postgres logs
+//        Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(LoggerFactory.getLogger("TestcontainersConfig"));
+//        postgres.followOutput(logConsumer);
+
         // Enable logging Tomcat logs
 //        Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(LoggerFactory.getLogger("TestcontainersConfig"));
 //        tomcat.followOutput(logConsumer);
@@ -89,5 +93,10 @@ public class TestcontainersConfigFull {
     static void afterAll() {
         tomcat.stop();
         postgres.stop();
+    }
+
+    protected void resetDatabase() throws IOException, InterruptedException {
+        postgres.execInContainer("psql -U ssbd03admin -d ssbd03 -a -f scripts/reset_db.sql".split(" "));
+        postgres.execInContainer("psql -U ssbd03admin -d ssbd03 -a -f scripts/init_users.sql".split(" "));
     }
 }

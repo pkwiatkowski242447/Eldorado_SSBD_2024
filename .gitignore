@@ -1,3 +1,7 @@
+### Scripts ###
+*.ps1
+*sh
+
 .idea/
 backend/target/
 target/

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Roles;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.roles.RolesMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
@@ -47,7 +48,11 @@ public class ComponentConfig {
 
                 List<SimpleGrantedAuthority> accountAuthorities = new ArrayList<>();
                 for (UserLevel userLevel : account.getUserLevels()) {
-                    accountAuthorities.addAll(rolesMapper.getAuthorities(userLevel.getClass().getSimpleName().toUpperCase()));
+                    accountAuthorities.addAll(
+                            rolesMapper.getAuthorities(
+                                    Roles.valueOf(userLevel.getClass().getSimpleName().toUpperCase())
+                            )
+                    );
                 }
 
                 return new User(account.getLogin(),
