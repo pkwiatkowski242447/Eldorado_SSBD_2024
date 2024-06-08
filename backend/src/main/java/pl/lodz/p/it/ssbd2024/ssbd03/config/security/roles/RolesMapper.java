@@ -35,8 +35,8 @@ public class RolesMapper {
     @Value("${role.system}")
     private String[] roleSystem;
 
-    public List<String> getAuthoritiesAsStrings(String role) throws UnsupportedRoleException {
-        return Stream.of(switch (role.toUpperCase()) {
+    public List<String> getAuthoritiesAsStrings(Roles role) throws UnsupportedRoleException {
+        return Stream.of(switch (role) {
                     case Roles.ADMIN -> roleAdmin;
                     case Roles.STAFF -> roleStaff;
                     case Roles.CLIENT -> roleClient;
@@ -49,7 +49,7 @@ public class RolesMapper {
                 .collect(Collectors.toList());
     }
 
-    public List<SimpleGrantedAuthority> getAuthorities(String role) throws UnsupportedRoleException {
+    public List<SimpleGrantedAuthority> getAuthorities(Roles role) throws UnsupportedRoleException {
         return getAuthoritiesAsStrings(role)
                 .stream()
                 .map(SimpleGrantedAuthority::new)

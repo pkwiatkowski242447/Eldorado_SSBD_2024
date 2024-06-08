@@ -58,7 +58,7 @@ public class LoggerAspect {
         try {
             try {
                 String callerIdentity = "Anonymous";
-                List<String> callerRoleList = List.of(Roles.ANONYMOUS);
+                List<String> callerRoleList = List.of(Roles.ANONYMOUS.name());
 
                 if (SecurityContextHolder.getContext().getAuthentication() != null) {
                     Authentication authenticationObj = SecurityContextHolder.getContext().getAuthentication();
