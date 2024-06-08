@@ -23,14 +23,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.Allocation
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingMapper;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingOutputMapper;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorMapper;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.SectorListMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
@@ -41,7 +35,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.integrity.SectorDataIn
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderIfMatchException;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ParkingListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ParkingControllerInterface;
@@ -132,11 +125,31 @@ public class ParkingController implements ParkingControllerInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_PARKING)
+    @RolesAllowed({Authorities.GET_PARKING, Authorities.EDIT_PARKING})
     public ResponseEntity<?> getParkingById(String id) throws ApplicationBaseException {
         try {
             Parking parking = parkingService.getParkingById(UUID.fromString(id));
-            return ResponseEntity.ok(ParkingOutputMapper.toParkingOutputDTO(parking));
+            return ResponseEntity.ok(ParkingMapper.toParkingOutputDto(parking));
+        } catch (ParkingNotFoundException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_PARKING})
+    public ResponseEntity<?> getClientSectorByParkingId(String id, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            List<SectorClientListDTO> sectors = parkingService
+                    .getSectorsByParkingId(UUID.fromString(id), true, pageNumber, pageSize)
+                    .stream()
+                    .map(SectorClientListMapper::toSectorClientListDTO)
+                    .toList();
+            if(sectors.isEmpty()){
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(sectors);
         } catch (ParkingNotFoundException exception) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -160,8 +173,8 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public ResponseEntity<?> getSectorsByParkingId(String id) throws ApplicationBaseException {
-        List<SectorListDTO> sectorList = parkingService.getSectorsByParkingId(UUID.fromString(id))
+    public ResponseEntity<?> getSectorsByParkingId(String id, int pageNumber, int pageSize) throws ApplicationBaseException {
+        List<SectorListDTO> sectorList = parkingService.getSectorsByParkingId(UUID.fromString(id), false, pageNumber, pageSize)
             .stream()
             .map(SectorListMapper::toSectorListDTO)
             .toList();
