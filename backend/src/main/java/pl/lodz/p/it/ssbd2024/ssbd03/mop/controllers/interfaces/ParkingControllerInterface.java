@@ -291,11 +291,9 @@ public interface ParkingControllerInterface {
     ResponseEntity<?> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
-     * This method is used to end the parking spot allocation.
-     * The exit code which was generated during the start of the allocation must be provided for the allocation to end.
+     * This method is used to end the parking spot allocation. Basically, it generates a parking event for exit
      *
      * @param reservationId Identifier of the reservation, which the client wants to use.
-     * @param exitCode Code that was generated during the start of the allocation.
      * @return 204 NO CONTENT responses are returned if the allocation ended successfully
      * Otherwise, if there is no such reservation, a user account does not exist,
      * the provided exit code is incorrect or the reservation could not be ended; then 400 BAD REQUESTs are returned.
@@ -304,7 +302,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from the facade and service layers below.
      */
-    @PostMapping(value = "/reservations/{id}/exit/{exitCode}")
-    ResponseEntity<?> exitParking(@PathVariable("id") String reservationId, @PathVariable("exitCode") String exitCode) throws ApplicationBaseException;
+    @PostMapping(value = "/reservations/{id}/exit")
+    ResponseEntity<?> exitParking(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 }
 

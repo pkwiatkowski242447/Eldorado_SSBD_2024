@@ -169,12 +169,11 @@ public interface ParkingServiceInterface {
 
     /**
      * Ends the parking allocation by registering the end of a parking event.
-     * If the reservation ID and the exit code are correct, the parking spot
+     * If the reservation ID is correct, the parking spot
      * is freed and the reservation is marked as ended.
      *
      * @param reservationId Identifier of the reservation, which the user uses.
-     * @param exitCode      Code used to end the reservation.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void exitParking(UUID reservationId, String exitCode) throws ApplicationBaseException;
+    void exitParking(UUID reservationId) throws ApplicationBaseException;
 }
