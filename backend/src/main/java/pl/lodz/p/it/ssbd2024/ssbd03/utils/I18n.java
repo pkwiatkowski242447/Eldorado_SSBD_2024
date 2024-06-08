@@ -27,7 +27,6 @@ public class I18n {
     // Account internationalization keys
     public static final String ACCOUNT_LOGIN_ALREADY_TAKEN = "account.login.already.taken.exception";
     public static final String ACCOUNT_EMAIL_ALREADY_TAKEN = "account.email.already.taken.exception";
-    public static final String ACCOUNT_BLOCKED = "account.blocked.exception";
     public static final String ACCOUNT_BLOCKED_BY_ADMIN = "account.blocked.by.admin.exception";
     public static final String ACCOUNT_BLOCKED_BY_FAILED_LOGIN_ATTEMPTS = "account.blocked.by.too.many.failed.attempts.exception";
     public static final String ACCOUNT_ALREADY_BLOCKED = "account.already.blocked.exception";
@@ -44,6 +43,38 @@ public class I18n {
     // Sector exceptions
     public static final String SECTOR_NOT_FOUND = "sector.not.found.exception";
     public static final String SECTOR_ALREADY_ACTIVE = "sector.already.active.exception";
+    public static final String SECTOR_ALREADY_INACTIVE = "sector.already.inactive.exception";
+
+    // Parking exceptions
+    public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.not.found.exception";
+    public static final String PARKING_DELETE_EXCEPTION = "parking.delete.exception";
+    public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
+    public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
+
+    // Reservation exceptions
+    public static final String RESERVATION_NOT_FOUND_EXCEPTION = "reservation.not.found.exception";
+    public static final String USER_NOT_RESERVATION_OWNER_EXCEPTION = "user.not.reservation.owner.exception";
+    public static final String RESERVATION_NOT_STARTED_EXCEPTION = "reservation.not.started.exception";
+    public static final String RESERVATION_EXPIRED_EXCEPTION = "reservation.expired.exception";
+    public static final String RESERVATION_SECTOR_NO_AVAILABLE_PLACES_EXCEPTION = "reservation.sector.no.available.places.exception";
+
+    // Account service
+    public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
+    public static final String NO_SUCH_USER_LEVEL_EXCEPTION = "user_level.no.such.user.level.exception";
+    public static final String ONE_USER_LEVEL = "user_level.one.user.level";
+    public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
+    public static final String USER_LEVEL_DUPLICATED = "user_level.type.duplicated.exception";
+    public static final String INVALID_LOGIN_ATTEMPT_EXCEPTION = "account.service.invalid.login.attempt.exception";
+    public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "account.service.account.not.found.exception";
+    public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
+    public static final String ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION = "account.service.account.try_to_block_own.exception";
+    public static final String ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION = "account.service.email_from_token_null.exception";
+    public static final String TOKEN_NOT_FOUND_EXCEPTION = "token.not.found.exception";
+
+    // Account controller
+    public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
+    public static final String UUID_INVALID = "account.controller.uuid.invalid";
+    public static final String MISSING_HEADER_IF_MATCH = "account.controller.missing.header.if_match.exception";
 
     // General exception messages
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "application.optimistic.lock.exception";
@@ -55,27 +86,6 @@ public class I18n {
     public static final String UNSUPPORTED_OPERATION_EXCEPTION = "application.unsupported.operation.exception";
     public static final String UNSUPPORTED_ROLE_EXCEPTION = "application.unsupported.role.exception";
 
-    // Account service
-    public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
-    public static final String NO_SUCH_USER_LEVEL_EXCEPTION = "user_level.no.such.user.level.exception";
-    public static final String ONE_USER_LEVEL = "user_level.one.user.level";
-    public static final String UNEXPECTED_CLIENT_TYPE = "user_level.client.client_type.unexpected.exception";
-    public static final String USER_LEVEL_DUPLICATED = "user_level.type.duplicated.exception";
-
-    // Account service
-    public static final String INVALID_LOGIN_ATTEMPT_EXCEPTION = "account.service.invalid.login.attempt.exception";
-    public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "account.service.account.not.found.exception";
-    public static final String ACCOUNT_SAME_EMAIL_EXCEPTION = "account.service.account.same.email.exception";
-    public static final String ACCOUNT_TRY_TO_BLOCK_OWN_EXCEPTION = "account.service.account.try_to_block_own.exception";
-    public static final String ACCOUNT_EMAIL_FROM_TOKEN_NULL_EXCEPTION = "account.service.email_from_token_null.exception";
-    public static final String TOKEN_NOT_FOUND_EXCEPTION = "token.not.found.exception";
-
-    // Account controller
-    public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
-    public static final String UUID_INVALID = "account.controller.uuid.invalid";
-    public static final String BAD_UUID_INVALID_FORMAT_EXCEPTION = "account.controller.uuid.invalid.format.exception";
-    public static final String MISSING_HEADER_IF_MATCH = "account.controller.missing.header.if_match.exception";
-
     // JWT
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
 
@@ -83,7 +93,7 @@ public class I18n {
     public static final String USER_LEVEL_MISSING = "controller.data.integrity.user_level.missing.exception";
     public static final String ATTRIBUTE_NOT_FOUND_EXCEPTION = "attribute.not.found.exception";
     public static final String ATTRIBUTE_REPEATED_EXCEPTION = "attribute.repeated.exception";
-
+    public static final String BAD_UUID_INVALID_FORMAT_EXCEPTION = "uuid.invalid.format.exception";
 
     // Mail provider
     public static final String CONFIRM_REGISTER_GREETING_MESSAGE = "mail.confirm.register.greeting.message";
@@ -171,10 +181,6 @@ public class I18n {
     public static final String CLIENT_USER_LEVEL = "user.level.client";
     public static final String STAFF_USER_LEVEL = "user.level.staff";
     public static final String ADMIN_USER_LEVEL = "user.level.admin";
-
-    public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
-    public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
-    public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.not.found.exception";
 
     public static String getMessage(String messageKey, String language) {
         Locale locale = new Locale.Builder().setLanguage(language).build();

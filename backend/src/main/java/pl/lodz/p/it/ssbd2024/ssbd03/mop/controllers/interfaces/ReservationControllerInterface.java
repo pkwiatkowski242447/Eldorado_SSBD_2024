@@ -1,9 +1,12 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.MakeReservationDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
@@ -24,6 +27,12 @@ public interface ReservationControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/active/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get your own active reservation", description = "The endpoint is used to get user's all active reservations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of reservations returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of reservations returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> getAllActiveReservationSelf(@RequestParam("pageNumber") int pageNumber,
                                     @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
@@ -39,6 +48,12 @@ public interface ReservationControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/historical/self", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get your own historical reservation", description = "The endpoint is used to get user's all historical reservations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of reservations returned from given page of given size is not empty."),
+            @ApiResponse(responseCode = "204", description = "List of reservations returned from given page of given size is empty."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> getAllHistoricalReservationSelf(@RequestParam("pageNumber") int pageNumber,
                                     @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
@@ -68,12 +83,13 @@ public interface ReservationControllerInterface {
     ResponseEntity<?> cancelReservation(@PathVariable("id") String id) throws ApplicationBaseException;
 
     /**
-     * This endpoint allows retrieving all reservations for a user in the system. In order to avoid sending too much data at once, the results are paginated.
+     * This endpoint allows retrieving all reservations in the system.
+     * To avoid sending too much data at once, the results are paginated.
      *
      * @param pageNumber Number of the page, which reservations will be retrieved from.
      * @param pageSize   Number of reservations per page.
-     * @return This method returns 200 OK as a response, where in response body a list of user's reservations is a JSON format.
-     * If the list is empty (there are no reservations for the user in the system),
+     * @return This method returns 200 OK as a response, where in response body a list of reservations is a JSON format.
+     * If the list is empty (there are no reservations for in the system),
      * this method would return 204 NO CONTENT as the response.
      * 500 INTERNAL SERVER ERROR is returned when another unexpected exception occurs.
      * @throws ApplicationBaseException Superclass for any application exception

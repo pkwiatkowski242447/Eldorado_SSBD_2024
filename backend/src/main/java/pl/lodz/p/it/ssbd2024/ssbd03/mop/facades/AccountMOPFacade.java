@@ -83,9 +83,11 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      * @param login Login of the Account to be retrieved.
      * @return If Account with the given login was found returns an Optional containing the Account, otherwise returns an empty Optional.
      */
-    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.CANCEL_RESERVATION,
-            Authorities.GET_ACTIVE_RESERVATIONS, Authorities.GET_HISTORICAL_RESERVATIONS}
-    )
+    @RolesAllowed({
+            Authorities.RESERVE_PARKING_PLACE, Authorities.CANCEL_RESERVATION,
+            Authorities.GET_ACTIVE_RESERVATIONS, Authorities.GET_HISTORICAL_RESERVATIONS,
+            Authorities.ENTER_PARKING_WITHOUT_RESERVATION
+    })
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
             TypedQuery<Account> findAccountByLogin = entityManager.createNamedQuery("Account.findByLogin", Account.class);

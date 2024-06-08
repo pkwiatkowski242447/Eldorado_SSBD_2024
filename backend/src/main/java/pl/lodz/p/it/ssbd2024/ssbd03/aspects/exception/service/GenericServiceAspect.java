@@ -5,13 +5,12 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
-import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationAccessDeniedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
-
-import java.lang.reflect.UndeclaredThrowableException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.TokenNotValidException;
 
 @Aspect
 @Order(15)
@@ -40,6 +39,8 @@ public class GenericServiceAspect {
             return proceedingJoinPoint.proceed();
         } catch (IllegalArgumentException exception) {
             throw new TokenNotValidException();
+        } catch (AccessDeniedException accessDeniedException) {
+            throw new ApplicationAccessDeniedException();
         } catch (ApplicationBaseException applicationBaseException) {
             throw applicationBaseException;
         } catch (Throwable throwable) {

@@ -15,6 +15,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,9 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 /**
  * Implementation of AbstractFacade that provides CRUD operations
@@ -73,7 +72,10 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param entity Reservation entity
      */
     @Override
-    @RolesAllowed({Authorities.ENTER_PARKING_WITHOUT_RESERVATION, Authorities.EXIT_PARKING})
+    @RolesAllowed({
+            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
+            Authorities.EXIT_PARKING
+    })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
     }
@@ -105,7 +107,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
     @Override
-    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    @RolesAllowed({
+            Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION
+    })
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
@@ -196,6 +200,32 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         return list;
     }
 
+    /***
+     * Returns all historical reservation for user with specified login
+     *
+     * @param login The user login.
+     * @param pageNumber page number.
+     * @param pageSize defines the maximum number of entities per page.
+     * @return All Reservation entities for selected Sector and page.
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    public List<Reservation> findAllHistoricalUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            var list = getEntityManager()
+                    .createNamedQuery("Reservation.findHistoricalReservationsByLogin", Reservation.class)
+                    .setParameter("clientLogin", login)
+                    .setFirstResult(pageNumber * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+            refreshAll(list);
+            log.error(list.toString());
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
     /**
      * Invokes superclass count method.
      * @return Returns the total number of Reservation entities
@@ -221,6 +251,31 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
             findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
             List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
             super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Returns all active reservation for user with specified login
+     *
+     * @param login The user login.
+     * @param pageNumber page number.
+     * @param pageSize defines the maximum number of entities per page.
+     * @return All Reservation entities for selected Sector and page.
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    public List<Reservation> findAllActiveUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            var list = getEntityManager()
+                    .createNamedQuery("Reservation.findActiveReservationsByLogin", Reservation.class)
+                    .setParameter("clientLogin", login)
+                    .setFirstResult(pageNumber * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+            refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
             return new ArrayList<>();

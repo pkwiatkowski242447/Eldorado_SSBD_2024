@@ -45,11 +45,10 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
         @NamedQuery(
-                name = "Parking.findAllParkings",
+                name = "Parking.findAllParking",
                 query = """
                         SELECT p FROM Parking p
-                        ORDER BY p.address.city
-                        """
+                        ORDER BY p.address.city"""
         ),
         @NamedQuery(
                 name = "Parking.findBySectorTypes",
@@ -66,6 +65,12 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                         WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
+        ),
+        @NamedQuery(
+                name = "Parking.removeParkingById",
+                query = """
+                        DELETE FROM Parking p
+                        WHERE p.id = :parkingId"""
         )
 })
 @Getter

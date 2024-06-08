@@ -30,7 +30,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokens
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.RefreshTokenDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.account.status.AccountNotActivatedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountNotActivatedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations.AuthenticationController;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AuthenticationService;
 import org.springframework.security.authentication.BadCredentialsException;

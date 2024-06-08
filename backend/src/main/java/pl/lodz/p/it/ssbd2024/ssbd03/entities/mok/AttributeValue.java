@@ -19,7 +19,10 @@ import java.io.Serializable;
 @Entity
 @Table(
         name = DatabaseConsts.ATTRIBUTE_VALUE_TABLE,
-        uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ATTRIBUTE_VALUE_COLUMN, DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN})
+        uniqueConstraints = @UniqueConstraint(columnNames = {DatabaseConsts.ATTRIBUTE_VALUE_COLUMN, DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN}),
+        indexes = {
+                @Index(name = DatabaseConsts.ATTRIBUTE_VALUE_ATTRIBUTE_NAME_ID_INDEX, columnList = DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN)
+        }
 )
 @NamedQueries({
         // General queries
@@ -29,8 +32,7 @@ import java.io.Serializable;
                         SELECT av FROM AttributeValue av
                         JOIN AttributeName an ON an.id = av.attributeNameId.id
                         WHERE an.attributeName = :attributeName
-                        ORDER BY av.attributeValue
-                        """
+                        ORDER BY av.attributeValue"""
         )
 })
 @LoggerInterceptor
@@ -57,7 +59,12 @@ public class AttributeValue extends AbstractEntity implements Serializable {
      */
     @NotNull(message = AttributeMessages.ATTRIBUTE_NAME_REFERENCE_NULL)
     @ManyToOne(optional = false)
-    @JoinColumn(name = DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
+    @JoinColumn(
+            name = DatabaseConsts.ATTRIBUTE_NAME_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.ATTRIBUTE_VALUE_ATTRIBUTE_NAME_ID_FK),
+            nullable = false, updatable = false
+    )
     private AttributeName attributeNameId;
 
     /**

@@ -19,8 +19,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenDataExtractionException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.token.TokenNotValidException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.TokenDataExtractionException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.TokenNotValidException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
@@ -248,7 +248,8 @@ public class JWTProvider {
      * @param signableDTO Object that should be signed.
      * @return Returns a signed Json Web Token.
      */
-    @RolesAllowed({Authorities.GET_OWN_ACCOUNT, Authorities.GET_USER_ACCOUNT, Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT})
+    @RolesAllowed({Authorities.GET_OWN_ACCOUNT, Authorities.GET_USER_ACCOUNT,
+            Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT, Authorities.GET_SECTOR})
     public String generateObjectSignature(SignableDTO signableDTO) {
         return JWT
                 .create()

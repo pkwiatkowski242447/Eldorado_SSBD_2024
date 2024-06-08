@@ -7,12 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationAccessDeniedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.mapper.MapperBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.request.InvalidRequestHeaderException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.IllegalOperationException;
@@ -135,8 +135,17 @@ public class GenericExceptionResolver {
                 .body(new ExceptionDTO(illegalOperationException));
     }
 
-    @ExceptionHandler(value = {AccessDeniedException.class})
-    public ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
+    /**
+     * This method is used to transform any Access Denied exception (either in form of ApplicationAccessDeniedException -
+     * exception thrown when calling principal does not have specified role in service and facade layers) or AccessDeniedException
+     * thrown in the controllers layer.
+     *
+     * @param ex        The exception, regarding lack of authorities to perform certain actions, to be transformed to HTTP Response.
+     * @return 401 UNAUTHORIZED response, indicating that the user is not authorized to perform certain actions in the
+     * application.
+     */
+    @ExceptionHandler(value = {AccessDeniedException.class, ApplicationAccessDeniedException.class})
+    public ResponseEntity<?> handleAccessDeniedException(Exception ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(I18n.ACCESS_DENIED_EXCEPTION));

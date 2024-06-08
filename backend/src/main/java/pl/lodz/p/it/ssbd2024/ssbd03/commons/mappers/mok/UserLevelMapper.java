@@ -9,8 +9,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedClientTypeException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mapper.MapperUnexpectedUserLevelException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.mapper.MapperUnexpectedClientTypeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.mapper.MapperUnexpectedUserLevelException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 /**

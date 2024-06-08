@@ -31,7 +31,13 @@ import java.util.List;
  * @see Client
  */
 @Entity
-@Table(name = DatabaseConsts.RESERVATION_TABLE)
+@Table(
+        name = DatabaseConsts.RESERVATION_TABLE,
+        indexes = {
+                @Index(name = DatabaseConsts.RESERVATION_CLIENT_ID_INDEX, columnList = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN),
+                @Index(name = DatabaseConsts.RESERVATION_SECTOR_ID_INDEX, columnList = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN)
+        }
+)
 @LoggerInterceptor
 @NoArgsConstructor
 @Getter
@@ -40,6 +46,14 @@ import java.util.List;
                 name = "Reservation.findAll",
                 query = """
                         SELECT r FROM Reservation r
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findActiveReservationsByLogin",
+                query = """
+                       SELECT r FROM Reservation r
+                        WHERE r.client.account.login = :clientLogin
+                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
                         ORDER BY r.beginTime"""
         ),
         @NamedQuery(
@@ -56,6 +70,14 @@ import java.util.List;
                         SELECT r FROM Reservation r
                         WHERE r.client.id = :clientId
                           AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
+                        ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findHistoricalReservationsByLogin",
+                query = """
+                       SELECT r FROM Reservation r
+                        WHERE r.client.account.login = :clientLogin
+                          AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
                         ORDER BY r.beginTime"""
         ),
         @NamedQuery(
@@ -86,15 +108,25 @@ public class Reservation extends AbstractEntity implements Serializable {
      * The client associated with this reservation.
      */
     @ManyToOne
-    @JoinColumn(name = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, updatable = false)
+    @JoinColumn(
+            name = DatabaseConsts.RESERVATION_CLIENT_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.RESERVATION_CLIENT_ID_FK),
+            updatable = false
+    )
     private Client client;
 
     /**
      * The sector in which the parking spot is allocated for this reservation.
      */
     @NotNull(message = ReservationMessages.SECTOR_NULL)
-    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN, referencedColumnName = DatabaseConsts.PK_COLUMN, nullable = false, updatable = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(
+            name = DatabaseConsts.RESERVATION_SECTOR_ID_COLUMN,
+            referencedColumnName = DatabaseConsts.PK_COLUMN,
+            foreignKey = @ForeignKey(name = DatabaseConsts.RESERVATION_SECTOR_ID_FK),
+            nullable = false, updatable = false
+    )
     private Sector sector;
 
     /**
@@ -117,7 +149,7 @@ public class Reservation extends AbstractEntity implements Serializable {
      * The list of parking events associated with this reservation.
      */
     @NotNull(message = ReservationMessages.LIST_OF_PARKING_EVENTS_NULL)
-    @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     @Getter
     private final List<ParkingEvent> parkingEvents = new ArrayList<>();
 
