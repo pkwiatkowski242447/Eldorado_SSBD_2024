@@ -126,7 +126,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/client/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with fiven id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Parking info."),

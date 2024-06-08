@@ -229,8 +229,6 @@ public class ParkingFacade extends AbstractFacade<Parking> {
                 .setMaxResults(pageSize)
                 .getResultList();
         refreshAllSectors(list);
-        list.forEach((sector)-> System.out.println(sector.getId()));
-        System.out.println("dupa");
         return list;
     }
 

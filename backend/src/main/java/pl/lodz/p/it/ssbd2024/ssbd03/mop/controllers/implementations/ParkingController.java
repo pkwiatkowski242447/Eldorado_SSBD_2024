@@ -129,7 +129,12 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> getParkingById(String id) throws ApplicationBaseException {
         try {
             Parking parking = parkingService.getParkingById(UUID.fromString(id));
-            return ResponseEntity.ok(ParkingMapper.toParkingOutputDto(parking));
+            ParkingOutputDTO parkingOutputDTO = ParkingMapper.toParkingOutputDto(parking);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag(String.format("\"%s\"", jwtProvider.generateObjectSignature(parkingOutputDTO)));
+
+            return ResponseEntity.ok().headers(headers).body(parkingOutputDTO);
         } catch (ParkingNotFoundException exception) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException illegalArgumentException) {

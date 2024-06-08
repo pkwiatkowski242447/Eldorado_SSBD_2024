@@ -98,7 +98,7 @@ public class ParkingService implements ParkingServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_PARKING)
+    @RolesAllowed({Authorities.GET_PARKING, Authorities.EDIT_PARKING})
     public Parking getParkingById(UUID id) throws ApplicationBaseException {
         return parkingFacade.findAndRefresh(id).orElseThrow(ParkingNotFoundException::new);
     }
