@@ -25,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,11 +62,12 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     private Parking parking;
     private Sector sector;
     private Reservation reservation;
+
     @BeforeEach
     public void setup() {
-        address = new Address("dd","casc","wqc");
+        address = new Address("dd", "casc", "wqc");
         parking = new Parking(address);
-        sector = new Sector(parking,"dd", Sector.SectorType.COVERED,23,11, true);
+        sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11, true);
         reservation = new Reservation(sector);
     }
 
@@ -76,7 +78,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
         assertNotNull(reservation);
         reservationFacade.create(reservation);
 
-        assertEquals("dd",reservation.getSector().getName());
+        assertEquals("dd", reservation.getSector().getName());
     }
 
     @Test
@@ -98,10 +100,22 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.GET_ALL_RESERVATIONS, Authorities.CANCEL_RESERVATION, Authorities.RESERVE_PARKING_PLACE})
     public void reservationFacadeFindAllReservationsWithPaginationTest() throws ApplicationBaseException {
-
-        List<Reservation> reservations = reservationFacade.findAllWithPagination(0,8);
+        List<Reservation> reservations = reservationFacade.findAllWithPagination(0, 15);
         assertNotNull(reservations);
-        assertEquals(3, reservations.size());
+        assertEquals(14, reservations.size());
     }
 
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Authorities.RESERVE_PARKING_PLACE})
+    public void countAllSectorReservationInTimeframeTest() throws ApplicationBaseException {
+        long numOfReservations = reservationFacade.countAllSectorReservationInTimeframe(
+                UUID.fromString("3e6a85db-d751-4549-bbb7-9705f0b2fa6b"),
+                LocalDateTime.of(2024, 12, 12, 12, 0, 0),
+                24,
+                LocalDateTime.of(2024, 12, 12, 8, 0, 0)
+        );
+
+        assertEquals(8, numOfReservations);
+    }
 }

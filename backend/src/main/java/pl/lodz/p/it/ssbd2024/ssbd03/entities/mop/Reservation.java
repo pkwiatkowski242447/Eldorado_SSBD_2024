@@ -97,14 +97,26 @@ import java.util.List;
                         AND
                         (
                             (
-                                r.beginTime > :beginTimeMinusMaxReservationTime
+                                (r.beginTime BETWEEN :beginTimeMinusMaxReservationTime AND :beginTimePlusMaxReservationTime)
                                 AND
-                                r.endTime < :beginTime
-                                AND
-                                MOD(SIZE(r.parkingEvents), 2) = 1
+                                (
+                                    (
+                                        r.endTime IS NULL
+                                        OR
+                                        (
+                                            r.endTime < :beginTime
+                                            AND
+                                            (
+                                                :current_timestamp < r.endTime
+                                                OR
+                                                MOD(SIZE(r.parkingEvents), 2) = 1
+                                            )
+                                        )
+                                    )
+                                    OR
+                                    r.endTime > :beginTime
+                                )
                             )
-                            OR
-                            (r.endTime IS NOT NULL AND r.endTime > :beginTime)
                             OR
                             (r.beginTime BETWEEN :beginTime AND :beginTimePlusMaxReservationTime)
                         )

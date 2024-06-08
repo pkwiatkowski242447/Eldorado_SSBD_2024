@@ -29,6 +29,7 @@ import java.util.UUID;
 /**
  * Implementation of AbstractFacade that provides CRUD operations
  * on the Reservation class using the injected EntityManager implementation.
+ *
  * @see Reservation
  * @see jakarta.persistence.EntityManager
  */
@@ -51,6 +52,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns injected EntityManager implementation.
+     *
      * @return EntityManager implementation
      */
     @Override
@@ -60,6 +62,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass create method on passed Reservation entity
+     *
      * @param entity Reservation entity
      */
     @Override
@@ -70,6 +73,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass edit method on passed Reservation entity
+     *
      * @param entity Reservation entity
      */
     @Override
@@ -83,6 +87,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass remove method on passed Reservation entity
+     *
      * @param entity Reservation entity
      */
     @Override
@@ -93,6 +98,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find method by passed entity id.
+     *
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
@@ -104,6 +110,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find with refreshing method by passed entity id.
+     *
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
@@ -117,6 +124,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find all method.
+     *
      * @return All Reservation entities
      */
     @Override
@@ -127,7 +135,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     * @param page page number
+     *
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All Reservation entities from selected page
      */
@@ -144,7 +153,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all active Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     * @param page page number
+     *
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All active Reservation entities from selected page
      */
@@ -163,7 +173,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all historical Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     * @param page page number
+     *
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All historical Reservation entities from selected page
      */
@@ -183,8 +194,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     /**
      * Returns all Reservation entities for the selected Sector, based on NamedQuery defined on Reservation class,
      * with pagination.
+     *
      * @param sectorId The UUID type identifier of the selected Sector
-     * @param page page number
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All Reservation entities for selected Sector and page
      */
@@ -229,9 +241,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
 
-
     /**
      * Invokes superclass count method.
+     *
      * @return Returns the total number of Reservation entities
      */
     @Override
@@ -270,13 +282,15 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     /**
      * TODO
      */
-    public int countAllSectorReservationInTimeframe(Sector sector, LocalDateTime beginTime, int maxReservationHours) throws ApplicationBaseException {
-            TypedQuery<Integer> countAllSectorReservationInTimeframeQuery =
-                    entityManager.createNamedQuery("Reservation.countAllSectorReservationInTimeframe", Integer.class);
-            countAllSectorReservationInTimeframeQuery.setParameter("sectorId", sector.getId());
-            countAllSectorReservationInTimeframeQuery.setParameter("beginTime", beginTime);
-            countAllSectorReservationInTimeframeQuery.setParameter("beginTimeMinusMaxReservationTime", beginTime.minusHours(maxReservationHours));
-            countAllSectorReservationInTimeframeQuery.setParameter("beginTimePlusMaxReservationTime", beginTime.plusHours(maxReservationHours));
-            return Objects.requireNonNullElse(countAllSectorReservationInTimeframeQuery.getSingleResult(), 0);
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    public long countAllSectorReservationInTimeframe(UUID sectorId, LocalDateTime beginTime, int maxReservationHours, LocalDateTime benchmark) throws ApplicationBaseException {
+        TypedQuery<Long> countAllSectorReservationInTimeframeQuery =
+                entityManager.createNamedQuery("Reservation.countAllSectorReservationInTimeframe", Long.class);
+        countAllSectorReservationInTimeframeQuery.setParameter("sectorId", sectorId);
+        countAllSectorReservationInTimeframeQuery.setParameter("beginTime", beginTime);
+        countAllSectorReservationInTimeframeQuery.setParameter("beginTimeMinusMaxReservationTime", beginTime.minusHours(maxReservationHours));
+        countAllSectorReservationInTimeframeQuery.setParameter("beginTimePlusMaxReservationTime", beginTime.plusHours(maxReservationHours));
+        countAllSectorReservationInTimeframeQuery.setParameter("current_timestamp", benchmark);
+        return Objects.requireNonNullElse(countAllSectorReservationInTimeframeQuery.getSingleResult(), 0L);
     }
 }
