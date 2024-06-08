@@ -213,7 +213,7 @@ public class ParkingController implements ParkingControllerInterface {
             throw new ParkingDataIntegrityCompromisedException();
         }
         ParkingOutputDTO parkingOutputDTO = ParkingMapper.toParkingOutputDto(
-                parkingService.editParking(ParkingMapper.toParking(parkingModifyDTO), parkingModifyDTO.getParkingId())
+                parkingService.editParking(ParkingMapper.toParking(parkingModifyDTO))
         );
 
         return ResponseEntity.ok().body(parkingOutputDTO);
@@ -238,8 +238,13 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.DELETE_SECTOR)
-    public ResponseEntity<?> removeSectorById(String sectorId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public ResponseEntity<?> removeSectorById(String id) throws ApplicationBaseException {
+        try {
+            this.parkingService.removeSectorById(UUID.fromString(id));
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @Override

@@ -239,6 +239,12 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Edit parking", description = "The endpoint is used to edit parking identified with the given identifier and name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The parking was successfully edited"),
+            @ApiResponse(responseCode = "400", description = "The parking could not be edited."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> editParking(@RequestHeader(HttpHeaders.IF_MATCH) String ifMatch,
                                   @Valid @RequestBody ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException;
 
@@ -274,6 +280,14 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
+
+    @Operation(summary = "Remove sector", description = "The endpoint is used to remove sector with a given id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The sector has been removed successfully."),
+            @ApiResponse(responseCode = "400", description = "The sector could not be remove."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+
     @DeleteMapping(value = "/sectors/{id}")
     ResponseEntity<?> removeSectorById(@PathVariable("id") String id) throws ApplicationBaseException;
 
