@@ -208,6 +208,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
      */
+    @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
     public List<Reservation> findAllHistoricalUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             var list = getEntityManager()
@@ -246,6 +247,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
      */
+    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
     public List<Reservation> findAllActiveUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             var list = getEntityManager()

@@ -87,6 +87,29 @@ import java.util.List;
                         WHERE r.sector.id = :sectorId
                         ORDER BY r.beginTime"""
         )
+        ,
+        // Creating reservation
+        @NamedQuery(
+                name = "Reservation.countAllSectorReservationInTimeframe",
+                query = """
+                        SELECT COUNT(*) FROM Reservation r
+                        WHERE r.sector.id = :sectorId
+                        AND
+                        (
+                            (
+                                r.beginTime > :beginTimeMinusMaxReservationTime
+                                AND
+                                r.endTime < :beginTime
+                                AND
+                                MOD(SIZE(r.parkingEvents), 2) = 1
+                            )
+                            OR
+                            (r.endTime IS NOT NULL AND r.endTime > :beginTime)
+                            OR
+                            (r.beginTime BETWEEN :beginTime AND :beginTimePlusMaxReservationTime)
+                        )
+                        """
+        )
 })
 public class Reservation extends AbstractEntity implements Serializable {
 
