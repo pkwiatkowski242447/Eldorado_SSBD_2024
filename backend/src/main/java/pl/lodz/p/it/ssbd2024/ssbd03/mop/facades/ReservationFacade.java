@@ -74,7 +74,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @Override
     @RolesAllowed({
             Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.EXIT_PARKING
+            Authorities.EXIT_PARKING, Authorities.END_RESERVATION
     })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
