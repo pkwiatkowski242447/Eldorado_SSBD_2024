@@ -215,7 +215,7 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.GET_ALL_AVAILABLE_PARKING)
     public List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        return parkingFacade.findAllAvailableParkingWithPagination(pageNumber, pageSize);
     }
 
     @Override

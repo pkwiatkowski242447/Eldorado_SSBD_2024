@@ -288,7 +288,8 @@ public interface ParkingControllerInterface {
      * exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
+    ResponseEntity<?> getAvailableParkingWithPagination(@RequestParam("pageNumber") int pageNumber,
+                                                        @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
      * This method is used to end the parking spot allocation.
