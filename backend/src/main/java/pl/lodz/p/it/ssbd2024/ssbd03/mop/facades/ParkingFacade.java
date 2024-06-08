@@ -219,12 +219,14 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         return optEntity;
     }
 
-    @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public List<Sector> findSectorsInParking(UUID parkingId)
+    @RolesAllowed({Authorities.GET_ALL_SECTORS, Authorities.GET_PARKING})
+    public List<Sector> findSectorsInParking(UUID parkingId, boolean active, int pageNumber, int pageSize)
             throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
-                .setParameter("showOnlyActive", false)
+                .setParameter("showOnlyActive", active)
+                .setFirstResult(pageNumber*pageSize)
+                .setMaxResults(pageSize)
                 .getResultList();
         refreshAllSectors(list);
         return list;

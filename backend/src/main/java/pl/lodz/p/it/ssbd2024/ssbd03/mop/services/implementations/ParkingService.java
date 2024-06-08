@@ -98,10 +98,11 @@ public class ParkingService implements ParkingServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_PARKING)
+    @RolesAllowed({Authorities.GET_PARKING, Authorities.EDIT_PARKING})
     public Parking getParkingById(UUID id) throws ApplicationBaseException {
         return parkingFacade.findAndRefresh(id).orElseThrow(ParkingNotFoundException::new);
     }
+
 
     @Override
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
@@ -122,9 +123,9 @@ public class ParkingService implements ParkingServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
-        return parkingFacade.findSectorsInParking(id);
+    @RolesAllowed({Authorities.GET_ALL_SECTORS, Authorities.GET_PARKING})
+    public List<Sector> getSectorsByParkingId(UUID id, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return parkingFacade.findSectorsInParking(id, active, pageNumber, pageSize);
     }
 
     @Override

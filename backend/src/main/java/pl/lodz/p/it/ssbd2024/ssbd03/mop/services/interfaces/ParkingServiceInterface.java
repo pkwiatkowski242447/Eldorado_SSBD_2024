@@ -67,10 +67,13 @@ public interface ParkingServiceInterface {
      * Retrieves from the database list of sectors by parking id.
      *
      * @param id Parking's id.
+     * @param active Determines whether to return all sectors or only active ones.
+     * @param pageNumber Number of the page.
+     * @param pageSize Size og the page.
      * @return If Parking with the given id was found, returns list of its Sectors.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException;
+    List<Sector> getSectorsByParkingId(UUID id, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Retrieves parking from the database by id.
