@@ -86,6 +86,14 @@ import java.util.List;
                         SELECT r FROM Reservation r
                         WHERE r.sector.id = :sectorId
                         ORDER BY r.beginTime"""
+        ),
+        @NamedQuery(
+                name = "Reservation.findAllReservationsMarkedForEnding",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.beginTime < :timestamp
+                        ORDER BY r.beginTime ASC
+                        """
         )
 })
 public class Reservation extends AbstractEntity implements Serializable {
