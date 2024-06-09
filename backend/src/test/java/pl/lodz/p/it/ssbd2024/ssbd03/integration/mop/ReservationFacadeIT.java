@@ -65,9 +65,9 @@ public class ReservationFacadeIT extends TestcontainersConfig {
 
     @BeforeEach
     public void setup() {
-        address = new Address("dd", "casc", "wqc");
+        address = new Address("Strykow","90-000","Kosciuszki");
         parking = new Parking(address);
-        sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11, true);
+        sector = new Sector(parking,"AA-02", Sector.SectorType.COVERED,23,11, true);
         reservation = new Reservation(sector, LocalDateTime.now());
     }
 
@@ -78,7 +78,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
         assertNotNull(reservation);
         reservationFacade.create(reservation);
 
-        assertEquals("dd", reservation.getSector().getName());
+        assertEquals("AA-02", reservation.getSector().getName());
     }
 
     @Test

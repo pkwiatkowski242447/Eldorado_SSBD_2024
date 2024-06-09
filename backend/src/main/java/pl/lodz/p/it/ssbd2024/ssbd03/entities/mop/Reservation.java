@@ -146,6 +146,11 @@ public class Reservation extends AbstractEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Enum class representing the status of the Reservation entity.
+     */
+    public enum ReservationStatus { AWAITING, IN_PROGRESS, COMPLETED_MANUALLY, COMPLETED_AUTOMATICALLY, CANCELED, TERMINATED }
+
+    /**
      * The client associated with this reservation.
      */
     @ManyToOne
@@ -193,6 +198,12 @@ public class Reservation extends AbstractEntity implements Serializable {
     @Getter
     private final List<ParkingEvent> parkingEvents = new ArrayList<>();
 
+    @NotNull(message = ReservationMessages.STATUS_NULL)
+    @Column(name = DatabaseConsts.RESERVATION_STATUS_COLUMN, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private ReservationStatus status;
+
     // Other fields - used for access control, and storing historical data
 
     /**
@@ -237,6 +248,7 @@ public class Reservation extends AbstractEntity implements Serializable {
         this.client = client;
         this.sector = sector;
         this.beginTime = beginTime;
+        this.status = ReservationStatus.AWAITING;
     }
 
     /**
@@ -246,6 +258,7 @@ public class Reservation extends AbstractEntity implements Serializable {
      */
     public Reservation(Sector sector, LocalDateTime beginTime) {
         this(null, sector, beginTime);
+        this.status = ReservationStatus.AWAITING;
     }
 
     /**

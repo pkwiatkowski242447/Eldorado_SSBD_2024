@@ -63,9 +63,9 @@ public class ParkingEventFacadeIT extends TestcontainersConfig {
 
     @BeforeEach
     public void setup() {
-        address = new Address("dd", "casc", "wqc");
+        address = new Address("Lowicz", "99-400", "Brzozowa");
         parking = new Parking(address);
-        sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11, true);
+        sector = new Sector(parking, "AB-01", Sector.SectorType.COVERED, 23, 11, true);
         reservation = new Reservation(sector, LocalDateTime.now());
         parkingEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
         parkingEvent.setReservation(reservation);
@@ -88,7 +88,7 @@ public class ParkingEventFacadeIT extends TestcontainersConfig {
         assertNotNull(parkingEvent);
         parkingEventFacade.create(parkingEvent);
 
-        assertEquals("dd", parkingEvent.getReservation().getSector().getName());
+        assertEquals("AB-01", parkingEvent.getReservation().getSector().getName());
     }
 
 //    @Test
@@ -102,7 +102,6 @@ public class ParkingEventFacadeIT extends TestcontainersConfig {
 //        assertNotNull(parkingEvent);
 //    }
 
-    // TODO check if edit method is sensible for ParkingEvent
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
 //    public void parkingFacadeEditParkingEventTest() throws ApplicationBaseException {

@@ -12,7 +12,6 @@ import io.restassured.specification.RequestSpecification;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -56,15 +55,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    @BeforeAll
-    public static void setup() {
+    /* Enable only in case of debugging tests */
+//    @BeforeAll
+//    public static void setup() {
 //        RestAssured.config = RestAssured.config()
 //                .logConfig(LogConfig.logConfig()
 //                        .enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
 //                        .enablePrettyPrinting(true));
-        // Enable global request and response logging filters
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-    }
+//        // Enable global request and response logging filters
+//        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+//    }
 
     @AfterEach
     void resetEnvironment() throws IOException, InterruptedException {
