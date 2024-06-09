@@ -110,6 +110,7 @@ public interface ParkingControllerInterface {
     @Operation(summary = "Get sectors", description = "The endpoint is used to get sectors from parking identified with the given identifier")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of sectors in the given parking was found successfully"),
+            @ApiResponse(responseCode = "204", description = "List of sectors returned from given page of given size is empty"),
             @ApiResponse(responseCode = "400", description = "Invalid format of parking uuid"),
             @ApiResponse(responseCode = "404", description = "Parking with the given uuid does not exist"),
             @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
@@ -127,7 +128,7 @@ public interface ParkingControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with fiven id.")
+    @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with given id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Parking info."),
             @ApiResponse(responseCode = "400", description = "Invalid UUID"),
@@ -146,7 +147,7 @@ public interface ParkingControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/client/sectors/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get parking's active sectors", description = "The endpoint is used retrieve list of parking with fiven id.")
+    @Operation(summary = "Get parking's active sectors", description = "The endpoint is used retrieve list of parking with given id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of active sectors."),
             @ApiResponse(responseCode = "204", description = "No active sectors."),
@@ -228,20 +229,19 @@ public interface ParkingControllerInterface {
 
     /**
      * This method is used to begin parking spot allocation. Basically, it generates a parking event for entry,
-     * which marks the start of the allocation, and then generates the exit code, which will be needed to end the
-     * allocation.
+     * which marks the start of the allocation.
      *
      * @param reservationId Identifier of the reservation, which the client wants to use.
-     * @return 200 OK response is returned if the allocation is started successfully, and the code if returned in the
-     * response body. Otherwise, if there is no such reservation, user account does not exist or reservation could not
+     * @return 204 NO CONTENT response is returned if the allocation is started successfully. Otherwise,
+     * if there is no such reservation, user account does not exist or reservation could not
      * be started, then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned when other unexpected
      * exception occurs during processing of the request.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @Operation(summary = "Enter parking with reservation", description = "The endpoint is used to generate entry code for user entering parking with reservation.")
+    @Operation(summary = "Enter parking with reservation", description = "The endpoint is used to generate entry event for user entering parking with reservation.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Entry code generated and place from sector allocated successfully."),
+            @ApiResponse(responseCode = "200", description = "Entry parking event generated and place from sector allocated successfully."),
             @ApiResponse(responseCode = "400", description = "Reservation could not be found or is expired / not started. This response is returned when user is not the owner of the reservation or when there are no available places in the sector."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
@@ -326,20 +326,18 @@ public interface ParkingControllerInterface {
                                                         @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
 
     /**
-     * This method is used to end the parking spot allocation.
-     * The exit code which was generated during the start of the allocation must be provided for the allocation to end.
+     * This method is used to end the parking spot allocation. Basically, it generates a parking event for exit
      *
      * @param reservationId Identifier of the reservation, which the client wants to use.
-     * @param exitCode      Code that was generated during the start of the allocation.
      * @return 204 NO CONTENT responses are returned if the allocation ended successfully
      * Otherwise, if there is no such reservation, a user account does not exist,
-     * the provided exit code is incorrect or the reservation could not be ended; then 400 BAD REQUESTs are returned.
+     * the provided exit code is incorrect or the reservation could not be ended; then 400 BAD REQUEST is returned.
      * 500 INTERNAL SERVER ERROR is returned when another unexpected
      * exception occurs during processing of the request.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from the facade and service layers below.
      */
-    @PostMapping(value = "/reservations/{id}/exit/{exitCode}")
-    ResponseEntity<?> exitParking(@PathVariable("id") String reservationId, @PathVariable("exitCode") String exitCode) throws ApplicationBaseException;
+    @PostMapping(value = "/reservations/{id}/exit")
+    ResponseEntity<?> exitParking(@PathVariable("id") String reservationId) throws ApplicationBaseException;
 }
 

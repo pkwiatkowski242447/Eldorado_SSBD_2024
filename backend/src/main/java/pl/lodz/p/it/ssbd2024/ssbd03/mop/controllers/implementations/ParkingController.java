@@ -2,11 +2,10 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
@@ -44,7 +41,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.net.URI;
 import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 
 /**
@@ -86,9 +85,9 @@ public class ParkingController implements ParkingControllerInterface {
     @RolesAllowed(Authorities.ADD_SECTOR)
     public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         parkingService.createSector(UUID.fromString(parkingId),
-            sectorCreateDTO.getName(), sectorCreateDTO.getType(),
-            sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
-            sectorCreateDTO.getActive());
+                sectorCreateDTO.getName(), sectorCreateDTO.getType(),
+                sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
+                sectorCreateDTO.getActive());
 
         return ResponseEntity.ok().build();
     }
@@ -193,9 +192,7 @@ public class ParkingController implements ParkingControllerInterface {
         try {
             this.parkingService.removeParkingById(UUID.fromString(id));
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
         return ResponseEntity.noContent().build();
     }
@@ -211,12 +208,10 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
         try {
             String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-            AllocationCodeDTO allocationCode = this.parkingService.enterParkingWithReservation(UUID.fromString(reservationId), userName);
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(allocationCode);
+            this.parkingService.enterParkingWithReservation(UUID.fromString(reservationId), userName);
+            return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
     }
 
@@ -248,8 +243,10 @@ public class ParkingController implements ParkingControllerInterface {
             throw new SectorDataIntegrityCompromisedException();
         }
 
+        Parking parking = parkingService.getParkingById(sectorModifyDTO.getParkingId());
+
         SectorOutputDTO sectorOutputDTO = SectorMapper.toSectorOutputDTO(
-                parkingService.editSector(parkingService.getSectorById(sectorModifyDTO.getId()))
+                parkingService.editSector(sectorModifyDTO.getId(), sectorModifyDTO.getVersion(), SectorMapper.toSector(sectorModifyDTO, parking))
         );
         return ResponseEntity.ok().body(sectorOutputDTO);
     }
@@ -282,7 +279,14 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.EXIT_PARKING)
-    public ResponseEntity<?> exitParking(String reservationId, String exitCode) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public ResponseEntity<?> exitParking(String reservationId) throws ApplicationBaseException {
+        try {
+            this.parkingService.exitParking(UUID.fromString(reservationId));
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+        }
     }
 }

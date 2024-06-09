@@ -44,13 +44,14 @@ public class I18n {
     public static final String SECTOR_NOT_FOUND = "sector.not.found.exception";
     public static final String SECTOR_ALREADY_ACTIVE = "sector.already.active.exception";
     public static final String SECTOR_ALREADY_INACTIVE = "sector.already.inactive.exception";
+    public static final String SECTOR_EDIT_OF_TYPE_OR_MAX_PLACES_WHEN_ACTIVE = "sector.edit.of.type.or.max.places.when.active.exception";
 
     // Parking exceptions
     public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.not.found.exception";
     public static final String PARKING_DELETE_EXCEPTION = "parking.delete.exception";
     public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
     public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
-
+    public static final String CANNOT_EXIT_PARKING_EXCEPTION = "parking.cannot.exit.exception";
     // Reservation exceptions
     public static final String RESERVATION_NOT_FOUND_EXCEPTION = "reservation.not.found.exception";
     public static final String USER_NOT_RESERVATION_OWNER_EXCEPTION = "user.not.reservation.owner.exception";
