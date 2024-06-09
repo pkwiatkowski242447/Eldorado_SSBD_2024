@@ -6,8 +6,6 @@ import jakarta.persistence.RollbackException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
@@ -196,9 +192,7 @@ public class ParkingController implements ParkingControllerInterface {
         try {
             this.parkingService.removeParkingById(UUID.fromString(id));
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
         return ResponseEntity.noContent().build();
     }
@@ -214,12 +208,10 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> enterParkingWithReservation(String reservationId) throws ApplicationBaseException {
         try {
             String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-            AllocationCodeDTO allocationCode = this.parkingService.enterParkingWithReservation(UUID.fromString(reservationId), userName);
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(allocationCode);
+            this.parkingService.enterParkingWithReservation(UUID.fromString(reservationId), userName);
+            return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
     }
 

@@ -520,7 +520,6 @@ public class AccountController implements AccountControllerInterface {
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
     public ResponseEntity<?> addAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException {
         accountService.addAttribute(attributeName);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -529,7 +528,6 @@ public class AccountController implements AccountControllerInterface {
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
     public ResponseEntity<?> removeAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException {
         accountService.removeAttribute(attributeName);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -539,7 +537,6 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> addAttributeValue(@PathVariable("attributeName") String attributeName,
                                                @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException {
         accountService.addAttributeValue(attributeName, attributeValue);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -549,7 +546,6 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName,
                                                   @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException {
         accountService.removeAttributeValue(attributeName, attributeValue);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -575,7 +571,6 @@ public class AccountController implements AccountControllerInterface {
                                              @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         accountService.assignAttribute(login, attributeName, attributeValue);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -585,7 +580,6 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         accountService.removeAttribute(login, attributeName);
-
         return ResponseEntity.noContent().build();
     }
 }
