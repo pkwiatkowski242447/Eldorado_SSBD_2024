@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
@@ -53,6 +54,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns injected EntityManager implementation.
+     *
      * @return EntityManager implementation
      */
     @Override
@@ -62,6 +64,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass create method on passed Reservation entity
+     *
      * @param entity Reservation entity
      */
     @Override
@@ -72,12 +75,13 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass edit method on passed Reservation entity
+     *
      * @param entity Reservation entity
      */
     @Override
     @RolesAllowed({
             Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.EXIT_PARKING, Authorities.END_RESERVATION
+            Authorities.EXIT_PARKING, Authorities.END_RESERVATION, Authorities.CANCEL_RESERVATION
     })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
@@ -85,6 +89,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass remove method on passed Reservation entity
+     *
      * @param entity Reservation entity
      */
     @Override
@@ -95,6 +100,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find method by passed entity id.
+     *
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
@@ -106,12 +112,14 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find with refreshing method by passed entity id.
+     *
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
     @Override
     @RolesAllowed({
-            Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION
+            Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION,
+            Authorities.CANCEL_RESERVATION
     })
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
@@ -119,6 +127,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find all method.
+     *
      * @return All Reservation entities
      */
     @Override
@@ -129,11 +138,12 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     * @param page page number
+     *
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All Reservation entities from selected page
      */
-    @RolesAllowed({Authorities.GET_ALL_RESERVATIONS, Authorities.CANCEL_RESERVATION})
+    @RolesAllowed(Authorities.GET_ALL_RESERVATIONS)
     public List<Reservation> findAllWithPagination(int page, int pageSize) throws ApplicationBaseException {
         var list = getEntityManager()
                 .createNamedQuery("Reservation.findAll", Reservation.class)
@@ -146,7 +156,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all active Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     * @param page page number
+     *
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All active Reservation entities from selected page
      */
@@ -165,7 +176,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all historical Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     * @param page page number
+     *
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All historical Reservation entities from selected page
      */
@@ -185,6 +197,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     /**
      * Returns all Reservation entities for the selected Sector, based on NamedQuery defined on Reservation class,
      * with pagination.
+     *
      * @param sectorId The UUID type identifier of the selected Sector
      * @param page     page number
      * @param pageSize defines the maximum number of entities per page
@@ -231,9 +244,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
 
-
     /**
      * Invokes superclass count method.
+     *
      * @return Returns the total number of Reservation entities
      */
     @Override
@@ -266,9 +279,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     /**
      * Returns all active reservations for user with specified login
      *
-     * @param login The user login.
+     * @param login      The user login.
      * @param pageNumber page number.
-     * @param pageSize defines the maximum number of entities per page.
+     * @param pageSize   defines the maximum number of entities per page.
      * @return All Reservation entities for selected Sector and page.
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
@@ -309,10 +322,10 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     /**
      * Counts all reservations for sector in the timeframe (beginTime - beginTime + maxReservationHours)
      *
-     * @param sectorId Sector identifier.
-     * @param beginTime Start time of the reservation.
+     * @param sectorId            Sector identifier.
+     * @param beginTime           Start time of the reservation.
      * @param maxReservationHours Maximum duration of the reservation, given in hours.
-     * @param benchmark Value indicating the point in time from the perspective of which the query is executed.
+     * @param benchmark           Value indicating the point in time from the perspective of which the query is executed.
      * @return Count of Reservation entities for selected client (collapsed with login).
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
@@ -327,5 +340,28 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         countAllSectorReservationInTimeframeQuery.setParameter("beginTimePlusMaxReservationTime", beginTime.plusHours(maxReservationHours));
         countAllSectorReservationInTimeframeQuery.setParameter("current_timestamp", benchmark);
         return Objects.requireNonNullElse(countAllSectorReservationInTimeframeQuery.getSingleResult(), 0L);
+    }
+
+    /**
+     * Retrieves a reservation by the id and its owner login.
+     *
+     * @param reservationId Identifier of reservation searched for.
+     * @param ownerLogin    Owner's login of reservation searched for.
+     * @return If Reservation with the ID, belonging to the specified owner, was found returns an Optional containing
+     * the Reservation, otherwise returns an empty Optional.
+     */
+    @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    public Optional<Reservation> findClientReservation(UUID reservationId, String ownerLogin) throws ApplicationBaseException {
+        Reservation reservation = null;
+
+        try {
+            TypedQuery<Reservation> findClientReservationQuery = entityManager.createNamedQuery("Reservation.findClientReservation", Reservation.class);
+            findClientReservationQuery.setParameter("reservationId", reservationId);
+            findClientReservationQuery.setParameter("ownerLogin", ownerLogin);
+            reservation = findClientReservationQuery.getSingleResult();
+            entityManager.refresh(reservation);
+        } catch (NoResultException ignore) {}
+
+        return Optional.ofNullable(reservation);
     }
 }

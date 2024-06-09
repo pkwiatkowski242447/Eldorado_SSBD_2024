@@ -64,6 +64,8 @@ public class I18n {
     public static final String RESERVATION_SECTOR_NON_ACTIVE = "reservation.sector.non.active.exception";
     public static final String RESERVATION_CLIENT_LIMIT_EXCEPTION = "reservation.client.limit.exception";
 
+    public static final String RESERVATION_CANCELLATION_LATE_ATTEMPT = "reservation.cancellation.late.attempt.exception";
+    public static final String RESERVATION_ALREADY_CANCELLED_EXCEPTION = "reservation.already.cancelled.exception";
 
     // Account service
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
