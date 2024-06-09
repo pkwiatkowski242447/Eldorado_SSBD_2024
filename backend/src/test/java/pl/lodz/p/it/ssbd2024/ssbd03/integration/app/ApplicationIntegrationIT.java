@@ -56,15 +56,16 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    @BeforeAll
-    public static void setup() {
-        RestAssured.config = RestAssured.config()
-                .logConfig(LogConfig.logConfig()
-                        .enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
-                        .enablePrettyPrinting(true));
-        // Enable global request and response logging filters
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-    }
+    /* Enable only in case of debugging tests */
+//    @BeforeAll
+//    public static void setup() {
+//        RestAssured.config = RestAssured.config()
+//                .logConfig(LogConfig.logConfig()
+//                        .enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
+//                        .enablePrettyPrinting(true));
+//        // Enable global request and response logging filters
+//        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+//    }
 
     @AfterEach
     void resetEnvironment() throws IOException, InterruptedException {
