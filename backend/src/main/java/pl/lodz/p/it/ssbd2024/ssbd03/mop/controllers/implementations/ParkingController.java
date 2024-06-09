@@ -77,7 +77,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.ADD_PARKING)
-    public ResponseEntity<?> createParking(@Valid @RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> createParking(@RequestBody @Valid ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
         Parking parking = parkingService.createParking(parkingCreateDTO.getCity(), parkingCreateDTO.getZipCode(),
                 parkingCreateDTO.getStreet());
         return ResponseEntity.created(URI.create(this.createdParkingResourceURL + parking.getId())).build();
@@ -223,7 +223,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
-    public ResponseEntity<?> editParking(String ifMatch, ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> editParking(String ifMatch, @Valid ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
         }

@@ -1,12 +1,18 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.AddressConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.AddressMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 
 import java.util.UUID;
 
@@ -18,15 +24,28 @@ import java.util.UUID;
 public class ParkingModifyDTO extends ParkingSignableDTO{
 
     @Schema(description = "Identifier of parking which is being edited.", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = ParkingMessages.UUID_BLANK)
     private UUID parkingId;
 
     @Schema(description = "City in which the parking is located", example = "LA", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = AddressMessages.CITY_BLANK)
+    @Pattern(regexp = AddressConsts.CITY_REGEX, message = AddressMessages.CITY_REGEX_NOT_MET)
+    @Size(min = AddressConsts.CITY_MIN_LENGTH, message = AddressMessages.CITY_NAME_TOO_SHORT)
+    @Size(max = AddressConsts.CITY_MAX_LENGTH, message = AddressMessages.CITY_NAME_TOO_LONG)
     private String city;
 
     @Schema(description = "ZipCode of the city in which the parking is located", example = "11-111", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = AddressMessages.ZIP_CODE_BLANK)
+    @Pattern(regexp = AddressConsts.ZIP_CODE_REGEX, message = AddressMessages.ZIP_CODE_REGEX_NOT_MET)
+    @Size(min = AddressConsts.ZIP_CODE_LENGTH, message = AddressMessages.ZIP_CODE_INVALID)
+    @Size(max = AddressConsts.ZIP_CODE_LENGTH, message = AddressMessages.ZIP_CODE_INVALID)
     private String zipCode;
 
     @Schema(description = "Street of the city in which the parking is located", example = "white", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = AddressMessages.STREET_BLANK)
+    @Pattern(regexp = AddressConsts.STREET_REGEX, message = AddressMessages.STREET_REGEX_NOT_MET)
+    @Size(min = AddressConsts.STREET_MIN_LENGTH, message = AddressMessages.STREET_NAME_TOO_SHORT)
+    @Size(max = AddressConsts.STREET_MAX_LENGTH, message = AddressMessages.STREET_NAME_TOO_LONG)
     private String street;
 
     public ParkingModifyDTO(String city, String zipCode, String street) {
