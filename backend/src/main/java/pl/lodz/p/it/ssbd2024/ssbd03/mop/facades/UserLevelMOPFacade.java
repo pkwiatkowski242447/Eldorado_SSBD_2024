@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -97,14 +98,14 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
     /**
      * Retrieves all user levels by the account ID and forces its refresh.
      *
-     * @param accountId Identifier of the account, which the user levels are searched for.
+     * @param login Identifier of the account, which the user levels are searched for.
      * @return All user levels associated with given account.
      * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
      */
     @DenyAll
-    public List<UserLevel> findUserLevelsForGivenAccount(UUID accountId) throws ApplicationBaseException {
+    public List<UserLevel> findUserLevelsForGivenAccount(String login) throws ApplicationBaseException {
         TypedQuery<UserLevel> findUserLevelsForGivenAccount = entityManager.createNamedQuery("UserLevel.findAllUserLevelsForGivenAccount", UserLevel.class);
-        findUserLevelsForGivenAccount.setParameter("accountId", accountId);
+        findUserLevelsForGivenAccount.setParameter("login", login);
         List<UserLevel> listOfUserLevels = findUserLevelsForGivenAccount.getResultList();
         super.refreshAll(listOfUserLevels);
         return listOfUserLevels;
@@ -113,17 +114,17 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
     /**
      * Retrieves particular user level (of class searchedUserLevel) associated with given account.
      *
-     * @param accountId Identifier of the account, which the user level is searched for.
+     * @param login Text identifier of the account, which the user level is searched for.
      * @param searchedUserLevel User level class, of user level connected to given account, that is searched for.
      * @return Certain user level, of given class, connected to the user account.
      * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
      */
-    @DenyAll
-    public Optional<UserLevel> findGivenUserLevelForGivenAccount(UUID accountId, Class<? extends UserLevel> searchedUserLevel) throws ApplicationBaseException {
-        TypedQuery<UserLevel> findGivenUserLevelForGivenAccount = entityManager.createNamedQuery("UserLevel.findGivenUserLevelsForGivenAccount", UserLevel.class);
-        findGivenUserLevelForGivenAccount.setParameter("accountId", accountId);
-        findGivenUserLevelForGivenAccount.setParameter("userLevel", searchedUserLevel);
-        UserLevel userLevel = findGivenUserLevelForGivenAccount.getSingleResult();
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    public Optional<Client> findGivenUserLevelForGivenAccount(String login, Class<? extends UserLevel> searchedUserLevel) throws ApplicationBaseException {
+        TypedQuery<Client> findGivenUserLevelForGivenAccount = entityManager.createNamedQuery("UserLevel.findGivenUserLevelsForGivenAccount", Client.class);
+        findGivenUserLevelForGivenAccount.setParameter("login", login);
+        findGivenUserLevelForGivenAccount.setParameter("userLevel", Client.class);
+        Client userLevel = findGivenUserLevelForGivenAccount.getSingleResult();
         entityManager.refresh(userLevel);
         return Optional.of(userLevel);
     }

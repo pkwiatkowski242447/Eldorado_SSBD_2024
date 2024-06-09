@@ -66,35 +66,35 @@ public class AccountUnitTest {
     }
 
     @Test
-    void couldAuthenticateReturnsTrueTest() {
+    void isEnabledReturnsTrueTest() {
         Account testAccount1 = new Account(ACCOUNT_LOGIN_NO_1, ACCOUNT_PASSWORD_NO_1, ACCOUNT_NAME_NO_1, ACCOUNT_LASTNAME_NO_1,
                 ACCOUNT_EMAIL_NO_1, ACCOUNT_PHONE_NUMBER_NO_1);
 
         testAccount1.setBlocked(false);
         testAccount1.setActive(true);
 
-        assertTrue(testAccount1.couldAuthenticate());
+        assertTrue(testAccount1.isEnabled());
 
         testAccount1.setBlocked(false);
         testAccount1.setActive(false);
 
-        assertFalse(testAccount1.couldAuthenticate());
+        assertFalse(testAccount1.isEnabled());
 
         testAccount1.setBlocked(true);
         testAccount1.setActive(true);
 
-        assertFalse(testAccount1.couldAuthenticate());
+        assertFalse(testAccount1.isEnabled());
     }
 
     @Test
-    void couldAuthenticateReturnsFalseTest() {
+    void isEnabledReturnsFalseTest() {
         Account testAccount1 = new Account(ACCOUNT_LOGIN_NO_1, ACCOUNT_PASSWORD_NO_1, ACCOUNT_NAME_NO_1, ACCOUNT_LASTNAME_NO_1,
                 ACCOUNT_EMAIL_NO_1, ACCOUNT_PHONE_NUMBER_NO_1);
 
         testAccount1.setBlocked(true);
         testAccount1.setActive(false);
 
-        assertFalse(testAccount1.couldAuthenticate());
+        assertFalse(testAccount1.isEnabled());
     }
 
     @Test

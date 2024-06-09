@@ -58,6 +58,9 @@ public class I18n {
     public static final String RESERVATION_EXPIRED_EXCEPTION = "reservation.expired.exception";
     public static final String RESERVATION_SECTOR_NO_AVAILABLE_PLACES_EXCEPTION = "reservation.sector.no.available.places.exception";
 
+    public static final String CLIENT_USER_LEVEL_FOR_RESERVATION_NOT_FOUND = "user.level.client.for.reservation.not.found.exception";
+
+
     // Account service
     public static final String ADMIN_ACCOUNT_REMOVE_OWN_ADMIN_USER_LEVEL_EXCEPTION = "account.service.admin.remove.own.admin.user.level.exception";
     public static final String NO_SUCH_USER_LEVEL_EXCEPTION = "user_level.no.such.user.level.exception";

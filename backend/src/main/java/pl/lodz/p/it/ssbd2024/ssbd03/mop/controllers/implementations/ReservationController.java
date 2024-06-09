@@ -29,6 +29,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceIn
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller used for manipulating reservations and parking events in the system.
@@ -82,7 +83,9 @@ public class ReservationController implements ReservationControllerInterface {
     @Override
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public ResponseEntity<?> makeReservation(MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        reservationService.makeReservation("michalkowal", UUID.randomUUID());
+
+        return ResponseEntity.noContent().build();
     }
 
     @Override

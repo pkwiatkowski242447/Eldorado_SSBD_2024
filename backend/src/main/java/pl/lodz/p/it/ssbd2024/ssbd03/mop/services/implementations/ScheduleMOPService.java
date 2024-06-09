@@ -50,7 +50,10 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     private final ParkingFacade parkingFacade;
 
     @Autowired
-    public ScheduleMOPService(ReservationFacade reservationFacade, UserLevelMOPFacade userLevelFacade, ParkingEventFacade parkingEventFacade, ParkingFacade parkingFacade) {
+    public ScheduleMOPService(ReservationFacade reservationFacade,
+                              UserLevelMOPFacade userLevelFacade,
+                              ParkingEventFacade parkingEventFacade,
+                              ParkingFacade parkingFacade) {
         this.reservationFacade = reservationFacade;
         this.userLevelFacade = userLevelFacade;
         this.parkingEventFacade = parkingEventFacade;

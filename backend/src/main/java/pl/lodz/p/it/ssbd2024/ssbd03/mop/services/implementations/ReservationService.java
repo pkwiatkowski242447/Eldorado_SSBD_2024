@@ -9,15 +9,20 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ClientUserLevelForReservationNotFound;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingEventFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -35,11 +40,15 @@ public class ReservationService implements ReservationServiceInterface {
 
     private final ReservationFacade reservationFacade;
     private final ParkingEventFacade parkingEventFacade;
+    private final UserLevelMOPFacade userLevelMOPFacade;
 
     @Autowired
-    public ReservationService(ReservationFacade reservationFacade, ParkingEventFacade parkingEventFacade) {
+    public ReservationService(ReservationFacade reservationFacade,
+                              ParkingEventFacade parkingEventFacade,
+                              UserLevelMOPFacade userLevelMOPFacade) {
         this.reservationFacade = reservationFacade;
         this.parkingEventFacade = parkingEventFacade;
+        this.userLevelMOPFacade = userLevelMOPFacade;
     }
 
     @Override
@@ -57,7 +66,16 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void makeReservation(String clientLogin, UUID sectorId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        // Obtaining Client
+        Optional<Client> clientOpt = userLevelMOPFacade.findGivenUserLevelForGivenAccount(clientLogin, Client.class);
+        Client client;
+        if (clientOpt.isPresent() && clientOpt.get() instanceof Client clientResult) {
+            client = clientResult;
+        } else {
+            throw new ClientUserLevelForReservationNotFound();
+        }
+
+        System.out.println(client);
     }
 
     @Override

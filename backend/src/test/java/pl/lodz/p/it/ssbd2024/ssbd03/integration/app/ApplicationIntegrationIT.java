@@ -58,10 +58,10 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @BeforeAll
     public static void setup() {
-        RestAssured.config = RestAssured.config()
-                .logConfig(LogConfig.logConfig()
-                        .enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
-                        .enablePrettyPrinting(true));
+//        RestAssured.config = RestAssured.config()
+//                .logConfig(LogConfig.logConfig()
+//                        .enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
+//                        .enablePrettyPrinting(true));
         // Enable global request and response logging filters
         RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
     }
