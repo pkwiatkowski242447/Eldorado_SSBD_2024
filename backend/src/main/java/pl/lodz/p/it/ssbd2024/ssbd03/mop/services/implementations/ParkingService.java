@@ -17,6 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.CannotExitParkingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationExpiredException;
@@ -35,6 +36,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -108,7 +110,7 @@ public class ParkingService implements ParkingServiceInterface {
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
     public void activateSector(UUID id) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
-        if(sector.getActive()) throw new SectorAlreadyActiveException();
+        if (sector.getActive()) throw new SectorAlreadyActiveException();
         sector.setActive(true);
         parkingFacade.editSector(sector);
     }
@@ -117,7 +119,7 @@ public class ParkingService implements ParkingServiceInterface {
     @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
     public void deactivateSector(UUID id) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
-        if(!sector.getActive()) throw new SectorAlreadyInactiveException();
+        if (!sector.getActive()) throw new SectorAlreadyInactiveException();
         sector.setActive(false);
         parkingFacade.editSector(sector);
     }
@@ -180,10 +182,10 @@ public class ParkingService implements ParkingServiceInterface {
     public Parking editParking(Parking modifiedParking) throws ApplicationBaseException {
         Parking foundParking = parkingFacade.findAndRefresh(modifiedParking.getId()).orElseThrow(ParkingNotFoundException::new);
 
-        if (!modifiedParking.getVersion().equals(foundParking.getVersion())){
+        if (!modifiedParking.getVersion().equals(foundParking.getVersion())) {
             throw new OptimisticLockException();
         }
-        Address address = new Address(modifiedParking.getAddress().getCity(),modifiedParking.getAddress().getZipCode(),modifiedParking.getAddress().getStreet());
+        Address address = new Address(modifiedParking.getAddress().getCity(), modifiedParking.getAddress().getZipCode(), modifiedParking.getAddress().getStreet());
         foundParking.setAddress(address);
         parkingFacade.edit(foundParking);
         return foundParking;
@@ -228,7 +230,38 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EXIT_PARKING)
-    public void exitParking(UUID reservationId, String exitCode) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public void exitParking(UUID reservationId) throws ApplicationBaseException {
+        Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
+
+        // Check if the user is the "owner" of the reservation (if the reservation has a client assigned to it)
+        if (reservation.getClient() != null) {
+            Account account = this.accountFacade.findByLogin(reservation.getClient().getAccount().getLogin()).orElseThrow(AccountNotFoundException::new);
+            if (Objects.equals(reservation.getClient().getAccount().getLogin(), account.getLogin())) {
+                throw new ReservationNotFoundException();
+            }
+        }
+
+        // Check if the number of entry parking events is greater than the number of exit events
+        long entryEventsCount = reservation.getParkingEvents().stream()
+                .filter(event -> event.getType() == ParkingEvent.EventType.ENTRY)
+                .count();
+
+        long exitEventsCount = reservation.getParkingEvents().stream()
+                .filter(event -> event.getType() == ParkingEvent.EventType.EXIT)
+                .count();
+
+        // If the number of entry events is less than or equal to the number of exit events,
+        // the user cannot exit the parking
+        if (entryEventsCount <= exitEventsCount) {
+            throw new CannotExitParkingException();
+        }
+
+        if (reservation.getEndTime() == null) {
+            reservation.setEndTime(LocalDateTime.now());
+        }
+        reservation.getSector().setAvailablePlaces(reservation.getSector().getAvailablePlaces() + 1);
+        ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
+        reservation.addParkingEvent(exitEvent);
+        this.reservationFacade.edit(reservation);
     }
 }
