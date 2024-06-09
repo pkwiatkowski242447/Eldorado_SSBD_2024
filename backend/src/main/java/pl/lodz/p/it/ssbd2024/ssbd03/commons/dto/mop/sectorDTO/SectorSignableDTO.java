@@ -27,6 +27,8 @@ public abstract class SectorSignableDTO implements SignableDTO {
 
     @Schema(description = "The identifier of the sector", example = "4ce920a0-6f4d-4e95-ba24-99ba32b66491", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID id;
+    @Schema(description = "The identifier of the parking containing the sector", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
+    private UUID parkingId;
     @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long version;
     @Schema(description = "The name of the sector", example = "BC-69", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -37,6 +39,7 @@ public abstract class SectorSignableDTO implements SignableDTO {
     public Map<String, ?> getSigningFields() {
         return Map.ofEntries(
                 Map.entry("id", id.toString()),
+                Map.entry("parkingId", parkingId.toString()),
                 Map.entry("name", name),
                 Map.entry("version", version)
         );

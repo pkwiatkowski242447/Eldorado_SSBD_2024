@@ -23,6 +23,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationN
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationExpiredException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationNotStartedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.edit.SectorEditOfTypeOrMaxPlacesWhenActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
@@ -193,15 +194,25 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
-    public Sector editSector(Sector modifiedSector) throws ApplicationBaseException {
-        Sector foundSector = parkingFacade.findAndRefreshSectorById(modifiedSector.getId()).orElseThrow(SectorNotFoundException::new);
+    public Sector editSector(UUID id, Long version, Sector modifiedSector) throws ApplicationBaseException {
+        Sector foundSector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
 
-        if (!modifiedSector.getVersion().equals(foundSector.getVersion())) {
+        if (!version.equals(foundSector.getVersion())) {
             throw new ApplicationOptimisticLockException();
         }
 
-        foundSector.setType(modifiedSector.getType());
-        foundSector.setMaxPlaces(modifiedSector.getMaxPlaces());
+        if (foundSector.getType().compareTo(modifiedSector.getType()) != 0) {
+            if (foundSector.getActive()) {
+                throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
+            }
+            foundSector.setType(modifiedSector.getType());
+        }
+        if (foundSector.getMaxPlaces().compareTo(modifiedSector.getMaxPlaces()) != 0) {
+            if (foundSector.getActive()) {
+                throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
+            }
+            foundSector.setMaxPlaces(modifiedSector.getMaxPlaces());
+        }
         foundSector.setWeight(modifiedSector.getWeight());
 
         parkingFacade.editSector(foundSector);
