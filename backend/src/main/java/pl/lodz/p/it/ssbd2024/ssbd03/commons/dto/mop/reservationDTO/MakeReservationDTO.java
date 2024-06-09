@@ -25,10 +25,10 @@ public class MakeReservationDTO {
 
     @Schema(description = "Identifier of sector in which a place is being reserved.", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID sectorId;
-    @Schema(description = "Reservation start time.", example = "2024-05-25T13:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Reservation start time.", example = "2024-07-25T13:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime beginTime;
-    @Schema(description = "Reservation end time.", example = "2024-05-25T15:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Reservation end time.", example = "2024-07-25T15:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime endTime;
 

@@ -20,7 +20,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AbstractEntity {
 
-    //TODO validation?
     /**
      * The unique identifier (ID) of the entity.
      */

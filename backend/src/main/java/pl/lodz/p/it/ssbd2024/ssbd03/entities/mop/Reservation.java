@@ -94,6 +94,47 @@ import java.util.List;
                         WHERE r.beginTime < :timestamp
                         ORDER BY r.beginTime ASC
                         """
+        ),
+        // Creating reservation
+        @NamedQuery(
+                name = "Reservation.countAllActiveUserReservationByLogin",
+                query = """
+                        SELECT COUNT(*) FROM Reservation r
+                        WHERE r.client.account.login = :clientLogin
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.countAllSectorReservationInTimeframe",
+                query = """
+                        SELECT COUNT(*) FROM Reservation r
+                        WHERE r.sector.id = :sectorId
+                        AND
+                        (
+                            (
+                                (r.beginTime BETWEEN :beginTimeMinusMaxReservationTime AND :beginTimePlusMaxReservationTime)
+                                AND
+                                (
+                                    (
+                                        r.endTime IS NULL
+                                        OR
+                                        (
+                                            r.endTime < :beginTime
+                                            AND
+                                            (
+                                                :current_timestamp < r.endTime
+                                                OR
+                                                MOD(SIZE(r.parkingEvents), 2) = 1
+                                            )
+                                        )
+                                    )
+                                    OR
+                                    r.endTime > :beginTime
+                                )
+                            )
+                            OR
+                            (r.beginTime BETWEEN :beginTime AND :beginTimePlusMaxReservationTime)
+                        )
+                        """
         )
 })
 public class Reservation extends AbstractEntity implements Serializable {
@@ -137,9 +178,8 @@ public class Reservation extends AbstractEntity implements Serializable {
     /**
      * The beginning time of this reservation.
      */
-    @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN)
+    @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    @Setter
     private LocalDateTime beginTime;
 
     /**
@@ -202,19 +242,22 @@ public class Reservation extends AbstractEntity implements Serializable {
      * Constructs a new reservation for a non-anonymous client.
      * @param client The Client on behalf of whom the reservation is made.
      * @param sector Sector in which the parking spot in allocated.
+     * @param beginTime Start time of the reservation.
      */
-    public Reservation(Client client, Sector sector) {
+    public Reservation(Client client, Sector sector, LocalDateTime beginTime) {
         this.client = client;
         this.sector = sector;
+        this.beginTime = beginTime;
         this.status = ReservationStatus.AWAITING;
     }
 
     /**
      * Constructs a new reservation for a non-anonymous client.
      * @param sector Sector in which the parking spot in allocated.
+     * @param beginTime Start time of the reservation.
      */
-    public Reservation(Sector sector) {
-        this(null, sector);
+    public Reservation(Sector sector, LocalDateTime beginTime) {
+        this(null, sector, beginTime);
         this.status = ReservationStatus.AWAITING;
     }
 

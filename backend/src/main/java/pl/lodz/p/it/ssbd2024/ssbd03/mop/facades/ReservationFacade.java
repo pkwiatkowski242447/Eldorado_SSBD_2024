@@ -13,21 +13,24 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
-import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * Implementation of AbstractFacade that provides CRUD operations
  * on the Reservation class using the injected EntityManager implementation.
+ *
  * @see Reservation
  * @see jakarta.persistence.EntityManager
  */
@@ -183,7 +186,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * Returns all Reservation entities for the selected Sector, based on NamedQuery defined on Reservation class,
      * with pagination.
      * @param sectorId The UUID type identifier of the selected Sector
-     * @param page page number
+     * @param page     page number
      * @param pageSize defines the maximum number of entities per page
      * @return All Reservation entities for selected Sector and page
      */
@@ -210,6 +213,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
      */
+    @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
     public List<Reservation> findAllHistoricalUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             var list = getEntityManager()
@@ -225,6 +229,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
             return new ArrayList<>();
         }
     }
+
+
 
     /**
      * Invokes superclass count method.
@@ -258,7 +264,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /**
-     * Returns all active reservation for user with specified login
+     * Returns all active reservations for user with specified login
      *
      * @param login The user login.
      * @param pageNumber page number.
@@ -267,6 +273,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
      */
+    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
     public List<Reservation> findAllActiveUserReservationByLoginWithPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             var list = getEntityManager()
@@ -276,9 +283,49 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
                     .setMaxResults(pageSize)
                     .getResultList();
             refreshAll(list);
+            log.error(list.toString());
             return list;
         } catch (PersistenceException exception) {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Counts all active reservations for user with specified login
+     *
+     * @param login The user login.
+     * @return Count of Reservation entities for selected client (collapsed with login).
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
+    public long countAllActiveUserReservationByLogin(String login) throws ApplicationBaseException {
+        TypedQuery<Long> countAllActiveUserReservationByLoginWithPaginationQuery =
+                entityManager.createNamedQuery("Reservation.countAllActiveUserReservationByLogin", Long.class);
+        countAllActiveUserReservationByLoginWithPaginationQuery.setParameter("clientLogin", login);
+        return Objects.requireNonNullElse(countAllActiveUserReservationByLoginWithPaginationQuery.getSingleResult(), 0L);
+    }
+
+    /**
+     * Counts all reservations for sector in the timeframe (beginTime - beginTime + maxReservationHours)
+     *
+     * @param sectorId Sector identifier.
+     * @param beginTime Start time of the reservation.
+     * @param maxReservationHours Maximum duration of the reservation, given in hours.
+     * @param benchmark Value indicating the point in time from the perspective of which the query is executed.
+     * @return Count of Reservation entities for selected client (collapsed with login).
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    public long countAllSectorReservationInTimeframe(UUID sectorId, LocalDateTime beginTime, int maxReservationHours, LocalDateTime benchmark) throws ApplicationBaseException {
+        TypedQuery<Long> countAllSectorReservationInTimeframeQuery =
+                entityManager.createNamedQuery("Reservation.countAllSectorReservationInTimeframe", Long.class);
+        countAllSectorReservationInTimeframeQuery.setParameter("sectorId", sectorId);
+        countAllSectorReservationInTimeframeQuery.setParameter("beginTime", beginTime);
+        countAllSectorReservationInTimeframeQuery.setParameter("beginTimeMinusMaxReservationTime", beginTime.minusHours(maxReservationHours));
+        countAllSectorReservationInTimeframeQuery.setParameter("beginTimePlusMaxReservationTime", beginTime.plusHours(maxReservationHours));
+        countAllSectorReservationInTimeframeQuery.setParameter("current_timestamp", benchmark);
+        return Objects.requireNonNullElse(countAllSectorReservationInTimeframeQuery.getSingleResult(), 0L);
     }
 }

@@ -66,7 +66,7 @@ public class ParkingEventFacadeIT extends TestcontainersConfig {
         address = new Address("Lowicz", "99-400", "Brzozowa");
         parking = new Parking(address);
         sector = new Sector(parking, "AB-01", Sector.SectorType.COVERED, 23, 11, true);
-        reservation = new Reservation(sector);
+        reservation = new Reservation(sector, LocalDateTime.now());
         parkingEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
         parkingEvent.setReservation(reservation);
     }

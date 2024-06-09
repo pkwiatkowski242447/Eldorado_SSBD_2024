@@ -68,6 +68,13 @@ public interface ReservationControllerInterface {
      *                                  layer of facade and service components in the application.
      */
     @PostMapping(value = "/make-reservation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Reserve a parking place", description = "The endpoint is used to reserve a place in selected Sector.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The reservation has been created successfully."),
+            @ApiResponse(responseCode = "400", description = "The reservation has not been created due to the correctness of the request " +
+                    "or sector blockage, including insufficient number of sector's places"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> makeReservation(@RequestBody MakeReservationDTO makeReservationDTO) throws ApplicationBaseException;
 
     /**

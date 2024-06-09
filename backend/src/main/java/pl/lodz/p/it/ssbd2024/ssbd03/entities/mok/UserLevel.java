@@ -43,14 +43,14 @@ import java.time.LocalDateTime;
                 name = "UserLevel.findAllUserLevelsForGivenAccount",
                 query = """
                         SELECT u FROM UserLevel u
-                        WHERE u.account.id = :accountId
+                        WHERE u.account.login = :login
                         """
         ),
         @NamedQuery(
                 name = "UserLevel.findGivenUserLevelsForGivenAccount",
                 query = """
                         SELECT ul FROM UserLevel ul
-                        WHERE ul.account.id = :accountId AND TYPE(ul) = :userLevel
+                        WHERE ul.account.login = :login AND TYPE(ul) = :userLevel
                         """
         )
 })

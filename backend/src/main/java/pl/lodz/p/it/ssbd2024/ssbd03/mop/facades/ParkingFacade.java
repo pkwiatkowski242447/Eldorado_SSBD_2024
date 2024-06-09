@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
@@ -353,4 +354,11 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         }
     }
 
+    /**
+     *  Force incrementing version of sector entity.
+     */
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {
+        getEntityManager().lock(sector, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+    }
 }
