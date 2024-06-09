@@ -191,10 +191,10 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
-    public Sector editSector(Sector modifiedSector) throws ApplicationBaseException {
-        Sector foundSector = parkingFacade.findAndRefreshSectorById(modifiedSector.getId()).orElseThrow(SectorNotFoundException::new);
+    public Sector editSector(UUID id, Long version, Sector modifiedSector) throws ApplicationBaseException {
+        Sector foundSector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
 
-        if (!modifiedSector.getVersion().equals(foundSector.getVersion())) {
+        if (!version.equals(foundSector.getVersion())) {
             throw new ApplicationOptimisticLockException();
         }
 

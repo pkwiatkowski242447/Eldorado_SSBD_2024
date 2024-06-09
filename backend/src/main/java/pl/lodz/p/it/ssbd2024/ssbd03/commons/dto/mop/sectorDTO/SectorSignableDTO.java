@@ -39,7 +39,7 @@ public abstract class SectorSignableDTO implements SignableDTO {
     public Map<String, ?> getSigningFields() {
         return Map.ofEntries(
                 Map.entry("id", id.toString()),
-                Map.entry("parking", parkingId.toString()),
+                Map.entry("parkingId", parkingId.toString()),
                 Map.entry("name", name),
                 Map.entry("version", version)
         );

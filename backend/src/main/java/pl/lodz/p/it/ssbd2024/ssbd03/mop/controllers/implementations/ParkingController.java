@@ -252,7 +252,7 @@ public class ParkingController implements ParkingControllerInterface {
         Parking parking = parkingService.getParkingById(sectorModifyDTO.getParkingId());
 
         SectorOutputDTO sectorOutputDTO = SectorMapper.toSectorOutputDTO(
-                parkingService.editSector(SectorMapper.toSector(sectorModifyDTO, parking))
+                parkingService.editSector(sectorModifyDTO.getId(), sectorModifyDTO.getVersion(), SectorMapper.toSector(sectorModifyDTO, parking))
         );
         return ResponseEntity.ok().body(sectorOutputDTO);
     }
