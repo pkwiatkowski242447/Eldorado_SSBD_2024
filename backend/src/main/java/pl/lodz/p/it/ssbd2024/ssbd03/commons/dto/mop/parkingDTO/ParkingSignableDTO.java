@@ -34,7 +34,7 @@ public abstract class ParkingSignableDTO implements SignableDTO {
     public Map<String, ?> getSigningFields() {
         return Map.ofEntries(
                 Map.entry("version", version),
-                Map.entry("parkingId",parkingId)
+                Map.entry("parkingId",parkingId.toString())
         );
     }
 

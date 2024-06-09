@@ -4,6 +4,7 @@ import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,5 +131,17 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
     @DenyAll
     public int count() throws ApplicationBaseException {
         return super.count();
+    }
+
+    /***
+     * Remove parking event that is linked to reservation with specified id
+     *
+     * @param reservationId UUID of reservation
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public void removeByReservation(UUID reservationId) {
+        getEntityManager().createNamedQuery("ParkingEvent.removeByReservation")
+                .setParameter("reservationId", reservationId)
+                .executeUpdate();
     }
 }

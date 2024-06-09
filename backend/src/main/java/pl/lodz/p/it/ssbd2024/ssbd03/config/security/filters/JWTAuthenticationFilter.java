@@ -76,7 +76,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
                 List<SimpleGrantedAuthority> listOfAuthorities = new ArrayList<>();
                 for (UserLevel userLevel : account.getUserLevels()) {
-                    listOfAuthorities.addAll(rolesMapper.getAuthorities(userLevel.getClass().getSimpleName().toUpperCase()));
+                    listOfAuthorities.addAll(
+                            rolesMapper.getAuthorities(
+                                    Roles.valueOf(userLevel.getClass().getSimpleName().toUpperCase())
+                            )
+                    );
                 }
                 listOfAuthorities.addAll(rolesMapper.getAuthorities(Roles.AUTHENTICATED));
 

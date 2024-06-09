@@ -5,6 +5,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,14 +15,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of AbstractFacade that provides CRUD operations
@@ -72,7 +74,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @Override
     @RolesAllowed({
             Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.EXIT_PARKING
+            Authorities.EXIT_PARKING, Authorities.END_RESERVATION
     })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
@@ -83,7 +85,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param entity Reservation entity
      */
     @Override
-    @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    @RolesAllowed(Authorities.END_RESERVATION)
     public void remove(Reservation entity) throws ApplicationBaseException {
         super.remove(entity);
     }
@@ -224,8 +226,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         }
     }
 
-
-
     /**
      * Invokes superclass count method.
      * @return Returns the total number of Reservation entities
@@ -237,6 +237,27 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /***
+     * This method is used to find all reservations, that last more than 24 hours
+     *
+     * @param amount Length of the specified time window, used to end reservations that last more than 24 hours.
+     * @param timeUnit Time unit, indicating size of the reservation ending time window.
+     * @return List of reservation that last more than 24 hours, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForEnding(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForEnding", Reservation.class);
+            findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
+            List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Returns all active reservation for user with specified login
      *
      * @param login The user login.
@@ -255,7 +276,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
                     .setMaxResults(pageSize)
                     .getResultList();
             refreshAll(list);
-            log.error(list.toString());
             return list;
         } catch (PersistenceException exception) {
             return new ArrayList<>();

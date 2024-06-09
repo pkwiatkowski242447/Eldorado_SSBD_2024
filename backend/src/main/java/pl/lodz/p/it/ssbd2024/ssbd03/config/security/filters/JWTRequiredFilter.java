@@ -41,7 +41,8 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
             "/configuration/ui",
             "/configuration/security",
             "/swagger-ui.html",
-            "/api/v1/parking/sectors/get"
+            "/api/v1/parking/sectors/get",
+            "/api/v1/parking/active"
     };
 
     @Override

@@ -74,7 +74,7 @@ public class SecurityConfig {
                                         .collect(Collectors.toList())
                         );
                     } catch (UnsupportedRoleException ex) {
-                        log.error("Unable to get authorities of role {}", Roles.ANONYMOUS);
+                        log.error("Unable to get authorities of role {}", Roles.ANONYMOUS.name());
                         anon.authorities("ROLE_ANONYMOUS");
                     }
                 })
