@@ -291,6 +291,23 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /**
+     * Counts all active reservation for user with specified login
+     *
+     * @param login The user login.
+     * @return Count of Reservation entities for selected client (collapsed with login).
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
+    public long countAllActiveUserReservationByLogin(String login) throws ApplicationBaseException {
+        TypedQuery<Long> countAllActiveUserReservationByLoginWithPaginationQuery =
+                entityManager.createNamedQuery("Reservation.countAllActiveUserReservationByLogin", Long.class);
+        countAllActiveUserReservationByLoginWithPaginationQuery.setParameter("clientLogin", login);
+        log.error("TUBA: {}", countAllActiveUserReservationByLoginWithPaginationQuery.getSingleResult().toString());
+        return Objects.requireNonNullElse(countAllActiveUserReservationByLoginWithPaginationQuery.getSingleResult(), 0L);
+    }
+
+    /**
      * TODO
      */
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)

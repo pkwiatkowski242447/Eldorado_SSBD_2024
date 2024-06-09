@@ -69,6 +69,7 @@ public class Client extends UserLevel implements Serializable {
     public String toString() {
         return new ToStringBuilder(this)
                 .append(super.toString())
+                .append("type", type)
                 .toString();
     }
 }

@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
@@ -114,18 +115,22 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
     /**
      * Retrieves particular user level (of class searchedUserLevel) associated with given account.
      *
-     * @param login Text identifier of the account, which the user level is searched for.
+     * @param login             Text identifier of the account, which the user level is searched for.
      * @param searchedUserLevel User level class, of user level connected to given account, that is searched for.
      * @return Certain user level, of given class, connected to the user account.
      * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
      */
-    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
     public Optional<Client> findGivenUserLevelForGivenAccount(String login, Class<? extends UserLevel> searchedUserLevel) throws ApplicationBaseException {
-        TypedQuery<Client> findGivenUserLevelForGivenAccount = entityManager.createNamedQuery("UserLevel.findGivenUserLevelsForGivenAccount", Client.class);
-        findGivenUserLevelForGivenAccount.setParameter("login", login);
-        findGivenUserLevelForGivenAccount.setParameter("userLevel", Client.class);
-        Client userLevel = findGivenUserLevelForGivenAccount.getSingleResult();
-        entityManager.refresh(userLevel);
-        return Optional.of(userLevel);
+        Client userLevel = null;
+
+        try {
+            TypedQuery<Client> findGivenUserLevelForGivenAccount = entityManager.createNamedQuery("UserLevel.findGivenUserLevelsForGivenAccount", Client.class);
+            findGivenUserLevelForGivenAccount.setParameter("login", login);
+            findGivenUserLevelForGivenAccount.setParameter("userLevel", Client.class);
+            userLevel = findGivenUserLevelForGivenAccount.getSingleResult();
+            entityManager.refresh(userLevel);
+        } catch (NoResultException ignore) {}
+        return Optional.ofNullable(userLevel);
     }
 }

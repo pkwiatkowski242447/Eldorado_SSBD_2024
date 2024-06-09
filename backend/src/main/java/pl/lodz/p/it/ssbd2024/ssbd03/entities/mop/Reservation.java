@@ -94,9 +94,15 @@ import java.util.List;
                         WHERE r.beginTime < :timestamp
                         ORDER BY r.beginTime ASC
                         """
-        )
-        ,
+        ),
         // Creating reservation
+        @NamedQuery(
+                name = "Reservation.countAllActiveUserReservationByLogin",
+                query = """
+                        SELECT COUNT(*) FROM Reservation r
+                        WHERE r.client.account.login = :clientLogin
+                        """
+        ),
         @NamedQuery(
                 name = "Reservation.countAllSectorReservationInTimeframe",
                 query = """
@@ -230,6 +236,7 @@ public class Reservation extends AbstractEntity implements Serializable {
     public Reservation(Client client, Sector sector) {
         this.client = client;
         this.sector = sector;
+        //FIXME maybe all args (including times)?
     }
 
     /**
