@@ -110,6 +110,7 @@ public interface ParkingControllerInterface {
     @Operation(summary = "Get sectors", description = "The endpoint is used to get sectors from parking identified with the given identifier")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of sectors in the given parking was found successfully"),
+            @ApiResponse(responseCode = "204", description = "List of sectors returned from given page of given size is empty"),
             @ApiResponse(responseCode = "400", description = "Invalid format of parking uuid"),
             @ApiResponse(responseCode = "404", description = "Parking with the given uuid does not exist"),
             @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
