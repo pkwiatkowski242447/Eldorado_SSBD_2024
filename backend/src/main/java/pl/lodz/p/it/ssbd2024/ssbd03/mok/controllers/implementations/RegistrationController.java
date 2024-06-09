@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,7 +64,7 @@ public class RegistrationController implements RegistrationControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER})
-    public ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> registerClient(@Valid @RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
         Account clientAccount = this.accountService.registerClient(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
                 accountRegisterDTO.getFirstName(),
@@ -76,7 +77,7 @@ public class RegistrationController implements RegistrationControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.REGISTER_USER})
-    public ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> registerStaff(@Valid @RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
         Account staffAccount = this.accountService.registerStaff(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
                 accountRegisterDTO.getFirstName(),
@@ -89,7 +90,7 @@ public class RegistrationController implements RegistrationControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.REGISTER_USER})
-    public ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> registerAdmin(@Valid @RequestBody AccountRegisterDTO accountRegisterDTO) throws ApplicationBaseException {
         Account adminAccount = this.accountService.registerAdmin(accountRegisterDTO.getLogin(),
                 accountRegisterDTO.getPassword(),
                 accountRegisterDTO.getFirstName(),
