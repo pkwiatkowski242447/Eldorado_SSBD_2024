@@ -1,7 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO;
 
-import java.util.UUID;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,33 +9,32 @@ import lombok.Setter;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @LoggerInterceptor
 public class SectorOutputDTO extends SectorSignableDTO {
 
-    @Schema(description = "The identifier of the parking containing this sector", requiredMode = Schema.RequiredMode.REQUIRED)
-    private UUID parkingId;
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
-    @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The status of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean active;
 
     public SectorOutputDTO(UUID id,
+                           UUID parkingId,
                            Long version,
                            String name,
-                           UUID parkingId,
                            Sector.SectorType type,
                            Integer maxPlaces,
                            Integer weight,
                            Boolean active) {
-        super(id, version, name);
-        this.parkingId = parkingId;
+        super(id, parkingId, version, name);
         this.type = type;
         this.maxPlaces = maxPlaces;
         this.weight = weight;

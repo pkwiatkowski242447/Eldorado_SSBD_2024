@@ -127,7 +127,7 @@ public interface ParkingControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with fiven id.")
+    @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with given id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Parking info."),
             @ApiResponse(responseCode = "400", description = "Invalid UUID"),
@@ -146,7 +146,7 @@ public interface ParkingControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/client/sectors/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get parking's active sectors", description = "The endpoint is used retrieve list of parking with fiven id.")
+    @Operation(summary = "Get parking's active sectors", description = "The endpoint is used retrieve list of parking with given id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of active sectors."),
             @ApiResponse(responseCode = "204", description = "No active sectors."),

@@ -195,6 +195,7 @@ public class Sector extends AbstractEntity implements Serializable {
      * @param type Sector's type.
      * @param maxPlaces Total number of parking spots in the sector.
      * @param weight Sector's weight in the spot assigning algorithms. If set to 0, the sector is disabled.
+     * @param active Sector's status.
      */
     public Sector(Parking parking, String name, SectorType type, Integer maxPlaces, Integer weight, Boolean active) {
         this.parking = parking;

@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -248,8 +249,10 @@ public class ParkingController implements ParkingControllerInterface {
             throw new SectorDataIntegrityCompromisedException();
         }
 
+        Parking parking = parkingService.getParkingById(sectorModifyDTO.getParkingId());
+
         SectorOutputDTO sectorOutputDTO = SectorMapper.toSectorOutputDTO(
-                parkingService.editSector(parkingService.getSectorById(sectorModifyDTO.getId()))
+                parkingService.editSector(SectorMapper.toSector(sectorModifyDTO, parking))
         );
         return ResponseEntity.ok().body(sectorOutputDTO);
     }
