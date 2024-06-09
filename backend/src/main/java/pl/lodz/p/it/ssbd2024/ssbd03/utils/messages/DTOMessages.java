@@ -24,4 +24,21 @@ public class DTOMessages {
     public static final String LANGUAGE_BLANK = "bean.validation.account.login.dto.language.blank";
     public static final String LANGUAGE_SIZE_INVALID = "bean.validation.account.login.dto.language.size.invalid";
     public static final String LANGUAGE_REGEX_NOT_MET = "bean.validation.account.login.dto.language.regex.not.met";
+
+    // ParkingCreateDTO Messages ----------------------------------------------------------------
+
+    public static final String CITY_BLANK = "bean.validation.parking.create.dto.city.blank";
+    public static final String CITY_REGEX_NOT_MET = "bean.validation.parking.create.dto.city.regex.not.met";
+    public static final String CITY_TOO_SHORT = "bean.validation.parking.create.dto.city.too.short";
+    public static final String CITY_TOO_LONG = "bean.validation.parking.create.dto.city.too.long";
+
+    public static final String ZIP_CODE_BLANK = "bean.validation.parking.create.dto.zip.code.blank";
+    public static final String ZIP_CODE_REGEX_NOT_MET = "bean.validation.parking.create.dto.zip.code.regex.not.met";
+    public static final String ZIP_CODE_TOO_SHORT = "bean.validation.parking.create.dto.zip.code.too.short";
+    public static final String ZIP_CODE_TOO_LONG = "bean.validation.parking.create.dto.zip.code.too.long";
+
+    public static final String STREET_BLANK = "bean.validation.parking.create.dto.street.blank";
+    public static final String STREET_REGEX_NOT_MET = "bean.validation.parking.create.dto.street.regex.not.met";
+    public static final String STREET_TOO_SHORT = "bean.validation.parking.create.dto.street.too.short";
+    public static final String STREET_TOO_LONG = "bean.validation.parking.create.dto.street.too.long";
 }

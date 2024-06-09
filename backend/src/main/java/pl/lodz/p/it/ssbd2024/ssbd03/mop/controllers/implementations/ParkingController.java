@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -76,7 +77,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.ADD_PARKING)
-    public ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> createParking(@Valid @RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
         Parking parking = parkingService.createParking(parkingCreateDTO.getCity(), parkingCreateDTO.getZipCode(),
                 parkingCreateDTO.getStreet());
         return ResponseEntity.created(URI.create(this.createdParkingResourceURL + parking.getId())).build();
