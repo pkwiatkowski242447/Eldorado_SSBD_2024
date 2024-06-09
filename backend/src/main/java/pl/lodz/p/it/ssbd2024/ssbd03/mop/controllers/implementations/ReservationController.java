@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +82,7 @@ public class ReservationController implements ReservationControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
-    public ResponseEntity<?> makeReservation(MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> makeReservation(@Valid MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
         throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
     }
 

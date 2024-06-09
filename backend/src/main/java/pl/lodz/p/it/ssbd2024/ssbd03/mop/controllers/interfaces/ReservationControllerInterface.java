@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +69,7 @@ public interface ReservationControllerInterface {
      *                                  layer of facade and service components in the application.
      */
     @PostMapping(value = "/make-reservation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> makeReservation(@RequestBody MakeReservationDTO makeReservationDTO) throws ApplicationBaseException;
+    ResponseEntity<?> makeReservation(@Valid @RequestBody MakeReservationDTO makeReservationDTO) throws ApplicationBaseException;
 
     /**
      * This endpoint allows to cancel active parking place reservation by identifier.

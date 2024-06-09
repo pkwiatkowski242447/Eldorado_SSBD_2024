@@ -41,4 +41,13 @@ public class DTOMessages {
     public static final String STREET_REGEX_NOT_MET = "bean.validation.parking.create.dto.street.regex.not.met";
     public static final String STREET_TOO_SHORT = "bean.validation.parking.create.dto.street.too.short";
     public static final String STREET_TOO_LONG = "bean.validation.parking.create.dto.street.too.long";
+
+    // MakeReservationDTO
+
+    public static final String SECTOR_UUID_BLANK = "bean.validation.reservation.make.dto.uuid.blank";
+    public static final String SECTOR_UUID_REGEX_NOT_MET = "bean.validation.reservation.make.dto.sector.uuid.regex.not.met";
+    public static final String BEGIN_TIME_BLANK = "bean.validation.reservation.make.dto.begin.time.blank";
+    public static final String BEGIN_TIME_REGEX_NOT_MET = "bean.validation.reservation.make.dto.begin.time.regex.not.met";
+    public static final String END_TIME_BLANK = "bean.validation.reservation.make.dto.end.time.blank";
+    public static final String END_TIME_REGEX_NOT_MET = "bean.validation.reservation.make.dto.end.time.regex.not.met";
 }

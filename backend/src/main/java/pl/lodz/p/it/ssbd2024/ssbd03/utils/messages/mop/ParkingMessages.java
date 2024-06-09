@@ -12,5 +12,6 @@ public class ParkingMessages {
     public static final String UPDATE_TIMESTAMP_FUTURE = "bean.validation.parking.update.time.from.future";
 
     public static final String UUID_BLANK = "bean.validation.parking.uuid.blank";
+    public static final String UUID_REGEX_NOT_MET = "bean.validation.parking.uuid.regex.not.met";
 
 }

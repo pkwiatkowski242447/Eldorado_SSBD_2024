@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.AddressConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.ParkingConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.AddressMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 
@@ -24,7 +25,8 @@ import java.util.UUID;
 public class ParkingModifyDTO extends ParkingSignableDTO{
 
     @Schema(description = "Identifier of parking which is being edited.", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = ParkingMessages.UUID_BLANK)
+    //@NotBlank(message = ParkingMessages.UUID_BLANK)
+    //@Pattern(regexp = ParkingConsts.UUID_REGEX, message = ParkingMessages.UUID_REGEX_NOT_MET)
     private UUID parkingId;
 
     @Schema(description = "City in which the parking is located", example = "LA", requiredMode = Schema.RequiredMode.REQUIRED)
