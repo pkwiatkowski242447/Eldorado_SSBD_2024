@@ -31,7 +31,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -83,14 +82,9 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
-    public void makeReservation(String clientLogin, MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
-        //TODO is ok to be DTO here?
-
+    public void makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
         // Obtaining Client
-        Optional<Client> clientOpt = userLevelMOPFacade.findGivenUserLevelForGivenAccount(clientLogin, Client.class);
-        Client client;
-        if (clientOpt.isEmpty()) throw new ReservationClientUserLevelNotFound();
-        client = clientOpt.get();
+        Client client = userLevelMOPFacade.findGivenUserLevelForGivenAccount(clientLogin).orElseThrow(ReservationClientUserLevelNotFound::new);
 
         // Check client availability
         if (!client.getAccount().isEnabled()) throw new ReservationClientAccountNonEnabledException();
@@ -99,26 +93,25 @@ public class ReservationService implements ReservationServiceInterface {
         if (reservationFacade.countAllActiveUserReservationByLogin(clientLogin) + 1 > clientLimit) throw new ReservationClientLimitException();
 
         // Obtaining Sector
-        Sector sector = parkingFacade.findAndRefreshSectorById(makeReservationDTO.getSectorId()).orElseThrow(SectorNotFoundException::new);
+        Sector sector = parkingFacade.findAndRefreshSectorById(sectorId).orElseThrow(SectorNotFoundException::new);
 
         // Check sector availability
         if (!sector.getActive()) throw new ReservationSectorNonActiveException();
 
         // Check sector place availability
         long numOfPlacesTaken = reservationFacade.countAllSectorReservationInTimeframe(
-                makeReservationDTO.getSectorId(),
-                makeReservationDTO.getBeginTime(),
+                sectorId,
+                beginTime,
                 reservationMaxHours,
                 LocalDateTime.now()
         );
         if (sector.getMaxPlaces() < numOfPlacesTaken + 1) throw new ReservationNoAvailablePlaceException();
 
         // Create reservation
-        Reservation newReservation = new Reservation(client, sector);
-        newReservation.setBeginTime(makeReservationDTO.getBeginTime());
-        newReservation.setEndTime(makeReservationDTO.getEndTime());
+        Reservation newReservation = new Reservation(client, sector, beginTime);
+        newReservation.setEndTime(endTime);
 
-        //TODO are you sure??
+        //TODO future check
         parkingFacade.forceVersionUpdate(sector);
 
         reservationFacade.create(newReservation);

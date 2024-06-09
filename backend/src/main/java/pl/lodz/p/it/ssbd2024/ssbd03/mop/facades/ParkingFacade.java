@@ -355,7 +355,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-     *  TODO
+     *  Force incrementing version of sector entity.
      */
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {

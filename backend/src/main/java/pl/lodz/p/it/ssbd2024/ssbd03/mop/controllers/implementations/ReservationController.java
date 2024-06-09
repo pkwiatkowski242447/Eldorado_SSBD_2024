@@ -5,7 +5,6 @@ import jakarta.persistence.RollbackException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -25,13 +24,14 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserActiveReservationLis
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ReservationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Controller used for manipulating reservations and parking events in the system.
@@ -84,10 +84,20 @@ public class ReservationController implements ReservationControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class,
+                    ReservationNoAvailablePlaceException.class, ReservationClientLimitException.class})
     public ResponseEntity<?> makeReservation(@Valid MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
+        //TODO future test Retryable
+
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        reservationService.makeReservation(login, makeReservationDTO);
+        reservationService.makeReservation(
+                login,
+                makeReservationDTO.getSectorId(),
+                makeReservationDTO.getBeginTime(),
+                makeReservationDTO.getEndTime()
+        );
 
         return ResponseEntity.noContent().build();
     }

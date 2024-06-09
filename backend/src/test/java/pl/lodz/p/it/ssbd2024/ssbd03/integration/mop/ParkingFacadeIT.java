@@ -25,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +70,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         address = new Address("dd", "casc", "wqc");
         parking = new Parking(address);
         sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11, true);
-        reservation = new Reservation(sector);
+        reservation = new Reservation(sector, LocalDateTime.now());
     }
 
     @Test

@@ -116,12 +116,11 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * Retrieves particular user level (of class searchedUserLevel) associated with given account.
      *
      * @param login             Text identifier of the account, which the user level is searched for.
-     * @param searchedUserLevel User level class, of user level connected to given account, that is searched for.
      * @return Certain user level, of given class, connected to the user account.
      * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
      */
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
-    public Optional<Client> findGivenUserLevelForGivenAccount(String login, Class<? extends UserLevel> searchedUserLevel) throws ApplicationBaseException {
+    public Optional<Client> findGivenUserLevelForGivenAccount(String login) throws ApplicationBaseException {
         Client userLevel = null;
 
         try {

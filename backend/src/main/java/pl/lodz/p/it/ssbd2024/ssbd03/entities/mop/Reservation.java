@@ -173,9 +173,8 @@ public class Reservation extends AbstractEntity implements Serializable {
     /**
      * The beginning time of this reservation.
      */
-    @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN)
+    @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    @Setter
     private LocalDateTime beginTime;
 
     /**
@@ -232,19 +231,21 @@ public class Reservation extends AbstractEntity implements Serializable {
      * Constructs a new reservation for a non-anonymous client.
      * @param client The Client on behalf of whom the reservation is made.
      * @param sector Sector in which the parking spot in allocated.
+     * @param beginTime Start time of the reservation.
      */
-    public Reservation(Client client, Sector sector) {
+    public Reservation(Client client, Sector sector, LocalDateTime beginTime) {
         this.client = client;
         this.sector = sector;
-        //FIXME maybe all args (including times)?
+        this.beginTime = beginTime;
     }
 
     /**
      * Constructs a new reservation for a non-anonymous client.
      * @param sector Sector in which the parking spot in allocated.
+     * @param beginTime Start time of the reservation.
      */
-    public Reservation(Sector sector) {
-        this(null, sector);
+    public Reservation(Sector sector, LocalDateTime beginTime) {
+        this(null, sector, beginTime);
     }
 
     /**

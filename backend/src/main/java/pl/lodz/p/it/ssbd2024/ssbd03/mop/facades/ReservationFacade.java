@@ -264,7 +264,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /**
-     * Returns all active reservation for user with specified login
+     * Returns all active reservations for user with specified login
      *
      * @param login The user login.
      * @param pageNumber page number.
@@ -291,7 +291,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /**
-     * Counts all active reservation for user with specified login
+     * Counts all active reservations for user with specified login
      *
      * @param login The user login.
      * @return Count of Reservation entities for selected client (collapsed with login).
@@ -303,12 +303,19 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         TypedQuery<Long> countAllActiveUserReservationByLoginWithPaginationQuery =
                 entityManager.createNamedQuery("Reservation.countAllActiveUserReservationByLogin", Long.class);
         countAllActiveUserReservationByLoginWithPaginationQuery.setParameter("clientLogin", login);
-        log.error("TUBA: {}", countAllActiveUserReservationByLoginWithPaginationQuery.getSingleResult().toString());
         return Objects.requireNonNullElse(countAllActiveUserReservationByLoginWithPaginationQuery.getSingleResult(), 0L);
     }
 
     /**
-     * TODO
+     * Counts all reservations for sector in the timeframe (beginTime - beginTime + maxReservationHours)
+     *
+     * @param sectorId Sector identifier.
+     * @param beginTime Start time of the reservation.
+     * @param maxReservationHours Maximum duration of the reservation, given in hours.
+     * @param benchmark Value indicating the point in time from the perspective of which the query is executed.
+     * @return Count of Reservation entities for selected client (collapsed with login).
+     * If a persistence exception is thrown, then empty list is returned.
+     * @throws ApplicationBaseException when other problem occurred.
      */
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public long countAllSectorReservationInTimeframe(UUID sectorId, LocalDateTime beginTime, int maxReservationHours, LocalDateTime benchmark) throws ApplicationBaseException {
