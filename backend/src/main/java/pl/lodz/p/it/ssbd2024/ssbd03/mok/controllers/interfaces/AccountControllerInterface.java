@@ -209,10 +209,10 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     ResponseEntity<?> getAccountsMatchingPhraseInNameOrLastname(@RequestParam(name = "phrase", defaultValue = "") String phrase,
-                                                                     @RequestParam(name = "orderBy", defaultValue = "login") String orderBy,
-                                                                     @RequestParam(name = "order", defaultValue = "true") boolean order,
-                                                                     @RequestParam(name = "pageNumber") int pageNumber,
-                                                                     @RequestParam(name = "pageSize") int pageSize)
+                                                                @RequestParam(name = "orderBy", defaultValue = "login") String orderBy,
+                                                                @RequestParam(name = "order", defaultValue = "true") boolean order,
+                                                                @RequestParam(name = "pageNumber") int pageNumber,
+                                                                @RequestParam(name = "pageSize") int pageSize)
             throws ApplicationBaseException;
 
     /**
@@ -384,7 +384,7 @@ public interface AccountControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Modify self account", description = "The endpoint is used to modify self account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
@@ -408,7 +408,7 @@ public interface AccountControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Modify other user account account", description = "The endpoint is used to modify user account.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The account has been modified correctly.",
@@ -606,9 +606,10 @@ public interface AccountControllerInterface {
 
     /**
      * This endpoint allows to check whether the account has a password reset request made by an admin.
+     *
      * @return Boolean representing whether there is a password reset request made by an admin
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     *      *                           exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/admin-password-reset-status", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Check if the logged in account has an admin reset password request.", description = "This endpoint allows to check whether the account has a password reset request made by an admin.")
@@ -650,7 +651,7 @@ public interface AccountControllerInterface {
      * This method retrieves account history data by the account's id. The results are ordered by
      * modification time.
      *
-     * @param id ID of the account which history data will be retrieved.
+     * @param id         ID of the account which history data will be retrieved.
      * @param pageNumber Number of the page, which user history data will be retrieved from.
      * @param pageSize   Number of user history data per page.
      * @return This method returns 200 OK as a response, where in response body a list of user account's history data is located, is a JSON format.
@@ -659,7 +660,7 @@ public interface AccountControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/{id}/history-data",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/history-data", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get history data of a account", description = "The endpoint is used retrieve list of account history data from given page of given size.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of account's history data returned from given page of given size is not empty."),
@@ -671,33 +672,137 @@ public interface AccountControllerInterface {
                                                 @RequestParam("pageSize") int pageSize)
             throws ApplicationBaseException;
 
+    /**
+     * This endpoint is used to retrieve all attribute names in the dynamic dictionary.
+     *
+     * @param pageNumber Number of the page with the attribute names.
+     * @param pageSize   Size of a single page with the attribute names.
+     * @return List of attribute names in the dynamic dictionary on given page with given size with status code 200 OK.
+     * If no attribute names were found then the empty list is returned with status code 204 NO CONTENT. 500
+     * INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @GetMapping(value = "/attributes", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAllAttributesNames(@RequestParam("pageNumber") int pageNumber,
-                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+                                            @RequestParam("pageSize") int pageSize)
+            throws ApplicationBaseException;
+
+    /**
+     * This endpoint is used to retrieve all values for given attribute in the dynamic dictionary.
+     *
+     * @param attributeName Name of the attribute, which values are to be retrieved.
+     * @param pageNumber    Number of the page, which contains attribute values for a given attribute.
+     * @param pageSize      Size of the page with attribute values.
+     * @return List of attribute values, retrieved for given attribute name, with status code 200 OK.
+     * If no values for given attribute name were found, then empty list is returned with status code 204 NO CONTENT.
+     * 500 INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @GetMapping(value = "/attributes/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAllAttributeValues(@PathVariable("name") String attributeName,
-                                                   @RequestParam("pageNumber") int pageNumber,
-                                                   @RequestParam("pageSize") int pageSize) throws ApplicationBaseException;
+                                            @RequestParam("pageNumber") int pageNumber,
+                                            @RequestParam("pageSize") int pageSize)
+            throws ApplicationBaseException;
 
+    /**
+     * This endpoint is used to add attribute with given name to the dynamic dictionary.
+     *
+     * @param attributeName Name of the attribute to be added to the dynamic dictionary.
+     * @return 204 NO CONTENT is returned when the attribute is created successfully in the dynamic dictionary. 500
+     * INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @PostMapping(value = "/attributes/add-attribute/{attributeName}")
-    ResponseEntity<?> addAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException;
+    ResponseEntity<?> addAttribute(@PathVariable("attributeName") String attributeName)
+            throws ApplicationBaseException;
 
+    /**
+     * This endpoint is used to delete attribute with given name from the dynamic dictionary.
+     *
+     * @param attributeName Name of the attribute to be deleted from the dynamic dictionary.
+     * @return HTTP response with status code 204 NO CONTENT is returned when the attribute is deleted successfully
+     * from the dynamic dictionary. 500 INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @DeleteMapping(value = "/attributes/remove-attribute/{attributeName}")
-    ResponseEntity<?> removeAttribute(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException;
+    ResponseEntity<?> removeAttribute(@PathVariable("attributeName") String attributeName)
+            throws ApplicationBaseException;
 
+    /**
+     * This endpoint is used to add value for attribute with given name in the dynamic dictionary.
+     *
+     * @param attributeName  Name of the attribute, which value will be added to the dynamic dictionary.
+     * @param attributeValue Value of the attribute.
+     * @return HTTP response with status code 204 NO CONTENT is returned when the value for given attribute
+     * is created in the dynamic dictionary successfully. 500 INTERNAL SERVER ERROR is returned when
+     * other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @PostMapping(value = "/attributes/add-value/{attributeName}/{attributeValue}")
     ResponseEntity<?> addAttributeValue(@PathVariable("attributeName") String attributeName,
-                                        @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;
+                                        @PathVariable("attributeValue") String attributeValue)
+            throws ApplicationBaseException;
 
+    /**
+     * This endpoint is used to remove value for an attribute with given name from the dynamic dictionary.
+     *
+     * @param attributeName  Name of the attribute, which the value will be removed from the dynamic dictionary for.
+     * @param attributeValue Value of the attribute, which will be removed from the dynamic dictionary.
+     * @return 204 NO CONTENT HTTP response is returned when the value is removed from the dynamic dictionary
+     * successfully. 500 INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @DeleteMapping(value = "/attributes/remove-value/{attributeName}/{attributeValue}")
     ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName,
-                                                  @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;
+                                           @PathVariable("attributeValue") String attributeValue)
+            throws ApplicationBaseException;
+
+    /**
+     * This endpoint is used to retrieve all attribute name - attribute value pairs for given user account (
+     * the one that is currently logged in).
+     *
+     * @return 200 OK HTTP response is returned with a list of attribute name - value pairs for currently logged-in
+     * user account. If there are no attribute mappings for the user account then 204 NO CONTENT is returned. 500
+     * INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @GetMapping(value = "/attributes/account/me/get", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAllAccountAttributes() throws ApplicationBaseException;
 
+    /**
+     * This method is used add new attribute name - value pair for given user account - in this case the one that is
+     * currently logged in.
+     *
+     * @param attributeName  Name of the attribute to be added for user account.
+     * @param attributeValue Value of the assigned attribute.
+     * @return 204 NO CONTENT is returned when adding new attribute name - value pair for user account was successful.
+     * 500 INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @PostMapping(value = "/attributes/account/me/assign/{attributeName}/{attributeValue}")
     ResponseEntity<?> assignAttribute(@PathVariable("attributeName") String attributeName,
-                                             @PathVariable("attributeValue") String attributeValue) throws ApplicationBaseException;
+                                      @PathVariable("attributeValue") String attributeValue)
+            throws ApplicationBaseException;
+
+    /**
+     * This endpoint is used to delete certain attribute name - value mapping for user account - in this case it is the
+     * account of the currently logged-in user.
+     *
+     * @param attributeName Name of the attribute, which the pairing with value will be removed from the dynamic dictionary.
+     * @return 204 NO CONTENT is returned when removing certain attribute name - value pair for user account was successful.
+     * 500 INTERNAL SERVER ERROR is returned when other, unexpected error occurs.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
+     *                                  exception handling aspects from facade and service layers below.
+     */
     @DeleteMapping(value = "/attributes/account/me/remove/{attributeName}")
-    ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName) throws ApplicationBaseException;
+    ResponseEntity<?> removeAttributeValue(@PathVariable("attributeName") String attributeName)
+            throws ApplicationBaseException;
 }

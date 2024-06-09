@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
@@ -26,7 +25,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundExc
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.EntryCodeFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
@@ -53,17 +51,14 @@ public class ParkingService implements ParkingServiceInterface {
     private final ParkingFacade parkingFacade;
     private final ReservationFacade reservationFacade;
     private final AccountMOPFacade accountFacade;
-    private final EntryCodeFacade entryCodeFacade;
 
     @Autowired
     public ParkingService(ParkingFacade parkingFacade,
                           ReservationFacade reservationFacade,
-                          AccountMOPFacade accountFacade,
-                          EntryCodeFacade entryCodeFacade) {
+                          AccountMOPFacade accountFacade) {
         this.parkingFacade = parkingFacade;
         this.reservationFacade = reservationFacade;
         this.accountFacade = accountFacade;
-        this.entryCodeFacade = entryCodeFacade;
     }
 
     @Override
@@ -137,7 +132,7 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.ENTER_PARKING_WITH_RESERVATION})
-    public AllocationCodeDTO enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException {
+    public void enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException {
         Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
         Account account = this.accountFacade.findByLogin(userName).orElseThrow(AccountNotFoundException::new);
 
@@ -156,23 +151,14 @@ public class ParkingService implements ParkingServiceInterface {
             throw new UserLevelMissingException(I18n.USER_NOT_RESERVATION_OWNER_EXCEPTION);
         }
 
-        EntryCode entryCode;
-        if (reservation.getParkingEvents().stream().anyMatch(parkingEvent -> parkingEvent.getType().equals(ParkingEvent.EventType.ENTRY))) {
-            // Entry code was already generated for that reservation
-            entryCode = this.entryCodeFacade.findEntryCodeByReservationId(reservationId).orElseThrow();
-        } else {
-            // Entry code generation
-            int entryCodeValue = (int) ((Math.random() * 90000000) + 1000000);
-            entryCode = new EntryCode(String.valueOf(entryCodeValue), reservation);
-            this.entryCodeFacade.create(entryCode);
-
+        if (reservation.getStatus().equals(Reservation.ReservationStatus.AWAITING)) {
             reservation.getSector().setAvailablePlaces(reservation.getSector().getAvailablePlaces() - 1);
+            reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
         }
 
         ParkingEvent entryEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
         reservation.addParkingEvent(entryEvent);
         this.reservationFacade.edit(reservation);
-        return new AllocationCodeDTO(entryCode.getEntryCode());
     }
 
     @Override

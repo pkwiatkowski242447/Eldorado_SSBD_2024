@@ -228,20 +228,19 @@ public interface ParkingControllerInterface {
 
     /**
      * This method is used to begin parking spot allocation. Basically, it generates a parking event for entry,
-     * which marks the start of the allocation, and then generates the exit code, which will be needed to end the
-     * allocation.
+     * which marks the start of the allocation.
      *
      * @param reservationId Identifier of the reservation, which the client wants to use.
-     * @return 200 OK response is returned if the allocation is started successfully, and the code if returned in the
-     * response body. Otherwise, if there is no such reservation, user account does not exist or reservation could not
+     * @return 204 NO CONTENT response is returned if the allocation is started successfully. Otherwise,
+     * if there is no such reservation, user account does not exist or reservation could not
      * be started, then 400 BAD REQUEST is returned. 500 INTERNAL SERVER ERROR is returned when other unexpected
      * exception occurs during processing of the request.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @Operation(summary = "Enter parking with reservation", description = "The endpoint is used to generate entry code for user entering parking with reservation.")
+    @Operation(summary = "Enter parking with reservation", description = "The endpoint is used to generate entry event for user entering parking with reservation.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Entry code generated and place from sector allocated successfully."),
+            @ApiResponse(responseCode = "200", description = "Entry parking event generated and place from sector allocated successfully."),
             @ApiResponse(responseCode = "400", description = "Reservation could not be found or is expired / not started. This response is returned when user is not the owner of the reservation or when there are no available places in the sector."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
