@@ -219,12 +219,14 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         return optEntity;
     }
 
-    @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public List<Sector> findSectorsInParking(UUID parkingId)
+    @RolesAllowed({Authorities.GET_ALL_SECTORS, Authorities.GET_PARKING})
+    public List<Sector> findSectorsInParking(UUID parkingId, boolean active, int pageNumber, int pageSize)
             throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
-                .setParameter("showOnlyActive", false)
+                .setParameter("showOnlyActive", active)
+                .setFirstResult(pageNumber*pageSize)
+                .setMaxResults(pageSize)
                 .getResultList();
         refreshAllSectors(list);
         return list;
@@ -297,7 +299,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param sector Sector to be modified.
      */
-    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR})
+    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION})
     public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
         getEntityManager().flush();
@@ -336,4 +338,19 @@ public class ParkingFacade extends AbstractFacade<Parking> {
             return new ArrayList<>();
         }
     }
+
+    public List<Parking> findAllAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            TypedQuery<Parking> findAllAvailableParking = entityManager.createNamedQuery("Parking.findAllAvailableParking", Parking.class);
+            findAllAvailableParking.setFirstResult(pageNumber * pageSize);
+            findAllAvailableParking.setMaxResults(pageSize);
+            findAllAvailableParking.setParameter("active", true);
+            List<Parking> list = findAllAvailableParking.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
 }

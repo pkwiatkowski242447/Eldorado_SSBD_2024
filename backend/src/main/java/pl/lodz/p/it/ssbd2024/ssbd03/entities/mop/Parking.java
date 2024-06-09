@@ -51,6 +51,14 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                         ORDER BY p.address.city"""
         ),
         @NamedQuery(
+                name = "Parking.findAllAvailableParking",
+                query = """
+                        SELECT s.parking FROM Sector s
+                        WHERE s.active = :active
+                        ORDER BY s.parking.address.city
+                        """
+        ),
+        @NamedQuery(
                 name = "Parking.findBySectorTypes",
                 query = """
                         SELECT s.parking FROM Sector s

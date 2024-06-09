@@ -98,10 +98,11 @@ public class ParkingService implements ParkingServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_PARKING)
+    @RolesAllowed({Authorities.GET_PARKING, Authorities.EDIT_PARKING})
     public Parking getParkingById(UUID id) throws ApplicationBaseException {
         return parkingFacade.findAndRefresh(id).orElseThrow(ParkingNotFoundException::new);
     }
+
 
     @Override
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
@@ -122,9 +123,9 @@ public class ParkingService implements ParkingServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public List<Sector> getSectorsByParkingId(UUID id) throws ApplicationBaseException {
-        return parkingFacade.findSectorsInParking(id);
+    @RolesAllowed({Authorities.GET_ALL_SECTORS, Authorities.GET_PARKING})
+    public List<Sector> getSectorsByParkingId(UUID id, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return parkingFacade.findSectorsInParking(id, active, pageNumber, pageSize);
     }
 
     @Override
@@ -176,8 +177,8 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
-    public Parking editParking(Parking modifiedParking, UUID id) throws ApplicationBaseException {
-        Parking foundParking = parkingFacade.findAndRefresh(id).orElseThrow(()-> new ParkingNotFoundException(I18n.PARKING_NOT_FOUND_EXCEPTION));
+    public Parking editParking(Parking modifiedParking) throws ApplicationBaseException {
+        Parking foundParking = parkingFacade.findAndRefresh(modifiedParking.getId()).orElseThrow(ParkingNotFoundException::new);
 
         if (!modifiedParking.getVersion().equals(foundParking.getVersion())){
             throw new OptimisticLockException();
@@ -209,13 +210,14 @@ public class ParkingService implements ParkingServiceInterface {
     @Override
     @RolesAllowed(Authorities.DELETE_SECTOR)
     public void removeSectorById(UUID id) throws ApplicationBaseException{
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Sector sector = this.parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
+        this.parkingFacade.removeSector(sector);
     }
 
     @Override
     @RolesAllowed(Authorities.GET_ALL_AVAILABLE_PARKING)
     public List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        return parkingFacade.findAllAvailableParkingWithPagination(pageNumber, pageSize);
     }
 
     @Override

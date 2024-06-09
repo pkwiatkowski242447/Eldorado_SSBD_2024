@@ -46,7 +46,7 @@ import java.time.LocalDateTime;
                 name = "Sector.findAllInParking",
                 query = """
                         SELECT s FROM Sector s
-                        WHERE s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight>0)
+                        WHERE s.parking.id = :parkingId AND (:showOnlyActive != true OR s.active)
                         ORDER BY s.name"""
         ),
         @NamedQuery(

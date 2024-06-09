@@ -16,6 +16,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
+import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -25,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Implementation of AbstractFacade that provides CRUD operations
@@ -52,7 +56,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns injected EntityManager implementation.
-     *
      * @return EntityManager implementation
      */
     @Override
@@ -62,7 +65,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass create method on passed Reservation entity
-     *
      * @param entity Reservation entity
      */
     @Override
@@ -73,13 +75,12 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass edit method on passed Reservation entity
-     *
      * @param entity Reservation entity
      */
     @Override
     @RolesAllowed({
             Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.EXIT_PARKING
+            Authorities.EXIT_PARKING, Authorities.END_RESERVATION
     })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
@@ -87,18 +88,16 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass remove method on passed Reservation entity
-     *
      * @param entity Reservation entity
      */
     @Override
-    @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    @RolesAllowed(Authorities.END_RESERVATION)
     public void remove(Reservation entity) throws ApplicationBaseException {
         super.remove(entity);
     }
 
     /**
      * Invokes superclass find method by passed entity id.
-     *
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
@@ -110,7 +109,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find with refreshing method by passed entity id.
-     *
      * @param id The UUID type identifier of the entity being searched for
      * @return Entity, wrapped in Optional class, with identifiers equals to id param
      */
@@ -124,7 +122,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Invokes superclass find all method.
-     *
      * @return All Reservation entities
      */
     @Override
@@ -135,8 +132,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     *
-     * @param page     page number
+     * @param page page number
      * @param pageSize defines the maximum number of entities per page
      * @return All Reservation entities from selected page
      */
@@ -153,8 +149,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all active Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     *
-     * @param page     page number
+     * @param page page number
      * @param pageSize defines the maximum number of entities per page
      * @return All active Reservation entities from selected page
      */
@@ -173,8 +168,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
     /**
      * Returns all historical Reservation entities, based on NamedQuery defined on Reservation class, with pagination.
-     *
-     * @param page     page number
+     * @param page page number
      * @param pageSize defines the maximum number of entities per page
      * @return All historical Reservation entities from selected page
      */
@@ -194,7 +188,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     /**
      * Returns all Reservation entities for the selected Sector, based on NamedQuery defined on Reservation class,
      * with pagination.
-     *
      * @param sectorId The UUID type identifier of the selected Sector
      * @param page     page number
      * @param pageSize defines the maximum number of entities per page
@@ -241,9 +234,9 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
 
+
     /**
      * Invokes superclass count method.
-     *
      * @return Returns the total number of Reservation entities
      */
     @Override
@@ -253,6 +246,27 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /***
+     * This method is used to find all reservations, that last more than 24 hours
+     *
+     * @param amount Length of the specified time window, used to end reservations that last more than 24 hours.
+     * @param timeUnit Time unit, indicating size of the reservation ending time window.
+     * @return List of reservation that last more than 24 hours, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForEnding(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForEnding", Reservation.class);
+            findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
+            List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Returns all active reservation for user with specified login
      *
      * @param login The user login.
