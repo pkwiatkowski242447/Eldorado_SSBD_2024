@@ -256,7 +256,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /***
-     * This method is used to find all reservations, that last more than 24 hours and are no close
+     * This method is used to find all reservations, that last more than 24 hours and are no closed
      *
      * @param amount Length of the specified time window, used to end reservations that last more than 24 hours.
      * @param timeUnit Time unit, indicating size of the reservation ending time window.
@@ -278,15 +278,15 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
 
 
     /**
-     * This method is used to find all reservations which
+     * This method is used to find all reservations marked for completing
      *
      * @return List of reservation that should be canceled automatically, If persistence exception is thrown returns empty list.
      * @throws ApplicationBaseException thrown when other unexpected problems occurred.
      */
     @RolesAllowed({Authorities.END_RESERVATION})
-    public List<Reservation> findAllReservationsMarkedForCanceling() throws ApplicationBaseException {
+    public List<Reservation> findAllReservationsMarkedForCompleting() throws ApplicationBaseException {
         try {
-            TypedQuery<Reservation> findAllReservationMarkedForCanceling = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForCanceling", Reservation.class);
+            TypedQuery<Reservation> findAllReservationMarkedForCanceling = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForCompleting", Reservation.class);
             List<Reservation> list = findAllReservationMarkedForCanceling.getResultList();
             super.refreshAll(list);
             return list;

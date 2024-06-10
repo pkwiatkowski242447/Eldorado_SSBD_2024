@@ -97,24 +97,19 @@ import java.util.List;
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.beginTime < :timestamp
-                        AND (r.status != ReservationStatus.COMPLETED_AUTOMATICALLY 
-                        AND r.status != ReservationStatus.COMPLETED_MANUALLY
-                        AND r.status != ReservationStatus.TERMINATED
-                        AND r.status != ReservationStatus.CANCELED)
+                        AND r.status = ReservationStatus.IN_PROGRESS
                         AND MOD(SIZE(r.parkingEvents), 2) = 1
                         ORDER BY r.beginTime ASC
                         """
         ),
         @NamedQuery(
-                name = "Reservation.findAllReservationsMarkedForCanceling",
+                name = "Reservation.findAllReservationsMarkedForCompleting",
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.endTime < CURRENT_TIMESTAMP
-                        AND (r.status != ReservationStatus.COMPLETED_AUTOMATICALLY 
-                        AND r.status != ReservationStatus.COMPLETED_MANUALLY
-                        AND r.status != ReservationStatus.TERMINATED
-                        AND r.status != ReservationStatus.CANCELED)
-                        AND MOD(SIZE(r.parkingEvents), 2) != 1
+                        AND (r.status = ReservationStatus.AWAITING
+                        OR r.status = ReservationStatus.IN_PROGRESS)
+                        AND MOD(SIZE(r.parkingEvents), 2) = 0
                         ORDER BY r.beginTime ASC
                         """
         ),

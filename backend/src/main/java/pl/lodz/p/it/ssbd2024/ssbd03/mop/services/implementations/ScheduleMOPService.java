@@ -65,9 +65,9 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     @RunAsSystem
     @Override
     @RolesAllowed({Authorities.END_RESERVATION})
-    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
-    public void endReservation() {
-        log.info("Method: endReservation(), used for terminating reservations which last more than 24 hours");
+    @Scheduled(fixedRate = 5L, timeUnit = TimeUnit.MINUTES, initialDelay = 5L)
+    public void terminateReservation() {
+        log.info("Method: endReservation(), used for terminating reservations which last more than scheduler.maximum_reservation_time value");
         List<Reservation> reservationsWhichLastMoreThan24h = new ArrayList<>();
         try {
             reservationsWhichLastMoreThan24h = reservationFacade.findAllReservationsMarkedForTerminating(Long.parseLong(endTime), TimeUnit.HOURS);
@@ -102,13 +102,13 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     @RunAsSystem
     @Override
     @RolesAllowed({Authorities.END_RESERVATION})
-    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    @Scheduled(fixedRate = 5L, timeUnit = TimeUnit.MINUTES, initialDelay = 5L)
     public void completeReservation() {
         log.info("Method: completeReservation(), used for completing reservations");
         List<Reservation> reservationsToEnd = new ArrayList<>();
         try {
-            reservationsToEnd = reservationFacade.findAllReservationsMarkedForCanceling();
-        } catch (NumberFormatException | ApplicationBaseException exception) {
+            reservationsToEnd = reservationFacade.findAllReservationsMarkedForCompleting();
+        } catch (ApplicationBaseException exception) {
             log.error("Exception: {} occurred while searching for reservation to be completed. Cause: {}.",
                     exception.getClass().getSimpleName(), exception.getMessage());
         }

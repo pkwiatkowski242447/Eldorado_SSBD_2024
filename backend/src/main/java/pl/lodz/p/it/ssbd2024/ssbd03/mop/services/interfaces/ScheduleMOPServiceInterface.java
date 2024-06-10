@@ -6,9 +6,12 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 public interface ScheduleMOPServiceInterface {
 
     /***
-     *This method is used to end reservation when the time of reservation has run out.
+     *This method is used to terminate reservation when the time of reservation has run out.
      */
-    void endReservation();
+    void terminateReservation();
 
+    /**
+     *This method is used to complete reservation automatically
+     */
     void completeReservation();
 }
