@@ -27,6 +27,8 @@ public class ParkingModifyDTO extends ParkingSignableDTO{
     @Schema(description = "Identifier of parking which is being edited.", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
     //@NotBlank(message = ParkingMessages.UUID_BLANK)
     //@Pattern(regexp = ParkingConsts.UUID_REGEX, message = ParkingMessages.UUID_REGEX_NOT_MET)
+    //
+    // todo change UUID -> STRING, and enable validation
     private UUID parkingId;
 
     @Schema(description = "City in which the parking is located", example = "LA", requiredMode = Schema.RequiredMode.REQUIRED)

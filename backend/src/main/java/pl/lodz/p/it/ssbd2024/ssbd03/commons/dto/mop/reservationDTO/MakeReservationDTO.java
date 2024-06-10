@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -32,16 +33,15 @@ public class MakeReservationDTO {
     @Schema(description = "Identifier of sector in which a place is being reserved.", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", requiredMode = Schema.RequiredMode.REQUIRED)
     //@NotBlank(message = DTOMessages.SECTOR_UUID_BLANK)
     //@Pattern(regexp = DTOConsts.UUID_REGEX, message = DTOMessages.SECTOR_UUID_REGEX_NOT_MET)
+    // todo UUID -> STRING and enable annotation
     private UUID sectorId;
     @Schema(description = "Reservation start time.", example = "2024-05-25T13:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @NotBlank(message = DTOMessages.BEGIN_TIME_BLANK)
-    @Pattern(regexp = DTOConsts.DATE_REGEX, message = DTOMessages.BEGIN_TIME_REGEX_NOT_MET)
+    @FutureOrPresent(message = DTOMessages.RESERVATION_BEGIN_TIME_INVALID)
     private LocalDateTime beginTime;
     @Schema(description = "Reservation end time.", example = "2024-05-25T15:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    //@NotBlank(message = DTOMessages.END_TIME_BLANK)
-    //@Pattern(regexp = DTOConsts.DATE_REGEX, message = DTOMessages.END_TIME_REGEX_NOT_MET)
+    @FutureOrPresent(message = DTOMessages.RESERVATION_END_TIME_INVALID)
     private LocalDateTime endTime;
 
     /**

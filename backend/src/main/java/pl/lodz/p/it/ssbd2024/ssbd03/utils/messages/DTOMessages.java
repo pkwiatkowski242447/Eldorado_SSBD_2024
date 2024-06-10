@@ -44,6 +44,8 @@ public class DTOMessages {
 
     // MakeReservationDTO
 
+    public static final String RESERVATION_BEGIN_TIME_INVALID = "bean.validation.reservation.make.dto.begin.time.invalid";
+    public static final String RESERVATION_END_TIME_INVALID = "bean.validation.reservation.make.dto.end.time.invalid";
     public static final String SECTOR_UUID_BLANK = "bean.validation.reservation.make.dto.uuid.blank";
     public static final String SECTOR_UUID_REGEX_NOT_MET = "bean.validation.reservation.make.dto.sector.uuid.regex.not.met";
     public static final String BEGIN_TIME_BLANK = "bean.validation.reservation.make.dto.begin.time.blank";
