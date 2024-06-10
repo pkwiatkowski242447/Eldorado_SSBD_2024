@@ -86,7 +86,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_SECTOR})
-    public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> createSector(String parkingId, @Valid SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         try {
             parkingService.createSector(UUID.fromString(parkingId),
                     sectorCreateDTO.getName(), sectorCreateDTO.getType(),
@@ -271,7 +271,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.EDIT_SECTOR})
-    public ResponseEntity<?> editSector(String ifMatch, SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> editSector(String ifMatch, @Valid SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
         }
