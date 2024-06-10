@@ -176,7 +176,7 @@ public class ParkingController implements ParkingControllerInterface {
     // MOP.9 - Activate sector
 
     @Override
-    @RolesAllowed(Authorities.ACTIVATE_SECTOR)
+    @RolesAllowed({Authorities.ACTIVATE_SECTOR})
     public ResponseEntity<?> activateSector(String id) throws ApplicationBaseException {
         try {
             parkingService.activateSector(UUID.fromString(id));
@@ -189,10 +189,10 @@ public class ParkingController implements ParkingControllerInterface {
     // MOP.10 - Deactivate sector
 
     @Override
-    @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
-    public ResponseEntity<?> deactivateSector(String id) throws ApplicationBaseException {
+    @RolesAllowed({Authorities.DEACTIVATE_SECTOR})
+    public ResponseEntity<?> deactivateSector(String id, SectorDeactivationTimeDTO deactivationTimeDTO) throws ApplicationBaseException {
         try {
-            parkingService.deactivateSector(UUID.fromString(id));
+            parkingService.deactivateSector(UUID.fromString(id), deactivationTimeDTO.getDeactivationTime());
         } catch (IllegalArgumentException exception) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }

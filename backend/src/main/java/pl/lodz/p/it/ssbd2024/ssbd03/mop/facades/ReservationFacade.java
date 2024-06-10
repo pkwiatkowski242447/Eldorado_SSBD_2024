@@ -75,7 +75,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @Override
     @RolesAllowed({
             Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.EXIT_PARKING, Authorities.END_RESERVATION, Authorities.CANCEL_RESERVATION
+            Authorities.EXIT_PARKING, Authorities.END_RESERVATION, Authorities.DEACTIVATE_SECTOR,
+            Authorities.CANCEL_RESERVATION
     })
     public void edit(Reservation entity) throws ApplicationBaseException {
         super.edit(entity);
@@ -247,6 +248,28 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         countAllSectorReservationInTimeframeQuery.setParameter("beginTimePlusMaxReservationTime", beginTime.plusHours(maxReservationHours));
         countAllSectorReservationInTimeframeQuery.setParameter("current_timestamp", benchmark);
         return Objects.requireNonNullElse(countAllSectorReservationInTimeframeQuery.getSingleResult(), 0L);
+    }
+
+    /**
+     * This method is used to retrieve all reservation that need to be cancelled because of the deactivation of the
+     * sector for which they were made.
+     *
+     * @param sectorId Identifier of the sector to be deactivated.
+     * @param cancellationTimeWindow Beginning of the time window before the deactivation.
+     * @return List of all the reservations that need to be cancelled.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by the exception
+     * handling aspects.
+     */
+    @RolesAllowed({Authorities.DEACTIVATE_SECTOR})
+    public List<Reservation> getAllReservationsToCancelBeforeDeactivation(UUID sectorId, LocalDateTime cancellationTimeWindow)
+            throws ApplicationBaseException {
+        TypedQuery<Reservation> getAllReservationsForDeactivation = getEntityManager()
+                .createNamedQuery("Reservation.findAllReservationsToCancelBeforeDeactivation", Reservation.class);
+        getAllReservationsForDeactivation.setParameter("sectorId", sectorId);
+        getAllReservationsForDeactivation.setParameter("timestamp", cancellationTimeWindow);
+        List<Reservation> list = getAllReservationsForDeactivation.getResultList();
+        super.refreshAll(list);
+        return list;
     }
 
     /**

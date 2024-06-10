@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
@@ -31,7 +30,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -136,13 +134,13 @@ public class ReservationService implements ReservationServiceInterface {
                         .getName()
         ).orElseThrow(ReservationNotFoundException::new);
 
-        if (reservation.getStatus() == Reservation.ReservationStatus.CANCELED) throw new ReservationAlreadyCancelledException();
+        if (reservation.getStatus() == Reservation.ReservationStatus.CANCELLED) throw new ReservationAlreadyCancelledException();
 
         if (reservation.getBeginTime().minusHours(cancellationMaxHoursBeforeReservation).isBefore(LocalDateTime.now())) {
             throw new ReservationCancellationLateAttempt();
         }
 
-        reservation.setStatus(Reservation.ReservationStatus.CANCELED);
+        reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
         reservationFacade.edit(reservation);
     }
 

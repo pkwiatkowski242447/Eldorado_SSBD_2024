@@ -329,7 +329,10 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
      *                                  facade exception handling aspect.
      */
-    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION})
+    @RolesAllowed({
+            Authorities.EDIT_SECTOR, Authorities.DEACTIVATE_SECTOR,
+            Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION
+    })
     public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
         getEntityManager().flush();

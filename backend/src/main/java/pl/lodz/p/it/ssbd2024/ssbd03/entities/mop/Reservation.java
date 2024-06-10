@@ -75,13 +75,21 @@ import java.util.List;
                         ORDER BY r.beginTime ASC
                         """
         ),
+        // Deactivating sector
+        @NamedQuery(
+                name = "Reservation.findAllReservationsToCancelBeforeDeactivation",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.sector.id = :sectorId
+                            AND r.beginTime < :timestamp
+                        ORDER BY r.beginTime ASC"""
+        ),
         @NamedQuery(
                 name = "Reservation.findClientReservation",
                 query = """
                         SELECT r FROM Reservation r
-                         WHERE r.id = :reservationId
-                           AND r.client.account.login = :ownerLogin
-                        """
+                        WHERE r.id = :reservationId
+                            AND r.client.account.login = :ownerLogin"""
         ),
         // Creating reservation
         @NamedQuery(
@@ -97,7 +105,7 @@ import java.util.List;
                         SELECT COUNT(*) FROM Reservation r
                         WHERE r.sector.id = :sectorId
                         AND
-                        r.status != 'CANCELED'
+                        r.status != ReservationStatus.CANCELLED
                         AND
                         (
                             (
@@ -138,7 +146,7 @@ public class Reservation extends AbstractEntity implements Serializable {
     /**
      * Enum class representing the status of the Reservation entity.
      */
-    public enum ReservationStatus { AWAITING, IN_PROGRESS, COMPLETED_MANUALLY, COMPLETED_AUTOMATICALLY, CANCELED, TERMINATED }
+    public enum ReservationStatus { AWAITING, IN_PROGRESS, COMPLETED_MANUALLY, COMPLETED_AUTOMATICALLY, CANCELLED, TERMINATED }
 
     /**
      * The client associated with this reservation.

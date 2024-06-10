@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundExc
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,10 +101,15 @@ public interface ParkingServiceInterface {
      * Deactivates sector with given id, by setting active field to false.
      *
      * @param id Sector's id.
+<<<<<<< HEAD
+     * @param deactivationTime Time of the sectors planned deactivation.
+     * @throws SectorNotFoundException Thrown when sector with given id cannot be found in the database.
+=======
      * @throws SectorNotFoundException        Thrown when sector with given id cannot be found in the database.
+>>>>>>> 5c4dedbc97c2eef6f6e67fae5c6e202ff1f66c17
      * @throws SectorAlreadyInactiveException Thrown when trying to deactivate an inactive sector.
      */
-    void deactivateSector(UUID id) throws ApplicationBaseException;
+    void deactivateSector(UUID id, LocalDateTime deactivationTime) throws ApplicationBaseException;
 
     /**
      * Removes parking from the database by its id.

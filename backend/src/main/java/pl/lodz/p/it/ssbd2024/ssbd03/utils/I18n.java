@@ -45,6 +45,7 @@ public class I18n {
     public static final String SECTOR_ALREADY_ACTIVE = "sector.already.active.exception";
     public static final String SECTOR_ALREADY_INACTIVE = "sector.already.inactive.exception";
     public static final String SECTOR_EDIT_OF_TYPE_OR_MAX_PLACES_WHEN_ACTIVE = "sector.edit.of.type.or.max.places.when.active.exception";
+    public static final String SECTOR_DEACTIVATION_INVALID_TIME = "sector.deactivation.invalid.time.exception";
     public static final String SECTOR_WITH_GIVEN_NAME_EXISTS_EXCEPTION = "sector.name.duplicate.in.parking.exception";
     public static final String SECTOR_DELETE_EXCEPTION = "sector.delete.exception";
 

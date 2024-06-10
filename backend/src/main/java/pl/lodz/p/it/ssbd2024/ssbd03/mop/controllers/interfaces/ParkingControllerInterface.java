@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorDeactivationTimeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -190,6 +191,7 @@ public interface ParkingControllerInterface {
      * This method is used to deactivate a sector with given id.
      *
      * @param id Identifier of sector to deactivate.
+     * @param deactivationTimeDTO Data transfer object containing deactivation time for the sector.
      * @return It returns HTTP response 204 NO_CONTENT when the sector is successfully deactivated.
      * When the sector with the provided id doesn't exist, the method returns 400. When the sector is already deactivated,
      * the method returns 400. 500 INTERNAL SERVER ERROR is returned when other unexpected exception is
@@ -204,7 +206,8 @@ public interface ParkingControllerInterface {
             @ApiResponse(responseCode = "400", description = "The account has not been deactivated due to it being already inactive or because the sector is not in the database."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> deactivateSector(@PathVariable("id") String id) throws ApplicationBaseException;
+    ResponseEntity<?> deactivateSector(@PathVariable("id") String id, @RequestBody SectorDeactivationTimeDTO deactivationTimeDTO)
+            throws ApplicationBaseException;
 
     /**
      * This method is used to remove parking, that is identified with the given identifier.
@@ -231,7 +234,7 @@ public interface ParkingControllerInterface {
      * This method is used to begin parking spot allocation. Basically, it generates a parking event for entry,
      * which marks the start of the allocation, and then generates the exit code, which will be needed to end the
      * allocation. User may enter chosen parking without previously making a reservation. The spot is then assigned
-     * according to the parking's spot assignment algorithm. After choosing the spot inpromptu reservation is created.
+     * according to the parking's spot assignment algorithm. After choosing the spot in prompt reservation is created.
      *
      * @param parkingId Identifier of the parking, which the client wants to enter.
      * @return 200 OK response is returned if the allocation is started successfully, body contains exit code and basic
