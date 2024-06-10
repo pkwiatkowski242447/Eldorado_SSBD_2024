@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -84,7 +85,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.ADD_SECTOR)
-    public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> createSector(String parkingId, @Valid SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         parkingService.createSector(UUID.fromString(parkingId),
             sectorCreateDTO.getName(), sectorCreateDTO.getType(),
             sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
@@ -239,7 +240,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_SECTOR)
-    public ResponseEntity<?> editSector(String ifMatch, SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> editSector(String ifMatch, @Valid SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
         }
