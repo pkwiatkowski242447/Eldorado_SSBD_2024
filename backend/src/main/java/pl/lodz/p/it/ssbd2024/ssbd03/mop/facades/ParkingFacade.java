@@ -393,7 +393,6 @@ public class ParkingFacade extends AbstractFacade<Parking> {
             TypedQuery<Parking> findAllAvailableParking = entityManager.createNamedQuery("Parking.findAllAvailableParking", Parking.class);
             findAllAvailableParking.setFirstResult(pageNumber * pageSize);
             findAllAvailableParking.setMaxResults(pageSize);
-            findAllAvailableParking.setParameter("active", true);
             List<Parking> list = findAllAvailableParking.getResultList();
             super.refreshAll(list);
             return list;

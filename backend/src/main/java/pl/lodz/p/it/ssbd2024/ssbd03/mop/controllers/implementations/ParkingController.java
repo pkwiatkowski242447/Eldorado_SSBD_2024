@@ -309,11 +309,12 @@ public class ParkingController implements ParkingControllerInterface {
                 .stream()
                 .map(ParkingListMapper::toParkingListDTO)
                 .toList();
-        if (parkingList.isEmpty())
-            return ResponseEntity
-                    .noContent()
-                    .build();
-        else return ResponseEntity.ok(parkingList);
+
+        if (parkingList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(parkingList);
     }
 
 

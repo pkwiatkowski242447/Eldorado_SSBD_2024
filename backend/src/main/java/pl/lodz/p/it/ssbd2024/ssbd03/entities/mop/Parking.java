@@ -57,7 +57,8 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findAllAvailableParking",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.active = :active
+                        WHERE s.active = true
+                        GROUP BY s.parking
                         ORDER BY s.parking.address.city
                         """
         ),
