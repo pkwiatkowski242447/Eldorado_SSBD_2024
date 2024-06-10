@@ -32,6 +32,7 @@ public class SectorModifyDTO extends SectorSignableDTO {
 
     @NotNull(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NULL)
     @PositiveOrZero(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NEGATIVE)
+    @Max(value = SectorConsts.SECTOR_MAX_PLACES_MAX_VALUE, message = SectorMessages.SECTOR_MAX_PLACES_FULL)
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
 

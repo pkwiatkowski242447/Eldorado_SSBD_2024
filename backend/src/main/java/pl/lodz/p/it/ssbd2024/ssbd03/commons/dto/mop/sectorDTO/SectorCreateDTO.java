@@ -22,6 +22,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.SectorMessages;
 @LoggerInterceptor
 public class SectorCreateDTO {
 
+    @NotBlank(message = SectorMessages.SECTOR_NAME_BLANK)
     @Pattern(regexp = SectorConsts.SECTOR_NAME_PATTERN, message = SectorMessages.SECTOR_REGEX_NOT_MET)
     @Size(min = SectorConsts.SECTOR_NAME_LENGTH, max = SectorConsts.SECTOR_NAME_LENGTH, message = SectorMessages.SECTOR_NAME_INVALID)
     @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -34,6 +35,7 @@ public class SectorCreateDTO {
 
     @NotNull(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NULL)
     @PositiveOrZero(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NEGATIVE)
+    @Max(value = SectorConsts.SECTOR_MAX_PLACES_MAX_VALUE, message = SectorMessages.SECTOR_MAX_PLACES_FULL)
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
 

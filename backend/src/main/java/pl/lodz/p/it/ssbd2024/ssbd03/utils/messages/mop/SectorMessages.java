@@ -5,6 +5,7 @@ public class SectorMessages {
     public static final String PARKING_NULL = "bean.validation.sector.parking.null";
 
     public static final String SECTOR_NAME_INVALID = "bean.validation.sector.name.invalid";
+    public static final String SECTOR_NAME_BLANK = "bean.validation.parking.name.blank";
     public static final String SECTOR_REGEX_NOT_MET = "bean.validation.sector.name.regex.not.met";
 
     public static final String SECTOR_TYPE_NULL = "bean.validation.sector.sector.type.null";
