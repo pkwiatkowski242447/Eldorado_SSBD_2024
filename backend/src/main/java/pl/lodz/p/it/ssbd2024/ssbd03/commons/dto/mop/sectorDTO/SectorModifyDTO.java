@@ -26,7 +26,6 @@ import java.util.UUID;
 public class SectorModifyDTO extends SectorSignableDTO {
 
     @NotNull(message = SectorMessages.SECTOR_TYPE_NULL)
-    @Enumerated(EnumType.STRING)
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
 

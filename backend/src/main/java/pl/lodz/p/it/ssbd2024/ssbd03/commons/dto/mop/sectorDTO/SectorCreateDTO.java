@@ -29,7 +29,6 @@ public class SectorCreateDTO {
     private String name;
 
     @NotNull(message = SectorMessages.SECTOR_TYPE_NULL)
-    @Enumerated(EnumType.STRING)
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
 
