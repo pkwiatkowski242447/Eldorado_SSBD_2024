@@ -61,7 +61,7 @@ public interface ParkingControllerInterface {
             @ApiResponse(responseCode = "409", description = "Parking with specified data already exists"),
             @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
     })
-    ResponseEntity<?> createSector(@PathVariable("id") String parkingId, @RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
+    ResponseEntity<?> createSector(@PathVariable("id") String parkingId,@Valid @RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
 
     /**
      * This method is used to find all parking spaces in system, using pagination.
