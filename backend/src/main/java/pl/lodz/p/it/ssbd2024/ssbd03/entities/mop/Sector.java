@@ -36,6 +36,10 @@ import java.time.LocalDateTime;
         name = DatabaseConsts.SECTOR_TABLE,
         indexes = {
                 @Index(name = DatabaseConsts.SECTOR_PARKING_ID_INDEX, columnList = DatabaseConsts.SECTOR_PARKING_ID_COLUMN)
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = DatabaseConsts.SECTOR_NAME_PARKING_ID_UNIQUE_KEY,
+                        columnNames = {DatabaseConsts.SECTOR_NAME_COLUMN, DatabaseConsts.SECTOR_PARKING_ID_COLUMN})
         }
 )
 @LoggerInterceptor
@@ -53,14 +57,14 @@ import java.time.LocalDateTime;
                 name = "Sector.findWithAvailablePlaces",
                 query = """
                         SELECT s FROM Sector s
-                        WHERE s.availablePlaces != 0 AND s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight>0)
+                        WHERE s.availablePlaces != 0 AND s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight > 0)
                         ORDER BY s.name"""
         ),
         @NamedQuery(
                 name = "Sector.findBySectorTypes",
                 query = """
                         SELECT s FROM Sector s
-                        WHERE s.type IN :sectorTypes AND :parkingId = s.parking AND (:showOnlyActive != true OR s.weight>0) 
+                        WHERE s.type IN :sectorTypes AND :parkingId = s.parking AND (:showOnlyActive != true OR s.weight > 0)
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
         @NamedQuery(
@@ -104,7 +108,7 @@ public class Sector extends AbstractEntity implements Serializable {
      */
     @Pattern(regexp = SectorConsts.SECTOR_NAME_PATTERN, message = SectorMessages.SECTOR_REGEX_NOT_MET)
     @Size(min = SectorConsts.SECTOR_NAME_LENGTH, max = SectorConsts.SECTOR_NAME_LENGTH, message = SectorMessages.SECTOR_NAME_INVALID)
-    @Column(name = DatabaseConsts.SECTOR_NAME_COLUMN, unique = true, nullable = false, length = 5)
+    @Column(name = DatabaseConsts.SECTOR_NAME_COLUMN, nullable = false, length = 5)
     @Setter
     private String name;
 

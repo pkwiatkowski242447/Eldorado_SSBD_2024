@@ -5,7 +5,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +20,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
@@ -42,7 +43,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findAll",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE (:showOnlyActive != true OR s.weight>0)
+                        WHERE (:showOnlyActive != true OR s.weight > 0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),

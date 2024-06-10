@@ -59,23 +59,6 @@ import java.util.List;
                        """
         ),
         @NamedQuery(
-                name = "Reservation.findActiveReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.client.id = :clientId
-                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
-                        ORDER BY r.beginTime"""
-        ),
-        @NamedQuery(
-                name = "Reservation.findHistoricalReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.client.id = :clientId
-                          AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
-                        ORDER BY r.beginTime
-                        """
-        ),
-        @NamedQuery(
                 name = "Reservation.findHistoricalReservationsByLogin",
                 query = """
                        SELECT r FROM Reservation r
@@ -83,14 +66,6 @@ import java.util.List;
                           AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
                         ORDER BY r.beginTime
                        """
-        ),
-        @NamedQuery(
-                name = "Reservation.findSectorReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.sector.id = :sectorId
-                        ORDER BY r.beginTime
-                        """
         ),
         @NamedQuery(
                 name = "Reservation.findAllReservationsMarkedForEnding",

@@ -17,15 +17,19 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @LoggerInterceptor
 public class SectorCreateDTO {
 
-    @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The name of the sector", example = "AB-09", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
-    @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+
+    @Schema(description = "The type of the sector", example = "UNDERGROUND", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
-    @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+
+    @Schema(description = "The maximum number of parking spots in the sector", example = "100", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
-    @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+
+    @Schema(description = "The weight of the sector", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
-    @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)
+
+    @Schema(description = "Determines whether the sector is active", defaultValue = "false", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean active;
 
     /**
