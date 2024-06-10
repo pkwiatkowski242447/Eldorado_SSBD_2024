@@ -89,7 +89,7 @@ INSERT INTO public.user_level (id, creation_timestamp, level, account_id, versio
 INSERT INTO public.client_data (id, type) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', 'BASIC');
 
 -- Parking
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, '00-000', 'BoatCity', 'Palki', 0);
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, 'LEAST_OCCUPIED','00-000', 'BoatCity', 'Palki', 0);
 
 -- First Sector S1
 INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, true, 20, 50, 1, 'S1', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
@@ -210,7 +210,7 @@ INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, cl
 
 -- Enter without reservation check methods tests
 
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('3591ced3-996e-49b4-8c56-40fe91193b1d', current_timestamp, '99-999', 'test1', 'test1', 0);
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('3591ced3-996e-49b4-8c56-40fe91193b1d', current_timestamp, 'LEAST_OCCUPIED', '99-999', 'test1', 'test1', 0);
 
 INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('14d51050-ffe2-4da2-abd2-4e6d06759ea5', current_timestamp, true, 0, 5, 3, 'UC-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
 INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('933bcce5-a38c-4b09-bd60-2b746d9f40e8', current_timestamp, true, 1, 2, 3, 'UC-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);

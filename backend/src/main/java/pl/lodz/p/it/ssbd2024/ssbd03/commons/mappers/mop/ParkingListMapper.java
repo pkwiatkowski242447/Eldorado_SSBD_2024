@@ -14,6 +14,6 @@ public class ParkingListMapper {
             sectorTypeList.add(p.getSectors().get(i).getType().name());
         }
         return new ParkingOutputListDTO(p.getId(), p.getAddress().getCity(), p.getAddress().getZipCode(), p.getAddress().getStreet(),
-                new ArrayList<>(new HashSet<>(sectorTypeList)));
+                new ArrayList<>(new HashSet<>(sectorTypeList)), p.getSectorStrategy());
     }
 }

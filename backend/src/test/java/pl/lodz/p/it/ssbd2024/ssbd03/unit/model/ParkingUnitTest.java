@@ -54,33 +54,33 @@ public class ParkingUnitTest {
 
     @Test
     void parkingConstructorNotNullObjectPositiveTest() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         assertNotNull(parking);
     }
 
     @Test
     void parkingGetAddressTestPositive() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         Assertions.assertEquals(ADDRESS, parking.getAddress());
     }
 
     @Test
     void parkingGetSectorsTestPositive() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         assertNotNull(parking.getSectors());
         Assertions.assertEquals(0, parking.getSectors().size());
     }
 
     @Test
     void parkingSetAddressTestPositive() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         parking.setAddress(ADDRESS_NO_2);
         Assertions.assertEquals(ADDRESS_NO_2, parking.getAddress());
     }
 
     @Test
     void parkingAddSectorPositiveTest() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         parking.addSector(SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
         Assertions.assertEquals(1, parking.getSectors().size());
 
@@ -93,7 +93,7 @@ public class ParkingUnitTest {
 
     @Test
     void parkingDeleteSectorPositiveText() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         parking.addSector(SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
         parking.addSector(SECTOR_NAME_NO_2, SECTOR_TYPE_NO_2, MAX_PLACES_NO_2, MAX_WEIGHT_NO_2, true);
 
@@ -109,7 +109,7 @@ public class ParkingUnitTest {
 
     @Test
     void parkingToStringPositiveTest() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         String testString = parking.toString();
         assertNotNull(testString);
         assertFalse(testString.isEmpty());
@@ -118,7 +118,7 @@ public class ParkingUnitTest {
 
     @Test
     void parkingAssignClient() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         parking.assignClient();
         ///TODO implement
 
@@ -126,7 +126,7 @@ public class ParkingUnitTest {
 
     @Test
     void parkingChangeSectorWeight() {
-        Parking parking = new Parking(ADDRESS);
+        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         parking.changeSectorWeight(SECTOR_NAME_NO_1, 12);
         ///TODO implement
     }

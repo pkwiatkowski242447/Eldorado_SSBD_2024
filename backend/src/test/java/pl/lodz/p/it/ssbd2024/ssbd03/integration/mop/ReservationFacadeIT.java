@@ -67,7 +67,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     @BeforeEach
     public void setup() {
         address = new Address("Strykow","90-000","Kosciuszki");
-        parking = new Parking(address);
+        parking = new Parking(address, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         sector = new Sector(parking,"AA-02", Sector.SectorType.COVERED,23,11, true);
         reservation = new Reservation(sector, LocalDateTime.now());
     }

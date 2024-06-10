@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations.ValueOfEnum;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
 
 import java.util.UUID;
 
@@ -29,11 +32,9 @@ public class ParkingModifyDTO extends ParkingSignableDTO{
     @Schema(description = "Street of the city in which the parking is located", example = "white", requiredMode = Schema.RequiredMode.REQUIRED)
     private String street;
 
-    public ParkingModifyDTO(String city, String zipCode, String street) {
-        this.city = city;
-        this.zipCode = zipCode;
-        this.street = street;
-    }
+    @ValueOfEnum(enumClass = Parking.SectorDeterminationStrategy.class, message = DTOMessages.PARKING_ENUM_INVALID)
+    @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String strategy;
 
     /**
      * Custom toString() method implementation that

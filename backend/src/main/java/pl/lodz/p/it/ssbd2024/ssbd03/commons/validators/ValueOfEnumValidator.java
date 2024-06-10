@@ -1,7 +1,8 @@
-package pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations;
+package pl.lodz.p.it.ssbd2024.ssbd03.commons.validators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations.ValueOfEnum;
 
 import java.util.List;
 import java.util.stream.Collectors;

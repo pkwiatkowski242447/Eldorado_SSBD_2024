@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.validators.ValueOfEnumValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

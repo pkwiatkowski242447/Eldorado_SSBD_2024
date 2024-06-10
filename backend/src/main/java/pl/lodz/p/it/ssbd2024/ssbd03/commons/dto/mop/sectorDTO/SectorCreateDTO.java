@@ -10,6 +10,7 @@ import lombok.Setter;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations.ValueOfEnum;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class SectorCreateDTO {
     @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ValueOfEnum(enumClass = Sector.SectorType.class, message = "piwo")
+    @ValueOfEnum(enumClass = Sector.SectorType.class, message = DTOMessages.SECTOR_ENUM_INVALID)
     private String type;
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;

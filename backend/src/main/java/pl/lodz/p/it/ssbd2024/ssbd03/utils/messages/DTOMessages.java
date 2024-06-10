@@ -24,4 +24,10 @@ public class DTOMessages {
     public static final String LANGUAGE_BLANK = "bean.validation.account.login.dto.language.blank";
     public static final String LANGUAGE_SIZE_INVALID = "bean.validation.account.login.dto.language.size.invalid";
     public static final String LANGUAGE_REGEX_NOT_MET = "bean.validation.account.login.dto.language.regex.not.met";
+
+    // ParkingCreateDTO Messages ---------------------------------------------------------------
+    public static final String PARKING_ENUM_INVALID = "bean.validation.parking.enum.invalid";
+
+    // SectorCreateDTO Messages ---------------------------------------------------------------
+    public static final String SECTOR_ENUM_INVALID = "bean.validation.sector.enum.invalid";
 }

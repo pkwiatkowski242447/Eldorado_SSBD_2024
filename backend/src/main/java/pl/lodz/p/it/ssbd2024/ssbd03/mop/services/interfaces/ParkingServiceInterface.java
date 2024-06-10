@@ -27,9 +27,10 @@ public interface ParkingServiceInterface {
      * @param city Address - city.
      * @param zipCode Address - zip code.
      * @param street Address - street.
+     * @param strategy Algorithm used in determining sector when entering parking without reservation.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException;
+    Parking createParking(String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) throws ApplicationBaseException;
 
     /**
      * Create sector in the given parking.

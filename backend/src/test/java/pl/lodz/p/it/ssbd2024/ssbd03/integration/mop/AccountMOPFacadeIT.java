@@ -66,7 +66,7 @@ public class AccountMOPFacadeIT extends TestcontainersConfig {
     @BeforeEach
     public void setup() {
         address = new Address("dd", "casc", "wqc");
-        parking = new Parking(address);
+        parking = new Parking(address, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11, true);
         reservation = new Reservation(sector, LocalDateTime.now());
         parkingEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.ENTRY);

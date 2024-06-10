@@ -37,10 +37,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.LeastOccupied;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.LeastOccupiedWeighted;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.MostOccupied;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.SectorStrategy;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccupied;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccupiedWeighted;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.MostOccupied;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.SectorStrategy;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,10 +82,9 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.ADD_PARKING)
-    public Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException {
+    public Parking createParking(String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) throws ApplicationBaseException {
         Address address = new Address(city, zipCode, street);
-        Parking parking = new Parking(address);
-        log.error(parking.getSectors().toString());
+        Parking parking = new Parking(address, strategy);
         this.parkingFacade.create(parking);
         return parking;
     }
@@ -259,7 +258,11 @@ public class ParkingService implements ParkingServiceInterface {
 
         //TODO add multiple algorithms for determining sector assignment
         if (result.isEmpty()) throw new ReservationNoAvailablePlaceException();
-        SectorStrategy sectorStrategy = new LeastOccupiedWeighted();
+        SectorStrategy sectorStrategy = switch (result.getFirst().getParking().getSectorStrategy()) {
+            case LEAST_OCCUPIED -> new LeastOccupied();
+            case MOST_OCCUPIED -> new MostOccupied();
+            case LEAST_OCCUPIED_WEIGHTED -> new LeastOccupiedWeighted();
+        };
         Sector chosenSector = sectorStrategy.choose(result);
 
         Reservation reservation = new Reservation(client, chosenSector, currentTime);

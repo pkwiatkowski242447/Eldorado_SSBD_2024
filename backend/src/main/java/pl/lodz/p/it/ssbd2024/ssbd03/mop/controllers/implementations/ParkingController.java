@@ -82,7 +82,7 @@ public class ParkingController implements ParkingControllerInterface {
     @RolesAllowed(Authorities.ADD_PARKING)
     public ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
         Parking parking = parkingService.createParking(parkingCreateDTO.getCity(), parkingCreateDTO.getZipCode(),
-                parkingCreateDTO.getStreet());
+                parkingCreateDTO.getStreet(), Parking.SectorDeterminationStrategy.valueOf(parkingCreateDTO.getStrategy()));
         return ResponseEntity.created(URI.create(this.createdParkingResourceURL + parking.getId())).build();
     }
 
