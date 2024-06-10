@@ -37,6 +37,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.LeastOccupied;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.LeastOccupiedWeighted;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.MostOccupied;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorChoosingStrategy.SectorStrategy;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -255,13 +259,14 @@ public class ParkingService implements ParkingServiceInterface {
 
         //TODO add multiple algorithms for determining sector assignment
         if (result.isEmpty()) throw new ReservationNoAvailablePlaceException();
-        Sector chosenSector = result.getFirst();
+        SectorStrategy sectorStrategy = new LeastOccupiedWeighted();
+        Sector chosenSector = sectorStrategy.choose(result);
 
         Reservation reservation = new Reservation(client, chosenSector, currentTime);
         reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
         reservationFacade.create(reservation);
 
-        //TODO zmiana na occupiedSpaces
+        //TODO zmiana na occupiedPlaces
         chosenSector.setAvailablePlaces(chosenSector.getAvailablePlaces() - 1);
         parkingFacade.editSector(chosenSector);
 
