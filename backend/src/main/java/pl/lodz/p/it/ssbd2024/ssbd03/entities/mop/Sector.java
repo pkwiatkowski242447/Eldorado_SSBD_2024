@@ -36,6 +36,9 @@ import java.time.LocalDateTime;
         name = DatabaseConsts.SECTOR_TABLE,
         indexes = {
                 @Index(name = DatabaseConsts.SECTOR_PARKING_ID_INDEX, columnList = DatabaseConsts.SECTOR_PARKING_ID_COLUMN)
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {DatabaseConsts.SECTOR_NAME_COLUMN, DatabaseConsts.SECTOR_PARKING_ID_COLUMN})
         }
 )
 @LoggerInterceptor
@@ -104,7 +107,7 @@ public class Sector extends AbstractEntity implements Serializable {
      */
     @Pattern(regexp = SectorConsts.SECTOR_NAME_PATTERN, message = SectorMessages.SECTOR_REGEX_NOT_MET)
     @Size(min = SectorConsts.SECTOR_NAME_LENGTH, max = SectorConsts.SECTOR_NAME_LENGTH, message = SectorMessages.SECTOR_NAME_INVALID)
-    @Column(name = DatabaseConsts.SECTOR_NAME_COLUMN, unique = true, nullable = false, length = 5)
+    @Column(name = DatabaseConsts.SECTOR_NAME_COLUMN, nullable = false, length = 5)
     @Setter
     private String name;
 

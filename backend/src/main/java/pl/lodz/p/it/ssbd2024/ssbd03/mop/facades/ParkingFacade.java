@@ -15,10 +15,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -300,7 +302,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param sector Sector to be modified.
      */
-    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION})
+    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
         getEntityManager().flush();
@@ -360,5 +362,30 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {
         getEntityManager().lock(sector, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+    }
+
+
+    /**
+     * Counts all reservations that need place reservations in the moment of invocation, in the sectors that given user
+     * can park.
+     *
+     * @return List of value pairs of sector and number of reservations blocking space currently.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
+    public List<Sector> getAvailableSectorsNow(Client.ClientType clientType, UUID parkingId, LocalDateTime now, int maxReservationHours) throws ApplicationBaseException {
+        TypedQuery<Sector> query = entityManager.createNamedQuery("Reservation.getAvailableBasicSectorsNow", Sector.class);
+       if( clientType == Client.ClientType.STANDARD){
+           System.out.println("dupa standard");
+            query = entityManager.createNamedQuery("Reservation.getAvailableStandardSectorsNow", Sector.class);
+        } else if( clientType == Client.ClientType.PREMIUM){
+           System.out.println("dupa premium");
+            query = entityManager.createNamedQuery("Reservation.getAvailablePremiumSectorsNow", Sector.class);
+        }
+        query.setParameter("parkingId", parkingId);
+        query.setParameter("currentTime", LocalDateTime.now());
+        query.setParameter("currentTimePlusReserve", now.plusHours(maxReservationHours));
+        query.setParameter("currentTimeMinusReserve", now.minusHours(maxReservationHours));
+        return query.getResultList();
     }
 }

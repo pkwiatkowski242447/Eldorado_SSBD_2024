@@ -25,7 +25,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.integrity.ParkingDataIntegrityCompromisedException;
@@ -202,7 +205,11 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
     public ResponseEntity<?> enterParkingWithoutReservation(String parkingId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        boolean isAnonymous = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString().isEmpty();
+
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Reservation reservation = parkingService.enterParkingWithoutReservation(UUID.fromString(parkingId), login, isAnonymous);
+        return ResponseEntity.ok(UserActiveReservationListMapper.toSectorListDTO(reservation));
     }
 
     @Override

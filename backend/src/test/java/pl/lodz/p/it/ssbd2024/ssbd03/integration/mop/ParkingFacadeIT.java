@@ -18,12 +18,14 @@ import org.springframework.web.context.WebApplicationContext;
 import pl.lodz.p.it.ssbd2024.ssbd03.TestcontainersConfig;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.WebConfig;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,9 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
@@ -58,6 +58,8 @@ public class ParkingFacadeIT extends TestcontainersConfig {
 
     @Autowired
     ParkingFacade parkingFacade;
+    @Autowired
+    ReservationFacade reservationFacade;
 
     private Address address;
     private Parking parking;
@@ -293,6 +295,116 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         parkingFacade.removeSector(sector);
         List<Sector> listOfSectors = new ArrayList<>();
         assertEquals(listOfSectors, parking.getSectors());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
+    public void countSectorsReservationsNowTestAnonymousOrBasic() throws ApplicationBaseException {
+        List<Sector> availableSectors = parkingFacade.getAvailableSectorsNow(Client.ClientType.BASIC, UUID.fromString("3591ced3-996e-49b4-8c56-40fe91193b1d"), LocalDateTime.now(), 24);
+        //names of the sectors from script
+        Sector uc1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("14d51050-ffe2-4da2-abd2-4e6d06759ea5")).orElse(null);
+        Sector uc2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("933bcce5-a38c-4b09-bd60-2b746d9f40e8")).orElse(null);
+        Sector uc3 = parkingFacade.findAndRefreshSectorById(UUID.fromString("828228e6-2fa7-418e-8cfe-7f4d79737557")).orElse(null);
+        Sector uc4 = parkingFacade.findAndRefreshSectorById(UUID.fromString("38c70882-c413-467d-bdd8-c5ed5f9128d0")).orElse(null);
+
+        Sector co1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("f274420a-1322-4530-bfcb-4e515dd5a920")).orElse(null);
+        Sector co2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("ae65eca6-669d-43ec-8c35-39f4eb6b72bb")).orElse(null);
+
+        Sector un1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("65c51075-0749-4304-984a-9cb926e65aab")).orElse(null);
+        Sector un2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("b9f5bb0c-d19f-4101-ac57-d758e063ac3e")).orElse(null);
+
+        assertTrue(availableSectors.contains(uc3));
+        assertTrue(availableSectors.contains(uc4));
+        assertTrue(availableSectors.contains(uc2));
+        assertFalse(availableSectors.contains(uc1));
+
+        assertFalse(availableSectors.contains(co2));
+        assertFalse(availableSectors.contains(co1));
+
+        assertFalse(availableSectors.contains(un2));
+        assertFalse(availableSectors.contains(un1));
+
+        assertEquals(3,availableSectors.size());
+
+//        Reservation reservation1 = new Reservation(null, uc2, LocalDateTime.now());
+//        reservation1.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
+//        reservationFacade.create(reservation1);
+//
+//        assertTrue(availableSectors.contains(uc3));
+//        assertTrue(availableSectors.contains(uc4));
+//        assertFalse(availableSectors.contains(uc2));
+//        assertFalse(availableSectors.contains(uc1));
+//
+//        assertFalse(availableSectors.contains(co2));
+//        assertFalse(availableSectors.contains(co1));
+//
+//        assertFalse(availableSectors.contains(un2));
+//        assertFalse(availableSectors.contains(un1));
+//
+//        assertEquals(2,availableSectors.size());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
+    public void countSectorsReservationsNowTestStandard() throws ApplicationBaseException {
+        List<Sector> availableSectors = parkingFacade.getAvailableSectorsNow(Client.ClientType.STANDARD, UUID.fromString("3591ced3-996e-49b4-8c56-40fe91193b1d"), LocalDateTime.now(),  24);
+        //names of the sectors from script
+        Sector uc1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("14d51050-ffe2-4da2-abd2-4e6d06759ea5")).orElse(null);
+        Sector uc2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("933bcce5-a38c-4b09-bd60-2b746d9f40e8")).orElse(null);
+        Sector uc3 = parkingFacade.findAndRefreshSectorById(UUID.fromString("828228e6-2fa7-418e-8cfe-7f4d79737557")).orElse(null);
+        Sector uc4 = parkingFacade.findAndRefreshSectorById(UUID.fromString("38c70882-c413-467d-bdd8-c5ed5f9128d0")).orElse(null);
+
+        Sector co1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("f274420a-1322-4530-bfcb-4e515dd5a920")).orElse(null);
+        Sector co2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("ae65eca6-669d-43ec-8c35-39f4eb6b72bb")).orElse(null);
+
+        Sector un1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("65c51075-0749-4304-984a-9cb926e65aab")).orElse(null);
+        Sector un2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("b9f5bb0c-d19f-4101-ac57-d758e063ac3e")).orElse(null);
+
+        assertTrue(availableSectors.contains(uc3));
+        assertTrue(availableSectors.contains(uc4));
+        assertTrue(availableSectors.contains(uc2));
+        assertFalse(availableSectors.contains(uc1));
+
+        assertTrue(availableSectors.contains(co2));
+        assertFalse(availableSectors.contains(co1));
+
+        assertFalse(availableSectors.contains(un2));
+        assertFalse(availableSectors.contains(un1));
+
+        assertEquals(4,availableSectors.size());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.REQUIRED)
+    @WithMockUser(roles = {Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
+    public void countSectorsReservationsNowTestPremium() throws ApplicationBaseException {
+        List<Sector> availableSectors = parkingFacade.getAvailableSectorsNow(Client.ClientType.PREMIUM, UUID.fromString("3591ced3-996e-49b4-8c56-40fe91193b1d"), LocalDateTime.now(), 24);
+        //names of the sectors from script
+        Sector uc1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("14d51050-ffe2-4da2-abd2-4e6d06759ea5")).orElse(null);
+        Sector uc2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("933bcce5-a38c-4b09-bd60-2b746d9f40e8")).orElse(null);
+        Sector uc3 = parkingFacade.findAndRefreshSectorById(UUID.fromString("828228e6-2fa7-418e-8cfe-7f4d79737557")).orElse(null);
+        Sector uc4 = parkingFacade.findAndRefreshSectorById(UUID.fromString("38c70882-c413-467d-bdd8-c5ed5f9128d0")).orElse(null);
+
+        Sector co1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("f274420a-1322-4530-bfcb-4e515dd5a920")).orElse(null);
+        Sector co2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("ae65eca6-669d-43ec-8c35-39f4eb6b72bb")).orElse(null);
+
+        Sector un1 = parkingFacade.findAndRefreshSectorById(UUID.fromString("65c51075-0749-4304-984a-9cb926e65aab")).orElse(null);
+        Sector un2 = parkingFacade.findAndRefreshSectorById(UUID.fromString("b9f5bb0c-d19f-4101-ac57-d758e063ac3e")).orElse(null);
+
+        assertTrue(availableSectors.contains(uc3));
+        assertTrue(availableSectors.contains(uc4));
+        assertTrue(availableSectors.contains(uc2));
+        assertFalse(availableSectors.contains(uc1));
+
+        assertTrue(availableSectors.contains(co2));
+        assertFalse(availableSectors.contains(co1));
+
+        assertTrue(availableSectors.contains(un2));
+        assertFalse(availableSectors.contains(un1));
+
+        assertEquals(5,availableSectors.size());
     }
 
 //    @Test

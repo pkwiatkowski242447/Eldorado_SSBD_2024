@@ -27,23 +27,25 @@ import java.io.OutputStream;
 public class JWTRequiredFilter extends OncePerRequestFilter {
 
     private static final String[] WHITELIST = {
-            "/api/v1/auth/login-credentials",
-            "/api/v1/auth/login-auth-code",
-            "/api/v1/register/client",
-            "/api/v1/accounts/forgot-password",
-            "/api/v1/accounts/change-password",
-            "/api/v1/accounts/activate-account",
-            "/api/v1/accounts/confirm-email",
-            "/api/v1/accounts/restore-access",
-            "/api/v1/accounts/restore-token",
-            "/v3/api-docs",
-            "/swagger-ui",
-            "/swagger-resources",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/api/v1/parking/sectors/get",
-            "/api/v1/parking/active"
+            "/api/v1/auth/login-credentials.*",
+            "/api/v1/auth/login-auth-code.*",
+            "/api/v1/register/client.*",
+            "/api/v1/accounts/forgot-password.*",
+            "/api/v1/accounts/change-password.*",
+            "/api/v1/accounts/activate-account.*",
+            "/api/v1/accounts/confirm-email.*",
+            "/api/v1/accounts/restore-access.*",
+            "/api/v1/accounts/restore-token.*",
+            "/v3/api-docs.*",
+            "/swagger-ui.*",
+            "/swagger-resources.*",
+            "/configuration/ui.*",
+            "/configuration/security.*",
+            "/swagger-ui.html.*",
+            "/api/v1/parking/client/sectors/.*",
+            "/api/v1/parking/active.*",
+            "/api/v1/parking/get.*",
+            "/api/v1/parking/.*/enter"
     };
 
     @Override
@@ -67,7 +69,7 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         for (String key : WHITELIST) {
-            if (request.getRequestURI().startsWith(key)) return true;
+            if (request.getRequestURI().matches(key)) return true;
         }
         return false;
     }

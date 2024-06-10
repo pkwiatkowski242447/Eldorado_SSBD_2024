@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingAddressAlreadyTakenException;
@@ -159,12 +160,12 @@ public interface ParkingServiceInterface {
      * by a registered client this method also sends an e-mail notification about beginning of the allocation
      * with the allocation code, used to end the reservation later.
      *
-     * @param userName Login of the user, who performs the action. May be null if the entry is made by an anonymous user
+     * @param login Login of the user, who performs the action. May be null if the entry is made by an anonymous user
      * @return Data transfer object containing allocation code, used later for ending the allocation, and basic
      * information about the assigned sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException;
+    Reservation enterParkingWithoutReservation(UUID parkingId, String login, boolean isAnonymous) throws ApplicationBaseException;
 
     /**
      * Ends the parking allocation by registering the end of a parking event.

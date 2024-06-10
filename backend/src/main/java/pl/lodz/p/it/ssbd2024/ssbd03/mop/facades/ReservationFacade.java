@@ -2,10 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,7 +12,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.time.LocalDateTime;
@@ -65,7 +64,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @param entity Reservation entity
      */
     @Override
-    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public void create(Reservation entity) throws ApplicationBaseException {
         super.create(entity);
     }
@@ -298,7 +297,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * If a persistence exception is thrown, then empty list is returned.
      * @throws ApplicationBaseException when other problem occurred.
      */
-    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
+    @RolesAllowed({Authorities.GET_ACTIVE_RESERVATIONS, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public long countAllActiveUserReservationByLogin(String login) throws ApplicationBaseException {
         TypedQuery<Long> countAllActiveUserReservationByLoginWithPaginationQuery =
                 entityManager.createNamedQuery("Reservation.countAllActiveUserReservationByLogin", Long.class);
@@ -328,4 +327,5 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         countAllSectorReservationInTimeframeQuery.setParameter("current_timestamp", benchmark);
         return Objects.requireNonNullElse(countAllSectorReservationInTimeframeQuery.getSingleResult(), 0L);
     }
+
 }

@@ -135,6 +135,134 @@ import java.util.List;
                             (r.beginTime BETWEEN :beginTime AND :beginTimePlusMaxReservationTime)
                         )
                         """
+        ),
+        @NamedQuery(
+                name = "Reservation.getAvailablePremiumSectorsNow",
+                query = """
+                        SELECT sectorFin FROM Sector sectorFin
+                        WHERE sectorFin.active = true
+                        AND sectorFin.parking.id = :parkingId
+                        AND sectorFin NOT IN (
+                            SELECT r.sector FROM Reservation r
+                            WHERE r.sector.active = true
+                            AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
+                            AND r.sector.parking.id = :parkingId
+                            AND
+                                (
+                                    (
+                                        (r.beginTime BETWEEN :currentTimeMinusReserve AND :currentTimePlusReserve)
+                                        AND
+                                        (
+                                            (
+                                                r.endTime IS NULL
+                                                OR
+                                                (
+                                                    r.endTime < :currentTime
+                                                    AND
+                                                    (
+                                                        :currentTime < r.endTime
+                                                        OR
+                                                        MOD(SIZE(r.parkingEvents), 2) = 1
+                                                    )
+                                                )
+                                            )
+                                            OR
+                                            r.endTime > :currentTime
+                                        )
+                                    )
+                                    OR
+                                    (r.beginTime BETWEEN :currentTime AND :currentTimePlusReserve)
+                                )
+                            GROUP BY r.sector, r.sector.maxPlaces
+                            HAVING COUNT(*) >= r.sector.maxPlaces
+                        )
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.getAvailableStandardSectorsNow",
+                query = """
+                        SELECT sectorFin FROM Sector sectorFin
+                        WHERE sectorFin.active = true
+                        AND sectorFin.type IN (SectorType.UNCOVERED, SectorType.COVERED)
+                        AND sectorFin.parking.id = :parkingId
+                        AND sectorFin NOT IN (
+                            SELECT r.sector FROM Reservation r
+                            WHERE r.sector.active = true
+                            AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
+                            AND r.sector.parking.id = :parkingId
+                            AND
+                                (
+                                    (
+                                        (r.beginTime BETWEEN :currentTimeMinusReserve AND :currentTimePlusReserve)
+                                        AND
+                                        (
+                                            (
+                                                r.endTime IS NULL
+                                                OR
+                                                (
+                                                    r.endTime < :currentTime
+                                                    AND
+                                                    (
+                                                        :currentTime < r.endTime
+                                                        OR
+                                                        MOD(SIZE(r.parkingEvents), 2) = 1
+                                                    )
+                                                )
+                                            )
+                                            OR
+                                            r.endTime > :currentTime
+                                        )
+                                    )
+                                    OR
+                                    (r.beginTime BETWEEN :currentTime AND :currentTimePlusReserve)
+                                )
+                            GROUP BY r.sector, r.sector.maxPlaces
+                            HAVING COUNT(*) >= r.sector.maxPlaces
+                        )
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.getAvailableBasicSectorsNow",
+                query = """
+                        SELECT sectorFin FROM Sector sectorFin
+                        WHERE sectorFin.active = true
+                        AND sectorFin.type = SectorType.UNCOVERED
+                        AND sectorFin.parking.id = :parkingId
+                        AND sectorFin NOT IN (
+                            SELECT r.sector FROM Reservation r
+                            WHERE r.sector.active = true
+                            AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
+                            AND r.sector.parking.id = :parkingId
+                            AND
+                                (
+                                    (
+                                        (r.beginTime BETWEEN :currentTimeMinusReserve AND :currentTimePlusReserve)
+                                        AND
+                                        (
+                                            (
+                                                r.endTime IS NULL
+                                                OR
+                                                (
+                                                    r.endTime < :currentTime
+                                                    AND
+                                                    (
+                                                        :currentTime < r.endTime
+                                                        OR
+                                                        MOD(SIZE(r.parkingEvents), 2) = 1
+                                                    )
+                                                )
+                                            )
+                                            OR
+                                            r.endTime > :currentTime
+                                        )
+                                    )
+                                    OR
+                                    (r.beginTime BETWEEN :currentTime AND :currentTimePlusReserve)
+                                )
+                            GROUP BY r.sector, r.sector.maxPlaces
+                            HAVING COUNT(*) >= r.sector.maxPlaces
+                        )
+                        """
         )
 })
 public class Reservation extends AbstractEntity implements Serializable {
