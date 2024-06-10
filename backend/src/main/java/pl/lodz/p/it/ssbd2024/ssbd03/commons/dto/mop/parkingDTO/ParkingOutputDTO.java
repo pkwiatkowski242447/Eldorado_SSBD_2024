@@ -31,7 +31,7 @@ public class ParkingOutputDTO extends ParkingSignableDTO {
     /***
      * All arguments constructor for ParkingOutputDTO - with calling constructor of superclass.
      */
-    public ParkingOutputDTO (Long version, UUID parkingId, String city, String zipCode, String street ){
+    public ParkingOutputDTO(Long version, UUID parkingId, String city, String zipCode, String street) {
         super(version, parkingId);
         this.city = city;
         this.zipCode = zipCode;

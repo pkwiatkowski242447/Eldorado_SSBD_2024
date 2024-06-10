@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,8 +13,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @LoggerInterceptor
-public class ParkingModifyDTO extends ParkingSignableDTO{
-
+public class ParkingModifyDTO extends ParkingSignableDTO {
 
     @Schema(description = "City in which the parking is located", example = "LA", requiredMode = Schema.RequiredMode.REQUIRED)
     private String city;
