@@ -4,7 +4,6 @@ import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,45 +51,28 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
     }
 
     /**
-     * Persists a new ParkingEvent to the database.
+     * Persists a new parkingEvent entity object in the database.
      *
      * @param entity ParkingEvent to be persisted.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
-    @RolesAllowed({Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.EXIT_PARKING}
-    )
+    @RolesAllowed({
+            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
+            Authorities.EXIT_PARKING
+    })
     public void create(ParkingEvent entity) throws ApplicationBaseException {
         super.create(entity);
     }
 
     /**
-     * Forces modification of the ParkingEvent in the database.
-     *
-     * @param entity ParkingEvent to be modified.
-     */
-    @Override
-    @DenyAll
-    public void edit(ParkingEvent entity) throws ApplicationBaseException {
-        super.edit(entity);
-    }
-
-    /**
-     * Removes a ParkingEvent from the database.
-     *
-     * @param entity ParkingEvent to be removed from the database.
-     */
-    @Override
-    @DenyAll
-    public void remove(ParkingEvent entity) throws ApplicationBaseException {
-        super.remove(entity);
-    }
-
-    /**
-     * Retrieves a ParkingEvent by the ID.
+     * Retrieves a parkingEvent by its identifier.
      *
      * @param id ID of the ParkingEvent to be retrieved.
      * @return If an ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @DenyAll
@@ -100,48 +81,16 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
     }
 
     /**
-     * Retrieves a ParkingEvent by the ID and forces its refresh.
+     * Retrieves a ParkingEvent by its identifier and forces its refresh.
      *
      * @param id ID of the ParkingEvent to be retrieved.
      * @return If a ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @DenyAll
     public Optional<ParkingEvent> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
-    }
-
-    /**
-     * Retrieves all ParkingEvents.
-     *
-     * @return List containing all ParkingEvents.
-     */
-    @Override
-    @DenyAll
-    public List<ParkingEvent> findAll() throws ApplicationBaseException {
-        return super.findAll();
-    }
-
-    /**
-     * Counts the number of the ParkingEvents in the database.
-     *
-     * @return Number of ParkingEvents in the database.
-     */
-    @Override
-    @DenyAll
-    public int count() throws ApplicationBaseException {
-        return super.count();
-    }
-
-    /***
-     * Remove parking event that is linked to reservation with specified id
-     *
-     * @param reservationId UUID of reservation
-     */
-    @RolesAllowed({Authorities.END_RESERVATION})
-    public void removeByReservation(UUID reservationId) {
-        getEntityManager().createNamedQuery("ParkingEvent.removeByReservation")
-                .setParameter("reservationId", reservationId)
-                .executeUpdate();
     }
 }

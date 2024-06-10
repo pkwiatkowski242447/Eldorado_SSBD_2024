@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +69,14 @@ public interface ReservationControllerInterface {
      *                                  layer of facade and service components in the application.
      */
     @PostMapping(value = "/make-reservation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> makeReservation(@RequestBody MakeReservationDTO makeReservationDTO) throws ApplicationBaseException;
+    @Operation(summary = "Reserve a parking place", description = "The endpoint is used to reserve a place in selected Sector.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The reservation has been created successfully."),
+            @ApiResponse(responseCode = "400", description = "The reservation has not been created due to the correctness of the request " +
+                    "or sector blockage, including insufficient number of sector's places"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> makeReservation(@Valid @RequestBody MakeReservationDTO makeReservationDTO) throws ApplicationBaseException;
 
     /**
      * This endpoint allows to cancel active parking place reservation by identifier.
@@ -79,6 +87,12 @@ public interface ReservationControllerInterface {
      * @throws ApplicationBaseException Superclass for any application exception thrown by exception handling aspects in the
      *                                  layer of facade and service components in the application.
      */
+    @Operation(summary = "Cancel an active reservation", description = "The endpoint is used to cancel an active reservation by its owner.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "The reservation has been cancelled successfully."),
+            @ApiResponse(responseCode = "400", description = "The reservation has not been cancelled due to the correctness of the request"),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     @DeleteMapping(value = "/cancel-reservation/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> cancelReservation(@PathVariable("id") String id) throws ApplicationBaseException;
 

@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,13 +29,14 @@ public abstract class ParkingSignableDTO implements SignableDTO {
 
     /**
      * This method returns Parking DTO properties  that should be signed.
+     *
      * @return Returns map of properties that should be signed.
      */
     @Override
     public Map<String, ?> getSigningFields() {
         return Map.ofEntries(
                 Map.entry("version", version),
-                Map.entry("parkingId",parkingId.toString())
+                Map.entry("parkingId", parkingId.toString())
         );
     }
 
@@ -52,5 +54,4 @@ public abstract class ParkingSignableDTO implements SignableDTO {
                 .append("parkingId: ", parkingId)
                 .toString();
     }
-
 }

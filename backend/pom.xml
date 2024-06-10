@@ -566,6 +566,7 @@
                 <debug-sql.log>false</debug-sql.log>
                 <logging.level>INFO</logging.level>
                 <url.host>https://team-3.proj-sum.it.p.lodz.pl</url.host>
+                <spring.profiles.active>prod</spring.profiles.active>
             </properties>
         </profile>
         <profile>
@@ -576,6 +577,7 @@
                 <debug-sql.log>false</debug-sql.log>
                 <logging.level>INFO</logging.level>
                 <url.host>http://localhost:3000</url.host>
+                <spring.profiles.active>test</spring.profiles.active>
             </properties>
         </profile>
         <profile>
@@ -589,6 +591,7 @@
                 <debug-sql.log>true</debug-sql.log>
                 <logging.level>DEBUG</logging.level>
                 <url.host>http://localhost:3000</url.host>
+                <spring.profiles.active>dev</spring.profiles.active>
             </properties>
         </profile>
     </profiles>

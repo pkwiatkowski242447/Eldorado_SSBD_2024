@@ -46,4 +46,9 @@ public class AccountMessages {
 
     public static final String CREATION_TIMESTAMP_FUTURE = "bean.validation.account.creation.time.from.future";
     public static final String UPDATE_TIMESTAMP_FUTURE = "bean.validation.account.update.time.from.future";
+
+    public static final String AUTH_CODE_BLANK = "bean.validation.account.auth.code.blank";
+    public static final String AUTH_CODE_REGEX_NOT_MET = "bean.validation.account.auth.code.regex.not.met";
+    public static final String AUTH_CODE_TOO_SHORT = "bean.validation.account.auth.code.too.short";
+    public static final String AUTH_CODE_TOO_LONG = "bean.validation.account.auth.code.too.long";
 }

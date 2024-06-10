@@ -22,7 +22,7 @@ public class ReservationUnitTest {
     public void setUp() {
         client = new Client();
         sector = new Sector();
-        reservation = new Reservation(client, sector);
+        reservation = new Reservation(client, sector, LocalDateTime.now());
 
     }
 
@@ -35,7 +35,7 @@ public class ReservationUnitTest {
 
     @Test
     public void reservationConstructorWithoutClientTest() {
-        Reservation reservationWithoutClient = new Reservation(sector);
+        Reservation reservationWithoutClient = new Reservation(sector, LocalDateTime.now());
         assertNull(reservationWithoutClient.getClient());
         assertEquals(sector, reservationWithoutClient.getSector());
         assertEquals(0, reservationWithoutClient.getParkingEvents().size());
@@ -44,13 +44,6 @@ public class ReservationUnitTest {
     @Test
     public void reservationConstructorNotNullObjectPositiveTest() {
         assertNotNull(reservation);
-    }
-
-    @Test
-    public void beginTimeGetterAndSetterTest() {
-        LocalDateTime newBeginTime = LocalDateTime.of(2024, 5, 1, 10, 0);
-        reservation.setBeginTime(newBeginTime);
-        assertEquals(newBeginTime, reservation.getBeginTime());
     }
 
     @Test

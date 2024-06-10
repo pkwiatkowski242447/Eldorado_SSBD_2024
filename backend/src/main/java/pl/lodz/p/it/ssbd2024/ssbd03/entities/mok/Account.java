@@ -523,7 +523,7 @@ public class Account extends AbstractEntity {
      * Otherwise, true is returned.
      * @return Boolean flag indicating whether account could be authenticated to.
      */
-    public boolean couldAuthenticate() {
+    public boolean isEnabled() {
         return !this.getBlocked() && this.getActive() && !this.getSuspended();
     }
 

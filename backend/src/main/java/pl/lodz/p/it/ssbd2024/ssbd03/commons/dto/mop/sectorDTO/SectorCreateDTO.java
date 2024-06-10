@@ -23,27 +23,27 @@ public class SectorCreateDTO {
     @NotBlank(message = SectorMessages.SECTOR_NAME_BLANK)
     @Pattern(regexp = SectorConsts.SECTOR_NAME_PATTERN, message = SectorMessages.SECTOR_REGEX_NOT_MET)
     @Size(min = SectorConsts.SECTOR_NAME_LENGTH, max = SectorConsts.SECTOR_NAME_LENGTH, message = SectorMessages.SECTOR_NAME_INVALID)
-    @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The name of the sector", example = "AB-09", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
     @NotNull(message = SectorMessages.SECTOR_TYPE_NULL)
-    @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The type of the sector", example = "UNDERGROUND", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
 
     @NotNull(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NULL)
     @PositiveOrZero(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NEGATIVE)
     @Max(value = SectorConsts.SECTOR_MAX_PLACES_MAX_VALUE, message = SectorMessages.SECTOR_MAX_PLACES_FULL)
-    @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The maximum number of parking spots in the sector", example = "100", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
 
     @NotNull(message = SectorMessages.SECTOR_WEIGHT_NULL)
     @Min(value = SectorConsts.SECTOR_WEIGHT_MIN_WEIGHT, message = SectorMessages.SECTOR_WEIGHT_TOO_SMALL)
     @Max(value = SectorConsts.SECTOR_WEIGHT_MAX_WEIGHT, message = SectorMessages.SECTOR_WEIGHT_TOO_LARGE)
-    @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "The weight of the sector", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
 
     @NotNull(message = SectorMessages.SECTOR_ACTIVE_NULL)
-    @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Determines whether the sector is active", defaultValue = "false", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean active;
 
     /**

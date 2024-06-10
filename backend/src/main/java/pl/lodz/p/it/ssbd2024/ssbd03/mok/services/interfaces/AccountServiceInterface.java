@@ -120,10 +120,10 @@ public interface AccountServiceInterface {
      *
      * @param oldPassword The OldPassword is the old password that the user must provide for authentication.
      * @param newPassword The new password is the password that the user wants to set.
-     * @param login The login retrieved from the security context.
+     * @param login       The login retrieved from the security context.
      * @throws ApplicationBaseException - IncorrectPasswordException (when oldPassword parameter and password in database
-     * are not equal), CurrentPasswordAndNewPasswordAreTheSameException (when newPassword parameter and password in database
-     * are not equal). AccountNotFoundException (when account not found).
+     *                                  are not equal), CurrentPasswordAndNewPasswordAreTheSameException (when newPassword parameter and password in database
+     *                                  are not equal). AccountNotFoundException (when account not found).
      */
     void changePasswordSelf(String oldPassword, String newPassword, String login) throws ApplicationBaseException;
 
@@ -327,32 +327,110 @@ public interface AccountServiceInterface {
      */
     void restoreAccountAccess(String token) throws ApplicationBaseException;
 
+    /**
+     * This method is used to retrieve reset password status, that is whether it was reset by the administrator, used
+     * to enforce password change by the user, whose password change process was begun by the administrator.
+     *
+     * @return Boolean value indicating whether password change process was initiated by the administrator.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
     boolean getPasswordAdminResetStatus() throws ApplicationBaseException;
 
     /**
      * Retrieve historic data of a given account.
      *
-     * @param id ID of the account which history data is requested.
+     * @param id         ID of the account which history data is requested.
      * @param pageNumber The page number of the results to return.
      * @param pageSize   The number of results to return per page.
      * @return A list history data entries, ordered by modification time from newest, with pagination applied.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<AccountHistoryData> getHistoryDataByAccountId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<AccountHistoryData> getHistoryDataByAccountId(UUID id, int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
-    List<AttributeName> getAllAttributesNames(int pageNumber, int pageSize) throws ApplicationBaseException;
+    /**
+     * This method is used to retrieve all attribute names from the dynamic dictionary. This is performed
+     * with pagination not to flood client with data.
+     *
+     * @param pageNumber Number of the page with attribute names.
+     * @param pageSize   Size of the page with attribute names.
+     * @return List of the attribute names that were already added to the dynamic dictionary. If no attribute names were
+     * found for given page number of given page size then empty list is returned.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<AttributeName> getAllAttributesNames(int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
-    List<AttributeValue> getAllAttributeValues(String attributeName, int pageNumber, int pageSize) throws ApplicationBaseException;
+    /**
+     * This method is used to retrieve all attribute values for given attribute name from the dynamic dictionary.
+     * This is performed with pagination not to flood client with data.
+     *
+     * @param attributeName Name of the attribute, which values are to be retrieved from the dynamic dictionary.
+     * @param pageNumber    Number of the page with attribute values.
+     * @param pageSize      Size of the page with attribute values.
+     * @return List of the attribute values for given attribute name. If no attribute values were found for given page number
+     * of given page size then empty list is returned.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<AttributeValue> getAllAttributeValues(String attributeName, int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
-    void addAttribute(String attributeName) throws ApplicationBaseException;
+    /**
+     * This method is used to insert a new attribute name into the dynamic dictionary.
+     *
+     * @param attributeName Name of the attribute to be inserted into the dynamic dictionary.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void addAttribute(String attributeName)
+            throws ApplicationBaseException;
 
-    void removeAttribute(String attributeName) throws ApplicationBaseException;
+    /**
+     * This method is used to remove an attribute name from the dynamic dictionary.
+     *
+     * @param attributeName Name of the attribute to be removed from the dynamic dictionary.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void removeAttribute(String attributeName)
+            throws ApplicationBaseException;
 
-    void addAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException;
+    /**
+     * This method is used to add a new value for given attribute name into the dynamic dictionary.
+     *
+     * @param attributeName  Name of the attribute which value will be inserted into the dynamic dictionary.
+     * @param attributeValue Value of the attribute, which is being currently added to the dictionary.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void addAttributeValue(String attributeName, String attributeValue)
+            throws ApplicationBaseException;
 
-    void removeAttributeValue(String attributeName, String attributeValue) throws ApplicationBaseException;
+    /**
+     * This method is used to remove attribute value for given attribute from the dynamic dictionary.
+     *
+     * @param attributeName  Name of the attribute, which value will be removed from the dictionary.
+     * @param attributeValue Value of the attribute to be removed from the dictionary.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void removeAttributeValue(String attributeName, String attributeValue)
+            throws ApplicationBaseException;
 
-    void assignAttribute(String userLogin, String attributeName, String attributeValue) throws ApplicationBaseException;
+    /**
+     * This method adds a new attribute name - value mapping for user account, identified by its login.
+     *
+     * @param userLogin      Login of the user account, which the mapping is created for.
+     * @param attributeName  Name of the attribute used in the mapping.
+     * @param attributeValue Value of the attribute for given user account.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void assignAttribute(String userLogin, String attributeName, String attributeValue)
+            throws ApplicationBaseException;
 
-    void removeAttribute(String userLogin, String attributeName) throws ApplicationBaseException;
+    /**
+     * This method is used to remove an attribute name - value mapping for user account, identified by its login.
+     *
+     * @param userLogin     Login of the user account, which the mapping is removed for.
+     * @param attributeName Name of the attribute used in the mapping, that is to be removed.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    void removeAttribute(String userLogin, String attributeName)
+            throws ApplicationBaseException;
 }

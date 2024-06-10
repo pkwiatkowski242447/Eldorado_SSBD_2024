@@ -203,6 +203,7 @@ public class DatabaseConsts {
     public static final String RESERVATION_SECTOR_ID_COLUMN = "sector_id";
     public static final String RESERVATION_BEGIN_TIME_COLUMN = "begin_time";
     public static final String RESERVATION_END_TIME_COLUMN = "end_time";
+    public static final String RESERVATION_STATUS_COLUMN = "status";
 
     public static final String RESERVATION_SECTOR_ID_INDEX = "idx_reservation_sector_id";
     public static final String RESERVATION_SECTOR_ID_FK = "reservation_sector_id_fk";
@@ -224,6 +225,8 @@ public class DatabaseConsts {
 
     public static final String SECTOR_PARKING_ID_INDEX = "idx_sector_parking_id";
     public static final String SECTOR_PARKING_ID_FK = "sector_parking_id_fk";
+
+    public static final String SECTOR_NAME_PARKING_ID_UNIQUE_KEY = "sector_name_parking_id_key";
 
     // public.entry_code
 

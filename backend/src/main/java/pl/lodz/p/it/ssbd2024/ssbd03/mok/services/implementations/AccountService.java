@@ -771,7 +771,7 @@ public class AccountService implements AccountServiceInterface {
         Account account = accountFacade.findByEmail(email).orElseThrow(AccountEmailNotFoundException::new);
         tokenFacade.removeByTypeAndAccount(Token.TokenType.RESTORE_ACCESS_TOKEN, account.getId());
 
-        if (account.couldAuthenticate()) {
+        if (account.isEnabled()) {
             throw new AccountRestoreAccessException();
         }
 
@@ -796,7 +796,7 @@ public class AccountService implements AccountServiceInterface {
 
         tokenFacade.remove(tokenObject);
 
-        if (account.couldAuthenticate()) {
+        if (account.isEnabled()) {
             throw new AccountRestoreAccessException();
         }
 

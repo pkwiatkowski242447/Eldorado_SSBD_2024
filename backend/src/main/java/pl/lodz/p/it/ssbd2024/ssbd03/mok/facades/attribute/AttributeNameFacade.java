@@ -108,6 +108,12 @@ public class AttributeNameFacade extends AbstractFacade<AttributeName> {
         return super.findAndRefresh(id);
     }
 
+    /**
+     * Retrieves a AttributeName by the name and forces its refresh.
+     *
+     * @param attributeName Name of the attribute to be retrieved.
+     * @return If AttributeName with the given name was found returns an Optional containing the AttributeName, otherwise returns an empty Optional.
+     */
     @RolesAllowed({Authorities.MANAGE_OWN_ATTRIBUTES, Authorities.MANAGE_ATTRIBUTES})
     public Optional<AttributeName> findByName(String attributeName) throws ApplicationBaseException {
         try {
