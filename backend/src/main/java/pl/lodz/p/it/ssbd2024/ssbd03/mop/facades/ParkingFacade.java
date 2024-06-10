@@ -300,7 +300,10 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param sector Sector to be modified.
      */
-    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION})
+    @RolesAllowed({
+            Authorities.EDIT_SECTOR, Authorities.DEACTIVATE_SECTOR,
+            Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION
+    })
     public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
         getEntityManager().flush();

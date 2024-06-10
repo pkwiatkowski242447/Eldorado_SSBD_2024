@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorDeactivationTimeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -180,6 +181,7 @@ public interface ParkingControllerInterface {
      * This method is used to deactivate a sector with given id.
      *
      * @param id Identifier of sector to deactivate.
+     * @param deactivationTimeDTO Data transfer object containing deactivation time for the sector.
      * @return It returns HTTP response 204 NO_CONTENT when the sector is successfully deactivated.
      * When the sector with the provided id doesn't exist,
      * the method returns 400. When the sector still has active parking spots,
@@ -188,7 +190,8 @@ public interface ParkingControllerInterface {
      *                                  exception handling aspects from the facade and service layers below.
      */
     @PostMapping(value = "/sectors/{id}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> deactivateSector(@PathVariable("id") String id) throws ApplicationBaseException;
+    ResponseEntity<?> deactivateSector(@PathVariable("id") String id, @RequestBody SectorDeactivationTimeDTO deactivationTimeDTO)
+            throws ApplicationBaseException;
 
     /**
      * This method is used to remove parking, that is identified with the given identifier.

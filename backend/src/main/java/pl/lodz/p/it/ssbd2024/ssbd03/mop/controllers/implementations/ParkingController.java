@@ -172,8 +172,12 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
-    public ResponseEntity<?> deactivateSector(String id) throws ApplicationBaseException {
-        parkingService.deactivateSector(UUID.fromString(id));
+    public ResponseEntity<?> deactivateSector(String id, SectorDeactivationTimeDTO deactivationTimeDTO) throws ApplicationBaseException {
+        try {
+            parkingService.deactivateSector(UUID.fromString(id), deactivationTimeDTO.getDeactivationTime());
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
         return ResponseEntity.noContent().build();
     }
 

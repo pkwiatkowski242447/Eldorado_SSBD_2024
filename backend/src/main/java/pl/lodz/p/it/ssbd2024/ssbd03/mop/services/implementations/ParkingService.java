@@ -4,6 +4,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvai
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationExpiredException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationNotStartedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.SectorInvalidDeactivationTimeException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.edit.SectorEditOfTypeOrMaxPlacesWhenActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
@@ -54,6 +56,9 @@ public class ParkingService implements ParkingServiceInterface {
     private final ParkingFacade parkingFacade;
     private final ReservationFacade reservationFacade;
     private final AccountMOPFacade accountFacade;
+
+    @Value("${reservation.max_hours}")
+    private Integer reservationMaxHours;
 
     @Autowired
     public ParkingService(ParkingFacade parkingFacade,
@@ -113,9 +118,20 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
-    public void deactivateSector(UUID id) throws ApplicationBaseException {
+    public void deactivateSector(UUID id, LocalDateTime deactivationTime) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
+
         if (!sector.getActive()) throw new SectorAlreadyInactiveException();
+        if (!deactivationTime.isAfter(LocalDateTime.now().plusHours(this.reservationMaxHours))) throw new SectorInvalidDeactivationTimeException();
+
+        List<Reservation> reservations = this.reservationFacade.getAllReservationsToCancelBeforeDeactivation(sector.getId(),
+                deactivationTime.minusHours(this.reservationMaxHours));
+
+        for (Reservation reservation : reservations) {
+            reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
+            this.reservationFacade.edit(reservation);
+        }
+
         sector.setActive(false);
         parkingFacade.editSector(sector);
     }
