@@ -71,7 +71,7 @@ public interface AuthenticationControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown exception occurred during logging attempt.")
     })
     ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                   @RequestBody AuthenticationCodeDTO authenticationCodeDTO,
+                                                   @Valid @RequestBody AuthenticationCodeDTO authenticationCodeDTO,
                                                    HttpServletRequest request)
             throws ApplicationBaseException;
 
