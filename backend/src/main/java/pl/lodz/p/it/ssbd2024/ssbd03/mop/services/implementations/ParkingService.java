@@ -166,13 +166,17 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
-    public Parking editParking(Parking modifiedParking) throws ApplicationBaseException {
-        Parking foundParking = parkingFacade.findAndRefresh(modifiedParking.getId()).orElseThrow(ParkingNotFoundException::new);
+    public Parking editParking(Parking modifiedParking, UUID parkingId) throws ApplicationBaseException {
+        Parking foundParking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
 
         if (!modifiedParking.getVersion().equals(foundParking.getVersion())) {
             throw new OptimisticLockException();
         }
-        Address address = new Address(modifiedParking.getAddress().getCity(), modifiedParking.getAddress().getZipCode(), modifiedParking.getAddress().getStreet());
+
+        Address address = new Address(modifiedParking.getAddress().getCity(),
+                modifiedParking.getAddress().getZipCode(),
+                modifiedParking.getAddress().getStreet());
+
         foundParking.setAddress(address);
         parkingFacade.edit(foundParking);
         return foundParking;

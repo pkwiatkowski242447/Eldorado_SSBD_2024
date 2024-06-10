@@ -25,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -227,11 +228,12 @@ public class ParkingController implements ParkingControllerInterface {
         if (!ifMatch.equals(jwtProvider.generateObjectSignature(parkingModifyDTO))) {
             throw new ParkingDataIntegrityCompromisedException();
         }
+
         ParkingOutputDTO parkingOutputDTO = ParkingMapper.toParkingOutputDto(
-                parkingService.editParking(ParkingMapper.toParking(parkingModifyDTO))
+                parkingService.editParking(ParkingMapper.toParking(parkingModifyDTO), parkingModifyDTO.getParkingId())
         );
 
-        return ResponseEntity.ok().body(parkingOutputDTO);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(parkingOutputDTO);
     }
 
     @Override
