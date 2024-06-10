@@ -7,8 +7,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingAddressAlreadyTakenException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.validation.ParkingConstraintViolationException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
 
 import java.time.LocalDateTime;
@@ -21,14 +21,15 @@ import java.util.UUID;
 public interface ParkingServiceInterface {
 
     /***
-     * Create parking with specified address.
+     * Create a new parking object with specified address.
      *
-     * @param city Address - city.
-     * @param zipCode Address - zip code.
-     * @param street Address - street.
+     * @param city City, where the parking is located, part of the Address object.
+     * @param zipCode Zip code, of the administrative area, where the parking is located, part of the Address object.
+     * @param street Street, which the parking is located at, part of the Address object.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException;
+    Parking createParking(String city, String zipCode, String street)
+            throws ApplicationBaseException;
 
     /**
      * Create sector in the given parking.
@@ -38,21 +39,22 @@ public interface ParkingServiceInterface {
      * @param type      The type of the sector.
      * @param maxPlaces The maximum number of parking spots in the sector.
      * @param weight    The weight of the sector.
-     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     * @throws ApplicationBaseException            General superclass for all exceptions thrown by aspects intercepting this method.
      * @throws ParkingConstraintViolationException Throws when database constraints are not followed
      * @throws ParkingAddressAlreadyTakenException Throws when database constraint unique on (zip-code, city, street) is not followed
      */
     void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException;
 
     /**
-     * Retrieve all parking spaces in the system.
+     * Retrieves all parking in the system.
      *
      * @param pageNumber The page number of the results to return.
      * @param pageSize   The number of results to return per page.
      * @return A list of all parking in the system, with pagination applied.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
     /**
      * Retrieves from the database sector by id.
@@ -61,15 +63,16 @@ public interface ParkingServiceInterface {
      * @return If Sector with the given id was found returns Sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Sector getSectorById(UUID id) throws ApplicationBaseException;
+    Sector getSectorById(UUID id)
+            throws ApplicationBaseException;
 
     /**
      * Retrieves from the database list of sectors by parking id.
      *
-     * @param id Parking's id.
-     * @param active Determines whether to return all sectors or only active ones.
+     * @param id         Parking's id.
+     * @param active     Determines whether to return all sectors or only active ones.
      * @param pageNumber Number of the page.
-     * @param pageSize Size og the page.
+     * @param pageSize   Size of the page with sector entries.
      * @return If Parking with the given id was found, returns list of its Sectors.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
@@ -82,13 +85,14 @@ public interface ParkingServiceInterface {
      * @return If parking with the given id was found returns Parking.
      * @throws ParkingNotFoundException Thrown when parking with given id cannot be found in the database.
      */
-    Parking getParkingById(UUID id) throws ApplicationBaseException;
+    Parking getParkingById(UUID id)
+            throws ApplicationBaseException;
 
     /**
      * Activates sector with given id, by setting active field to true.
      *
      * @param id Sector's id.
-     * @throws SectorNotFoundException Thrown when sector with given id cannot be found in the database.
+     * @throws SectorNotFoundException      Thrown when sector with given id cannot be found in the database.
      * @throws SectorAlreadyActiveException Thrown when trying to activate an active sector.
      */
     void activateSector(UUID id) throws ApplicationBaseException;
@@ -97,8 +101,12 @@ public interface ParkingServiceInterface {
      * Deactivates sector with given id, by setting active field to false.
      *
      * @param id Sector's id.
+<<<<<<< HEAD
      * @param deactivationTime Time of the sectors planned deactivation.
      * @throws SectorNotFoundException Thrown when sector with given id cannot be found in the database.
+=======
+     * @throws SectorNotFoundException        Thrown when sector with given id cannot be found in the database.
+>>>>>>> 5c4dedbc97c2eef6f6e67fae5c6e202ff1f66c17
      * @throws SectorAlreadyInactiveException Thrown when trying to deactivate an inactive sector.
      */
     void deactivateSector(UUID id, LocalDateTime deactivationTime) throws ApplicationBaseException;
@@ -109,7 +117,8 @@ public interface ParkingServiceInterface {
      * @param id Identifier of the parking to be removed.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void removeParkingById(UUID id) throws ApplicationBaseException;
+    void removeParkingById(UUID id)
+            throws ApplicationBaseException;
 
     /**
      * Registers new entry parking event for given reservation, identified by its id.
@@ -125,9 +134,10 @@ public interface ParkingServiceInterface {
      * Edits parking in the database by its id.
      *
      * @param modifiedParking Parking with potentially modified properties: city, zipCode, street.
+     * @param parkingId       Identifier of the parking to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Parking editParking (Parking modifiedParking) throws ApplicationBaseException;
+    Parking editParking(Parking modifiedParking, UUID parkingId) throws ApplicationBaseException;
 
     /**
      * Edits sector in the database by its id.
@@ -135,7 +145,8 @@ public interface ParkingServiceInterface {
      * @param modifiedSector Sector to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Sector editSector(UUID id, Long version, Sector modifiedSector) throws ApplicationBaseException;
+    Sector editSector(UUID id, Long version, Sector modifiedSector)
+            throws ApplicationBaseException;
 
     /**
      * Removes sector from the database by its id.
@@ -146,14 +157,15 @@ public interface ParkingServiceInterface {
     void removeSectorById(UUID id) throws ApplicationBaseException;
 
     /**
-     * Retrieves all parking that are available from the database.
+     * Retrieves all parking that are available (have at least one active sector) from the database.
      *
-     * @param pageNumber          Number of the page to retrieve.
-     * @param pageSize            Number of results per page.
+     * @param pageNumber Number of the page to retrieve.
+     * @param pageSize   Number of results per page.
      * @return If there are available parking returns these parking.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
     /**
      * Uses parking's spot assignment algorithm to choose a parking spot for the requested entry. Then in creates

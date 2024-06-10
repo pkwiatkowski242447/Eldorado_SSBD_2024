@@ -6,7 +6,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,7 +29,6 @@ import java.util.UUID;
  * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client
  * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff
  */
-@Slf4j
 @Repository
 @LoggerInterceptor
 @TxTracked
@@ -62,21 +59,25 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
     }
 
     /**
-     * Forces modification of the UserLevel in the database.
+     * Forces modification of the UserLevel entity object in the database.
      *
      * @param userLevel UserLevel to be modified.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
-    @RolesAllowed(Authorities.CHANGE_CLIENT_TYPE)
+    @RolesAllowed({Authorities.CHANGE_CLIENT_TYPE})
     public void edit(UserLevel userLevel) throws ApplicationBaseException {
         super.edit(userLevel);
     }
 
     /**
-     * Retrieves a UserLevel by the ID.
+     * Retrieves a UserLevel by its identifier.
      *
      * @param id ID of the UserLevel to be retrieved.
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @DenyAll
@@ -85,10 +86,12 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
     }
 
     /**
-     * Retrieves a UserLevel by the ID and forces its refresh.
+     * Retrieves a UserLevel by its identifier and forces its refresh.
      *
      * @param id ID of the UserLevel to be retrieved.
      * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @DenyAll
@@ -97,27 +100,12 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
     }
 
     /**
-     * Retrieves all user levels by the account ID and forces its refresh.
-     *
-     * @param login Identifier of the account, which the user levels are searched for.
-     * @return All user levels associated with given account.
-     * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
-     */
-    @DenyAll
-    public List<UserLevel> findUserLevelsForGivenAccount(String login) throws ApplicationBaseException {
-        TypedQuery<UserLevel> findUserLevelsForGivenAccount = entityManager.createNamedQuery("UserLevel.findAllUserLevelsForGivenAccount", UserLevel.class);
-        findUserLevelsForGivenAccount.setParameter("login", login);
-        List<UserLevel> listOfUserLevels = findUserLevelsForGivenAccount.getResultList();
-        super.refreshAll(listOfUserLevels);
-        return listOfUserLevels;
-    }
-
-    /**
      * Retrieves particular user level (of class searchedUserLevel) associated with given account.
      *
-     * @param login             Text identifier of the account, which the user level is searched for.
+     * @param login Text identifier of the account, which the user level is searched for.
      * @return Certain user level, of given class, connected to the user account.
-     * @throws ApplicationBaseException General superclass of all possible exceptions throw in the persistence layer.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
     public Optional<Client> findGivenUserLevelForGivenAccount(String login) throws ApplicationBaseException {
@@ -129,7 +117,8 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
             findGivenUserLevelForGivenAccount.setParameter("userLevel", Client.class);
             userLevel = findGivenUserLevelForGivenAccount.getSingleResult();
             entityManager.refresh(userLevel);
-        } catch (NoResultException ignore) {}
+        } catch (NoResultException ignore) {
+        }
         return Optional.ofNullable(userLevel);
     }
 }

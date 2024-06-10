@@ -31,7 +31,7 @@ public class SectorExceptionResolver {
     }
 
     /**
-     * This method is used to transform SectorAlreadyActiveException and SectorAlreadyInactiveException,
+     * This method is used to transform SectorAlreadyActiveException or SectorAlreadyInactiveException,
      * that are being propagated from controller component into HTTP response, so that exception
      * is handled without container intervention.
      *

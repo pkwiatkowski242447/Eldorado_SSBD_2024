@@ -167,7 +167,7 @@ public class AccountController implements AccountControllerInterface {
     @RolesAllowed({Authorities.CHANGE_OWN_PASSWORD})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> changePasswordSelf(@Valid @RequestBody AccountChangePasswordDTO accountChangePasswordDTO) throws ApplicationBaseException {
         String oldPassword = accountChangePasswordDTO.getOldPassword();
         String newPassword = accountChangePasswordDTO.getNewPassword();
 

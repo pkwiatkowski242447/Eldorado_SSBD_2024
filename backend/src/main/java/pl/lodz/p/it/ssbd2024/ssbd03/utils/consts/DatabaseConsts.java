@@ -226,6 +226,8 @@ public class DatabaseConsts {
     public static final String SECTOR_PARKING_ID_INDEX = "idx_sector_parking_id";
     public static final String SECTOR_PARKING_ID_FK = "sector_parking_id_fk";
 
+    public static final String SECTOR_NAME_PARKING_ID_UNIQUE_KEY = "sector_name_parking_id_key";
+
     // public.entry_code
 
     public static final String ENTRY_CODE_TABLE = "entry_code";

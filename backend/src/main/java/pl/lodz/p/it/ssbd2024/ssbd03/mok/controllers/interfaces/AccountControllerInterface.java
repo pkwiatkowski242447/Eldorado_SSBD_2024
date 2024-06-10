@@ -157,7 +157,7 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "400", description = "Given past password is not the same as the old one, new password is the same as the old one or account, which the password is change for could not be found."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> changePasswordSelf(@RequestBody AccountChangePasswordDTO accountChangePasswordDTO)
+    ResponseEntity<?> changePasswordSelf(@Valid @RequestBody AccountChangePasswordDTO accountChangePasswordDTO)
             throws ApplicationBaseException;
 
     // Read methods

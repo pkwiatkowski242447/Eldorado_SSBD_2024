@@ -1,10 +1,13 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +43,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findAll",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE (:showOnlyActive != true OR s.weight>0)
+                        WHERE (:showOnlyActive != true OR s.weight > 0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
@@ -89,6 +92,7 @@ public class Parking extends AbstractEntity {
      */
     @NotNull(message = ParkingMessages.ADDRESS_NULL)
     @Embedded
+    @Valid
     @Setter
     private Address address;
 
@@ -145,6 +149,17 @@ public class Parking extends AbstractEntity {
     }
 
     /**
+     * Constructs a new parking entity with version setting.
+     *
+     * @param version Version of the constructed parking entity.
+     * @param address Address of the parking.
+     */
+    public Parking(Long version, Address address) {
+        super(version);
+        this.address = address;
+    }
+
+    /**
      * Add a new sector to the Parking. Sector is created and managed by the Parking.
      *
      * @param name      Sector's name.
@@ -160,7 +175,7 @@ public class Parking extends AbstractEntity {
      * Removes the sector from the parking.
      * Note that it doesn't mean the sector is removed from the database, because of the bidirectional relationship.
      *
-     * @param sectorName
+     * @param sectorName Name of the sector to be removed from the parking.
      */
     public void deleteSector(String sectorName) {
         //Replace sector list with the list without the specified sector
