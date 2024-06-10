@@ -9,4 +9,6 @@ public interface ScheduleMOPServiceInterface {
      *This method is used to end reservation when the time of reservation has run out.
      */
     void endReservation();
+
+    void completeReservation();
 }

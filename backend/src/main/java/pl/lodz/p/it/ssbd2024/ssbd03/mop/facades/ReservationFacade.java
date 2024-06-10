@@ -256,7 +256,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /***
-     * This method is used to find all reservations, that last more than 24 hours
+     * This method is used to find all reservations, that last more than 24 hours and are no close
      *
      * @param amount Length of the specified time window, used to end reservations that last more than 24 hours.
      * @param timeUnit Time unit, indicating size of the reservation ending time window.
@@ -264,11 +264,30 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @throws ApplicationBaseException thrown when other unexpected problems occurred.
      */
     @RolesAllowed({Authorities.END_RESERVATION})
-    public List<Reservation> findAllReservationsMarkedForEnding(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
+    public List<Reservation> findAllReservationsMarkedForTerminating(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
         try {
-            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForEnding", Reservation.class);
+            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForTerminating", Reservation.class);
             findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
             List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
+
+    /**
+     * This method is used to find all reservations which
+     *
+     * @return List of reservation that should be canceled automatically, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForCanceling() throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForCanceling = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForCanceling", Reservation.class);
+            List<Reservation> list = findAllReservationMarkedForCanceling.getResultList();
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {

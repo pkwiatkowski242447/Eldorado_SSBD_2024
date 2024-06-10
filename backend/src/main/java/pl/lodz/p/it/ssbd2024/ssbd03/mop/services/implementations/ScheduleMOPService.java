@@ -67,12 +67,12 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     @RolesAllowed({Authorities.END_RESERVATION})
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void endReservation() {
-        log.info("Method: endReservation(), used for removing reservations which last more than 24 hours");
+        log.info("Method: endReservation(), used for terminating reservations which last more than 24 hours");
         List<Reservation> reservationsWhichLastMoreThan24h = new ArrayList<>();
         try {
-            reservationsWhichLastMoreThan24h = reservationFacade.findAllReservationsMarkedForEnding(Long.parseLong(endTime), TimeUnit.HOURS);
+            reservationsWhichLastMoreThan24h = reservationFacade.findAllReservationsMarkedForTerminating(Long.parseLong(endTime), TimeUnit.HOURS);
         } catch (NumberFormatException | ApplicationBaseException exception) {
-            log.error("Exception: {} occurred while searching for reservation to be ended. Cause: {}.",
+            log.error("Exception: {} occurred while searching for reservation to be terminated. Cause: {}.",
                     exception.getClass().getSimpleName(), exception.getMessage());
         }
 
@@ -85,26 +85,50 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
 
         for (Reservation reservation : reservationsWhichLastMoreThan24h) {
             try {
-                int numberOfEntries = 0;
-                int numberOfExits = 0;
-                for (ParkingEvent parkingEvent : reservation.getParkingEvents()) {
-                    if (parkingEvent.getType() == ParkingEvent.EventType.ENTRY) {
-                        numberOfEntries += 1;
-                    }
-                    else {
-                        numberOfExits += 1;
-                    }
-                }
-                if (numberOfExits != numberOfEntries) {
-                    ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
-                    reservation.addParkingEvent(exitEvent);
-                    this.reservationFacade.edit(reservation);
-                    Sector sector = reservation.getSector();
-                    sector.setAvailablePlaces(sector.getAvailablePlaces() + 1);
-                    parkingFacade.editSector(sector);
-                }
+                ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
+                reservation.addParkingEvent(exitEvent);
+                reservation.setStatus(Reservation.ReservationStatus.TERMINATED);
+                this.reservationFacade.edit(reservation);
+                Sector sector = reservation.getSector();
+                sector.setAvailablePlaces(sector.getAvailablePlaces() + 1);
+                parkingFacade.editSector(sector);
             } catch (Exception exception) {
-                log.error("Exception: {} occurred while removing reservation with id: {}. Cause: {}.",
+                log.error("Exception: {} occurred while terminating reservation with id: {}. Cause: {}.",
+                        exception.getClass().getSimpleName(), reservation.getId(), exception.getMessage());
+            }
+        }
+    }
+
+    @RunAsSystem
+    @Override
+    @RolesAllowed({Authorities.END_RESERVATION})
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
+    public void completeReservation() {
+        log.info("Method: completeReservation(), used for completing reservations");
+        List<Reservation> reservationsToEnd = new ArrayList<>();
+        try {
+            reservationsToEnd = reservationFacade.findAllReservationsMarkedForCanceling();
+        } catch (NumberFormatException | ApplicationBaseException exception) {
+            log.error("Exception: {} occurred while searching for reservation to be completed. Cause: {}.",
+                    exception.getClass().getSimpleName(), exception.getMessage());
+        }
+
+        if (reservationsToEnd.isEmpty()) {
+            log.info("No reservations to be completed were found.");
+            return;
+        }
+
+        log.info("List of identifiers of reservations to be ended: {}", reservationsToEnd.stream().map(Reservation::getId).toList());
+
+        for (Reservation reservation : reservationsToEnd) {
+            try {
+                reservation.setStatus(Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY);
+                this.reservationFacade.edit(reservation);
+                Sector sector = reservation.getSector();
+                sector.setAvailablePlaces(sector.getAvailablePlaces() + 1);
+                parkingFacade.editSector(sector);
+            } catch (Exception exception) {
+                log.error("Exception: {} occurred while canceling reservation with id: {}. Cause: {}.",
                         exception.getClass().getSimpleName(), reservation.getId(), exception.getMessage());
             }
         }
