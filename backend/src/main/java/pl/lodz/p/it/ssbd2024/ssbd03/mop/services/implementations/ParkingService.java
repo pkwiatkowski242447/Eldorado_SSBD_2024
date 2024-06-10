@@ -35,7 +35,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -145,7 +144,7 @@ public class ParkingService implements ParkingServiceInterface {
             throw new ReservationExpiredException();
         }
 
-        if (reservation.getSector().getAvailablePlaces() == 0) {
+        if (reservation.getSector().getOccupiedPlaces() == 0) {
             throw new ReservationNoAvailablePlaceException();
         }
 
@@ -155,7 +154,7 @@ public class ParkingService implements ParkingServiceInterface {
         }
 
         if (reservation.getStatus().equals(Reservation.ReservationStatus.AWAITING)) {
-            reservation.getSector().setAvailablePlaces(reservation.getSector().getAvailablePlaces() - 1);
+            reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
             reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
         }
 
@@ -227,13 +226,13 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EXIT_PARKING)
-    public void exitParking(UUID reservationId) throws ApplicationBaseException {
+    public void exitParking(UUID reservationId, String userLogin, boolean endReservation) throws ApplicationBaseException {
         Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
 
         // Check if the user is the "owner" of the reservation (if the reservation has a client assigned to it)
         if (reservation.getClient() != null) {
-            Account account = this.accountFacade.findByLogin(reservation.getClient().getAccount().getLogin()).orElseThrow(AccountNotFoundException::new);
-            if (Objects.equals(reservation.getClient().getAccount().getLogin(), account.getLogin())) {
+            Account account = this.accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+            if (!account.getUserLevels().contains(reservation.getClient())) {
                 throw new ReservationNotFoundException();
             }
         }
@@ -253,12 +252,17 @@ public class ParkingService implements ParkingServiceInterface {
             throw new CannotExitParkingException();
         }
 
-        if (reservation.getEndTime() == null) {
-            reservation.setEndTime(LocalDateTime.now());
+        // If reservation is made for anonymous user or the reservation needs to be finished
+        if (reservation.getClient() == null || endReservation) {
+            // Case for anonymous user - end time is being set
+            if (reservation.getClient() == null) reservation.setEndTime(LocalDateTime.now());
+            reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
+            reservation.setStatus(Reservation.ReservationStatus.COMPLETED_MANUALLY);
         }
-        reservation.getSector().setAvailablePlaces(reservation.getSector().getAvailablePlaces() + 1);
+
         ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
         reservation.addParkingEvent(exitEvent);
+
         this.reservationFacade.edit(reservation);
     }
 }

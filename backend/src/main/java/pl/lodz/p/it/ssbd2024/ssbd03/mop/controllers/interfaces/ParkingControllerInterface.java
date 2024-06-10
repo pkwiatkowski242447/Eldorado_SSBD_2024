@@ -329,6 +329,7 @@ public interface ParkingControllerInterface {
      * This method is used to end the parking spot allocation. Basically, it generates a parking event for exit
      *
      * @param reservationId Identifier of the reservation, which the client wants to use.
+     * @param endReservation Boolean flag indicating whether the reservation should be ended.
      * @return 204 NO CONTENT responses are returned if the allocation ended successfully
      * Otherwise, if there is no such reservation, a user account does not exist,
      * the provided exit code is incorrect or the reservation could not be ended; then 400 BAD REQUEST is returned.
@@ -338,6 +339,8 @@ public interface ParkingControllerInterface {
      *                                  exception handling aspects from the facade and service layers below.
      */
     @PostMapping(value = "/reservations/{id}/exit")
-    ResponseEntity<?> exitParking(@PathVariable("id") String reservationId) throws ApplicationBaseException;
+    ResponseEntity<?> exitParking(@PathVariable("id") String reservationId,
+                                  @RequestParam(value = "end", defaultValue = "false") boolean endReservation)
+            throws ApplicationBaseException;
 }
 

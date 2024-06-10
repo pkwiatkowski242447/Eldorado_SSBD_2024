@@ -26,6 +26,8 @@ import java.io.OutputStream;
 @LoggerInterceptor
 public class JWTRequiredFilter extends OncePerRequestFilter {
 
+    private static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+
     private static final String[] WHITELIST = {
             "/api/v1/auth/login-credentials",
             "/api/v1/auth/login-auth-code",
@@ -43,7 +45,8 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
             "/configuration/security",
             "/swagger-ui.html",
             "/api/v1/parking/sectors/get",
-            "/api/v1/parking/active"
+            "/api/v1/parking/active",
+            "/api/v1/parking/reservations/%s/exit".formatted(UUID_REGEX)
     };
 
     @Override
@@ -67,7 +70,7 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         for (String key : WHITELIST) {
-            if (request.getRequestURI().startsWith(key)) return true;
+            if (request.getRequestURI().matches(key)) return true;
         }
         return false;
     }

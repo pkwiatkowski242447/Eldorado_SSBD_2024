@@ -2,11 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -171,13 +167,13 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param parkingId Identifier (UUID) of the parking to be removed.
      * @throws ApplicationBaseException General superclass of all the exceptions
-     * that could be thrown by aspects intercepting exceptions in the facade layer.
+     *                                  that could be thrown by aspects intercepting exceptions in the facade layer.
      */
     @RolesAllowed({Authorities.DELETE_PARKING})
     public void removeParkingById(UUID parkingId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Parking.removeParkingById")
-            .setParameter("parkingId", parkingId)
-            .executeUpdate();
+                .setParameter("parkingId", parkingId)
+                .executeUpdate();
     }
 
     /**
@@ -226,7 +222,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("showOnlyActive", active)
-                .setFirstResult(pageNumber*pageSize)
+                .setFirstResult(pageNumber * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
         refreshAllSectors(list);
@@ -355,7 +351,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-     *  Force incrementing version of sector entity.
+     * Force incrementing version of sector entity.
      */
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {

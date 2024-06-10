@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,7 +72,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findWithAvailablePlaces",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0)
+                        WHERE s.occupiedPlaces < s.maxPlaces AND (:showOnlyActive != true OR s.weight>0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
@@ -160,7 +162,7 @@ public class Parking extends AbstractEntity {
      * Removes the sector from the parking.
      * Note that it doesn't mean the sector is removed from the database, because of the bidirectional relationship.
      *
-     * @param sectorName
+     * @param sectorName Name of the sector to be removed from the parking.
      */
     public void deleteSector(String sectorName) {
         //Replace sector list with the list without the specified sector
