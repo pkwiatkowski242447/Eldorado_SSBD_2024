@@ -30,8 +30,8 @@ public class SectorCreateDTO {
     @Schema(description = "The type of the sector", example = "UNDERGROUND", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
 
-    @NotNull(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NULL)
-    @PositiveOrZero(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NEGATIVE)
+    @NotNull(message = SectorMessages.SECTOR_OCCUPIED_PLACES_NULL)
+    @PositiveOrZero(message = SectorMessages.SECTOR_OCCUPIED_PLACES_NEGATIVE)
     @Max(value = SectorConsts.SECTOR_MAX_PLACES_MAX_VALUE, message = SectorMessages.SECTOR_MAX_PLACES_FULL)
     @Schema(description = "The maximum number of parking spots in the sector", example = "100", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
