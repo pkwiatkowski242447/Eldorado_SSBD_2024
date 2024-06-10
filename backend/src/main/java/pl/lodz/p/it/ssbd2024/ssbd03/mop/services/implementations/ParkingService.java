@@ -252,11 +252,7 @@ public class ParkingService implements ParkingServiceInterface {
             clientType = client.getType();
         }
         List<Sector> result = parkingFacade.getAvailableSectorsNow(clientType, parkingId, currentTime, reservationMaxHours);
-        //TODO remove
-        result.forEach((value) -> {
-            System.out.println(value.toString());
-        });
-        System.out.println("dupa");
+
         //TODO add multiple algorithms for determining sector assignment
         if (result.isEmpty()) throw new ReservationNoAvailablePlaceException();
         Sector chosenSector = result.getFirst();

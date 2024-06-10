@@ -159,11 +159,7 @@ import java.util.List;
                                                 (
                                                     r.endTime < :currentTime
                                                     AND
-                                                    (
-                                                        :currentTime < r.endTime
-                                                        OR
-                                                        MOD(SIZE(r.parkingEvents), 2) = 1
-                                                    )
+                                                    MOD(SIZE(r.parkingEvents), 2) = 1
                                                 )
                                             )
                                             OR
@@ -202,11 +198,7 @@ import java.util.List;
                                                 (
                                                     r.endTime < :currentTime
                                                     AND
-                                                    (
-                                                        :currentTime < r.endTime
-                                                        OR
-                                                        MOD(SIZE(r.parkingEvents), 2) = 1
-                                                    )
+                                                    MOD(SIZE(r.parkingEvents), 2) = 1
                                                 )
                                             )
                                             OR
@@ -245,11 +237,7 @@ import java.util.List;
                                                 (
                                                     r.endTime < :currentTime
                                                     AND
-                                                    (
-                                                        :currentTime < r.endTime
-                                                        OR
-                                                        MOD(SIZE(r.parkingEvents), 2) = 1
-                                                    )
+                                                    MOD(SIZE(r.parkingEvents), 2) = 1
                                                 )
                                             )
                                             OR

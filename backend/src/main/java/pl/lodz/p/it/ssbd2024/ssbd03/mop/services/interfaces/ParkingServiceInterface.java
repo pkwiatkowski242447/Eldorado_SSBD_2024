@@ -156,11 +156,11 @@ public interface ParkingServiceInterface {
 
     /**
      * Uses parking's spot assignment algorithm to choose a parking spot for the requested entry. Then in creates
-     * a new reservation , generates allocation code and registers entry parking event. Moreover, if the entry is made
-     * by a registered client this method also sends an e-mail notification about beginning of the allocation
-     * with the allocation code, used to end the reservation later.
+     * a new reservation , generates allocation code and registers entry parking event.
      *
-     * @param login Login of the user, who performs the action. May be null if the entry is made by an anonymous user
+     * @param parkingId ID of the parking that the user want to enter.
+     * @param login Login of the user, who performs the action.
+     * @param isAnonymous Determines whether the action is made by an anonymous user or not.
      * @return Data transfer object containing allocation code, used later for ending the allocation, and basic
      * information about the assigned sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.

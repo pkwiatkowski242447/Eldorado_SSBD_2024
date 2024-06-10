@@ -366,24 +366,24 @@ public class ParkingFacade extends AbstractFacade<Parking> {
 
 
     /**
-     * Counts all reservations that need place reservations in the moment of invocation, in the sectors that given user
-     * can park.
-     *
-     * @return List of value pairs of sector and number of reservations blocking space currently.
+     * Retrieves all sectors available for entry for given client type in a given parking.
+     * @param clientType Client type determining type of sectors included.
+     * @param parkingId ID of the parking searched.
+     * @param now Time of entry to the parking. It needs to be passed to keep it the same as start of the reservation.
+     * @param maxReservationHours Maximum time that a vehicle can spend on the parking.
+     * @return List of sector available for entry.
      * @throws ApplicationBaseException when other problem occurred.
      */
     @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
     public List<Sector> getAvailableSectorsNow(Client.ClientType clientType, UUID parkingId, LocalDateTime now, int maxReservationHours) throws ApplicationBaseException {
         TypedQuery<Sector> query = entityManager.createNamedQuery("Reservation.getAvailableBasicSectorsNow", Sector.class);
        if( clientType == Client.ClientType.STANDARD){
-           System.out.println("dupa standard");
             query = entityManager.createNamedQuery("Reservation.getAvailableStandardSectorsNow", Sector.class);
         } else if( clientType == Client.ClientType.PREMIUM){
-           System.out.println("dupa premium");
             query = entityManager.createNamedQuery("Reservation.getAvailablePremiumSectorsNow", Sector.class);
         }
         query.setParameter("parkingId", parkingId);
-        query.setParameter("currentTime", LocalDateTime.now());
+        query.setParameter("currentTime", now);
         query.setParameter("currentTimePlusReserve", now.plusHours(maxReservationHours));
         query.setParameter("currentTimeMinusReserve", now.minusHours(maxReservationHours));
         return query.getResultList();

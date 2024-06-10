@@ -184,7 +184,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         parkingNo3.addSector("name4", Sector.SectorType.UNCOVERED, 20, 200, true);
 
         List<Parking> listOfParkingLots = parkingFacade.findAllWithPagination(0, 10, true);
-        assertEquals(4, listOfParkingLots.size());
+        assertEquals(5, listOfParkingLots.size());
     }
 
 //    @Test
@@ -267,7 +267,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
             listOfSectors.get(i).setAvailablePlaces(i);
         }
         List<Parking> listOfParkingLots = parkingFacade.findParkingWithAvailablePlaces(0, 5, true);
-        assertEquals(2, listOfParkingLots.size());
+        assertEquals(3, listOfParkingLots.size());
     }
 
     @Test

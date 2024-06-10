@@ -233,7 +233,7 @@ INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUE
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('7a7035f8-d15b-48c9-86c2-eb1264c93993', current_timestamp, current_timestamp - interval '3 hour', current_timestamp - interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('96923bbc-3f9d-4e5c-a5c4-f3428aaa6d7e', '7a7035f8-d15b-48c9-86c2-eb1264c93993', current_timestamp - interval '1 hour', 'ENTRY', 0);
 
---2.2 -- starts and ends in the past, but still in progress - overlaps - one entry, one exit - non blocking
+--2.2 -- starts and ends in the past, but still in progress - overlaps - one entry, one exit - blocking
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('1b1282c0-ae25-4cfe-b22d-fe1f3abf4fdc', current_timestamp, current_timestamp - interval '3 hour', current_timestamp - interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('3ba9685e-3676-4331-b73e-1c63526c0d30', '1b1282c0-ae25-4cfe-b22d-fe1f3abf4fdc', current_timestamp - interval '2 hours', 'ENTRY', 0);
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('93df7dbc-030f-4b45-8c4f-b514419aa1e9', '1b1282c0-ae25-4cfe-b22d-fe1f3abf4fdc', current_timestamp - interval '1 hour 30 minutes', 'EXIT', 0);
@@ -263,16 +263,10 @@ INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, cl
 
 
 -- Reservations to the second sector, one blocking case and all non blocking
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('731c7497-19f9-44af-8143-8d5281d264f0', current_timestamp, current_timestamp, null, '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'IN_PROGRESS');
 --1 -- completed - non blocking
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('5f2048b1-f964-4c0a-99f9-2f006c304794', current_timestamp, TIMESTAMP '2023-12-12 04:00:00', TIMESTAMP '2023-12-12 06:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'COMPLETED_MANUALLY');
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('199e1411-677c-44d9-82e8-13fc12822af1', '5f2048b1-f964-4c0a-99f9-2f006c304794', TIMESTAMP '2023-12-12 06:00:00', 'ENTRY', 0);
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('b827ce01-4d40-480d-a3bd-813fc9919703', '5f2048b1-f964-4c0a-99f9-2f006c304794', TIMESTAMP '2023-12-12 06:00:00', 'EXIT', 0);
-
---2.2 -- starts and ends in the past, but still in progress - overlaps - one entry, one exit - non blocking
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('4cd56edf-e398-468a-9e42-72ef97ee031c', current_timestamp, current_timestamp - interval '3 hour', current_timestamp - interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'IN_PROGRESS');
-INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('d0999b13-f60d-4d4e-b699-6dd29c80dff2', '4cd56edf-e398-468a-9e42-72ef97ee031c', current_timestamp - interval '2 hours', 'ENTRY', 0);
-INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('16448edf-2f27-424f-8cb6-45e00aceac76', '4cd56edf-e398-468a-9e42-72ef97ee031c', current_timestamp - interval '1 hour 30 minutes', 'EXIT', 0);
 
 --3 -- starts and ends in the past, but still in progress - doesn't overlap - one entry, one exit - non blocking
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('121dc917-c508-4f03-8471-9becb82e9835', current_timestamp, current_timestamp - interval '48 hours', current_timestamp - interval '46 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'IN_PROGRESS');
@@ -290,11 +284,6 @@ INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, cl
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('62de17c1-a3ff-4d2a-8d61-dc2e280f3be6', current_timestamp, TIMESTAMP '2023-12-12 04:00:00', TIMESTAMP '2023-12-12 06:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'COMPLETED_MANUALLY');
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('94f62649-2962-4015-adaf-a921f384ea55', '62de17c1-a3ff-4d2a-8d61-dc2e280f3be6', TIMESTAMP '2023-12-12 06:00:00', 'ENTRY', 0);
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('2c6d47c5-1c12-46cb-869f-ba5d0068ae0d', '62de17c1-a3ff-4d2a-8d61-dc2e280f3be6', TIMESTAMP '2023-12-12 06:00:00', 'EXIT', 0);
-
---2.2 -- starts and ends in the past, but still in progress - overlaps - one entry, one exit - non blocking
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('129dfb0a-302b-44e0-94e7-199b257f91cf', current_timestamp, current_timestamp - interval '3 hour', current_timestamp - interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'IN_PROGRESS');
-INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('f9f11bd6-288b-4b8e-9a8d-46e235d5ae80', '129dfb0a-302b-44e0-94e7-199b257f91cf', current_timestamp - interval '2 hours', 'ENTRY', 0);
-INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('329747ea-45d3-47e7-b998-556f56bfce53', '129dfb0a-302b-44e0-94e7-199b257f91cf', current_timestamp - interval '1 hour 30 minutes', 'EXIT', 0);
 
 --3 -- starts and ends in the past, but still in progress - doesn't overlap - one entry, one exit - non blocking
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('27b8f933-3bdf-4bfb-affe-0d19260a51cc', current_timestamp, current_timestamp - interval '48 hours', current_timestamp - interval '46 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'IN_PROGRESS');
