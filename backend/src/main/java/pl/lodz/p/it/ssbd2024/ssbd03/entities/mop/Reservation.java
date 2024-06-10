@@ -105,7 +105,7 @@ import java.util.List;
                         SELECT COUNT(*) FROM Reservation r
                         WHERE r.sector.id = :sectorId
                         AND
-                        r.status != 'CANCELED'
+                        r.status != ReservationStatus.CANCELLED
                         AND
                         (
                             (
