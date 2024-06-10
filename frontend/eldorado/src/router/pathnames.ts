@@ -19,7 +19,7 @@ export const Pathnames = {
         adminCreateUser: '/manage-users/create',
     },
     staff: {
-
+        allReservations: '/all-reservations',
     },
     client: {
         myReservations: '/my-reservations',
