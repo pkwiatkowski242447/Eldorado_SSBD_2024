@@ -58,7 +58,7 @@ public class RunAsImpl {
      * @return Value returned by the called method, intercepted by this aspect.
      */
     @Around(value = "runAsSystemPointcut()")
-    private Object runAsSystemAdvice(ProceedingJoinPoint point) {
+    private Object runAsSystemAdvice(ProceedingJoinPoint point) throws Throwable {
         Object result = null;
         try {
             List<SimpleGrantedAuthority> listOfRoles = rolesMapper.getAuthorities(Roles.SYSTEM);
@@ -71,6 +71,7 @@ public class RunAsImpl {
         } catch (Throwable throwable) {
             log.error("Exception: {} was thrown during aspect method execution. Message: {}. Cause: ",
                     throwable.getClass().getSimpleName(), throwable.getMessage(), throwable.getCause());
+            throw throwable;
         }
         return result;
     }

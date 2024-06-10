@@ -35,11 +35,11 @@ public class MakeReservationDTO {
     //@Pattern(regexp = DTOConsts.UUID_REGEX, message = DTOMessages.SECTOR_UUID_REGEX_NOT_MET)
     // todo UUID -> STRING and enable annotation
     private UUID sectorId;
-    @Schema(description = "Reservation start time.", example = "2024-05-25T13:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Reservation start time.", example = "2024-07-25T13:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @FutureOrPresent(message = DTOMessages.RESERVATION_BEGIN_TIME_INVALID)
     private LocalDateTime beginTime;
-    @Schema(description = "Reservation end time.", example = "2024-05-25T15:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Reservation end time.", example = "2024-07-25T15:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @FutureOrPresent(message = DTOMessages.RESERVATION_END_TIME_INVALID)
     private LocalDateTime endTime;

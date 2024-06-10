@@ -40,17 +40,10 @@ import java.time.LocalDateTime;
 @Getter
 @NamedQueries(value = {
         @NamedQuery(
-                name = "UserLevel.findAllUserLevelsForGivenAccount",
-                query = """
-                        SELECT u FROM UserLevel u
-                        WHERE u.account.id = :accountId
-                        """
-        ),
-        @NamedQuery(
                 name = "UserLevel.findGivenUserLevelsForGivenAccount",
                 query = """
                         SELECT ul FROM UserLevel ul
-                        WHERE ul.account.id = :accountId AND TYPE(ul) = :userLevel
+                        WHERE ul.account.login = :login AND TYPE(ul) = :userLevel
                         """
         )
 })

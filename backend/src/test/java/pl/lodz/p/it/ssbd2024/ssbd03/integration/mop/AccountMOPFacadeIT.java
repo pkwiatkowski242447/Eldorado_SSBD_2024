@@ -65,10 +65,10 @@ public class AccountMOPFacadeIT extends TestcontainersConfig {
 
     @BeforeEach
     public void setup() {
-        address = new Address("dd", "casc", "wqc");
+        address = new Address("Boat", "90-000", "Pomorska");
         parking = new Parking(address);
-        sector = new Sector(parking, "dd", Sector.SectorType.COVERED, 23, 11, true);
-        reservation = new Reservation(sector);
+        sector = new Sector(parking, "AA-02", Sector.SectorType.COVERED, 23, 11, true);
+        reservation = new Reservation(sector, LocalDateTime.now());
         parkingEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.ENTRY);
         parkingEvent.setReservation(reservation);
         account = new Account("login", "haslo", "imie", "nazwisko", "email", "123456789");

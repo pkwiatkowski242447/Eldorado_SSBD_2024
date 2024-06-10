@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -34,6 +35,7 @@ public class ReservationOutputListDTO {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Schema(description = "Reservation ending time", example = "YYYY-MM-dd HH:mm", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime endingTime;
-    @Schema(description = "UUID identifier of the client linked with the reservation", example = "c276cb93-5cfe-4bf5-9998-ecdeee8ba06b", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Schema(description = "UUID identifier of the client linked with the reservation", example = "c276cb93-5cfe-4bf5-9998-ecdeee8ba06b")
     private UUID clientId;
 }

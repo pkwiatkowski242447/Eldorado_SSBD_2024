@@ -46,7 +46,8 @@ import java.util.List;
                 name = "Reservation.findAll",
                 query = """
                         SELECT r FROM Reservation r
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                        """
         ),
         @NamedQuery(
                 name = "Reservation.findActiveReservationsByLogin",
@@ -54,23 +55,8 @@ import java.util.List;
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
                           AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
-                        ORDER BY r.beginTime"""
-        ),
-        @NamedQuery(
-                name = "Reservation.findActiveReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.client.id = :clientId
-                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
-                        ORDER BY r.beginTime"""
-        ),
-        @NamedQuery(
-                name = "Reservation.findHistoricalReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.client.id = :clientId
-                          AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                       """
         ),
         @NamedQuery(
                 name = "Reservation.findHistoricalReservationsByLogin",
@@ -78,14 +64,8 @@ import java.util.List;
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
                           AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
-                        ORDER BY r.beginTime"""
-        ),
-        @NamedQuery(
-                name = "Reservation.findSectorReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.sector.id = :sectorId
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                       """
         ),
         @NamedQuery(
                 name = "Reservation.findAllReservationsMarkedForEnding",
@@ -93,6 +73,57 @@ import java.util.List;
                         SELECT r FROM Reservation r
                         WHERE r.beginTime < :timestamp
                         ORDER BY r.beginTime ASC
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.findClientReservation",
+                query = """
+                        SELECT r FROM Reservation r
+                         WHERE r.id = :reservationId
+                           AND r.client.account.login = :ownerLogin
+                        """
+        ),
+        // Creating reservation
+        @NamedQuery(
+                name = "Reservation.countAllActiveUserReservationByLogin",
+                query = """
+                        SELECT COUNT(*) FROM Reservation r
+                        WHERE r.client.account.login = :clientLogin
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.countAllSectorReservationInTimeframe",
+                query = """
+                        SELECT COUNT(*) FROM Reservation r
+                        WHERE r.sector.id = :sectorId
+                        AND
+                        r.status != 'CANCELED'
+                        AND
+                        (
+                            (
+                                (r.beginTime BETWEEN :beginTimeMinusMaxReservationTime AND :beginTimePlusMaxReservationTime)
+                                AND
+                                (
+                                    (
+                                        r.endTime IS NULL
+                                        OR
+                                        (
+                                            r.endTime < :beginTime
+                                            AND
+                                            (
+                                                :current_timestamp < r.endTime
+                                                OR
+                                                MOD(SIZE(r.parkingEvents), 2) = 1
+                                            )
+                                        )
+                                    )
+                                    OR
+                                    r.endTime > :beginTime
+                                )
+                            )
+                            OR
+                            (r.beginTime BETWEEN :beginTime AND :beginTimePlusMaxReservationTime)
+                        )
                         """
         )
 })
@@ -103,6 +134,11 @@ public class Reservation extends AbstractEntity implements Serializable {
      */
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Enum class representing the status of the Reservation entity.
+     */
+    public enum ReservationStatus { AWAITING, IN_PROGRESS, COMPLETED_MANUALLY, COMPLETED_AUTOMATICALLY, CANCELED, TERMINATED }
 
     /**
      * The client associated with this reservation.
@@ -132,9 +168,8 @@ public class Reservation extends AbstractEntity implements Serializable {
     /**
      * The beginning time of this reservation.
      */
-    @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN)
+    @Column(name = DatabaseConsts.RESERVATION_BEGIN_TIME_COLUMN, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    @Setter
     private LocalDateTime beginTime;
 
     /**
@@ -152,6 +187,12 @@ public class Reservation extends AbstractEntity implements Serializable {
     @OneToMany(mappedBy = DatabaseConsts.RESERVATION_TABLE, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     @Getter
     private final List<ParkingEvent> parkingEvents = new ArrayList<>();
+
+    @NotNull(message = ReservationMessages.STATUS_NULL)
+    @Column(name = DatabaseConsts.RESERVATION_STATUS_COLUMN, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private ReservationStatus status;
 
     // Other fields - used for access control, and storing historical data
 
@@ -191,18 +232,23 @@ public class Reservation extends AbstractEntity implements Serializable {
      * Constructs a new reservation for a non-anonymous client.
      * @param client The Client on behalf of whom the reservation is made.
      * @param sector Sector in which the parking spot in allocated.
+     * @param beginTime Start time of the reservation.
      */
-    public Reservation(Client client, Sector sector) {
+    public Reservation(Client client, Sector sector, LocalDateTime beginTime) {
         this.client = client;
         this.sector = sector;
+        this.beginTime = beginTime;
+        this.status = ReservationStatus.AWAITING;
     }
 
     /**
      * Constructs a new reservation for a non-anonymous client.
      * @param sector Sector in which the parking spot in allocated.
+     * @param beginTime Start time of the reservation.
      */
-    public Reservation(Sector sector) {
-        this(null, sector);
+    public Reservation(Sector sector, LocalDateTime beginTime) {
+        this(null, sector, beginTime);
+        this.status = ReservationStatus.AWAITING;
     }
 
     /**

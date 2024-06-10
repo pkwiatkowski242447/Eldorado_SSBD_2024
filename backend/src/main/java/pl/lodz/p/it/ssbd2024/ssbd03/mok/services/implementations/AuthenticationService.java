@@ -251,7 +251,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         Token refreshTokenObject = this.tokenFacade.findByTokenValue(refreshToken).orElseThrow(TokenNotFoundException::new);
 
         // If account is blocked or inactive - then throw exception
-        if (!foundAccount.couldAuthenticate()) {
+        if (!foundAccount.isEnabled()) {
             throw new AccountAuthenticationException();
         }
 

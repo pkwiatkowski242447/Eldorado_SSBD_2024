@@ -1,10 +1,10 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.implementations;
 
-import ch.qos.logback.core.util.TimeUtil;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -13,7 +13,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.util.RunAsSystem;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
@@ -35,6 +34,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
+@Profile("!test")
 @LoggerInterceptor
 @TxTracked
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -52,7 +52,10 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     private final ParkingFacade parkingFacade;
 
     @Autowired
-    public ScheduleMOPService(ReservationFacade reservationFacade, UserLevelMOPFacade userLevelFacade, ParkingEventFacade parkingEventFacade, ParkingFacade parkingFacade) {
+    public ScheduleMOPService(ReservationFacade reservationFacade,
+                              UserLevelMOPFacade userLevelFacade,
+                              ParkingEventFacade parkingEventFacade,
+                              ParkingFacade parkingFacade) {
         this.reservationFacade = reservationFacade;
         this.userLevelFacade = userLevelFacade;
         this.parkingEventFacade = parkingEventFacade;

@@ -19,21 +19,29 @@ public class SectorModifyDTO extends SectorSignableDTO {
 
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
+
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
+
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
 
+    @Schema(description = "The status of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Boolean active;
+
     public SectorModifyDTO(UUID id,
+                           UUID parkingId,
                            Long version,
                            String name,
                            Sector.SectorType type,
                            Integer maxPlaces,
-                           Integer weight) {
-        super(id, version, name);
+                           Integer weight,
+                           Boolean active) {
+        super(id, parkingId, version, name);
         this.type = type;
         this.maxPlaces = maxPlaces;
         this.weight = weight;
+        this.active = active;
     }
 
     /**

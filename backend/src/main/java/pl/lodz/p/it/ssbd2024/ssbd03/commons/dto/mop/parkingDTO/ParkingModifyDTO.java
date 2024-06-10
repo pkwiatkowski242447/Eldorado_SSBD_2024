@@ -4,32 +4,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.AddressConsts;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.ParkingConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.AddressMessages;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
-
-import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @LoggerInterceptor
-public class ParkingModifyDTO extends ParkingSignableDTO{
-
-    @Schema(description = "Identifier of parking which is being edited.", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
-    //@NotBlank(message = ParkingMessages.UUID_BLANK)
-    //@Pattern(regexp = ParkingConsts.UUID_REGEX, message = ParkingMessages.UUID_REGEX_NOT_MET)
-    //
-    // todo change UUID -> STRING, and enable validation
-    private UUID parkingId;
+public class ParkingModifyDTO extends ParkingSignableDTO {
 
     @Schema(description = "City in which the parking is located", example = "LA", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = AddressMessages.CITY_BLANK)
@@ -68,7 +55,6 @@ public class ParkingModifyDTO extends ParkingSignableDTO{
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("ParkingId: ", parkingId)
                 .append("city: ", city)
                 .append("zipCode: ", zipCode)
                 .append("street: ", street)
