@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
@@ -89,6 +91,7 @@ public class Parking extends AbstractEntity {
      */
     @NotNull(message = ParkingMessages.ADDRESS_NULL)
     @Embedded
+    @Valid
     @Setter
     private Address address;
 
@@ -145,6 +148,17 @@ public class Parking extends AbstractEntity {
     }
 
     /**
+     * Constructs a new parking entity with version setting.
+     *
+     * @param version Version of the constructed parking entity.
+     * @param address Address of the parking.
+     */
+    public Parking(Long version, Address address) {
+        super(version);
+        this.address = address;
+    }
+
+    /**
      * Add a new sector to the Parking. Sector is created and managed by the Parking.
      *
      * @param name      Sector's name.
@@ -160,7 +174,7 @@ public class Parking extends AbstractEntity {
      * Removes the sector from the parking.
      * Note that it doesn't mean the sector is removed from the database, because of the bidirectional relationship.
      *
-     * @param sectorName
+     * @param sectorName Name of the sector to be removed from the parking.
      */
     public void deleteSector(String sectorName) {
         //Replace sector list with the list without the specified sector
