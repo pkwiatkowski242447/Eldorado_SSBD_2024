@@ -237,7 +237,8 @@ public class ParkingFacadeIT extends TestcontainersConfig {
 
         List<Sector> listOfSectorsNo1 = parkingNo1.getSectors();
         for (int i = 0; i < listOfSectorsNo1.size(); i++) {
-            listOfSectorsNo1.get(i).setAvailablePlaces(i);
+            Sector sectorCopy = listOfSectorsNo1.get(i);
+            sectorCopy.setOccupiedPlaces(sectorCopy.getMaxPlaces() - i);
         }
 
         List<Sector> listOfSectorsNo2 = parkingFacade.findSectorInParkingWithAvailablePlaces(parkingNo1.getId(), 0, 15, true);
@@ -262,7 +263,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
 
         List<Sector> listOfSectors = parkingNo1.getSectors();
         for (int i = 0; i < listOfSectors.size(); i++) {
-            listOfSectors.get(i).setAvailablePlaces(i);
+            listOfSectors.get(i).setOccupiedPlaces(i);
         }
         List<Parking> listOfParkingLots = parkingFacade.findParkingWithAvailablePlaces(0, 5, true);
         assertEquals(2, listOfParkingLots.size());

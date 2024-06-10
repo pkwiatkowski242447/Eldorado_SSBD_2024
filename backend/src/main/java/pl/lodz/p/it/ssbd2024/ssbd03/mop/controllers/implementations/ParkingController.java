@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
@@ -321,14 +319,13 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.EXIT_PARKING)
-    public ResponseEntity<?> exitParking(String reservationId) throws ApplicationBaseException {
+    public ResponseEntity<?> exitParking(String reservationId, boolean endReservation) throws ApplicationBaseException {
         try {
-            this.parkingService.exitParking(UUID.fromString(reservationId));
+            String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+            this.parkingService.exitParking(UUID.fromString(reservationId), userLogin, endReservation);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(new ExceptionDTO(I18n.UUID_INVALID));
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
     }
 }

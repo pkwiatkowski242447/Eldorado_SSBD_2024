@@ -73,7 +73,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findWithAvailablePlaces",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0)
+                        WHERE s.occupiedPlaces < s.maxPlaces AND (:showOnlyActive != true OR s.weight>0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),

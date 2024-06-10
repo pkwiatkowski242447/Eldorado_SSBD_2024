@@ -57,7 +57,7 @@ import java.time.LocalDateTime;
                 name = "Sector.findWithAvailablePlaces",
                 query = """
                         SELECT s FROM Sector s
-                        WHERE s.availablePlaces != 0 AND s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight > 0)
+                        WHERE s.occupiedPlaces < s.maxPlaces AND s.parking.id = :parkingId AND (:showOnlyActive != true OR s.weight > 0)
                         ORDER BY s.name"""
         ),
         @NamedQuery(
@@ -134,11 +134,11 @@ public class Sector extends AbstractEntity implements Serializable {
     /**
      * The current number of available parking spots in this sector.
      */
-    @NotNull(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NULL)
-    @PositiveOrZero(message = SectorMessages.SECTOR_AVAILABLE_PLACES_NEGATIVE)
-    @Column(name = DatabaseConsts.SECTOR_AVAILABLE_PLACES_COLUMN, nullable = false)
+    @NotNull(message = SectorMessages.SECTOR_OCCUPIED_PLACES_NULL)
+    @PositiveOrZero(message = SectorMessages.SECTOR_OCCUPIED_PLACES_NEGATIVE)
+    @Column(name = DatabaseConsts.SECTOR_OCCUPIED_PLACES_COLUMN, nullable = false)
     @Setter
-    private Integer availablePlaces = maxPlaces;
+    private Integer occupiedPlaces = maxPlaces;
 
     /**
      * The weight of this sector in spot assigning algorithms.
@@ -206,7 +206,7 @@ public class Sector extends AbstractEntity implements Serializable {
         this.name = name;
         this.type = type;
         this.maxPlaces = maxPlaces;
-        this.availablePlaces = maxPlaces;
+        this.occupiedPlaces = maxPlaces;
         this.weight = weight;
         this.active = active;
     }

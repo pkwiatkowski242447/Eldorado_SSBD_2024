@@ -107,7 +107,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @Override
     @RolesAllowed({
             Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION,
-            Authorities.CANCEL_RESERVATION
+            Authorities.EXIT_PARKING, Authorities.CANCEL_RESERVATION
     })
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);

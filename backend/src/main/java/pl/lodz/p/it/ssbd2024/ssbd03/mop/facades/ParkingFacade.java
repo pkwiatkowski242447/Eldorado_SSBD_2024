@@ -403,12 +403,16 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
+<<<<<<< HEAD
+     * Force incrementing version of sector entity.
+=======
      * This method is used to force incrementing version field on the parking entity object
      * for given sector. Used when updating the aggregate.
      *
      * @param sector Sector which causes version increment in the parking entity object.
      * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
      *                                  facade exception handling aspect.
+>>>>>>> 93060683e7e7d76bdea942080ad8522caee753ca
      */
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.CannotExitParkingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.exception.ParkingConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingAddressDuplicateException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingDeleteException;
@@ -53,6 +54,23 @@ public class ParkingExceptionResolver {
      */
     @ExceptionHandler(value = {ParkingDeleteException.class, SectorDeleteException.class})
     public ResponseEntity<?> handleParkingDeleteException(Exception exception) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(exception.getMessage()));
+    }
+
+    /**
+     * This method transforms any CannotExitParkingException, propagating from the controller layer
+     * to the HTTP response containing internationalization key with status code, which in this case is
+     * 400 BAD REQUEST.
+     *
+     * @param exception Exception of type CannotExitParkingException (or subclass of that exception), propagating from
+     *                  the controller layer.
+     * @return HTTP Response with status 400 BAD REQUEST and internationalization key, which is located in the
+     * Response body.
+     */
+    @ExceptionHandler(value = {CannotExitParkingException.class})
+    public ResponseEntity<?> handleCannotExitParkingException(CannotExitParkingException exception) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(exception.getMessage()));
