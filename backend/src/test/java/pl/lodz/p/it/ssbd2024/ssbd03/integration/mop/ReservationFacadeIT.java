@@ -100,9 +100,9 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.GET_ALL_RESERVATIONS, Authorities.CANCEL_RESERVATION, Authorities.RESERVE_PARKING_PLACE})
     public void reservationFacadeFindAllReservationsWithPaginationTest() throws ApplicationBaseException {
-        List<Reservation> reservations = reservationFacade.findAllWithPagination(0, 15);
+        List<Reservation> reservations = reservationFacade.findAllWithPagination(0, 50);
         assertNotNull(reservations);
-        assertEquals(14, reservations.size());
+        assertEquals(15, reservations.size());
     }
 
     @Test

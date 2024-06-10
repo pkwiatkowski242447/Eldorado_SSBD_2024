@@ -26,12 +26,14 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ReservationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller used for manipulating reservations and parking events in the system.
@@ -105,7 +107,12 @@ public class ReservationController implements ReservationControllerInterface {
     @Override
     @RolesAllowed(Authorities.CANCEL_RESERVATION)
     public ResponseEntity<?> cancelReservation(String id) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        try {
+            reservationService.cancelReservation(UUID.fromString(id));
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @Override

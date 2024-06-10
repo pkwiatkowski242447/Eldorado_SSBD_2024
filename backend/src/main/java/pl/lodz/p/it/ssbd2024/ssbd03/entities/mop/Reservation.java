@@ -46,7 +46,8 @@ import java.util.List;
                 name = "Reservation.findAll",
                 query = """
                         SELECT r FROM Reservation r
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                        """
         ),
         @NamedQuery(
                 name = "Reservation.findActiveReservationsByLogin",
@@ -54,7 +55,8 @@ import java.util.List;
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
                           AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                       """
         ),
         @NamedQuery(
                 name = "Reservation.findActiveReservations",
@@ -70,7 +72,8 @@ import java.util.List;
                         SELECT r FROM Reservation r
                         WHERE r.client.id = :clientId
                           AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                        """
         ),
         @NamedQuery(
                 name = "Reservation.findHistoricalReservationsByLogin",
@@ -78,14 +81,16 @@ import java.util.List;
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
                           AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                       """
         ),
         @NamedQuery(
                 name = "Reservation.findSectorReservations",
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.sector.id = :sectorId
-                        ORDER BY r.beginTime"""
+                        ORDER BY r.beginTime
+                        """
         ),
         @NamedQuery(
                 name = "Reservation.findAllReservationsMarkedForEnding",
@@ -93,6 +98,14 @@ import java.util.List;
                         SELECT r FROM Reservation r
                         WHERE r.beginTime < :timestamp
                         ORDER BY r.beginTime ASC
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.findClientReservation",
+                query = """
+                        SELECT r FROM Reservation r
+                         WHERE r.id = :reservationId
+                           AND r.client.account.login = :ownerLogin
                         """
         ),
         // Creating reservation
@@ -108,6 +121,8 @@ import java.util.List;
                 query = """
                         SELECT COUNT(*) FROM Reservation r
                         WHERE r.sector.id = :sectorId
+                        AND
+                        r.status != 'CANCELED'
                         AND
                         (
                             (
