@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mop;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
@@ -42,7 +43,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findAll",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE (:showOnlyActive != true OR s.weight>0)
+                        WHERE (:showOnlyActive != true OR s.weight > 0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
@@ -91,6 +92,7 @@ public class Parking extends AbstractEntity {
      */
     @NotNull(message = ParkingMessages.ADDRESS_NULL)
     @Embedded
+    @Valid
     @Setter
     private Address address;
 
@@ -143,6 +145,17 @@ public class Parking extends AbstractEntity {
      * @param address Parking's address
      */
     public Parking(Address address) {
+        this.address = address;
+    }
+
+    /**
+     * Constructs a new parking entity with version setting.
+     *
+     * @param version Version of the constructed parking entity.
+     * @param address Address of the parking.
+     */
+    public Parking(Long version, Address address) {
+        super(version);
         this.address = address;
     }
 

@@ -206,3 +206,6 @@ INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUE
 
 -- 11
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('7f4dc283-9140-4b6b-bec8-92b99b472856', current_timestamp, TIMESTAMP '2024-12-15 12:00:00', TIMESTAMP '2024-12-15 14:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'AWAITING');
+
+-- 12 CANCELED
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('836a3b41-c11d-466a-8c54-900f87ed1195', current_timestamp, TIMESTAMP '2024-12-12 6:00:00', TIMESTAMP '2024-12-12 15:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'CANCELLED');

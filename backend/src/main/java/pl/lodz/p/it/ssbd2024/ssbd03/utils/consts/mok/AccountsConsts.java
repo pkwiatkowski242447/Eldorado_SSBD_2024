@@ -25,4 +25,8 @@ public class AccountsConsts {
     public static final String LANGUAGE_REGEX = "^([A-Z]{2}|[a-z]{2})$";
 
     public static final String PHONE_NUMBER_REGEX = "^(?<!\\w)(\\(?(\\+|00)?[1-9][0-9]{0,2}\\)?)?[ -]?\\d{3}[ -]?\\d{3}[ -]?\\d{3}(?!\\w)$";
+
+    public static final int AUTH_CODE_MIN_LENGTH = 8;
+    public static final int AUTH_CODE_MAX_LENGTH = 8;
+    public static final String AUTH_CODE_REGEX = "^[0-9]{8}$";
 }
