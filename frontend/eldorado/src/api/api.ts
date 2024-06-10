@@ -232,7 +232,11 @@ export const api = {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
 
-    getHistoricalReservationsSelf: (pageNumber: string, pageSize: string) => {
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     }
 }
