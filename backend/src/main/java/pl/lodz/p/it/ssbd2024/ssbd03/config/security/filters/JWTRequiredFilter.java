@@ -47,7 +47,7 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         put("^/api/v1/auth/login-auth-code", HttpMethod.POST.name());
         put("^/api/v1/register/client", HttpMethod.POST.name());
         put("^/api/v1/accounts/forgot-password", HttpMethod.POST.name());
-        put("^/api/v1/accounts/change-password/.*", HttpMethod.PATCH.name());
+        put("^/api/v1/accounts/change-password/.*", HttpMethod.POST.name());
         put("^/api/v1/accounts/activate-account/.*", HttpMethod.POST.name());
         put("^/api/v1/accounts/confirm-email/.*", HttpMethod.POST.name());
         put("^/api/v1/accounts/restore-access", HttpMethod.POST.name());
@@ -80,6 +80,9 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         for (String key : WHITELIST_MAP.keySet()) {
             String methodName = WHITELIST_MAP.get(key);
+            log.debug("Path in the application: {}", urlPathHelper.getPathWithinApplication(request));
+            log.debug("Key: {}", key);
+            log.debug("Result: {}", urlPathHelper.getPathWithinApplication(request).matches(key));
             if (urlPathHelper.getPathWithinApplication(request).matches(key) &&
                     (methodName == null ||
                     request.getMethod().equals(methodName))) return true;
