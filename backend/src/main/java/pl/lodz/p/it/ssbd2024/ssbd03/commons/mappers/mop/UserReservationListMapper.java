@@ -4,11 +4,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.UserReservati
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Address;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 
-public class UserHistoricalReservationListMapper {
+public class UserReservationListMapper {
+
     static public UserReservationOutputListDTO toSectorListDTO(Reservation reservation) {
         Address parkingAddress = reservation.getSector().getParking().getAddress();
-        return new UserReservationOutputListDTO(
-                reservation.getId(),
+        return new UserReservationOutputListDTO(reservation.getId(),
                 parkingAddress.getCity(),
                 parkingAddress.getZipCode(),
                 parkingAddress.getStreet(),

@@ -146,11 +146,11 @@ import java.util.List;
                 name = "Reservation.getAvailablePremiumSectorsNow",
                 query = """
                         SELECT sectorFin FROM Sector sectorFin
-                        WHERE sectorFin.active = true
+                        WHERE (sectorFin.deactivationTime IS NULL OR sectorFin.deactivationTime > :deactivationMinimum)
                         AND sectorFin.parking.id = :parkingId
                         AND sectorFin NOT IN (
                             SELECT r.sector FROM Reservation r
-                            WHERE r.sector.active = true
+                            WHERE (r.sector.deactivationTime IS NULL OR r.sector.deactivationTime > :deactivationMinimum)
                             AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
                             AND r.sector.parking.id = :parkingId
                             AND
@@ -184,12 +184,12 @@ import java.util.List;
                 name = "Reservation.getAvailableStandardSectorsNow",
                 query = """
                         SELECT sectorFin FROM Sector sectorFin
-                        WHERE sectorFin.active = true
+                        WHERE (sectorFin.deactivationTime IS NULL OR sectorFin.deactivationTime > :deactivationMinimum)
                         AND sectorFin.type IN (SectorType.UNCOVERED, SectorType.COVERED)
                         AND sectorFin.parking.id = :parkingId
                         AND sectorFin NOT IN (
                             SELECT r.sector FROM Reservation r
-                            WHERE r.sector.active = true
+                            WHERE (r.sector.deactivationTime IS NULL OR r.sector.deactivationTime > :deactivationMinimum)
                             AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
                             AND r.sector.parking.id = :parkingId
                             AND
@@ -223,12 +223,12 @@ import java.util.List;
                 name = "Reservation.getAvailableBasicSectorsNow",
                 query = """
                         SELECT sectorFin FROM Sector sectorFin
-                        WHERE sectorFin.active = true
+                        WHERE (sectorFin.deactivationTime IS NULL OR sectorFin.deactivationTime > :deactivationMinimum)
                         AND sectorFin.type = SectorType.UNCOVERED
                         AND sectorFin.parking.id = :parkingId
                         AND sectorFin NOT IN (
                             SELECT r.sector FROM Reservation r
-                            WHERE r.sector.active = true
+                            WHERE (r.sector.deactivationTime IS NULL OR r.sector.deactivationTime > :deactivationMinimum)
                             AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
                             AND r.sector.parking.id = :parkingId
                             AND

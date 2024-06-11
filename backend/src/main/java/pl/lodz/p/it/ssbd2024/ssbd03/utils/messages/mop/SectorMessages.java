@@ -23,6 +23,8 @@ public class SectorMessages {
 
     public static final String SECTOR_ACTIVE_NULL = "bean.validation.sector.active.null";
 
+    public static final String DEACTIVATION_TIME_PAST = "bean.validation.sector.deactivation.time.in.past";
+
     public static final String CREATION_TIMESTAMP_FUTURE = "bean.validation.sector.creation.time.from.future";
     public static final String UPDATE_TIMESTAMP_FUTURE = "bean.validation.sector.update.time.from.future";
 }

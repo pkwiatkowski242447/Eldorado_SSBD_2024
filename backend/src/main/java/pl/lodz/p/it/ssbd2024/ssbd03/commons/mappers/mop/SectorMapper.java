@@ -24,8 +24,7 @@ public class SectorMapper {
                 sector.getName(),
                 sector.getType(),
                 sector.getMaxPlaces(),
-                sector.getWeight(),
-                sector.getActive()
+                sector.getWeight()
         );
     }
 
@@ -35,8 +34,7 @@ public class SectorMapper {
             sectorModifyDTO.getName(),
             sectorModifyDTO.getType(),
             sectorModifyDTO.getMaxPlaces(),
-            sectorModifyDTO.getWeight(),
-            sectorModifyDTO.getActive()
+            sectorModifyDTO.getWeight()
         );
     }
 }

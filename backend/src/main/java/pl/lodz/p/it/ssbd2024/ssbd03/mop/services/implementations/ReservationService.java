@@ -101,7 +101,7 @@ public class ReservationService implements ReservationServiceInterface {
         Sector sector = parkingFacade.findAndRefreshSectorById(sectorId).orElseThrow(SectorNotFoundException::new);
 
         // Check sector availability
-        if (!sector.getActive()) throw new ReservationSectorNonActiveException();
+        if (!sector.getActive(this.reservationMaxHours)) throw new ReservationSectorNonActiveException();
 
         // Check sector place availability
         long numOfPlacesTaken = reservationFacade.countAllSectorReservationInTimeframe(

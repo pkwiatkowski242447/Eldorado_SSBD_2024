@@ -45,10 +45,6 @@ public class SectorCreateDTO {
     @Schema(description = "The weight of the sector", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
 
-    @NotNull(message = SectorMessages.SECTOR_ACTIVE_NULL)
-    @Schema(description = "Determines whether the sector is active", defaultValue = "false", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Boolean active;
-
     /**
      * Custom toString() method implementation that
      * does not return any information relating to the business
