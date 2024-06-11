@@ -9,9 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DTOConsts;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.AddressConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations.ValueOfEnum;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.AddressConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.AddressMessages;
 
 @Getter
@@ -40,4 +41,7 @@ public class ParkingCreateDTO {
     @Size(min = AddressConsts.STREET_MIN_LENGTH, message = AddressMessages.STREET_NAME_TOO_SHORT)
     @Size(max = AddressConsts.STREET_MAX_LENGTH, message = AddressMessages.STREET_NAME_TOO_LONG)
     private String street;
+    @ValueOfEnum(enumClass = Parking.SectorDeterminationStrategy.class, message = DTOMessages.PARKING_ENUM_INVALID)
+    @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String strategy;
 }

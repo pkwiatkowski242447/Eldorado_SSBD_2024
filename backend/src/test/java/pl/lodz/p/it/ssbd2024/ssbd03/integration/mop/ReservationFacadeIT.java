@@ -26,6 +26,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,7 +67,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     @BeforeEach
     public void setup() {
         address = new Address("Strykow","90-000","Kosciuszki");
-        parking = new Parking(address);
+        parking = new Parking(address, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         sector = new Sector(parking,"AA-02", Sector.SectorType.COVERED,23,11, true);
         reservation = new Reservation(sector, LocalDateTime.now());
     }
@@ -102,7 +103,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     public void reservationFacadeFindAllReservationsWithPaginationTest() throws ApplicationBaseException {
         List<Reservation> reservations = reservationFacade.findAllWithPagination(0, 50);
         assertNotNull(reservations);
-        assertEquals(15, reservations.size());
+        assertEquals(35, reservations.size());
     }
 
     @Test

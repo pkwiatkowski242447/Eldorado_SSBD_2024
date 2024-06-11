@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,14 +9,19 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeWithSectorDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.CannotExitParkingException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientAccountNonEnabledException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationExpiredException;
@@ -26,14 +30,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.SectorInvalidDeactivat
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.edit.SectorEditOfTypeOrMaxPlacesWhenActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccupied;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccupiedWeighted;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.MostOccupied;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.SectorStrategy;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,26 +62,32 @@ public class ParkingService implements ParkingServiceInterface {
     private final ParkingFacade parkingFacade;
     private final ReservationFacade reservationFacade;
     private final AccountMOPFacade accountFacade;
+    private final UserLevelMOPFacade userLevelMOPFacade;
 
     @Value("${reservation.max_hours}")
     private Integer reservationMaxHours;
 
+    @Value("${reservation.client_limit}")
+    private Integer clientLimit;
+
     @Autowired
     public ParkingService(ParkingFacade parkingFacade,
                           ReservationFacade reservationFacade,
-                          AccountMOPFacade accountFacade) {
+                          AccountMOPFacade accountFacade,
+                          UserLevelMOPFacade userLevelMOPFacade) {
         this.parkingFacade = parkingFacade;
         this.reservationFacade = reservationFacade;
         this.accountFacade = accountFacade;
+        this.userLevelMOPFacade = userLevelMOPFacade;
     }
 
     // MOP.2 - Add parking
 
     @Override
     @RolesAllowed({Authorities.ADD_PARKING})
-    public Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException {
+    public Parking createParking(String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) throws ApplicationBaseException {
         Address address = new Address(city, zipCode, street);
-        Parking parking = new Parking(address);
+        Parking parking = new Parking(address, strategy);
         this.parkingFacade.create(parking);
         return parking;
     }
@@ -252,7 +265,7 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.DELETE_SECTOR})
-    public void removeSectorById(UUID id) throws ApplicationBaseException{
+    public void removeSectorById(UUID id) throws ApplicationBaseException {
         Sector sector = this.parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
         this.parkingFacade.removeSector(sector);
     }
@@ -267,8 +280,43 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
-    public AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+    public Reservation enterParkingWithoutReservation(UUID parkingId, String login, boolean isAnonymous) throws ApplicationBaseException {
+        Client client = null;
+        Client.ClientType clientType = Client.ClientType.BASIC;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        //checks when entry is not anonymous
+        if (!isAnonymous) {
+            client = userLevelMOPFacade.findGivenUserLevelForGivenAccount(login).orElseThrow(ReservationClientUserLevelNotFound::new);
+
+            // Check client availability
+            if (!client.getAccount().isEnabled()) throw new ReservationClientAccountNonEnabledException();
+
+            // Check client reservations limit
+            if (reservationFacade.countAllActiveUserReservationByLogin(login) + 1 > clientLimit)
+                throw new ReservationClientLimitException();
+
+            clientType = client.getType();
+        }
+        List<Sector> result = parkingFacade.getAvailableSectorsNow(clientType, parkingId, currentTime, reservationMaxHours);
+
+        //TODO add multiple algorithms for determining sector assignment
+        if (result.isEmpty()) throw new ReservationNoAvailablePlaceException();
+        SectorStrategy sectorStrategy = switch (result.getFirst().getParking().getSectorStrategy()) {
+            case LEAST_OCCUPIED -> new LeastOccupied();
+            case MOST_OCCUPIED -> new MostOccupied();
+            case LEAST_OCCUPIED_WEIGHTED -> new LeastOccupiedWeighted();
+        };
+        Sector chosenSector = sectorStrategy.choose(result);
+
+        Reservation reservation = new Reservation(client, chosenSector, currentTime);
+        reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
+        reservationFacade.create(reservation);
+
+        chosenSector.setOccupiedPlaces(chosenSector.getOccupiedPlaces() + 1);
+        parkingFacade.editSector(chosenSector);
+
+        return reservation;
     }
 
     @Override

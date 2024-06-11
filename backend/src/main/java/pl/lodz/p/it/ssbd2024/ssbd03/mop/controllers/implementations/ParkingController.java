@@ -25,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
@@ -76,7 +77,7 @@ public class ParkingController implements ParkingControllerInterface {
     @RolesAllowed({Authorities.ADD_PARKING})
     public ResponseEntity<?> createParking(@Valid ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
         Parking parking = parkingService.createParking(parkingCreateDTO.getCity(), parkingCreateDTO.getZipCode(),
-                parkingCreateDTO.getStreet());
+                parkingCreateDTO.getStreet(), Parking.SectorDeterminationStrategy.valueOf(parkingCreateDTO.getStrategy()));
         return ResponseEntity.created(URI.create(this.createdParkingResourceURL + parking.getId())).build();
     }
 
@@ -87,7 +88,7 @@ public class ParkingController implements ParkingControllerInterface {
     public ResponseEntity<?> createSector(String parkingId, @Valid SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         try {
             parkingService.createSector(UUID.fromString(parkingId),
-                    sectorCreateDTO.getName(), sectorCreateDTO.getType(),
+                    sectorCreateDTO.getName(), Sector.SectorType.valueOf(sectorCreateDTO.getType()),
                     sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
                     sectorCreateDTO.getActive());
         } catch (IllegalArgumentException exception) {
@@ -230,7 +231,11 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
     public ResponseEntity<?> enterParkingWithoutReservation(String parkingId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        boolean isAnonymous = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString().isEmpty();
+
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Reservation reservation = parkingService.enterParkingWithoutReservation(UUID.fromString(parkingId), login, isAnonymous);
+        return ResponseEntity.ok(UserActiveReservationListMapper.toSectorListDTO(reservation));
     }
 
     @Override

@@ -39,7 +39,7 @@ public class SectorUnitTest {
         STREET = "streetNo1";
 
         ADDRESS = new Address(CITY, ZIP_CODE, STREET);
-        PARKING = new Parking(ADDRESS);
+        PARKING = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
 
         SECTOR_NAME_NO_1 = "sectorNameNo1";
         SECTOR_NAME_NO_2 = "sectorNameNo2";

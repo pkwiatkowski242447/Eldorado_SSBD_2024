@@ -17,6 +17,6 @@ public class ParkingListMapper {
         }
 
         return new ParkingOutputListDTO(parking.getId(), parking.getAddress().getCity(), parking.getAddress().getZipCode(), parking.getAddress().getStreet(),
-                sectorTypeList.stream().toList());
+                sectorTypeList.stream().toList(), parking.getSectorStrategy());
     }
 }

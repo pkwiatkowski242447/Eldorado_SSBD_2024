@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,4 +31,6 @@ public class ParkingOutputListDTO {
 
     @Schema(description = "Sector types on parking", example = "[\"UNDERGROUND\", \"COVERED\"]", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> sectorTypes;
+    @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Parking.SectorDeterminationStrategy strategy;
 }

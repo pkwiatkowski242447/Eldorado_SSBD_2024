@@ -60,7 +60,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      *                                  facade exception handling aspect.
      */
     @Override
-    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE})
+    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public void create(Reservation entity) throws ApplicationBaseException {
         super.create(entity);
     }
@@ -218,7 +218,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
      *                                  facade exception handling aspect.
      */
-    @RolesAllowed({Authorities.GET_ACTIVE_RESERVATIONS})
+    @RolesAllowed({Authorities.GET_ACTIVE_RESERVATIONS, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public long countAllActiveUserReservationByLogin(String login) throws ApplicationBaseException {
         TypedQuery<Long> countAllActiveUserReservationByLoginWithPaginationQuery =
                 entityManager.createNamedQuery("Reservation.countAllActiveUserReservationByLogin", Long.class);

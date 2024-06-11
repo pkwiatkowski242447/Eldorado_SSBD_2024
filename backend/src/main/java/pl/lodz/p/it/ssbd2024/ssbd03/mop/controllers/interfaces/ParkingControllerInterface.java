@@ -62,7 +62,8 @@ public interface ParkingControllerInterface {
             @ApiResponse(responseCode = "409", description = "Parking with specified data already exists"),
             @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
     })
-    ResponseEntity<?> createSector(@PathVariable("id") String parkingId,@Valid @RequestBody SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException;
+    ResponseEntity<?> createSector(@PathVariable("id") String parkingId, @Valid @RequestBody SectorCreateDTO sectorCreateDTO)
+            throws ApplicationBaseException;
 
     /**
      * This method is used to find all parking in the system, using pagination.
@@ -137,7 +138,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get parking", description = "The endpoint is used retrieve list of parking with given id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Parking info."),
@@ -232,8 +233,7 @@ public interface ParkingControllerInterface {
 
     /**
      * This method is used to begin parking spot allocation. Basically, it generates a parking event for entry,
-     * which marks the start of the allocation, and then generates the exit code, which will be needed to end the
-     * allocation. User may enter chosen parking without previously making a reservation. The spot is then assigned
+     * which marks the start of the allocation. User may enter chosen parking without previously making a reservation. The spot is then assigned
      * according to the parking's spot assignment algorithm. After choosing the spot in prompt reservation is created.
      *
      * @param parkingId Identifier of the parking, which the client wants to enter.
@@ -244,7 +244,7 @@ public interface ParkingControllerInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      *                                  exception handling aspects from facade and service layers below.
      */
-    @PostMapping(value = "/{id}/enter")
+    @PostMapping(value = "/{id}/enter", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> enterParkingWithoutReservation(@PathVariable("id") String parkingId) throws ApplicationBaseException;
 
     /**

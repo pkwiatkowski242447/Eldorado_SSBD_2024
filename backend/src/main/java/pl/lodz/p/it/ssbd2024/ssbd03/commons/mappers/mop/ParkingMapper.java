@@ -25,7 +25,8 @@ public class ParkingMapper {
                 parking.getId(),
                 parking.getAddress().getCity(),
                 parking.getAddress().getZipCode(),
-                parking.getAddress().getStreet()
+                parking.getAddress().getStreet(),
+                parking.getSectorStrategy()
         );
     }
 
@@ -36,6 +37,6 @@ public class ParkingMapper {
      */
     public static Parking toParking(ParkingModifyDTO parkingModifyDTO) {
         Address address = new Address(parkingModifyDTO.getCity(),parkingModifyDTO.getZipCode(), parkingModifyDTO.getStreet());
-        return new Parking(parkingModifyDTO.getVersion(), address);
+        return new Parking(address, Parking.SectorDeterminationStrategy.valueOf(parkingModifyDTO.getStrategy()));
     }
 }

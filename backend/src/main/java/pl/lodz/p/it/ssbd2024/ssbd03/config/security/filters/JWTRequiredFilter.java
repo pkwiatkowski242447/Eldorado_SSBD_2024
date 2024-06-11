@@ -55,6 +55,9 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         put("^/api/v1/parking/sectors/get/%s".formatted(UUID_REGEX), HttpMethod.GET.name());
         put("^/api/v1/parking/active", HttpMethod.GET.name());
         put("^/api/v1/parking/reservations/%s/exit$".formatted(UUID_REGEX), HttpMethod.POST.name());
+        put("^/api/v1/parking/%s/enter$".formatted(UUID_REGEX), HttpMethod.POST.name());
+        put("^/api/v1/parking/get/%s$".formatted(UUID_REGEX), HttpMethod.GET.name());
+        put("^/api/v1/parking/client/sectors/%s$".formatted(UUID_REGEX), HttpMethod.GET.name());
     }};
 
     @Override
@@ -80,9 +83,9 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         for (String key : WHITELIST_MAP.keySet()) {
             String methodName = WHITELIST_MAP.get(key);
-            log.debug("Path in the application: {}", urlPathHelper.getPathWithinApplication(request));
-            log.debug("Key: {}", key);
-            log.debug("Result: {}", urlPathHelper.getPathWithinApplication(request).matches(key));
+//            log.debug("Path in the application: {}", urlPathHelper.getPathWithinApplication(request));
+//            log.debug("Key: {}", key);
+//            log.debug("Result: {}", urlPathHelper.getPathWithinApplication(request).matches(key));
             if (urlPathHelper.getPathWithinApplication(request).matches(key) &&
                     (methodName == null ||
                     request.getMethod().equals(methodName))) return true;
