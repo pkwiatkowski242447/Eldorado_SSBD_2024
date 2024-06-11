@@ -99,6 +99,10 @@ public class Authorities {
     public static final String GET_ALL_RESERVATIONS = "GET_ALL_RESERVATIONS";
     // MOP 23
     public static final String END_RESERVATION = "END_RESERVATION";
+    // MOP 24
+    public static final String GET_OWN_RESERVATION_DETAILS = "GET_OWN_RESERVATION_DETAILS";
+    // MOP 25
+    public static final String GET_ANY_RESERVATION_DETAILS = "GET_ANY_RESERVATION_DETAILS";
 
     // Additional
 

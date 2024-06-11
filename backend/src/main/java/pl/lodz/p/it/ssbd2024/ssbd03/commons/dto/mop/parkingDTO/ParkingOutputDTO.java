@@ -28,6 +28,7 @@ public class ParkingOutputDTO extends ParkingSignableDTO {
 
     @Schema(description = "Street of the city in which the parking is located", example = "white", requiredMode = Schema.RequiredMode.REQUIRED)
     private String street;
+
     @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
     private Parking.SectorDeterminationStrategy strategy;
 

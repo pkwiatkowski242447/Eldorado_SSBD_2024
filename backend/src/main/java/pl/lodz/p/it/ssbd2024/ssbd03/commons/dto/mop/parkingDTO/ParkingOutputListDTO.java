@@ -31,6 +31,7 @@ public class ParkingOutputListDTO {
 
     @Schema(description = "Sector types on parking", example = "[\"UNDERGROUND\", \"COVERED\"]", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<String> sectorTypes;
+
     @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
     private Parking.SectorDeterminationStrategy strategy;
 }
