@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.annotations.ValueOfEnum;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mop.SectorConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.SectorMessages;
 
@@ -26,9 +28,10 @@ public class SectorCreateDTO {
     @Schema(description = "The name of the sector", example = "AB-09", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
+    @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = SectorMessages.SECTOR_TYPE_NULL)
-    @Schema(description = "The type of the sector", example = "UNDERGROUND", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Sector.SectorType type;
+    @ValueOfEnum(enumClass = Sector.SectorType.class, message = DTOMessages.SECTOR_ENUM_INVALID)
+    private String type;
 
     @NotNull(message = SectorMessages.SECTOR_OCCUPIED_PLACES_NULL)
     @PositiveOrZero(message = SectorMessages.SECTOR_OCCUPIED_PLACES_NEGATIVE)

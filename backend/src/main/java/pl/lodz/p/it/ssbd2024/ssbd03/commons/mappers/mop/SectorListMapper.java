@@ -11,7 +11,7 @@ public class SectorListMapper {
      * @return Returns mapped SectorListDTO instance.
      */
     static public SectorListDTO toSectorListDTO(Sector s) {
-        return new SectorListDTO(s.getName(), s.getActive(), s.getType(),
+        return new SectorListDTO(s.getId(), s.getName(), s.getActive(), s.getType(),
             s.getMaxPlaces(), s.getOccupiedPlaces(), s.getWeight());
     }
 }

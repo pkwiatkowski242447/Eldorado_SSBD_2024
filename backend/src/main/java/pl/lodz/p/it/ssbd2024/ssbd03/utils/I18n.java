@@ -63,7 +63,7 @@ public class I18n {
     public static final String RESERVATION_NOT_STARTED_EXCEPTION = "reservation.not.started.exception";
     public static final String RESERVATION_EXPIRED_EXCEPTION = "reservation.expired.exception";
     public static final String RESERVATION_SECTOR_NO_AVAILABLE_PLACES_EXCEPTION = "reservation.sector.no.available.places.exception";
-
+    public static final String RESERVATION_SECTOR_NO_AVAILABLE_SECTORS_EXCEPTION = "reservation.sector.no.available.sectors.exception";
     public static final String RESERVATION_CLIENT_USER_LEVEL_NOT_FOUND = "reservation.user.level.client.not.found.exception";
     public static final String RESERVATION_CLIENT_ACCOUNT_NON_ENABLED = "reservation.client.account.non.enabled.exception";
     public static final String RESERVATION_SECTOR_NON_ACTIVE = "reservation.sector.non.active.exception";

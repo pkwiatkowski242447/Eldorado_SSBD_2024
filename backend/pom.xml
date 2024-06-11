@@ -23,6 +23,7 @@
         <spring-framework.version>6.1.4</spring-framework.version>
         <spring-security.version>6.2.3</spring-security.version>
         <spring-retry.version>2.0.5</spring-retry.version>
+        <spring-hateoas.version>2.3.0</spring-hateoas.version>
         <jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
         <jakarta.transaction-api>2.0.1</jakarta.transaction-api>
         <!--Persistence-->
@@ -169,6 +170,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
             <version>${spring-framework.version}</version>
+        </dependency>
+
+        <!-- Spring HATEOAS -->
+        <dependency>
+            <groupId>org.springframework.hateoas</groupId>
+            <artifactId>spring-hateoas</artifactId>
+            <version>${spring-hateoas.version}</version>
         </dependency>
 
         <!-- Spring Retry -->

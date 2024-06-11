@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.ReservationParkingEventListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.UserReservationOutputListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserHistoricalReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
@@ -22,13 +23,14 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.ReservationOu
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserActiveReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ReservationControllerInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
@@ -47,13 +49,10 @@ import java.util.UUID;
 public class ReservationController implements ReservationControllerInterface {
 
     private final ReservationServiceInterface reservationService;
-    private final ParkingServiceInterface parkingService;
 
     @Autowired
-    public ReservationController(ReservationServiceInterface reservationService,
-                                 ParkingServiceInterface parkingService) {
+    public ReservationController(ReservationServiceInterface reservationService) {
         this.reservationService = reservationService;
-        this.parkingService = parkingService;
     }
 
     @Override
@@ -116,7 +115,7 @@ public class ReservationController implements ReservationControllerInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_ALL_RESERVATIONS)
+    @RolesAllowed({Authorities.GET_ALL_RESERVATIONS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException {
@@ -126,5 +125,32 @@ public class ReservationController implements ReservationControllerInterface {
                 .toList();
         if (reservationList.isEmpty()) return ResponseEntity.noContent().build();
         else return ResponseEntity.ok(reservationList);
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS})
+    public ResponseEntity<?> getOwnReservationDetails(String reservationId, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+            Reservation reservation = this.reservationService.getOwnReservationById(UUID.fromString(reservationId), userLogin);
+            List<ParkingEvent> listOfParkingEvents = this.reservationService.getParkingEventsForGivenReservation(UUID.fromString(reservationId), pageNumber, pageSize);
+            ReservationParkingEventListDTO reservationDetailsDTO = ReservationListMapper.toReservationParkingEventListDTO(reservation, listOfParkingEvents);
+            return ResponseEntity.ok(reservationDetailsDTO);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_ANY_RESERVATION_DETAILS})
+    public ResponseEntity<?> getAnyReservationDetails(String reservationId, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            Reservation reservation = this.reservationService.getAnyReservationById(UUID.fromString(reservationId));
+            List<ParkingEvent> listOfParkingEvents = this.reservationService.getParkingEventsForGivenReservation(UUID.fromString(reservationId), pageNumber, pageSize);
+            ReservationParkingEventListDTO reservationDetailsDTO = ReservationListMapper.toReservationParkingEventListDTO(reservation, listOfParkingEvents);
+            return ResponseEntity.ok(reservationDetailsDTO);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
     }
 }

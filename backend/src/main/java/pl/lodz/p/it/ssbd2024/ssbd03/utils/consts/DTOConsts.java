@@ -38,4 +38,7 @@ public class DTOConsts {
     // Make reservation constants
     public static final String UUID_REGEX = "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$";
     public static final String DATE_REGEX = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9].\\d{3}Z$";
+
+    // ParkingOutputDTO internationalization keys
+    public static final String PARKING_EVENT_TYPE_PREFIX = "parking.event.type.";
 }

@@ -183,6 +183,7 @@ public class DatabaseConsts {
     public static final String PARKING_CITY_COLUMN = "city";
     public static final String PARKING_ZIP_CODE_COLUMN = "zip_code";
     public static final String PARKING_STREET_COLUMN = "street";
+    public static final String PARKING_SECTOR_STRATEGY_COLUMN = "sector_strategy";
 
     // public.parking_event table
 

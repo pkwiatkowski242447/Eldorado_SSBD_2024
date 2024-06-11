@@ -21,7 +21,8 @@ public class ParkingListMapper {
                 parking.getAddress().getCity(),
                 parking.getAddress().getZipCode(),
                 parking.getAddress().getStreet(),
-                sectorTypeList.stream().toList()
+                sectorTypeList.stream().toList(),
+                parking.getSectorStrategy()
         );
     }
 }

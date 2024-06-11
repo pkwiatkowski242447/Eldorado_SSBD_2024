@@ -8,15 +8,18 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class ReservationOutputListDTO {
+public class ReservationParkingEventListDTO {
 
     @Schema(description = "UUID identifier linked with parking", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID id;
@@ -46,4 +49,7 @@ public class ReservationOutputListDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Schema(description = "UUID identifier of the client linked with the reservation", example = "c276cb93-5cfe-4bf5-9998-ecdeee8ba06b")
     private UUID clientId;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    List<ParkingEventOutputDTO> parkingEvents;
 }

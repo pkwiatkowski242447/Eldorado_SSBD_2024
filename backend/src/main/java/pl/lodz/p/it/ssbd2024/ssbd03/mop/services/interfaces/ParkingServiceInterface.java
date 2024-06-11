@@ -1,7 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.allocationCodeDTO.AllocationCodeWithSectorDTO;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingAddressAlreadyTakenException;
@@ -26,9 +28,11 @@ public interface ParkingServiceInterface {
      * @param city City, where the parking is located, part of the Address object.
      * @param zipCode Zip code, of the administrative area, where the parking is located, part of the Address object.
      * @param street Street, which the parking is located at, part of the Address object.
+     * @param strategy Algorithm used in determining sector when entering parking without reservation.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Parking createParking(String city, String zipCode, String street) throws ApplicationBaseException;
+    Parking createParking(String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy)
+            throws ApplicationBaseException;
 
     /**
      * Create sector in the given parking.
@@ -158,16 +162,21 @@ public interface ParkingServiceInterface {
 
     /**
      * Uses parking's spot assignment algorithm to choose a parking spot for the requested entry. Then in creates
-     * a new reservation , generates allocation code and registers entry parking event. Moreover, if the entry is made
-     * by a registered client this method also sends an e-mail notification about beginning of the allocation
-     * with the allocation code, used to end the reservation later.
+     * a new reservation , generates allocation code and registers entry parking event.
      *
-     * @param userName Login of the user, who performs the action. May be null if the entry is made by an anonymous user
+     * @param parkingId ID of the parking that the user want to enter.
+     * @param login Login of the user, who performs the action.
+     * @param isAnonymous Determines whether the action is made by an anonymous user or not.
      * @return Data transfer object containing allocation code, used later for ending the allocation, and basic
      * information about the assigned sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    AllocationCodeWithSectorDTO enterParkingWithoutReservation(String userName) throws ApplicationBaseException;
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New reservation"),
+            @ApiResponse(responseCode = "400", description = "Entry was not possible due to reservation not being created."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    Reservation enterParkingWithoutReservation(UUID parkingId, String login, boolean isAnonymous) throws ApplicationBaseException;
 
     /**
      * Ends the parking allocation by registering the end of a parking event.

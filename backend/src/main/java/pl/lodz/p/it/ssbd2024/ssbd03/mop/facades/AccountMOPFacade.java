@@ -92,7 +92,8 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
     @RolesAllowed({
             Authorities.RESERVE_PARKING_PLACE, Authorities.CANCEL_RESERVATION,
             Authorities.GET_ACTIVE_RESERVATIONS, Authorities.GET_HISTORICAL_RESERVATIONS,
-            Authorities.ENTER_PARKING_WITHOUT_RESERVATION, Authorities.EXIT_PARKING
+            Authorities.ENTER_PARKING_WITHOUT_RESERVATION, Authorities.EXIT_PARKING,
+            Authorities.GET_OWN_RESERVATION_DETAILS
     })
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {

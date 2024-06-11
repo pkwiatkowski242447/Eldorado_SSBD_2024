@@ -11,10 +11,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -331,7 +333,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @RolesAllowed({
             Authorities.EDIT_SECTOR, Authorities.DEACTIVATE_SECTOR,
-            Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION
+            Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION,
+            Authorities.ENTER_PARKING_WITHOUT_RESERVATION
     })
     public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
@@ -416,5 +419,30 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {
         getEntityManager().lock(sector, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+    }
+
+
+    /**
+     * Retrieves all sectors available for entry for given client type in a given parking.
+     * @param clientType Client type determining type of sectors included.
+     * @param parkingId ID of the parking searched.
+     * @param now Time of entry to the parking. It needs to be passed to keep it the same as start of the reservation.
+     * @param maxReservationHours Maximum time that a vehicle can spend on the parking.
+     * @return List of sector available for entry.
+     * @throws ApplicationBaseException when other problem occurred.
+     */
+    @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
+    public List<Sector> getAvailableSectorsNow(Client.ClientType clientType, UUID parkingId, LocalDateTime now, int maxReservationHours) throws ApplicationBaseException {
+        TypedQuery<Sector> query = entityManager.createNamedQuery("Reservation.getAvailableBasicSectorsNow", Sector.class);
+       if( clientType == Client.ClientType.STANDARD){
+            query = entityManager.createNamedQuery("Reservation.getAvailableStandardSectorsNow", Sector.class);
+        } else if( clientType == Client.ClientType.PREMIUM){
+            query = entityManager.createNamedQuery("Reservation.getAvailablePremiumSectorsNow", Sector.class);
+        }
+        query.setParameter("parkingId", parkingId);
+        query.setParameter("currentTime", now);
+        query.setParameter("currentTimePlusReserve", now.plusHours(maxReservationHours));
+        query.setParameter("currentTimeMinusReserve", now.minusHours(maxReservationHours));
+        return query.getResultList();
     }
 }
