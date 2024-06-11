@@ -36,6 +36,13 @@ public class ParkingModifyDTO extends ParkingSignableDTO{
     @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
     private String strategy;
 
+    public ParkingModifyDTO(String city, String zipCode, String street, String strategy) {
+        this.city = city;
+        this.zipCode = zipCode;
+        this.street = street;
+        this.strategy = strategy;
+    }
+
     /**
      * Custom toString() method implementation that
      * does not return any information relating to the business
