@@ -9,6 +9,6 @@ public class MostOccupied implements SectorStrategy{
 
     @Override
     public Sector choose(List<Sector> sectors) {
-        return sectors.stream().max(Comparator.comparingInt(s -> s.getMaxPlaces() - s.getAvailablePlaces())).orElse(null);
+        return sectors.stream().max(Comparator.comparingInt(Sector::getOccupiedPlaces)).orElse(null);
     }
 }
