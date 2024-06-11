@@ -19,12 +19,16 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.AccountExceptio
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller.GenericExceptionResolver;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig.SpringWebInitializer;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.AbstractEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.conflict.AccountConflictException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations.RegistrationController;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.implementations.AccountService;
+
+import java.lang.reflect.Field;
+import java.util.UUID;
 
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @ContextConfiguration(classes = SpringWebInitializer.class)
@@ -58,6 +62,12 @@ public class RegistrationControllerMockTest {
     @Test
     public void registerClientSuccessful() throws Exception {
         Account account = new Account(testLogin, testPassword, testFirstname, testLastname, testEmail, testPhoneNumber);
+
+        Field idField = AbstractEntity.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(account, UUID.randomUUID());
+        idField.setAccessible(false);
+
         Mockito.doReturn(account).when(accountService).registerClient(
                 testLogin,
                 testPassword,
@@ -249,6 +259,12 @@ public class RegistrationControllerMockTest {
     @Test
     public void registerStaffSuccessful() throws Exception {
         Account account = new Account(testLogin, testPassword, testFirstname, testLastname, testEmail, testPhoneNumber);
+
+        Field idField = AbstractEntity.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(account, UUID.randomUUID());
+        idField.setAccessible(false);
+
         Mockito.doReturn(account).when(accountService).registerStaff(
                 testLogin,
                 testPassword,
@@ -288,6 +304,12 @@ public class RegistrationControllerMockTest {
     @Test
     public void registerAdminSuccessful() throws Exception {
         Account account = new Account(testLogin, testPassword, testFirstname, testLastname, testEmail, testPhoneNumber);
+
+        Field idField = AbstractEntity.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(account, UUID.randomUUID());
+        idField.setAccessible(false);
+
         Mockito.doReturn(account).when(accountService).registerAdmin(
                 testLogin,
                 testPassword,

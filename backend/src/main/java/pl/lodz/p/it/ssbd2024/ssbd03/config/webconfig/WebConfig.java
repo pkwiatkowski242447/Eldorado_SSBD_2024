@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.*;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -27,6 +28,7 @@ import java.util.List;
 })
 @EnableRetry
 @EnableAspectJAutoProxy(proxyTargetClass = true)
+@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
