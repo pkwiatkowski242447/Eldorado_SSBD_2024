@@ -2029,6 +2029,143 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
     }
 
+    @Test
+    public void getAllSectorsByParkingIdReturnListAndOKStatusCode() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+
+        List<String> list1 =
+                RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 3)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .get(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .jsonPath()
+                .getList("id");
+
+        assertEquals(3, list1.size());
+
+    }
+
+    @Test
+    public void getAllSectorsByParkingIdReturnNoContent() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 3)
+                .pathParam("id","ddcae4ec-aeb5-4ece-aa2b-46819763d55f")
+                .get(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void getAllSectorsByParkingIdAsUnauthenticatedUser() {
+        RestAssured
+                .given()
+                .param("pageNumber", 0)
+                .param("pageSize", 5)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .get(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void getAllSectorsByParkingIdAsUnauthorizedUserForbidden() throws JsonProcessingException {
+        String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 5)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .get(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void getAllActiveReservationsReturnNoContent() throws JsonProcessingException {
+        String loginToken = login("piotrnowak", "P@ssw0rd!", "pl");
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 3)
+                .get(BASE_URL + "/reservations/active/self")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void getAllActiveReservationsAsUnauthorizedUserForbidden() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + loginToken)
+                .param("pageNumber", 0)
+                .param("pageSize", 5)
+                .get(BASE_URL + "/reservations/active/self")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void getAllActiveReservationsAsUnauthenticatedUser() throws JsonProcessingException {
+        RestAssured
+                .given()
+                .param("pageNumber", 0)
+                .param("pageSize", 5)
+                .get(BASE_URL + "/reservations/active/self")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void getAllActiveReservationsReturnListAndOKStatusCode() throws JsonProcessingException {
+        String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
+
+        List<String> list1 =
+                RestAssured
+                        .given()
+                        .header("Authorization", "Bearer " + loginToken)
+                        .param("pageNumber", 0)
+                        .param("pageSize", 3)
+                        .get(BASE_URL + "/reservations/active/self")
+                        .then()
+                        .assertThat()
+                        .statusCode(HttpStatus.OK.value())
+                        .extract()
+                        .jsonPath()
+                        .getList("id");
+
+        assertEquals(2, list1.size());
+
+    }
+
+
+
+
+
+
     private static Stream<Arguments> provideNewUserLevelForAccountParameters() {
         return Stream.of(
                 Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "staff"), //aandrus
