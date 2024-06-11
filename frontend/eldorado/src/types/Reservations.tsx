@@ -8,7 +8,7 @@ export interface ReservationType {
     zipCode: string,
 }
 
-export function arrayToDate(arr: number[]): Date {
+export function arrayToDate(arr: number[]): string {
     const [year, month, day, hour, minute] = arr;
     let date = new Date(year, month - 1, day, hour, minute);
 
