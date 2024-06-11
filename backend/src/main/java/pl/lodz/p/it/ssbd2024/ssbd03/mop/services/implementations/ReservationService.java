@@ -151,7 +151,7 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS})
-    public Reservation getReservationById(UUID reservationId, String userLogin) throws ApplicationBaseException {
+    public Reservation getOwnReservationById(UUID reservationId, String userLogin) throws ApplicationBaseException {
         Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
         Account account = this.accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
         if(!account.getUserLevels().contains(reservation.getClient())) throw new ReservationNotFoundException();
@@ -159,7 +159,13 @@ public class ReservationService implements ReservationServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS})
+    @RolesAllowed({Authorities.GET_ANY_RESERVATION_DETAILS})
+    public Reservation getAnyReservationById(UUID reservationId) throws ApplicationBaseException {
+        return this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS, Authorities.GET_ANY_RESERVATION_DETAILS})
     public List<ParkingEvent> getParkingEventsForGivenReservation(UUID reservationId, int pageNumber, int pageSize) throws ApplicationBaseException {
         return this.reservationFacade.findParkingEventsForGivenReservationWithPagination(reservationId, pageNumber, pageSize);
     }

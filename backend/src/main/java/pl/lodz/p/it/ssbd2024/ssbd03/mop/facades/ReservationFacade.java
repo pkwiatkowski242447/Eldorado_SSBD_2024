@@ -108,7 +108,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @Override
     @RolesAllowed({
             Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION,
-            Authorities.EXIT_PARKING, Authorities.CANCEL_RESERVATION
+            Authorities.EXIT_PARKING, Authorities.CANCEL_RESERVATION,
+            Authorities.GET_OWN_RESERVATION_DETAILS, Authorities.GET_ANY_RESERVATION_DETAILS
     })
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
@@ -309,7 +310,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
      * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
      *                                  facade exception handling aspect.
      */
-    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS})
+    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS, Authorities.GET_ANY_RESERVATION_DETAILS})
     public List<ParkingEvent> findParkingEventsForGivenReservationWithPagination(UUID reservationId, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<ParkingEvent> findParkingEvents = getEntityManager().createNamedQuery("Reservation.findAllParkingEventsForGivenReservation", ParkingEvent.class);

@@ -22,10 +22,10 @@ public interface ReservationControllerInterface {
      * @param pageNumber Number of the page, which reservations will be retrieved from.
      * @param pageSize   Number of reservations per page.
      * @return It returns HTTP response 200 OK with all active reservation list.
-     *         It returns HTTP response 204 NO CONTENT when list is empty.
-     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * It returns HTTP response 204 NO CONTENT when list is empty.
+     * It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/active/self", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get your own active reservations", description = "The endpoint is used to get user's all active reservations")
@@ -44,10 +44,10 @@ public interface ReservationControllerInterface {
      * @param pageNumber Number of the page, which reservations will be retrieved from.
      * @param pageSize   Number of reservations per page.
      * @return It returns HTTP response 200 OK with all historical reservation list.
-     *         It returns HTTP response 204 NO CONTENT when list is empty.
-     *         It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
+     * It returns HTTP response 204 NO CONTENT when list is empty.
+     * It returns HTTP response 500 INTERNAL SERVER ERROR is returned when other unexpected exception occurs.
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
-     * exception handling aspects from facade and service layers below.
+     *                                  exception handling aspects from facade and service layers below.
      */
     @GetMapping(value = "/historical/self", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get your own historical reservations", description = "The endpoint is used to get user's all historical reservations")
@@ -109,7 +109,7 @@ public interface ReservationControllerInterface {
      * this method would return 204 NO CONTENT as the response.
      * 500 INTERNAL SERVER ERROR is returned when another unexpected exception occurs.
      * @throws ApplicationBaseException Superclass for any application exception
-     * thrown by exception handling aspects in the layer of facade and service components in the application.
+     *                                  thrown by exception handling aspects in the layer of facade and service components in the application.
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all reservations", description = "The endpoint is used to retrieve all reservation by user with staff access level.")
@@ -123,17 +123,17 @@ public interface ReservationControllerInterface {
 
     /**
      * This method is used to retrieve reservation details (like all the parking events registered for the reservation)
-     * by the client, which is the owner of the reservation.
+     * by the user with client access level, which is the owner of the reservation.
      *
      * @param reservationId Identifier of the reservation.
-     * @param pageNumber Number of the page with the parking events entries.
-     * @param pageSize Number of the parking events entries per page.
+     * @param pageNumber    Number of the page with the parking events entries.
+     * @param pageSize      Number of the parking events entries per page.
      * @return List of reservation specific information, with parking event list, which form depends on the
      * pagination settings.
      * @throws ApplicationBaseException Superclass for any application exception
-     * thrown by exception handling aspects in the layer of facade and service components in the application.
+     *                                  thrown by exception handling aspects in the layer of facade and service components in the application.
      */
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/client/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get own reservation details", description = "The endpoint is used to retrieve own reservation details by the user, which is the owner of the reservation.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Details about reservation have been found and retrieved successfully."),
@@ -141,6 +141,30 @@ public interface ReservationControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     ResponseEntity<?> getOwnReservationDetails(@PathVariable("id") String reservationId,
+                                               @RequestParam("pageNumber") int pageNumber,
+                                               @RequestParam("pageSize") int pageSize)
+            throws ApplicationBaseException;
+
+    /**
+     * This method is used to retrieve reservation details (like all the parking events registered for the reservation)
+     * by the user with staff access level.
+     *
+     * @param reservationId Identifier of the reservation.
+     * @param pageNumber    Number of the page with the parking events entries.
+     * @param pageSize      Number of the parking events entries per page.
+     * @return List of reservation specific information, with parking event list, which form depends on the
+     * pagination settings.
+     * @throws ApplicationBaseException Superclass for any application exception
+     *                                  thrown by exception handling aspects in the layer of facade and service components in the application.
+     */
+    @GetMapping(value = "/staff/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get any reservation details", description = "The endpoint is used to retrieve any reservation details by the user with staff access level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Details about reservation have been found and retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "There is no reservation with such id in the system, or id format is invalid."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
+    ResponseEntity<?> getAnyReservationDetails(@PathVariable("id") String reservationId,
                                                @RequestParam("pageNumber") int pageNumber,
                                                @RequestParam("pageSize") int pageSize)
             throws ApplicationBaseException;
