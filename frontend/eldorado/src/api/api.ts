@@ -238,5 +238,9 @@ export const api = {
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getAllReservations: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     }
 }
