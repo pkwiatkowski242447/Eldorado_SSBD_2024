@@ -65,7 +65,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     @RunAsSystem
     @Override
     @RolesAllowed({Authorities.END_RESERVATION})
-    @Scheduled(fixedRate = 5L, timeUnit = TimeUnit.MINUTES, initialDelay = 5L)
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void terminateReservation() {
         log.info("Method: endReservation(), used for terminating reservations which last more than scheduler.maximum_reservation_time value");
         List<Reservation> reservationsWhichLastMoreThan24h = new ArrayList<>();
@@ -102,7 +102,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     @RunAsSystem
     @Override
     @RolesAllowed({Authorities.END_RESERVATION})
-    @Scheduled(fixedRate = 5L, timeUnit = TimeUnit.MINUTES, initialDelay = 5L)
+    @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void completeReservation() {
         log.info("Method: completeReservation(), used for completing reservations");
         List<Reservation> reservationsToEnd = new ArrayList<>();
