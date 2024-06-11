@@ -235,7 +235,7 @@ public class ParkingController implements ParkingControllerInterface {
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Reservation reservation = parkingService.enterParkingWithoutReservation(UUID.fromString(parkingId), login, isAnonymous);
-        return ResponseEntity.ok(UserActiveReservationListMapper.toSectorListDTO(reservation));
+        return ResponseEntity.ok(UserReservationMapper.toDTO(reservation));
     }
 
     @Override
