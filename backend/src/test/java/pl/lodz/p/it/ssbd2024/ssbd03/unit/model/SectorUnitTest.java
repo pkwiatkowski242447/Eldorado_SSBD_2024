@@ -91,7 +91,7 @@ public class SectorUnitTest {
     @Test
     void sectorGetAvailablePlacesPositiveTest() {
         Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
-        Assertions.assertEquals(MAX_PLACES_NO_1, sector.getAvailablePlaces());
+        Assertions.assertEquals(MAX_PLACES_NO_1, sector.getOccupiedPlaces());
     }
 
     @Test
@@ -121,9 +121,9 @@ public class SectorUnitTest {
     @Test
     void sectorSetAvailablePlacesPositiveTest() {
         Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
-        sector.setAvailablePlaces(AVAILABLE_PLACES_NO_1);
+        sector.setOccupiedPlaces(AVAILABLE_PLACES_NO_1);
 
-        Assertions.assertEquals(AVAILABLE_PLACES_NO_1, sector.getAvailablePlaces());
+        Assertions.assertEquals(AVAILABLE_PLACES_NO_1, sector.getOccupiedPlaces());
     }
 
     @Test

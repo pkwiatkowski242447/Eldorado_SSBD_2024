@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +26,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvai
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationExpiredException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationNotStartedException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.SectorInvalidDeactivationTimeException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.edit.SectorEditOfTypeOrMaxPlacesWhenActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
@@ -44,7 +44,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.SectorStra
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -64,8 +63,10 @@ public class ParkingService implements ParkingServiceInterface {
     private final ReservationFacade reservationFacade;
     private final AccountMOPFacade accountFacade;
     private final UserLevelMOPFacade userLevelMOPFacade;
+
     @Value("${reservation.max_hours}")
     private Integer reservationMaxHours;
+
     @Value("${reservation.client_limit}")
     private Integer clientLimit;
 
@@ -80,8 +81,10 @@ public class ParkingService implements ParkingServiceInterface {
         this.userLevelMOPFacade = userLevelMOPFacade;
     }
 
+    // MOP.2 - Add parking
+
     @Override
-    @RolesAllowed(Authorities.ADD_PARKING)
+    @RolesAllowed({Authorities.ADD_PARKING})
     public Parking createParking(String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) throws ApplicationBaseException {
         Address address = new Address(city, zipCode, street);
         Parking parking = new Parking(address, strategy);
@@ -89,8 +92,10 @@ public class ParkingService implements ParkingServiceInterface {
         return parking;
     }
 
+    // MOP.6 - Create sector
+
     @Override
-    @RolesAllowed({Authorities.ADD_SECTOR, Authorities.GET_PARKING})
+    @RolesAllowed({Authorities.ADD_SECTOR})
     public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException {
         Parking parking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
         Sector sector = new Sector(parking, name, type, maxPlaces, weight, active);
@@ -98,17 +103,23 @@ public class ParkingService implements ParkingServiceInterface {
         parkingFacade.createSector(sector);
     }
 
+    // MOP.1 - Get all parking
+
     @Override
-    @RolesAllowed(Authorities.GET_ALL_PARKING)
+    @RolesAllowed({Authorities.GET_ALL_PARKING})
     public List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         return parkingFacade.findAllParkingWithPagination(pageNumber, pageSize);
     }
 
+    // MOP.13 - Get sector
+
     @Override
-    @RolesAllowed(Authorities.GET_SECTOR)
+    @RolesAllowed({Authorities.GET_SECTOR})
     public Sector getSectorById(UUID id) throws ApplicationBaseException {
         return parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
     }
+
+    // MOP.12 - Get parking
 
     @Override
     @RolesAllowed({Authorities.GET_PARKING, Authorities.EDIT_PARKING})
@@ -116,6 +127,7 @@ public class ParkingService implements ParkingServiceInterface {
         return parkingFacade.findAndRefresh(id).orElseThrow(ParkingNotFoundException::new);
     }
 
+    // MOP.9 - Activate sector
 
     @Override
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
@@ -126,23 +138,41 @@ public class ParkingService implements ParkingServiceInterface {
         parkingFacade.editSector(sector);
     }
 
+    // MOP.10 - Deactivate sector
+
     @Override
     @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
-    public void deactivateSector(UUID id) throws ApplicationBaseException {
+    public void deactivateSector(UUID id, LocalDateTime deactivationTime) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
+
         if (!sector.getActive()) throw new SectorAlreadyInactiveException();
+        if (!deactivationTime.isAfter(LocalDateTime.now().plusHours(this.reservationMaxHours))) throw new SectorInvalidDeactivationTimeException();
+
+        List<Reservation> reservations = this.reservationFacade.getAllReservationsToCancelBeforeDeactivation(sector.getId(),
+                deactivationTime.minusHours(this.reservationMaxHours));
+
+        for (Reservation reservation : reservations) {
+            reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
+            this.reservationFacade.edit(reservation);
+        }
+
         sector.setActive(false);
         parkingFacade.editSector(sector);
     }
 
+    // MOP.5 - Get all sectors
+
     @Override
     @RolesAllowed({Authorities.GET_ALL_SECTORS, Authorities.GET_PARKING})
     public List<Sector> getSectorsByParkingId(UUID id, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
+        this.parkingFacade.findAndRefresh(id).orElseThrow(ParkingNotFoundException::new);
         return parkingFacade.findSectorsInParking(id, active, pageNumber, pageSize);
     }
 
+    // MOP.3 - Remove parking
+
     @Override
-    @RolesAllowed(Authorities.DELETE_PARKING)
+    @RolesAllowed({Authorities.DELETE_PARKING})
     public void removeParkingById(UUID id) throws ApplicationBaseException {
         Parking parking = this.parkingFacade.findAndRefresh(id).orElseThrow(ParkingNotFoundException::new);
         this.parkingFacade.removeParkingById(parking.getId());
@@ -160,7 +190,7 @@ public class ParkingService implements ParkingServiceInterface {
             throw new ReservationExpiredException();
         }
 
-        if (reservation.getSector().getAvailablePlaces() == 0) {
+        if (reservation.getSector().getOccupiedPlaces() == 0) {
             throw new ReservationNoAvailablePlaceException();
         }
 
@@ -170,7 +200,7 @@ public class ParkingService implements ParkingServiceInterface {
         }
 
         if (reservation.getStatus().equals(Reservation.ReservationStatus.AWAITING)) {
-            reservation.getSector().setAvailablePlaces(reservation.getSector().getAvailablePlaces() - 1);
+            reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
             reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
         }
 
@@ -179,22 +209,30 @@ public class ParkingService implements ParkingServiceInterface {
         this.reservationFacade.edit(reservation);
     }
 
+    // MOP.4 - Edit parking
+
     @Override
-    @RolesAllowed(Authorities.EDIT_PARKING)
-    public Parking editParking(Parking modifiedParking) throws ApplicationBaseException {
-        Parking foundParking = parkingFacade.findAndRefresh(modifiedParking.getId()).orElseThrow(ParkingNotFoundException::new);
+    @RolesAllowed({Authorities.EDIT_PARKING})
+    public Parking editParking(Parking modifiedParking, UUID parkingId) throws ApplicationBaseException {
+        Parking foundParking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
 
         if (!modifiedParking.getVersion().equals(foundParking.getVersion())) {
-            throw new OptimisticLockException();
+            throw new ApplicationOptimisticLockException();
         }
-        Address address = new Address(modifiedParking.getAddress().getCity(), modifiedParking.getAddress().getZipCode(), modifiedParking.getAddress().getStreet());
+
+        Address address = new Address(modifiedParking.getAddress().getCity(),
+                modifiedParking.getAddress().getZipCode(),
+                modifiedParking.getAddress().getStreet());
+
         foundParking.setAddress(address);
         parkingFacade.edit(foundParking);
         return foundParking;
     }
 
+    // MOP.8 - Edit sector
+
     @Override
-    @RolesAllowed(Authorities.EDIT_SECTOR)
+    @RolesAllowed({Authorities.EDIT_SECTOR})
     public Sector editSector(UUID id, Long version, Sector modifiedSector) throws ApplicationBaseException {
         Sector foundSector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
 
@@ -202,18 +240,20 @@ public class ParkingService implements ParkingServiceInterface {
             throw new ApplicationOptimisticLockException();
         }
 
-        if (foundSector.getType().compareTo(modifiedSector.getType()) != 0) {
+        if (!foundSector.getType().equals(modifiedSector.getType())) {
             if (foundSector.getActive()) {
                 throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
             }
             foundSector.setType(modifiedSector.getType());
         }
-        if (foundSector.getMaxPlaces().compareTo(modifiedSector.getMaxPlaces()) != 0) {
+
+        if (!foundSector.getMaxPlaces().equals(modifiedSector.getMaxPlaces())) {
             if (foundSector.getActive()) {
                 throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
             }
             foundSector.setMaxPlaces(modifiedSector.getMaxPlaces());
         }
+
         foundSector.setWeight(modifiedSector.getWeight());
 
         parkingFacade.editSector(foundSector);
@@ -221,15 +261,19 @@ public class ParkingService implements ParkingServiceInterface {
         return foundSector;
     }
 
+    // MOP.7 - Remove sector
+
     @Override
-    @RolesAllowed(Authorities.DELETE_SECTOR)
+    @RolesAllowed({Authorities.DELETE_SECTOR})
     public void removeSectorById(UUID id) throws ApplicationBaseException {
         Sector sector = this.parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
         this.parkingFacade.removeSector(sector);
     }
 
+    // MOP.11 - Get all available parking
+
     @Override
-    @RolesAllowed(Authorities.GET_ALL_AVAILABLE_PARKING)
+    @RolesAllowed({Authorities.GET_ALL_AVAILABLE_PARKING})
     public List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         return parkingFacade.findAllAvailableParkingWithPagination(pageNumber, pageSize);
     }
@@ -269,8 +313,7 @@ public class ParkingService implements ParkingServiceInterface {
         reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
         reservationFacade.create(reservation);
 
-        //TODO zmiana na occupiedPlaces
-        chosenSector.setAvailablePlaces(chosenSector.getAvailablePlaces() - 1);
+        chosenSector.setOccupiedPlaces(chosenSector.getOccupiedPlaces() + 1);
         parkingFacade.editSector(chosenSector);
 
         return reservation;
@@ -278,13 +321,13 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.EXIT_PARKING)
-    public void exitParking(UUID reservationId) throws ApplicationBaseException {
+    public void exitParking(UUID reservationId, String userLogin, boolean endReservation) throws ApplicationBaseException {
         Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
 
         // Check if the user is the "owner" of the reservation (if the reservation has a client assigned to it)
         if (reservation.getClient() != null) {
-            Account account = this.accountFacade.findByLogin(reservation.getClient().getAccount().getLogin()).orElseThrow(AccountNotFoundException::new);
-            if (Objects.equals(reservation.getClient().getAccount().getLogin(), account.getLogin())) {
+            Account account = this.accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+            if (!account.getUserLevels().contains(reservation.getClient())) {
                 throw new ReservationNotFoundException();
             }
         }
@@ -304,12 +347,17 @@ public class ParkingService implements ParkingServiceInterface {
             throw new CannotExitParkingException();
         }
 
-        if (reservation.getEndTime() == null) {
-            reservation.setEndTime(LocalDateTime.now());
+        // If reservation is made for anonymous user or the reservation needs to be finished
+        if (reservation.getClient() == null || endReservation) {
+            // Case for anonymous user - end time is being set
+            if (reservation.getClient() == null) reservation.setEndTime(LocalDateTime.now());
+            reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
+            reservation.setStatus(Reservation.ReservationStatus.COMPLETED_MANUALLY);
         }
-        reservation.getSector().setAvailablePlaces(reservation.getSector().getAvailablePlaces() + 1);
+
         ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
         reservation.addParkingEvent(exitEvent);
+
         this.reservationFacade.edit(reservation);
     }
 }

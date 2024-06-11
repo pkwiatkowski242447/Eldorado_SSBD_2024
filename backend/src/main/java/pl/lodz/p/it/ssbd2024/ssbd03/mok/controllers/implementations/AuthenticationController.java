@@ -146,7 +146,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                          @RequestBody AuthenticationCodeDTO authenticationCodeDTO,
+                                                          @Valid @RequestBody AuthenticationCodeDTO authenticationCodeDTO,
                                                           HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {

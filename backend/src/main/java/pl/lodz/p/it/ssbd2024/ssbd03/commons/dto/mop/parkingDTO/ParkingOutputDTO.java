@@ -31,10 +31,10 @@ public class ParkingOutputDTO extends ParkingSignableDTO {
     @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
     private Parking.SectorDeterminationStrategy strategy;
 
-    /***
+    /**
      * All arguments constructor for ParkingOutputDTO - with calling constructor of superclass.
      */
-    public ParkingOutputDTO (Long version, UUID parkingId, String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy){
+    public ParkingOutputDTO (Long version, UUID parkingId, String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) {
         super(version, parkingId);
         this.city = city;
         this.zipCode = zipCode;

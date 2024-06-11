@@ -4,30 +4,32 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationCancellationLateAttempt;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientAccountNonEnabledException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationSectorNonActiveException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationAlreadyCancelledException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingEventFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,6 +58,9 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Value("${reservation.max_hours}")
     private Integer reservationMaxHours;
+
+    @Value("${reservation.cancellation.max_hours}")
+    private Long cancellationMaxHoursBeforeReservation;
 
     @Autowired
     public ReservationService(ReservationFacade reservationFacade,
@@ -90,7 +95,8 @@ public class ReservationService implements ReservationServiceInterface {
         if (!client.getAccount().isEnabled()) throw new ReservationClientAccountNonEnabledException();
 
         // Check client reservations limit
-        if (reservationFacade.countAllActiveUserReservationByLogin(clientLogin) + 1 > clientLimit) throw new ReservationClientLimitException();
+        if (reservationFacade.countAllActiveUserReservationByLogin(clientLogin) + 1 > clientLimit)
+            throw new ReservationClientLimitException();
 
         // Obtaining Sector
         Sector sector = parkingFacade.findAndRefreshSectorById(sectorId).orElseThrow(SectorNotFoundException::new);
@@ -120,7 +126,22 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed(Authorities.CANCEL_RESERVATION)
     public void cancelReservation(UUID reservationId) throws ApplicationBaseException {
-        throw new UnsupportedOperationException(I18n.UNSUPPORTED_OPERATION_EXCEPTION);
+        Reservation reservation = reservationFacade.findClientReservation(
+                reservationId,
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName()
+        ).orElseThrow(ReservationNotFoundException::new);
+
+        if (reservation.getStatus() == Reservation.ReservationStatus.CANCELLED) throw new ReservationAlreadyCancelledException();
+
+        if (reservation.getBeginTime().minusHours(cancellationMaxHoursBeforeReservation).isBefore(LocalDateTime.now())) {
+            throw new ReservationCancellationLateAttempt();
+        }
+
+        reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
+        reservationFacade.edit(reservation);
     }
 
     @Override

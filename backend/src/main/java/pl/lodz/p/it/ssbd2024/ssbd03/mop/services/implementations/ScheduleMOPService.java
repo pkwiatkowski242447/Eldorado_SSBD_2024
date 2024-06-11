@@ -100,7 +100,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                     reservation.addParkingEvent(exitEvent);
                     this.reservationFacade.edit(reservation);
                     Sector sector = reservation.getSector();
-                    sector.setAvailablePlaces(sector.getAvailablePlaces() + 1);
+                    sector.setOccupiedPlaces(sector.getOccupiedPlaces() + 1);
                     parkingFacade.editSector(sector);
                 }
             } catch (Exception exception) {

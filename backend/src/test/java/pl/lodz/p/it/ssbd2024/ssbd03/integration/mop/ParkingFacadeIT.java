@@ -82,7 +82,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         assertNotNull(parking);
         parkingFacade.create(parking);
 
-        assertEquals("Lodz", parking.getAddress().getCity());
+        assertEquals("BoatCity", parking.getAddress().getCity());
     }
 
 //    @Test
@@ -166,9 +166,9 @@ public class ParkingFacadeIT extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.ADD_PARKING, Authorities.GET_ALL_PARKING})
     public void parkingFacadeFindAllParkingLotsWithPaginationTest() throws ApplicationBaseException {
-        Address addressNo1 = new Address("avf", "mjh", "cdd");
-        Address addressNo2 = new Address("ass", "mfr", "cpd");
-        Address addressNo3 = new Address("ap", "mja", "cdl");
+        Address addressNo1 = new Address("BoatCity", "90-001", "Wodna");
+        Address addressNo2 = new Address("BoatCity", "90-010", "Pomorska");
+        Address addressNo3 = new Address("BoatCity", "90-100", "Kwiatowa");
 
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         Parking parkingNo2 = new Parking(addressNo2, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
@@ -178,10 +178,10 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         parkingFacade.create(parkingNo2);
         parkingFacade.create(parkingNo3);
 
-        parkingNo1.addSector("name1", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("name2", Sector.SectorType.COVERED, 20, 200, true);
-        parkingNo2.addSector("name3", Sector.SectorType.UNCOVERED, 20, 200, true);
-        parkingNo3.addSector("name4", Sector.SectorType.UNCOVERED, 20, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
+        parkingNo1.addSector("SA-02", Sector.SectorType.COVERED, 20, 200, true);
+        parkingNo2.addSector("SA-03", Sector.SectorType.UNCOVERED, 20, 200, true);
+        parkingNo3.addSector("SA-04", Sector.SectorType.UNCOVERED, 20, 200, true);
 
         List<Parking> listOfParkingLots = parkingFacade.findAllWithPagination(0, 10, true);
         assertEquals(5, listOfParkingLots.size());
@@ -212,11 +212,11 @@ public class ParkingFacadeIT extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.ADD_PARKING, Authorities.GET_ALL_SECTORS})
     public void parkingFacadeFindSectorsInParkingWithPaginationTest() throws ApplicationBaseException {
-        Address addressNo1 = new Address("a", "b", "c");
+        Address addressNo1 = new Address("BoatCity", "90-000", "Pomorska");
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        parkingNo1.addSector("name1", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("name2", Sector.SectorType.UNCOVERED, 20, 200, true);
-        parkingNo1.addSector("name3", Sector.SectorType.UNCOVERED, 20, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
+        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 20, 200, true);
+        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 20, 200, true);
 
         parkingFacade.create(parkingNo1);
 
@@ -229,17 +229,18 @@ public class ParkingFacadeIT extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.ADD_PARKING, Authorities.RESERVE_PARKING_PLACE})
     public void parkingFacadeFindSectorInParkingWithAvailablePlacesTest() throws ApplicationBaseException {
-        Address addressNo1 = new Address("a", "b", "c");
+        Address addressNo1 = new Address("BoatCity", "90-000", "Pomorska");
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
 
         parkingFacade.create(parkingNo1);
-        parkingNo1.addSector("name1", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("name2", Sector.SectorType.UNCOVERED, 10, 200, true);
-        parkingNo1.addSector("name3", Sector.SectorType.UNCOVERED, 10, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
+        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 10, 200, true);
+        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 10, 200, true);
 
         List<Sector> listOfSectorsNo1 = parkingNo1.getSectors();
         for (int i = 0; i < listOfSectorsNo1.size(); i++) {
-            listOfSectorsNo1.get(i).setAvailablePlaces(i);
+            Sector sectorCopy = listOfSectorsNo1.get(i);
+            sectorCopy.setOccupiedPlaces(sectorCopy.getMaxPlaces() - i);
         }
 
         List<Sector> listOfSectorsNo2 = parkingFacade.findSectorInParkingWithAvailablePlaces(parkingNo1.getId(), 0, 15, true);
@@ -251,20 +252,20 @@ public class ParkingFacadeIT extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.ADD_PARKING, Authorities.RESERVE_PARKING_PLACE})
     public void parkingFacadeFindParkingWithAvailablePlacesTest() throws ApplicationBaseException {
-        Address addressNo1 = new Address("a", "b", "c");
-        Address addressNo2 = new Address("ar", "br", "rc");
+        Address addressNo1 = new Address("BoatCity", "90-000", "Pomorska");
+        Address addressNo2 = new Address("BoatCity", "90-000", "Pomorska");
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
         Parking parkingNo2 = new Parking(addressNo2, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
 
         parkingFacade.create(parkingNo1);
-        parkingNo1.addSector("name1", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("name2", Sector.SectorType.UNCOVERED, 10, 200, true);
-        parkingNo1.addSector("name3", Sector.SectorType.UNCOVERED, 10, 200, true);
-        parkingNo2.addSector("name4", Sector.SectorType.UNCOVERED, 10, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
+        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 10, 200, true);
+        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 10, 200, true);
+        parkingNo2.addSector("SA-04", Sector.SectorType.UNCOVERED, 10, 200, true);
 
         List<Sector> listOfSectors = parkingNo1.getSectors();
         for (int i = 0; i < listOfSectors.size(); i++) {
-            listOfSectors.get(i).setAvailablePlaces(i);
+            listOfSectors.get(i).setOccupiedPlaces(i);
         }
         List<Parking> listOfParkingLots = parkingFacade.findParkingWithAvailablePlaces(0, 5, true);
         assertEquals(3, listOfParkingLots.size());
@@ -274,12 +275,12 @@ public class ParkingFacadeIT extends TestcontainersConfig {
     @Transactional(propagation = Propagation.REQUIRED)
     @WithMockUser(roles = {Authorities.ADD_PARKING, Authorities.EDIT_SECTOR})
     public void parkingFacadeEditSectorTest() throws ApplicationBaseException {
-        Address addressNo1 = new Address("Tes", "Te", "Tes");
+        Address addressNo1 = new Address("BoatCity", "90-000", "Pomorska");
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
 
         parkingFacade.create(parkingNo1);
-        parkingNo1.addSector("test", Sector.SectorType.COVERED, 100, 100, true);
-        Sector sectorNo1 = new Sector(parkingNo1, "tt11", Sector.SectorType.COVERED, 100, 100, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 100, true);
+        Sector sectorNo1 = new Sector(parkingNo1, "SA-02", Sector.SectorType.COVERED, 100, 100, true);
 
         sectorNo1.setMaxPlaces(200);
 

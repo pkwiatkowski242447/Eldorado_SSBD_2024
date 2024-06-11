@@ -35,11 +35,8 @@ public class ParkingMapper {
      * @param parkingModifyDTO Parking DTO to map.
      * @return Returns mapped Parking entity class.
      */
-    public static Parking toParking(ParkingModifyDTO parkingModifyDTO){
+    public static Parking toParking(ParkingModifyDTO parkingModifyDTO) {
         Address address = new Address(parkingModifyDTO.getCity(),parkingModifyDTO.getZipCode(), parkingModifyDTO.getStreet());
-        Parking parking = new Parking(address, Parking.SectorDeterminationStrategy.valueOf(parkingModifyDTO.getStrategy()));
-
-        return parking;
+        return new Parking(address, Parking.SectorDeterminationStrategy.valueOf(parkingModifyDTO.getStrategy()));
     }
-
 }

@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO;
 
+import java.util.UUID;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +19,8 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 @LoggerInterceptor
 public class SectorListDTO {
 
+    @Schema(description = "The identifier of the sector", example = "4ce920a0-6f4d-4e95-ba24-99ba32b66491", requiredMode = Schema.RequiredMode.REQUIRED)
+    private UUID id;
     @Schema(description = "The name of the sector", example = "SA-02", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
     @Schema(description = "Determines whether the sector is active", requiredMode = Schema.RequiredMode.REQUIRED)

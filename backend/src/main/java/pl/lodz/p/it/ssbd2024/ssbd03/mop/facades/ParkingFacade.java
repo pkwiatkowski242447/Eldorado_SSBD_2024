@@ -2,11 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,51 +52,60 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-     * Persists a new Parking to the database.
+     * Persists a new parking entity object to the database.
      *
      * @param entity Parking to be persisted.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
-    @RolesAllowed(Authorities.ADD_PARKING)
+    @RolesAllowed({Authorities.ADD_PARKING})
     public void create(Parking entity) throws ApplicationBaseException {
         super.create(entity);
     }
 
     /**
-     * Forces modification of the Parking in the database.
+     * Forces modification of the parking entity object in the database.
      *
      * @param entity Parking to be modified.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
-    @RolesAllowed({Authorities.EDIT_PARKING, Authorities.ADD_PARKING,
+    @RolesAllowed({
+            Authorities.EDIT_PARKING, Authorities.ADD_PARKING,
             Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR,
-            Authorities.ACTIVATE_SECTOR, Authorities.DEACTIVATE_SECTOR}
-    )
+            Authorities.ACTIVATE_SECTOR, Authorities.DEACTIVATE_SECTOR
+    })
     public void edit(Parking entity) throws ApplicationBaseException {
         super.edit(entity);
     }
 
     /**
-     * Retrieves a Parking by the ID and forces its refresh.
+     * Retrieves a parking entity object by the ID and forces its refresh.
      *
-     * @param id ID of the Parking to be retrieved.
+     * @param id Identifier of the parking to be retrieved from the database.
      * @return If a Parking with the given ID was found returns an Optional containing the Parking, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @RolesAllowed({Authorities.GET_PARKING, Authorities.DELETE_PARKING, Authorities.EDIT_PARKING, Authorities.ADD_SECTOR,
             Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR, Authorities.RESERVE_PARKING_PLACE,
             Authorities.CANCEL_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.EXIT_PARKING}
-    )
+            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.EXIT_PARKING
+    })
     public Optional<Parking> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
     }
 
     /**
-     * Retrieves a Parking by the ID.
+     * Retrieves a Parking by the ID (without object refresh).
      *
-     * @param id ID of the Parking to be retrieved.
+     * @param id Identifier of the Parking to be retrieved.
      * @return If a Parking with the given ID was found returns an Optional containing the Parking, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @DenyAll
@@ -109,47 +114,22 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-     * Retrieves all Parking.
+     * This method is used to retrieve all parking entity objects from the database, taking into account
+     * pagination settings.
      *
-     * @return List containing all Parking.
+     * @param pageNumber     Number of the page with parking entries to be retrieved from the database.
+     * @param pageSize       Number of the parking entries per page.
+     * @param showOnlyActive Boolean flag indicating whether this query should return only parking with active sectors.
+     * @return List of parking entities matching certain criteria, if a form of list - or empty list - if no matching
+     * parking entities were found.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
-    @Override
-    @DenyAll
-    public List<Parking> findAll() throws ApplicationBaseException {
-        return super.findAll();
-    }
-
-    @RolesAllowed(Authorities.GET_ALL_PARKING)
-    public List<Parking> findAllWithPagination(int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
+    @RolesAllowed({Authorities.GET_ALL_PARKING})
+    public List<Parking> findAllWithPagination(int pageNumber, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Parking.findAll", Parking.class)
-                .setFirstResult(page * pageSize)
+                .setFirstResult(pageNumber * pageSize)
                 .setParameter("showOnlyActive", showOnlyActive)
-                .setMaxResults(pageSize)
-                .getResultList();
-        refreshAll(list);
-        return list;
-    }
-
-    @DenyAll
-    public List<Parking> findParkingBySectorTypes(
-            List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
-        var list = getEntityManager().
-                createNamedQuery("Parking.findBySectorTypes", Parking.class)
-                .setParameter("sectorTypes", sectorTypes)
-                .setParameter("showOnlyActive", showOnlyActive)
-                .setFirstResult(page * pageSize)
-                .setMaxResults(pageSize)
-                .getResultList();
-        refreshAll(list);
-        return list;
-    }
-
-    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.GET_ALL_AVAILABLE_PARKING})
-    public List<Parking> findParkingWithAvailablePlaces(int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
-        var list = getEntityManager().
-                createNamedQuery("Parking.findWithAvailablePlaces", Parking.class)
-                .setParameter("showOnlyActive", showOnlyActive)
-                .setFirstResult(page * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
         refreshAll(list);
@@ -157,12 +137,37 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-     * Removes a Parking from the database.
+     * This method is used to retrieve parking with active sectors that have available places for
+     * new reservations left.
      *
-     * @param entity Parking to be removed from the database.
+     * @param pageNumber     Number of the page with parking entities to be returned.
+     * @param pageSize       Number of the parking entries per page.
+     * @param showOnlyActive Boolean flag indicating whether this query should return only parking with active sectors.
+     * @return List of parking entities if a form of list - or empty list - if no matching parking were found.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
+     */
+    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.GET_ALL_AVAILABLE_PARKING})
+    public List<Parking> findParkingWithAvailablePlaces(int pageNumber, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
+        var list = getEntityManager().
+                createNamedQuery("Parking.findWithAvailablePlaces", Parking.class)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(pageNumber * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+        refreshAll(list);
+        return list;
+    }
+
+    /**
+     * Removes a parking entity object from the database.
+     *
+     * @param entity Parking object to be removed from the database.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
-    @RolesAllowed(Authorities.DELETE_PARKING)
+    @RolesAllowed({Authorities.DELETE_PARKING})
     public void remove(Parking entity) throws ApplicationBaseException {
         super.remove(entity);
     }
@@ -173,26 +178,14 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param parkingId Identifier (UUID) of the parking to be removed.
      * @throws ApplicationBaseException General superclass of all the exceptions
-     * that could be thrown by aspects intercepting exceptions in the facade layer.
+     *                                  that could be thrown by aspects intercepting exceptions in the facade layer.
      */
     @RolesAllowed({Authorities.DELETE_PARKING})
     public void removeParkingById(UUID parkingId) throws ApplicationBaseException {
         getEntityManager().createNamedQuery("Parking.removeParkingById")
-            .setParameter("parkingId", parkingId)
-            .executeUpdate();
+                .setParameter("parkingId", parkingId)
+                .executeUpdate();
     }
-
-    /**
-     * Counts the number of the Parking in the database.
-     *
-     * @return Number of Parking in the database.
-     */
-    @Override
-    @DenyAll
-    public int count() throws ApplicationBaseException {
-        return super.count();
-    }
-
 
     // -- SECTORS --
 
@@ -201,6 +194,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param id ID of the Sector to be retrieved.
      * @return If a Sector with the given ID was found returns an Optional containing the Sector, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions
+     *                                  that could be thrown by aspects intercepting exceptions in the facade layer.
      */
     @RolesAllowed({Authorities.GET_SECTOR})
     private Optional<Sector> findSectorById(UUID id) throws ApplicationBaseException {
@@ -212,63 +207,38 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *
      * @param id ID of the Sector to be retrieved.
      * @return If a Sector with the given ID was found returns an Optional containing the Sector, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
-    @RolesAllowed({Authorities.GET_SECTOR, Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR,
+    @RolesAllowed({
+            Authorities.GET_SECTOR, Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR,
             Authorities.CANCEL_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
-            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.EXIT_PARKING, Authorities.ACTIVATE_SECTOR})
+            Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.EXIT_PARKING, Authorities.ACTIVATE_SECTOR
+    })
     public Optional<Sector> findAndRefreshSectorById(UUID id) throws ApplicationBaseException {
         Optional<Sector> optEntity = findSectorById(id);
         optEntity.ifPresent(t -> getEntityManager().refresh(t));
         return optEntity;
     }
 
+    /**
+     * This method is used to retrieve all sectors in the parking object in the database.
+     *
+     * @param parkingId  Identifier of the parking entity, which sectors are to be retrieved.
+     * @param active     Boolean flag indicating status of the retrieved sectors - if true then only active sectors are returned.
+     * @param pageNumber Number of the page with sector entries.
+     * @param pageSize   Size of the page with sector entries for given parking.
+     * @return List of the sectors from given page of given size, retrieved for certain parking.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
+     */
     @RolesAllowed({Authorities.GET_ALL_SECTORS, Authorities.GET_PARKING})
     public List<Sector> findSectorsInParking(UUID parkingId, boolean active, int pageNumber, int pageSize)
             throws ApplicationBaseException {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("showOnlyActive", active)
-                .setFirstResult(pageNumber*pageSize)
-                .setMaxResults(pageSize)
-                .getResultList();
-        refreshAllSectors(list);
-        return list;
-    }
-
-    @RolesAllowed(Authorities.GET_ALL_SECTORS)
-    public List<Sector> findSectorsInParkingWithPagination(UUID parkingId, int page, int pageSize, boolean showOnlyActive)
-            throws ApplicationBaseException {
-        var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
-                .setParameter("parkingId", parkingId)
-                .setParameter("showOnlyActive", showOnlyActive)
-                .setFirstResult(page * pageSize)
-                .setMaxResults(pageSize)
-                .getResultList();
-        refreshAllSectors(list);
-        return list;
-    }
-
-    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
-    public List<Sector> findSectorInParkingWithAvailablePlaces(UUID parkingId, int page, int pageSize, boolean showOnlyActive)
-            throws ApplicationBaseException {
-        var list = getEntityManager().createNamedQuery("Sector.findWithAvailablePlaces", Sector.class)
-                .setParameter("parkingId", parkingId)
-                .setParameter("showOnlyActive", showOnlyActive)
-                .setFirstResult(page * pageSize)
-                .setMaxResults(pageSize)
-                .getResultList();
-        refreshAllSectors(list);
-        return list;
-    }
-
-    @DenyAll
-    public List<Sector> findSectorInParkingBySectorTypes(
-            UUID parkingId, List<Sector.SectorType> sectorTypes, int page, int pageSize, boolean showOnlyActive) throws ApplicationBaseException {
-        var list = getEntityManager().createNamedQuery("Sector.findBySectorTypes", Sector.class)
-                .setParameter("parkingId", parkingId)
-                .setParameter("sectorTypes", sectorTypes)
-                .setParameter("showOnlyActive", showOnlyActive)
-                .setFirstResult(page * pageSize)
+                .setFirstResult(pageNumber * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
         refreshAllSectors(list);
@@ -276,9 +246,64 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-     * Persists a new Sector to the database.
+     * This method is used to retrieve all sectors in a given parking, identified by its identifier with
+     * only active / or both active and inactive sectors.
+     *
+     * @param parkingId      Identifier of the parking, which sectors are to be retrieved.
+     * @param pageNumber     Number of the page with sectors entries to be returned.
+     * @param pageSize       Number of the sectors entry per page.
+     * @param showOnlyActive Boolean flag indicating whether only active or both active and inactive sectors should be returned.
+     * @return List of the sectors from given parking, identified by its id, or empty list if given parking
+     * does not have any sectors.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
-    @RolesAllowed(Authorities.ADD_SECTOR)
+    @RolesAllowed({Authorities.GET_ALL_SECTORS})
+    public List<Sector> findSectorsInParkingWithPagination(UUID parkingId, int pageNumber, int pageSize, boolean showOnlyActive)
+            throws ApplicationBaseException {
+        var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
+                .setParameter("parkingId", parkingId)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(pageNumber * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+        refreshAllSectors(list);
+        return list;
+    }
+
+    /**
+     * This method is used to find active sectors with available places, used when making new reservation.
+     *
+     * @param parkingId      Identifier of the parking, which sectors are to be retrieved.
+     * @param pageNumber     Number of the page with sectors entries to be returned.
+     * @param pageSize       Number of the sectors entry per page.
+     * @param showOnlyActive Boolean flag indicating whether only active or both active and inactive sectors should be returned.
+     * @return List of the sectors from given parking, identified by its id, or empty list if given parking
+     * does not have any sectors.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
+     */
+    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE})
+    public List<Sector> findSectorInParkingWithAvailablePlaces(UUID parkingId, int pageNumber, int pageSize, boolean showOnlyActive)
+            throws ApplicationBaseException {
+        var list = getEntityManager().createNamedQuery("Sector.findWithAvailablePlaces", Sector.class)
+                .setParameter("parkingId", parkingId)
+                .setParameter("showOnlyActive", showOnlyActive)
+                .setFirstResult(pageNumber * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+        refreshAllSectors(list);
+        return list;
+    }
+
+    /**
+     * This method is used to persist sector entity object to the database.
+     *
+     * @param sector Sector to be persisted into the database.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
+     */
+    @RolesAllowed({Authorities.ADD_SECTOR})
     public void createSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().persist(sector);
         getEntityManager().flush();
@@ -286,12 +311,14 @@ public class ParkingFacade extends AbstractFacade<Parking> {
 
     /**
      * Removes a sector from the database.
-     * This method will not single-handedly remove the sector from database.
+     * This method will not remove the sector from database completely.
      * To remove it you need to additionally update the parking and save changes to database.
      *
      * @param sector Sector to be removed from the database.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
-    @RolesAllowed(Authorities.DELETE_SECTOR)
+    @RolesAllowed({Authorities.DELETE_SECTOR})
     public void removeSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().remove(sector);
         getEntityManager().flush();
@@ -301,8 +328,14 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * Forces modification of the sector in the database.
      *
      * @param sector Sector to be modified.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
-    @RolesAllowed({Authorities.EDIT_SECTOR, Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
+    @RolesAllowed({
+            Authorities.EDIT_SECTOR, Authorities.DEACTIVATE_SECTOR,
+            Authorities.ACTIVATE_SECTOR, Authorities.END_RESERVATION,
+            Authorities.ENTER_PARKING_WITHOUT_RESERVATION
+    })
     public void editSector(Sector sector) throws ApplicationBaseException {
         getEntityManager().merge(sector);
         getEntityManager().flush();
@@ -312,6 +345,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * Forces a refresh on all elements in the list.
      *
      * @param list List of the Sectors to be refreshed.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @RolesAllowed({Authorities.GET_ALL_SECTORS, Authorities.RESERVE_PARKING_PLACE})
     protected void refreshAllSectors(List<Sector> list) throws ApplicationBaseException {
@@ -321,14 +356,16 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /***
-     * Get all parking from database
+     * Get all parking from the database.
      *
      * @param pageNumber Number of the page with parking to be retrieved.
      * @param pageSize Number of parking per page.
      * @return List of all parking from a specified page, of a given page size.
      * If a persistence exception is thrown, then empty list is returned.
-     * @throws ApplicationBaseException when other problem occurred.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
+    @RolesAllowed({Authorities.GET_ALL_PARKING})
     public List<Parking> findAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Parking> findAllParking = entityManager.createNamedQuery("Parking.findAllParking", Parking.class);
@@ -342,6 +379,18 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         }
     }
 
+    /**
+     * This method is to return all available parking, that is parking where there is at least one
+     * sector with available places.
+     *
+     * @param pageNumber Number of the page with parking entries, to be returned.
+     * @param pageSize   Number of parking entries per page.
+     * @return List of parking, available to the end user, which means that new reservations or entries from
+     * the street can occur. Otherwise, empty list is returned.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
+     */
+    @RolesAllowed({Authorities.GET_ALL_AVAILABLE_PARKING})
     public List<Parking> findAllAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<Parking> findAllAvailableParking = entityManager.createNamedQuery("Parking.findAllAvailableParking", Parking.class);
@@ -357,7 +406,16 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-     *  Force incrementing version of sector entity.
+<<<<<<< HEAD
+     * Force incrementing version of sector entity.
+=======
+     * This method is used to force incrementing version field on the parking entity object
+     * for given sector. Used when updating the aggregate.
+     *
+     * @param sector Sector which causes version increment in the parking entity object.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
+>>>>>>> 93060683e7e7d76bdea942080ad8522caee753ca
      */
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {
