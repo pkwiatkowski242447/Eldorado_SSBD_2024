@@ -29,7 +29,6 @@ GRANT SELECT                         ON TABLE public.user_level             TO s
 GRANT SELECT                , UPDATE ON TABLE public.client_data            TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.admin_data             TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.staff_data             TO ssbd03mop;
-GRANT SELECT, INSERT, DELETE         ON TABLE public.entry_code             TO ssbd03mop;
 
 GRANT SELECT                         ON TABLE public.account_attributes     TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.attribute_association  TO ssbd03mop;
@@ -119,19 +118,19 @@ INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, c
 INSERT INTO public.sector (id, creation_timestamp, active ,occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, true, 30, 50, 1, 'SA-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
 
 -- Second Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('9f7f2969-1b7e-4bb3-ab84-6dbc31c01277', current_timestamp, true, 30, 50, 1, 'S1', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('9f7f2969-1b7e-4bb3-ab84-6dbc31c01277', current_timestamp, true, 30, 50, 1, 'SB-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
 
 -- Third Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('99023647-d8d2-43a5-91c7-b24781f06e13', current_timestamp, true, 30, 50, 1, 'S2', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('99023647-d8d2-43a5-91c7-b24781f06e13', current_timestamp, true, 30, 50, 1, 'SB-02', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
 
 -- Fourth Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('bca50310-f4fb-4911-bf3c-68e00e517b95', current_timestamp, true, 30, 50, 1, 'S3', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('bca50310-f4fb-4911-bf3c-68e00e517b95', current_timestamp, true, 30, 50, 1, 'SB-03', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
 
 -- Fifth Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('82b4ad91-a5ef-48bf-bc5b-390d7f4d1dea', current_timestamp, true, 30, 50, 1, 'S4', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'COVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('82b4ad91-a5ef-48bf-bc5b-390d7f4d1dea', current_timestamp, true, 30, 50, 1, 'SB-04', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'COVERED', 0);
 
 -- Sixth Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('36e19dcd-1d5b-4258-a5df-ba9f4372c58c', current_timestamp, true, 30, 50, 1, 'S5', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNDERGROUND', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('36e19dcd-1d5b-4258-a5df-ba9f4372c58c', current_timestamp, true, 30, 50, 1, 'SB-05', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNDERGROUND', 0);
 
 -- Seventh Sector S2
 INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('4ce920a0-6f4d-4e95-ba24-99ba32b66491', current_timestamp, true, 30, 60, 2, 'SA-02', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
@@ -265,16 +264,16 @@ INSERT INTO public.attribute_value(id, version, attribute_name_id, attribute_val
 
 INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('3591ced3-996e-49b4-8c56-40fe91193b1d', current_timestamp, 'LEAST_OCCUPIED', '99-999', 'test1', 'test1', 0);
 
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('14d51050-ffe2-4da2-abd2-4e6d06759ea5', current_timestamp, true, 0, 5, 3, 'UC-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('933bcce5-a38c-4b09-bd60-2b746d9f40e8', current_timestamp, true, 1, 2, 3, 'UC-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('828228e6-2fa7-418e-8cfe-7f4d79737557', current_timestamp, true, 1, 1, 3, 'UC-03', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('38c70882-c413-467d-bdd8-c5ed5f9128d0', current_timestamp, true, 1, 1, 3, 'UC-04', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('14d51050-ffe2-4da2-abd2-4e6d06759ea5', current_timestamp, true, 0, 5, 3, 'UC-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('933bcce5-a38c-4b09-bd60-2b746d9f40e8', current_timestamp, true, 1, 2, 3, 'UC-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('828228e6-2fa7-418e-8cfe-7f4d79737557', current_timestamp, true, 1, 1, 3, 'UC-03', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('38c70882-c413-467d-bdd8-c5ed5f9128d0', current_timestamp, true, 1, 1, 3, 'UC-04', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
 
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('f274420a-1322-4530-bfcb-4e515dd5a920', current_timestamp, true, 0, 2, 3, 'CO-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'COVERED', 0);
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('ae65eca6-669d-43ec-8c35-39f4eb6b72bb', current_timestamp, true, 1, 1, 3, 'CO-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'COVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('f274420a-1322-4530-bfcb-4e515dd5a920', current_timestamp, true, 0, 2, 3, 'CO-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'COVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('ae65eca6-669d-43ec-8c35-39f4eb6b72bb', current_timestamp, true, 1, 1, 3, 'CO-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'COVERED', 0);
 
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('65c51075-0749-4304-984a-9cb926e65aab', current_timestamp, true, 0, 2, 3, 'UN-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNDERGROUND', 0);
-INSERT INTO public.sector (id, creation_timestamp, active, available_places, max_places, weight, name, parking_id, type, version) VALUES ('b9f5bb0c-d19f-4101-ac57-d758e063ac3e', current_timestamp, true, 1, 1, 3, 'UN-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNDERGROUND', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('65c51075-0749-4304-984a-9cb926e65aab', current_timestamp, true, 0, 2, 3, 'UN-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNDERGROUND', 0);
+INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('b9f5bb0c-d19f-4101-ac57-d758e063ac3e', current_timestamp, true, 1, 1, 3, 'UN-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNDERGROUND', 0);
 
 -- Reservations to the first sector, all reservation cases
 --1 -- completed - non blocking

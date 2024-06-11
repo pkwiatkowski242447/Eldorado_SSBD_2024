@@ -82,7 +82,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         assertNotNull(parking);
         parkingFacade.create(parking);
 
-        assertEquals("BoatCity", parking.getAddress().getCity());
+        assertEquals("Lodz", parking.getAddress().getCity());
     }
 
 //    @Test

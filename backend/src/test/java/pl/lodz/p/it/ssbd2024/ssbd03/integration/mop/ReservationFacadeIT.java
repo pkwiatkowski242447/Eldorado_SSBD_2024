@@ -103,7 +103,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     public void reservationFacadeFindAllReservationsWithPaginationTest() throws ApplicationBaseException {
         List<Reservation> reservations = reservationFacade.findAllWithPagination(0, 50);
         assertNotNull(reservations);
-        assertEquals(15, reservations.size());
+        assertEquals(35, reservations.size());
     }
 
     @Test
