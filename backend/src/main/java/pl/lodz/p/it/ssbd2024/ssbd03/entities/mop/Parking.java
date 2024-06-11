@@ -168,9 +168,10 @@ public class Parking extends AbstractEntity {
      * @param version Version of the constructed parking entity.
      * @param address Address of the parking.
      */
-    public Parking(Long version, Address address) {
+    public Parking(Long version, Address address, SectorDeterminationStrategy strategy) {
         super(version);
         this.address = address;
+        this.sectorStrategy = strategy;
     }
 
     /**

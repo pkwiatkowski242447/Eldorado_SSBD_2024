@@ -135,6 +135,46 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
         return list;
     }
 
+    /***
+     * This method is used to find all reservations, that last more than 24 hours and are no closed
+     *
+     * @param amount Length of the specified time window, used to end reservations that last more than 24 hours.
+     * @param timeUnit Time unit, indicating size of the reservation ending time window.
+     * @return List of reservation that last more than 24 hours, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForTermination(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForTermination", Reservation.class);
+            findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
+            List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
+
+    /**
+     * This method is used to find all reservations marked for completing
+     *
+     * @return List of reservation that should be canceled automatically, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForCompleting() throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForCanceling = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForCompleting", Reservation.class);
+            List<Reservation> list = findAllReservationMarkedForCanceling.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
     /**
      * Returns all active reservations for user with specified login
      *
@@ -183,28 +223,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
                     .setMaxResults(pageSize)
                     .getResultList();
             refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to find all reservations, that last more than 24 hours
-     *
-     * @param amount   Length of the specified time window, used to end reservations that last more than 24 hours.
-     * @param timeUnit Time unit, indicating size of the reservation ending time window.
-     * @return List of reservation that last more than 24 hours, If persistence exception is thrown returns empty list.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @RolesAllowed({Authorities.END_RESERVATION})
-    public List<Reservation> findAllReservationsMarkedForEnding(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
-        try {
-            TypedQuery<Reservation> findAllReservationMarkedForEnding = getEntityManager().createNamedQuery("Reservation.findAllReservationsMarkedForEnding", Reservation.class);
-            findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
-            List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
-            super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
             return new ArrayList<>();

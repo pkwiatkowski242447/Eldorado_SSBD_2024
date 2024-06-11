@@ -37,6 +37,7 @@ public class ParkingMapper {
      */
     public static Parking toParking(ParkingModifyDTO parkingModifyDTO) {
         Address address = new Address(parkingModifyDTO.getCity(),parkingModifyDTO.getZipCode(), parkingModifyDTO.getStreet());
-        return new Parking(address, Parking.SectorDeterminationStrategy.valueOf(parkingModifyDTO.getStrategy()));
+        return new Parking(parkingModifyDTO.getVersion(), address,
+                Parking.SectorDeterminationStrategy.valueOf(parkingModifyDTO.getStrategy()));
     }
 }
