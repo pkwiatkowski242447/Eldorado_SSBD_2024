@@ -75,6 +75,14 @@ import java.util.List;
                         ORDER BY r.beginTime ASC
                         """
         ),
+        // Find all parking events for reservation
+        @NamedQuery(
+                name = "Reservation.findAllParkingEventsForGivenReservation",
+                query = """
+                        SELECT p FROM ParkingEvent p
+                        WHERE p.reservation.id = :reservationId
+                        ORDER BY p.createdBy DESC"""
+        ),
         // Deactivating sector
         @NamedQuery(
                 name = "Reservation.findAllReservationsToCancelBeforeDeactivation",
