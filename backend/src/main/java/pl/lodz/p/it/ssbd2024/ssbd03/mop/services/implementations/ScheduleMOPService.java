@@ -77,11 +77,11 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
         }
 
         if (reservationsToBeFinished.isEmpty()) {
-            log.info("No reservations to be ended were found.");
+            log.info("No reservations to be terminated were found.");
             return;
         }
 
-        log.info("List of identifiers of reservations to be ended: {}", reservationsToBeFinished.stream().map(Reservation::getId).toList());
+        log.info("List of identifiers of reservations to be terminated: {}", reservationsToBeFinished.stream().map(Reservation::getId).toList());
 
         for (Reservation reservation : reservationsToBeFinished) {
             try {
@@ -100,7 +100,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                     reservation.addParkingEvent(exitEvent);
                     this.reservationFacade.edit(reservation);
                     Sector sector = reservation.getSector();
-                    sector.setOccupiedPlaces(sector.getOccupiedPlaces() + 1);
+                    sector.setOccupiedPlaces(sector.getOccupiedPlaces() - 1);
                     parkingFacade.editSector(sector);
                 }
             } catch (Exception exception) {
@@ -129,7 +129,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
             return;
         }
 
-        log.info("List of identifiers of reservations to be ended: {}", reservationsToEnd.stream().map(Reservation::getId).toList());
+        log.info("List of identifiers of reservations to be completed: {}", reservationsToEnd.stream().map(Reservation::getId).toList());
 
         for (Reservation reservation : reservationsToEnd) {
             try {
