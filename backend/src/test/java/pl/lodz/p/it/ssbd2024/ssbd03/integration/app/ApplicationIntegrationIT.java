@@ -29,6 +29,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountOutp
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.AccountConstraintViolationExceptionDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokensDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
@@ -2161,6 +2162,165 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     }
 
+    @Test
+    public void addNewSectorSuccessful() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+
+        String name = "SA-11";
+        int maxPlaces = 100;
+        int weight = 100;
+        boolean active = true;
+
+        SectorCreateDTO sectorCreateDTO = new SectorCreateDTO(name, "UNCOVERED",maxPlaces,weight,active);
+
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(sectorCreateDTO)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .post(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value());
+}
+
+    @Test
+    public void addNewSectorAsUnauthorizedUserForbidden() throws JsonProcessingException {
+        String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
+
+        String name = "SA-11";
+        int maxPlaces = 100;
+        int weight = 100;
+        boolean active = true;
+
+        SectorCreateDTO sectorCreateDTO = new SectorCreateDTO(name, "UNCOVERED",maxPlaces,weight,active);
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(sectorCreateDTO)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .post(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void addNewSectorConflict() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+
+        String name = "SA-01";
+        int maxPlaces = 100;
+        int weight = 100;
+        boolean active = true;
+
+        SectorCreateDTO sectorCreateDTO = new SectorCreateDTO(name, "UNCOVERED",maxPlaces,weight,active);
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(sectorCreateDTO)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .post(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.CONFLICT.value());
+    }
+
+    @Test
+    public void addNewSectorAsUnauthenticatedUser() throws JsonProcessingException {
+        String name = "SA-01";
+        int maxPlaces = 100;
+        int weight = 100;
+        boolean active = true;
+
+        SectorCreateDTO sectorCreateDTO = new SectorCreateDTO(name, "UNCOVERED",maxPlaces,weight,active);
+
+        RestAssured.given()
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(sectorCreateDTO)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .post(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void addNewSectorBadRequestWeightTooLarge() throws JsonProcessingException {
+        String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
+
+        String name = "SA-11";
+        int maxPlaces = 100;
+        int weight = 1000;
+        boolean active = true;
+
+        SectorCreateDTO sectorCreateDTO = new SectorCreateDTO(name, "UNCOVERED",maxPlaces,weight,active);
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(sectorCreateDTO)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .post(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void addNewSectorBadRequestOverTheLimitOfMaxPlaces() throws JsonProcessingException {
+        String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
+
+        String name = "SA-11";
+        int maxPlaces = 2000;
+        int weight = 100;
+        boolean active = true;
+
+        SectorCreateDTO sectorCreateDTO = new SectorCreateDTO(name, "UNCOVERED",maxPlaces,weight,active);
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(sectorCreateDTO)
+                .pathParam("id","96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .post(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void addNewSectorParkingNotFound() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+
+        String name = "SA-11";
+        int maxPlaces = 100;
+        int weight = 100;
+        boolean active = true;
+
+        SectorCreateDTO sectorCreateDTO = new SectorCreateDTO(name, "UNCOVERED",maxPlaces,weight,active);
+
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(sectorCreateDTO)
+                .pathParam("id","96f36faa-f2a2-41b8-9c3c-b6bef04ce6d1")
+                .post(BASE_URL + "/parking/{id}/sectors")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
 
 
 
