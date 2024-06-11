@@ -68,30 +68,41 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS, initialDelay = -1L)
     public void terminateReservation() {
         log.info("Method: endReservation(), used for terminating reservations which last more than scheduler.maximum_reservation_time value");
-        List<Reservation> reservationsWhichLastMoreThan24h = new ArrayList<>();
+        List<Reservation> reservationsToBeFinished = new ArrayList<>();
         try {
-            reservationsWhichLastMoreThan24h = reservationFacade.findAllReservationsMarkedForTerminating(Long.parseLong(endTime), TimeUnit.HOURS);
+            reservationsToBeFinished = reservationFacade.findAllReservationsMarkedForTermination(Long.parseLong(endTime), TimeUnit.HOURS);
         } catch (NumberFormatException | ApplicationBaseException exception) {
             log.error("Exception: {} occurred while searching for reservation to be terminated. Cause: {}.",
                     exception.getClass().getSimpleName(), exception.getMessage());
         }
 
-        if (reservationsWhichLastMoreThan24h.isEmpty()) {
+        if (reservationsToBeFinished.isEmpty()) {
             log.info("No reservations to be ended were found.");
             return;
         }
 
-        log.info("List of identifiers of reservations to be ended: {}", reservationsWhichLastMoreThan24h.stream().map(Reservation::getId).toList());
+        log.info("List of identifiers of reservations to be ended: {}", reservationsToBeFinished.stream().map(Reservation::getId).toList());
 
-        for (Reservation reservation : reservationsWhichLastMoreThan24h) {
+        for (Reservation reservation : reservationsToBeFinished) {
             try {
-                ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
-                reservation.addParkingEvent(exitEvent);
-                reservation.setStatus(Reservation.ReservationStatus.TERMINATED);
-                this.reservationFacade.edit(reservation);
-                Sector sector = reservation.getSector();
-                sector.setAvailablePlaces(sector.getAvailablePlaces() + 1);
-                parkingFacade.editSector(sector);
+                int numberOfEntries = 0;
+                int numberOfExits = 0;
+                for (ParkingEvent parkingEvent : reservation.getParkingEvents()) {
+                    if (parkingEvent.getType() == ParkingEvent.EventType.ENTRY) {
+                        numberOfEntries += 1;
+                    }
+                    else {
+                        numberOfExits += 1;
+                    }
+                }
+                if (numberOfExits != numberOfEntries) {
+                    ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
+                    reservation.addParkingEvent(exitEvent);
+                    this.reservationFacade.edit(reservation);
+                    Sector sector = reservation.getSector();
+                    sector.setOccupiedPlaces(sector.getOccupiedPlaces() + 1);
+                    parkingFacade.editSector(sector);
+                }
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while terminating reservation with id: {}. Cause: {}.",
                         exception.getClass().getSimpleName(), reservation.getId(), exception.getMessage());
@@ -125,7 +136,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                 reservation.setStatus(Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY);
                 this.reservationFacade.edit(reservation);
                 Sector sector = reservation.getSector();
-                sector.setAvailablePlaces(sector.getAvailablePlaces() + 1);
+                sector.setOccupiedPlaces(sector.getOccupiedPlaces() - 1);
                 parkingFacade.editSector(sector);
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while canceling reservation with id: {}. Cause: {}.",

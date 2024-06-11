@@ -58,6 +58,8 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      *
      * @param id ID of the Account to be retrieved.
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @DenyAll
@@ -70,6 +72,8 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
      *
      * @param id ID of the Account to be retrieved.
      * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
     @DenyAll
@@ -78,15 +82,18 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
     }
 
     /**
-     * Retrieves an Account by login.
+     * Retrieves an account entity object by login.
      *
      * @param login Login of the Account to be retrieved.
      * @return If Account with the given login was found returns an Optional containing the Account, otherwise returns an empty Optional.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @RolesAllowed({
             Authorities.RESERVE_PARKING_PLACE, Authorities.CANCEL_RESERVATION,
             Authorities.GET_ACTIVE_RESERVATIONS, Authorities.GET_HISTORICAL_RESERVATIONS,
-            Authorities.ENTER_PARKING_WITHOUT_RESERVATION
+            Authorities.ENTER_PARKING_WITHOUT_RESERVATION, Authorities.EXIT_PARKING,
+            Authorities.GET_OWN_RESERVATION_DETAILS
     })
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
@@ -103,12 +110,14 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
     // U - update methods
 
     /**
-     * Forces the modification of the entity in the database.
+     * Forces the modification of the account entity object in the database.
      *
      * @param account Account to be modified.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
      */
     @Override
-    @DenyAll
+    @RolesAllowed({Authorities.CHANGE_CLIENT_TYPE})
     public void edit(Account account) throws ApplicationBaseException{
         super.edit(account);
     }

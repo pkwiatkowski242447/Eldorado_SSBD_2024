@@ -14,8 +14,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingAddressDuplicateException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingDeleteException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.ParkingSectorNameDuplicateException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.validation.ParkingConstraintViolationException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.conflict.SectorDeleteException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.sql.SQLException;
@@ -58,6 +61,12 @@ public class ParkingFacadeAspect {
             do {
                 if (exception.getMessage().contains("sector_parking_id_fk")) {
                     throw new ParkingDeleteException();
+                } else if (exception.getMessage().contains("parking_city_zip_code_street_key")) {
+                    throw new ParkingAddressDuplicateException();
+                } else if (exception.getMessage().contains("sector_name_parking_id_key")) {
+                    throw new ParkingSectorNameDuplicateException();
+                } else if (exception.getMessage().contains("reservation_sector_id_fk")) {
+                    throw new SectorDeleteException();
                 }
                 exceptionCopy = exceptionCopy.getCause();
             } while (exceptionCopy != null);

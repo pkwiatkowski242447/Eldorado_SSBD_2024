@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -60,4 +61,38 @@ public interface ReservationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
     List<Reservation> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException;
+
+    /**
+     * Retrieve reservation from the database by its identifier.
+     *
+     * @param reservationId Identifier of the reservation to be retrieved.
+     * @param userLogin Login of the user, which tries to retrieve reservation.
+     * @return Reservation entity object retrieved from the database.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    Reservation getOwnReservationById(UUID reservationId, String userLogin)
+            throws ApplicationBaseException;
+
+    /**
+     * Retrieve reservation from the database by its identifier.
+     *
+     * @param reservationId Identifier of the reservation to be retrieved.
+     * @return Reservation entity object retrieved from the database.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    Reservation getAnyReservationById(UUID reservationId)
+            throws ApplicationBaseException;
+
+    /**
+     * Retrieve parking events for given reservation, identified by its identifier, which is UUID.
+     *
+     * @param reservationId Identifier of the reservation, which the parking events should be retrieved for.
+     * @param pageNumber Number of page with parking event entries.
+     * @param pageSize Number of the parking event entries per page.
+     * @return List of parking events for given reservation, taking into account pagination. If no events matching criteria \
+     * (like page number and size) were found then empty list is returned.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<ParkingEvent> getParkingEventsForGivenReservation(UUID reservationId, int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 }

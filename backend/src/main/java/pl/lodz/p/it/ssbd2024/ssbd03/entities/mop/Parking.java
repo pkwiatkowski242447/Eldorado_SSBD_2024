@@ -5,7 +5,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +20,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ParkingMessages;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
@@ -42,7 +43,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findAll",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE (:showOnlyActive != true OR s.weight>0)
+                        WHERE (:showOnlyActive != true OR s.weight > 0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
@@ -72,7 +73,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findWithAvailablePlaces",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.availablePlaces != 0 AND (:showOnlyActive != true OR s.weight>0)
+                        WHERE s.occupiedPlaces < s.maxPlaces AND (:showOnlyActive != true OR s.weight>0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
@@ -85,6 +86,11 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
 })
 @Getter
 public class Parking extends AbstractEntity {
+
+    /**
+     * Algorithms used in determining sector when entering parking without reservation.
+     */
+    public enum SectorDeterminationStrategy {LEAST_OCCUPIED, MOST_OCCUPIED, LEAST_OCCUPIED_WEIGHTED}
 
     /**
      * The address of the parking.
@@ -103,6 +109,14 @@ public class Parking extends AbstractEntity {
     @Size(max = ParkingConsts.LIST_OF_SECTORS_MAX_SIZE, message = ParkingMessages.LIST_OF_SECTORS_FULL)
     @OneToMany(mappedBy = DatabaseConsts.PARKING_TABLE, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Sector> sectors = new ArrayList<>();
+
+    /**
+     * Algorithms used in determining sector when entering parking without reservation.
+     */
+    @NotNull(message = ParkingMessages.SECTOR_STRATEGY_NULL)
+    @Column(name = DatabaseConsts.PARKING_SECTOR_STRATEGY_COLUMN)
+    @Enumerated(EnumType.STRING)
+    private SectorDeterminationStrategy sectorStrategy;
 
     // Other fields - used for access control, and storing historical data
 
@@ -143,8 +157,9 @@ public class Parking extends AbstractEntity {
      *
      * @param address Parking's address
      */
-    public Parking(Address address) {
+    public Parking(Address address, SectorDeterminationStrategy strategy) {
         this.address = address;
+        this.sectorStrategy = strategy;
     }
 
     /**
@@ -153,9 +168,10 @@ public class Parking extends AbstractEntity {
      * @param version Version of the constructed parking entity.
      * @param address Address of the parking.
      */
-    public Parking(Long version, Address address) {
+    public Parking(Long version, Address address, SectorDeterminationStrategy strategy) {
         super(version);
         this.address = address;
+        this.sectorStrategy = strategy;
     }
 
     /**

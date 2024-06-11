@@ -183,6 +183,7 @@ public class DatabaseConsts {
     public static final String PARKING_CITY_COLUMN = "city";
     public static final String PARKING_ZIP_CODE_COLUMN = "zip_code";
     public static final String PARKING_STREET_COLUMN = "street";
+    public static final String PARKING_SECTOR_STRATEGY_COLUMN = "sector_strategy";
 
     // public.parking_event table
 
@@ -219,12 +220,14 @@ public class DatabaseConsts {
     public static final String SECTOR_NAME_COLUMN = "name";
     public static final String SECTOR_TYPE_COLUMN = "type";
     public static final String SECTOR_MAX_PLACES_COLUMN = "max_places";
-    public static final String SECTOR_AVAILABLE_PLACES_COLUMN = "available_places";
+    public static final String SECTOR_OCCUPIED_PLACES_COLUMN = "occupied_places";
     public static final String SECTOR_WEIGHT_COLUMN = "weight";
     public static final String SECTOR_ACTIVE_COLUMN = "active";
 
     public static final String SECTOR_PARKING_ID_INDEX = "idx_sector_parking_id";
     public static final String SECTOR_PARKING_ID_FK = "sector_parking_id_fk";
+
+    public static final String SECTOR_NAME_PARKING_ID_UNIQUE_KEY = "sector_name_parking_id_key";
 
     // public.entry_code
 

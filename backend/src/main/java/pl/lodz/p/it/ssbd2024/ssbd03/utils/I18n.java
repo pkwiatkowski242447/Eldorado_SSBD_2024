@@ -45,6 +45,9 @@ public class I18n {
     public static final String SECTOR_ALREADY_ACTIVE = "sector.already.active.exception";
     public static final String SECTOR_ALREADY_INACTIVE = "sector.already.inactive.exception";
     public static final String SECTOR_EDIT_OF_TYPE_OR_MAX_PLACES_WHEN_ACTIVE = "sector.edit.of.type.or.max.places.when.active.exception";
+    public static final String SECTOR_DEACTIVATION_INVALID_TIME = "sector.deactivation.invalid.time.exception";
+    public static final String SECTOR_WITH_GIVEN_NAME_EXISTS_EXCEPTION = "sector.name.duplicate.in.parking.exception";
+    public static final String SECTOR_DELETE_EXCEPTION = "sector.delete.exception";
 
     // Parking exceptions
     public static final String PARKING_NOT_FOUND_EXCEPTION = "parking.not.found.exception";
@@ -52,13 +55,15 @@ public class I18n {
     public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
     public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
     public static final String CANNOT_EXIT_PARKING_EXCEPTION = "parking.cannot.exit.exception";
+    public static final String PARKING_ADDRESS_DUPLICATE_EXCEPTION = "parking.address.duplicate.exception";
+
     // Reservation exceptions
     public static final String RESERVATION_NOT_FOUND_EXCEPTION = "reservation.not.found.exception";
     public static final String USER_NOT_RESERVATION_OWNER_EXCEPTION = "user.not.reservation.owner.exception";
     public static final String RESERVATION_NOT_STARTED_EXCEPTION = "reservation.not.started.exception";
     public static final String RESERVATION_EXPIRED_EXCEPTION = "reservation.expired.exception";
     public static final String RESERVATION_SECTOR_NO_AVAILABLE_PLACES_EXCEPTION = "reservation.sector.no.available.places.exception";
-
+    public static final String RESERVATION_SECTOR_NO_AVAILABLE_SECTORS_EXCEPTION = "reservation.sector.no.available.sectors.exception";
     public static final String RESERVATION_CLIENT_USER_LEVEL_NOT_FOUND = "reservation.user.level.client.not.found.exception";
     public static final String RESERVATION_CLIENT_ACCOUNT_NON_ENABLED = "reservation.client.account.non.enabled.exception";
     public static final String RESERVATION_SECTOR_NON_ACTIVE = "reservation.sector.non.active.exception";

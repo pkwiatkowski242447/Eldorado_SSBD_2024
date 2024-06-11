@@ -7,11 +7,11 @@ public class SectorListMapper {
 
     /**
      * This method is used to map Sector entity to an instance of SectorListDTO.
-     * @param sector Sector to map.
+     * @param s Sector to map.
      * @return Returns mapped SectorListDTO instance.
      */
     static public SectorListDTO toSectorListDTO(Sector s) {
-        return new SectorListDTO(s.getName(), s.getActive(), s.getType(),
-            s.getMaxPlaces(), s.getAvailablePlaces(), s.getWeight());
+        return new SectorListDTO(s.getId(), s.getName(), s.getActive(), s.getType(),
+            s.getMaxPlaces(), s.getOccupiedPlaces(), s.getWeight());
     }
 }

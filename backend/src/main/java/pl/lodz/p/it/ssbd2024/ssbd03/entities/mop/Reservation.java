@@ -59,23 +59,6 @@ import java.util.List;
                        """
         ),
         @NamedQuery(
-                name = "Reservation.findActiveReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.client.id = :clientId
-                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
-                        ORDER BY r.beginTime"""
-        ),
-        @NamedQuery(
-                name = "Reservation.findHistoricalReservations",
-                query = """
-                        SELECT r FROM Reservation r
-                        WHERE r.client.id = :clientId
-                          AND r.endTime IS NOT NULL AND CURRENT_TIMESTAMP >= r.endTime
-                        ORDER BY r.beginTime
-                        """
-        ),
-        @NamedQuery(
                 name = "Reservation.findHistoricalReservationsByLogin",
                 query = """
                        SELECT r FROM Reservation r
@@ -93,7 +76,7 @@ import java.util.List;
                         """
         ),
         @NamedQuery(
-                name = "Reservation.findAllReservationsMarkedForTerminating",
+                name = "Reservation.findAllReservationsMarkedForTermination",
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.beginTime < :timestamp
@@ -113,13 +96,29 @@ import java.util.List;
                         ORDER BY r.beginTime ASC
                         """
         ),
+        // Find all parking events for reservation
+        @NamedQuery(
+                name = "Reservation.findAllParkingEventsForGivenReservation",
+                query = """
+                        SELECT p FROM ParkingEvent p
+                        WHERE p.reservation.id = :reservationId
+                        ORDER BY p.createdBy DESC"""
+        ),
+        // Deactivating sector
+        @NamedQuery(
+                name = "Reservation.findAllReservationsToCancelBeforeDeactivation",
+                query = """
+                        SELECT r FROM Reservation r
+                        WHERE r.sector.id = :sectorId
+                            AND r.beginTime < :timestamp
+                        ORDER BY r.beginTime ASC"""
+        ),
         @NamedQuery(
                 name = "Reservation.findClientReservation",
                 query = """
                         SELECT r FROM Reservation r
-                         WHERE r.id = :reservationId
-                           AND r.client.account.login = :ownerLogin
-                        """
+                        WHERE r.id = :reservationId
+                            AND r.client.account.login = :ownerLogin"""
         ),
         // Creating reservation
         @NamedQuery(
@@ -135,7 +134,7 @@ import java.util.List;
                         SELECT COUNT(*) FROM Reservation r
                         WHERE r.sector.id = :sectorId
                         AND
-                        r.status != 'CANCELED'
+                        r.status != ReservationStatus.CANCELLED
                         AND
                         (
                             (
@@ -163,6 +162,122 @@ import java.util.List;
                             (r.beginTime BETWEEN :beginTime AND :beginTimePlusMaxReservationTime)
                         )
                         """
+        ),
+        @NamedQuery(
+                name = "Reservation.getAvailablePremiumSectorsNow",
+                query = """
+                        SELECT sectorFin FROM Sector sectorFin
+                        WHERE sectorFin.active = true
+                        AND sectorFin.parking.id = :parkingId
+                        AND sectorFin NOT IN (
+                            SELECT r.sector FROM Reservation r
+                            WHERE r.sector.active = true
+                            AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
+                            AND r.sector.parking.id = :parkingId
+                            AND
+                                (
+                                    (
+                                        (r.beginTime BETWEEN :currentTimeMinusReserve AND :currentTimePlusReserve)
+                                        AND
+                                        (
+                                            (
+                                                r.endTime IS NULL
+                                                OR
+                                                (
+                                                    r.endTime < :currentTime
+                                                    AND
+                                                    MOD(SIZE(r.parkingEvents), 2) = 1
+                                                )
+                                            )
+                                            OR
+                                            r.endTime > :currentTime
+                                        )
+                                    )
+                                    OR
+                                    (r.beginTime BETWEEN :currentTime AND :currentTimePlusReserve)
+                                )
+                            GROUP BY r.sector, r.sector.maxPlaces
+                            HAVING COUNT(*) >= r.sector.maxPlaces
+                        )
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.getAvailableStandardSectorsNow",
+                query = """
+                        SELECT sectorFin FROM Sector sectorFin
+                        WHERE sectorFin.active = true
+                        AND sectorFin.type IN (SectorType.UNCOVERED, SectorType.COVERED)
+                        AND sectorFin.parking.id = :parkingId
+                        AND sectorFin NOT IN (
+                            SELECT r.sector FROM Reservation r
+                            WHERE r.sector.active = true
+                            AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
+                            AND r.sector.parking.id = :parkingId
+                            AND
+                                (
+                                    (
+                                        (r.beginTime BETWEEN :currentTimeMinusReserve AND :currentTimePlusReserve)
+                                        AND
+                                        (
+                                            (
+                                                r.endTime IS NULL
+                                                OR
+                                                (
+                                                    r.endTime < :currentTime
+                                                    AND
+                                                    MOD(SIZE(r.parkingEvents), 2) = 1
+                                                )
+                                            )
+                                            OR
+                                            r.endTime > :currentTime
+                                        )
+                                    )
+                                    OR
+                                    (r.beginTime BETWEEN :currentTime AND :currentTimePlusReserve)
+                                )
+                            GROUP BY r.sector, r.sector.maxPlaces
+                            HAVING COUNT(*) >= r.sector.maxPlaces
+                        )
+                        """
+        ),
+        @NamedQuery(
+                name = "Reservation.getAvailableBasicSectorsNow",
+                query = """
+                        SELECT sectorFin FROM Sector sectorFin
+                        WHERE sectorFin.active = true
+                        AND sectorFin.type = SectorType.UNCOVERED
+                        AND sectorFin.parking.id = :parkingId
+                        AND sectorFin NOT IN (
+                            SELECT r.sector FROM Reservation r
+                            WHERE r.sector.active = true
+                            AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
+                            AND r.sector.parking.id = :parkingId
+                            AND
+                                (
+                                    (
+                                        (r.beginTime BETWEEN :currentTimeMinusReserve AND :currentTimePlusReserve)
+                                        AND
+                                        (
+                                            (
+                                                r.endTime IS NULL
+                                                OR
+                                                (
+                                                    r.endTime < :currentTime
+                                                    AND
+                                                    MOD(SIZE(r.parkingEvents), 2) = 1
+                                                )
+                                            )
+                                            OR
+                                            r.endTime > :currentTime
+                                        )
+                                    )
+                                    OR
+                                    (r.beginTime BETWEEN :currentTime AND :currentTimePlusReserve)
+                                )
+                            GROUP BY r.sector, r.sector.maxPlaces
+                            HAVING COUNT(*) >= r.sector.maxPlaces
+                        )
+                        """
         )
 })
 public class Reservation extends AbstractEntity implements Serializable {
@@ -176,7 +291,7 @@ public class Reservation extends AbstractEntity implements Serializable {
     /**
      * Enum class representing the status of the Reservation entity.
      */
-    public enum ReservationStatus { AWAITING, IN_PROGRESS, COMPLETED_MANUALLY, COMPLETED_AUTOMATICALLY, CANCELED, TERMINATED }
+    public enum ReservationStatus { AWAITING, IN_PROGRESS, COMPLETED_MANUALLY, COMPLETED_AUTOMATICALLY, CANCELLED, TERMINATED }
 
     /**
      * The client associated with this reservation.

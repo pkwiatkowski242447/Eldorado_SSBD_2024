@@ -1,4 +1,4 @@
-import {API_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
+import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
 
@@ -138,7 +138,7 @@ export const api = {
 
     confirmEmail: (token: string) => {
         return axios.create({
-            baseURL: API_URL,
+            baseURL: API_TEST_URL,
             timeout: TIMEOUT_IN_MS,
             headers: DEFAULT_HEADERS,
         }).post(`/accounts/confirm-email/${token}`)
@@ -216,15 +216,15 @@ export const api = {
         return apiWithConfig.post(`/accounts/restore-token/${token}`)
     },
 
-    getPasswordAdminResetStatus:()=>{
+    getPasswordAdminResetStatus: () => {
         return apiWithConfig.get('/accounts/admin-password-reset-status')
     },
 
-    getAllAttributes:()=>{
+    getAllAttributes: () => {
         return apiWithConfig.get('/accounts/attributes?pageNumber=0&pageSize=2')
     },
 
-    getMyAttributes:()=>{
+    getMyAttributes: () => {
         return apiWithConfig.get('/accounts/attributes/account/me/get')
     },
 
@@ -232,4 +232,15 @@ export const api = {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
 
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getAllReservations: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    }
 }

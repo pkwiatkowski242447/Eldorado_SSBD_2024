@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
 
 import java.util.UUID;
 
@@ -28,14 +29,18 @@ public class ParkingOutputDTO extends ParkingSignableDTO {
     @Schema(description = "Street of the city in which the parking is located", example = "white", requiredMode = Schema.RequiredMode.REQUIRED)
     private String street;
 
-    /***
+    @Schema(description = "Strategy used in determining sector for entries without reservation", example="LEAST_OCCUPIED", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Parking.SectorDeterminationStrategy strategy;
+
+    /**
      * All arguments constructor for ParkingOutputDTO - with calling constructor of superclass.
      */
-    public ParkingOutputDTO(Long version, UUID parkingId, String city, String zipCode, String street) {
+    public ParkingOutputDTO (Long version, UUID parkingId, String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) {
         super(version, parkingId);
         this.city = city;
         this.zipCode = zipCode;
         this.street = street;
+        this.strategy = strategy;
     }
 
     /**
