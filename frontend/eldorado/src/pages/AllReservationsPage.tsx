@@ -68,7 +68,7 @@ function AllReservationsPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>All User Reservations</BreadcrumbLink>
+                            <BreadcrumbLink>{t("allReservationsPage.title")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -83,27 +83,27 @@ function AllReservationsPage() {
                             <TableHeader>
                                 <TableRow className={"text-center p-10"}>
                                     <TableHead
-                                        className="text-center">{"Client ID"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.clientID")}</TableHead>
                                     <TableHead
-                                        className="text-center">{"Begin Time"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.beginTime")}</TableHead>
                                     <TableHead
-                                        className="text-center">{"Ending Time"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.endingTime")}</TableHead>
                                     <TableHead
-                                        className="text-center">{"City"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.city")}</TableHead>
                                     <TableHead
-                                        className="text-center">{"Street"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.street")}</TableHead>
                                     <TableHead
-                                        className="text-center">{"Zip Code"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.zipCode")}</TableHead>
                                     <TableHead
-                                        className="text-center">{"Sector Name"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.sectorName")}</TableHead>
                                     <TableHead
-                                        className="text-center">{"ID"}</TableHead>
+                                        className="text-center">{t("allReservationsPage.table.reservationId")}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className={"text-center"}>
                                 {reservations.map(reservation => (
                                     <TableRow key={reservation.id} className="flex-auto">
-                                        <TableCell>{reservation.clientId ? reservation.clientId : "Anonymous"}</TableCell>
+                                        <TableCell>{reservation.clientId ? reservation.clientId : t("general.anonymous")}</TableCell>
                                         <TableCell>{reservation.beginTime}</TableCell>
                                         <TableCell>{reservation.endingTime}</TableCell>
                                         <TableCell>{reservation.city}</TableCell>

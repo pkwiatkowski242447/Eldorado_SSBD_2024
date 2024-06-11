@@ -303,6 +303,15 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Twoje hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Zaloguj się",
 
+  "allReservationsPage.title": "Wszystkie rezerwacje w systemie",
+  "allReservationsPage.table.clientID": "ID Klienta",
+  "allReservationsPage.table.beginTime": "Czas rozpoczęcia",
+  "allReservationsPage.table.endingTime": "Czas zakończenia",
+  "allReservationsPage.table.city": "Parking",
+  "allReservationsPage.table.street": "Ulica",
+  "allReservationsPage.table.zipCode": "Kod pocztowy",
+  "allReservationsPage.table.sectorName": "Sektor",
+  "allReservationsPage.table.reservationId": "ID rezerwacji",
 
 
 
