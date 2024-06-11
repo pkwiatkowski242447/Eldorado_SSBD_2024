@@ -100,7 +100,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                     reservation.addParkingEvent(exitEvent);
                     this.reservationFacade.edit(reservation);
                     Sector sector = reservation.getSector();
-                    sector.setOccupiedPlaces(sector.getOccupiedPlaces() - 1);
+                    sector.setOccupiedPlaces(sanitizeInteger(sector.getOccupiedPlaces() - 1));
                     parkingFacade.editSector(sector);
                 }
             } catch (Exception exception) {
@@ -136,7 +136,7 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                 reservation.setStatus(Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY);
                 this.reservationFacade.edit(reservation);
                 Sector sector = reservation.getSector();
-                sector.setOccupiedPlaces(sector.getOccupiedPlaces() - 1);
+                sector.setOccupiedPlaces(sanitizeInteger(sector.getOccupiedPlaces() - 1));
                 parkingFacade.editSector(sector);
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while canceling reservation with id: {}. Cause: {}.",
@@ -144,4 +144,8 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
             }
         }
     }
+
+    private static int sanitizeInteger(int value) {
+        return Math.max(value, 0);
+    };
 }

@@ -135,6 +135,8 @@ import java.util.List;
                 query = """
                         SELECT COUNT(*) FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
+                          AND r.status IN (ReservationStatus.AWAITING,
+                                           ReservationStatus.IN_PROGRESS)
                         """
         ),
         @NamedQuery(
