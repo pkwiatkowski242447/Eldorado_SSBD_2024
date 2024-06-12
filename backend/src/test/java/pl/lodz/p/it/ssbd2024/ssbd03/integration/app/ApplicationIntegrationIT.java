@@ -2781,7 +2781,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @Test
-    public void removeSectorTestSuccessful() throws IOException {
+    public void removeSectorTestSuccessful() throws JsonProcessingException {
         String loginToken = this.login("tkarol", "P@ssw0rd!", "pl");
         RequestSpecification requestSpec = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken);
