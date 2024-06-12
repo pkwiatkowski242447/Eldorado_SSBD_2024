@@ -16,7 +16,7 @@ public class ParkingConstraintViolationException extends ParkingValidationExcept
     }
 
     public ParkingConstraintViolationException(Throwable cause, Set<String> violations) {
-        super(I18n.ACCOUNT_CONSTRAINT_VIOLATION, cause);
+        super(I18n.PARKING_CONSTRAINT_VIOLATION, cause);
         this.violations = violations;
     }
 }

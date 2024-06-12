@@ -108,10 +108,9 @@ INSERT INTO public.user_level (id, creation_timestamp, level, account_id, versio
 INSERT INTO public.client_data (id, type) VALUES ('248a31fa-7fef-41d5-8042-e70a38d30a9d', 'BASIC');
 
 -- Parking
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, '91-416', 'BoatCity', 'Palki', 0);
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', current_timestamp, '00-000', 'Lodz', 'Pomorska', 20);
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('ddcae4ec-aeb5-4ece-aa2b-46819763d55f', current_timestamp, '95-010', 'Strykow', 'Krotka', 9);
-
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, 'LEAST_OCCUPIED', '91-416', 'BoatCity', 'Palki', 0);
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', current_timestamp, 'LEAST_OCCUPIED', '00-000', 'Lodz', 'Pomorska', 20);
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('ddcae4ec-aeb5-4ece-aa2b-46819763d55f', current_timestamp, 'LEAST_OCCUPIED', '95-010', 'Strykow', 'Krotka', 9);
 -- First Sector S1
 INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, 30, 50, 1, 'SA-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
 
