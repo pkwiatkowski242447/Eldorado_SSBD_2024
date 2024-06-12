@@ -17,7 +17,10 @@ import AdminCreateUserPage from "@/pages/AdminCreateUserPage.tsx";
 import RestoreAccessPage from "@/pages/RestoreAccessPage.tsx";
 import RestoreTokenPage from "@/pages/RestoreTokenPage.tsx";
 import ParkingManagementPage from "@/pages/ParkingManagementPage.tsx";
-import {ParkingManagementInfoPage} from "@/pages/ParkingManagementInfoPage.tsx";
+import { ParkingManagementInfoPage } from "@/pages/ParkingManagementInfoPage.tsx";
+import MyReservationsPage from "@/pages/MyReservationsPage.tsx";
+import AllReservationsPage from "@/pages/AllReservationsPage.tsx";
+import ActiveParkingPage from "@/pages/ActiveParkingPage.tsx";
 
 
 export const PublicRoutes: RouteType[] = [
@@ -65,7 +68,10 @@ export const PublicRoutes: RouteType[] = [
         path: Pathnames.public.restoreToken,
         Component: RestoreTokenPage
     },
-
+    {
+        path: Pathnames.public.parkingList,
+        Component: ActiveParkingPage
+    }
 ]
 
 export const AdminRoutes: RouteType[] = [
@@ -123,7 +129,11 @@ export const StaffRoutes: RouteType[] = [
     {
         path: Pathnames.staff.parkingManagementInfo,
         Component: ParkingManagementInfoPage
-    }
+    },
+    {
+        path: Pathnames.staff.allReservations,
+        Component: AllReservationsPage
+    },
 ]
 
 export const ClientRoutes: RouteType[] = [
@@ -142,5 +152,13 @@ export const ClientRoutes: RouteType[] = [
     {
         path: Pathnames.loggedIn.changeUserLevel,
         Component: ChangeUserLevelPage
+    },
+    {
+        path: Pathnames.client.myReservations,
+        Component: MyReservationsPage
+    },
+    {
+        path: Pathnames.client.parkingList,
+        Component: ActiveParkingPage
     },
 ]

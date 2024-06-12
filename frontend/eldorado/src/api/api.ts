@@ -232,21 +232,58 @@ export const api = {
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
+    
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
+
     createParking: (parking: CreateParkingType) => {
         return apiWithConfig.post('/parking', {...parking})
     },
+
     deleteParking: (parkingId: string) => {
         return apiWithConfig.delete(`/parking/${parkingId}`)
     },
+
     getParkingById: (parkingId: string) => {
         return apiWithConfig.get(`/parking/get/${parkingId}`)
     },
+
+    getSectorsStaff: (id:string | undefined, details: string) => {
+        return apiWithConfig.get(`/parking/${id}/sectors${details}`)
+    },
+
+    createSector: (parkingId: string, sector: CreateSectorType) => {
+        return apiWithConfig.post(`/parking/${parkingId}/sectors`, {...sector})
+    },
+
+    deleteSector: (sectorId: string) => {
+        return apiWithConfig.delete(`/parking/sectors/${sectorId}`)
+    },
+
+    getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getAllReservations: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getActiveParking: (details: string) => {
+        return apiWithConfig.get('/parking/active' + details)
+    },
+
+    getSectorById: (sectorId: string) => {
+        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
+    },
+
     modifyParking: (parking: ParkingType) => {
         const cleanedEtag = parking.signature.replace(/^"|"$/g, '');
-        let temp = {
+        const temp = {
             parkingId: parking.parkingId,
             version: parking.version,
             city: parking.city,
@@ -265,21 +302,10 @@ export const api = {
             }
         )
     },
-    getSectorsStaff: (id: string | undefined, details: string) => {
-        return apiWithConfig.get(`/parking/${id}/sectors${details}`)
-    },
-    createSector: (parkingId: string, sector: CreateSectorType) => {
-        return apiWithConfig.post(`/parking/${parkingId}/sectors`, {...sector})
-    },
-    deleteSector: (sectorId: string) => {
-        return apiWithConfig.delete(`/parking/sectors/${sectorId}`)
-    },
-    getSectorById: (sectorId: string) => {
-        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
-    },
+
     modifySector: (sector: SectorType) => {
         const cleanedEtag = sector.signature.replace(/^"|"$/g, '');
-        let temp = {
+        const temp = {
             id: sector.id,
             parkingId: sector.parkingId,
             version: sector.version,
@@ -299,10 +325,12 @@ export const api = {
             }
         )
     },
-    deactivateSector: (sectorId: string, time: Date) => {
-        return apiWithConfig.post(`/parking/sectors/${sectorId}/deactivate`, {deactivationTime: time})
-    },
+
     activateSector: (sectorId: string) => {
         return apiWithConfig.post(`/parking/sectors/${sectorId}/activate`)
+    },
+
+    deactivateSector: (sectorId: string, time: Date) => {
+        return apiWithConfig.post(`/parking/sectors/${sectorId}/deactivate`, {deactivationTime: time})
     },
 }

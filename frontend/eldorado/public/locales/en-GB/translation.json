@@ -156,7 +156,7 @@
   "siteHeader.changeLevel.select": "Select your active role:",
   "siteHeader.changeLevel.select.save": "Save",
   "siteHeader.login": "Log In",
-  "siteHeader.manageParking": "Manage Parking",
+
 
   "accountSettings.title": "Account settings",
   "accountSettings.email": "E-mail",
@@ -310,8 +310,17 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Your password has been successfully changed. You can log in now.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Log In",
 
-  "parkingManagementPage.createParking": "Create Parking",
+  "allReservationsPage.title": "All reservations",
+  "allReservationsPage.table.clientID": "Client ID",
+  "allReservationsPage.table.beginTime": "Beginning time",
+  "allReservationsPage.table.endingTime": "Ending time",
+  "allReservationsPage.table.city": "Parking",
+  "allReservationsPage.table.street": "Street",
+  "allReservationsPage.table.zipCode": "Zip code",
+  "allReservationsPage.table.sectorName": "Sector",
+  "allReservationsPage.table.reservationId": "Reservation ID",
 
+  "parkingManagementPage.createParking": "Create Parking",
 
   "account.constraint.violation.exception" : "Account constraint violation",
   "account.with.given.email.not.found.exception" : "Account with the given email not found",
