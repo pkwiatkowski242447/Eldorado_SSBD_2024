@@ -246,5 +246,10 @@ export const api = {
 
     getMyReservationDetails: (id: string, details: string) => {
         return apiWithConfig.get(`/reservations/client/${id}` + details)
-    }
+    },
+
+    getReservationDetails: (id: string, details: string) => {
+        return apiWithConfig.get(`/reservations/staff/${id}` + details)
+    },
+
 }

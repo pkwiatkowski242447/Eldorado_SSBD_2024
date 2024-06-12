@@ -20,6 +20,7 @@ export const Pathnames = {
     },
     staff: {
         allReservations: '/all-reservations',
+        reservationDetails: '/all-reservations/:id',
     },
     client: {
         myReservations: '/my-reservations',
