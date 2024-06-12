@@ -222,7 +222,7 @@ public class DatabaseConsts {
     public static final String SECTOR_MAX_PLACES_COLUMN = "max_places";
     public static final String SECTOR_OCCUPIED_PLACES_COLUMN = "occupied_places";
     public static final String SECTOR_WEIGHT_COLUMN = "weight";
-    public static final String SECTOR_ACTIVE_COLUMN = "active";
+    public static final String SECTOR_DEACTIVATION_TIME_COLUMN = "deactivation_time";
 
     public static final String SECTOR_PARKING_ID_INDEX = "idx_sector_parking_id";
     public static final String SECTOR_PARKING_ID_FK = "sector_parking_id_fk";

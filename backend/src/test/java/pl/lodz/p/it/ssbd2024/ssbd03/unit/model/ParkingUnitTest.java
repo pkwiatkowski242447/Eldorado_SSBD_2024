@@ -81,7 +81,7 @@ public class ParkingUnitTest {
     @Test
     void parkingAddSectorPositiveTest() {
         Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        parking.addSector(SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        parking.addSector(SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(1, parking.getSectors().size());
 
         Sector sector = parking.getSectors().getFirst();
@@ -94,8 +94,8 @@ public class ParkingUnitTest {
     @Test
     void parkingDeleteSectorPositiveText() {
         Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        parking.addSector(SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
-        parking.addSector(SECTOR_NAME_NO_2, SECTOR_TYPE_NO_2, MAX_PLACES_NO_2, MAX_WEIGHT_NO_2, true);
+        parking.addSector(SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
+        parking.addSector(SECTOR_NAME_NO_2, SECTOR_TYPE_NO_2, MAX_PLACES_NO_2, MAX_WEIGHT_NO_2);
 
         parking.deleteSector(SECTOR_NAME_NO_1);
         Sector sector = parking.getSectors().getFirst();

@@ -24,6 +24,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.SectorMessages;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -50,7 +51,9 @@ import java.time.LocalDateTime;
                 name = "Sector.findAllInParking",
                 query = """
                         SELECT s FROM Sector s
-                        WHERE s.parking.id = :parkingId AND (:showOnlyActive != true OR s.active)
+                        WHERE s.parking.id = :parkingId
+                            AND (:showOnlyActive != true
+                            OR (s.deactivationTime IS NULL OR s.deactivationTime > :deactivationMinimum))
                         ORDER BY s.name"""
         ),
         @NamedQuery(
@@ -150,13 +153,9 @@ public class Sector extends AbstractEntity implements Serializable {
     @Setter
     private Integer weight;
 
-    /**
-     * Determines whether the sector is active.
-     */
-    @NotNull(message = SectorMessages.SECTOR_ACTIVE_NULL)
-    @Column(name = DatabaseConsts.SECTOR_ACTIVE_COLUMN, nullable = false)
-    @Setter
-    private Boolean active;
+    @FutureOrPresent(message = SectorMessages.DEACTIVATION_TIME_PAST)
+    @Column(name = DatabaseConsts.SECTOR_DEACTIVATION_TIME_COLUMN)
+    private LocalDateTime deactivationTime;
 
     // Other fields - used for access control, and storing historical data
 
@@ -199,16 +198,14 @@ public class Sector extends AbstractEntity implements Serializable {
      * @param type Sector's type.
      * @param maxPlaces Total number of parking spots in the sector.
      * @param weight Sector's weight in the spot assigning algorithms. If set to 0, the sector is disabled.
-     * @param active Sector's status.
      */
-    public Sector(Parking parking, String name, SectorType type, Integer maxPlaces, Integer weight, Boolean active) {
+    public Sector(Parking parking, String name, SectorType type, Integer maxPlaces, Integer weight) {
         this.parking = parking;
         this.name = name;
         this.type = type;
         this.maxPlaces = maxPlaces;
         this.occupiedPlaces = maxPlaces;
         this.weight = weight;
-        this.active = active;
     }
 
     /**
@@ -223,6 +220,34 @@ public class Sector extends AbstractEntity implements Serializable {
         return new ToStringBuilder(this)
                 .append(super.toString())
                 .toString();
+    }
+
+    /**
+     * Method used to determine whether this sector is active or not.
+     * It used the reservation maximum time to determine that, since sector deactivation
+     * must happen at least with reservationMaxLength time ahead of current date and time.
+     * @param reservationMaxLength Maximum length of the reservation in hours.
+     * @return Boolean flag indicating whether this sector is active or not.
+     */
+    public boolean getActive(int reservationMaxLength) {
+        return this.deactivationTime == null ||
+                (Duration.between(this.deactivationTime, LocalDateTime.now()).toHoursPart() > reservationMaxLength);
+    }
+
+    /**
+     * Method used in order to reset the active
+     * status of the sector, that is to activate the sector.
+     */
+    public void activateSector() {
+        this.deactivationTime = null;
+    }
+
+    /**
+     * Method used in order to deactivate this sector,
+     * setting its deactivation time.
+     */
+    public void deactivateSector(LocalDateTime deactivationTime) {
+        this.deactivationTime = deactivationTime;
     }
 
     @PrePersist

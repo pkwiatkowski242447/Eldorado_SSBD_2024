@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,9 @@ import java.util.UUID;
 @TxTracked
 @Transactional(propagation = Propagation.MANDATORY)
 public class ParkingFacade extends AbstractFacade<Parking> {
+
+    @Value("${reservation.max_hours}")
+    private int reservationMaxLength;
 
     @PersistenceContext(unitName = DatabaseConfigConstants.MOP_PU)
     private EntityManager entityManager;
@@ -238,6 +242,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("showOnlyActive", active)
+                .setParameter("deactivationMinimum", LocalDateTime.now().plusDays(this.reservationMaxLength))
                 .setFirstResult(pageNumber * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
@@ -264,6 +269,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("showOnlyActive", showOnlyActive)
+                .setParameter("deactivationMinimum", LocalDateTime.now().plusHours(this.reservationMaxLength))
                 .setFirstResult(pageNumber * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
@@ -396,7 +402,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
             TypedQuery<Parking> findAllAvailableParking = entityManager.createNamedQuery("Parking.findAllAvailableParking", Parking.class);
             findAllAvailableParking.setFirstResult(pageNumber * pageSize);
             findAllAvailableParking.setMaxResults(pageSize);
-            findAllAvailableParking.setParameter("active", true);
+            findAllAvailableParking.setParameter("deactivationMinimum", LocalDateTime.now().plusHours(this.reservationMaxLength));
             List<Parking> list = findAllAvailableParking.getResultList();
             super.refreshAll(list);
             return list;
@@ -406,16 +412,12 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     }
 
     /**
-<<<<<<< HEAD
-     * Force incrementing version of sector entity.
-=======
      * This method is used to force incrementing version field on the parking entity object
      * for given sector. Used when updating the aggregate.
      *
      * @param sector Sector which causes version increment in the parking entity object.
      * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
      *                                  facade exception handling aspect.
->>>>>>> 93060683e7e7d76bdea942080ad8522caee753ca
      */
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void forceVersionUpdate(Sector sector) throws ApplicationBaseException {
@@ -434,11 +436,14 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      */
     @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
     public List<Sector> getAvailableSectorsNow(Client.ClientType clientType, UUID parkingId, LocalDateTime now, int maxReservationHours) throws ApplicationBaseException {
-        TypedQuery<Sector> query = entityManager.createNamedQuery("Reservation.getAvailableBasicSectorsNow", Sector.class);
+        TypedQuery<Sector> query = entityManager.createNamedQuery("Reservation.getAvailableBasicSectorsNow", Sector.class)
+                .setParameter("deactivationMinimum", LocalDateTime.now().plusHours(this.reservationMaxLength));
        if( clientType == Client.ClientType.STANDARD){
-            query = entityManager.createNamedQuery("Reservation.getAvailableStandardSectorsNow", Sector.class);
+            query = entityManager.createNamedQuery("Reservation.getAvailableStandardSectorsNow", Sector.class)
+                    .setParameter("deactivationMinimum", LocalDateTime.now().plusHours(this.reservationMaxLength));
         } else if( clientType == Client.ClientType.PREMIUM){
-            query = entityManager.createNamedQuery("Reservation.getAvailablePremiumSectorsNow", Sector.class);
+            query = entityManager.createNamedQuery("Reservation.getAvailablePremiumSectorsNow", Sector.class)
+                    .setParameter("deactivationMinimum", LocalDateTime.now().plusHours(this.reservationMaxLength));
         }
         query.setParameter("parkingId", parkingId);
         query.setParameter("currentTime", now);

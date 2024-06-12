@@ -17,11 +17,10 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.ReservationParkingEventListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.UserReservationOutputListDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserHistoricalReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.ReservationOutputListDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.ReservationListMapper;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserActiveReservationListMapper;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.UserReservationListMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
@@ -63,7 +62,7 @@ public class ReservationController implements ReservationControllerInterface {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         List<UserReservationOutputListDTO> reservationList = reservationService.getAllActiveReservationsByUserLoginWthPagination(login, pageNumber, pageSize)
                 .stream()
-                .map(UserActiveReservationListMapper::toSectorListDTO)
+                .map(UserReservationListMapper::toSectorListDTO)
                 .toList();
         if (reservationList.isEmpty()) return ResponseEntity.noContent().build();
         else return ResponseEntity.ok(reservationList);
@@ -77,7 +76,7 @@ public class ReservationController implements ReservationControllerInterface {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         List<UserReservationOutputListDTO> reservationList = reservationService.getAllHistoricalReservationsByUserIdWthPagination(login, pageNumber, pageSize)
                 .stream()
-                .map(UserHistoricalReservationListMapper::toSectorListDTO)
+                .map(UserReservationListMapper::toSectorListDTO)
                 .toList();
         if (reservationList.isEmpty()) return ResponseEntity.noContent().build();
         else return ResponseEntity.ok(reservationList);

@@ -57,15 +57,15 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findAllAvailableParking",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.active = :active
-                        ORDER BY s.parking.address.city
-                        """
+                        WHERE (s.deactivationTime IS NULL OR s.deactivationTime > :deactivationMinimum)
+                        GROUP BY s.parking
+                        ORDER BY s.parking.address.city"""
         ),
         @NamedQuery(
                 name = "Parking.findBySectorTypes",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.type IN :sectorTypes AND (:showOnlyActive != true OR s.weight>0)
+                        WHERE s.type IN :sectorTypes AND (:showOnlyActive != true OR s.weight > 0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
@@ -73,7 +73,7 @@ import static pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector.SectorType;
                 name = "Parking.findWithAvailablePlaces",
                 query = """
                         SELECT s.parking FROM Sector s
-                        WHERE s.occupiedPlaces < s.maxPlaces AND (:showOnlyActive != true OR s.weight>0)
+                        WHERE s.occupiedPlaces < s.maxPlaces AND (:showOnlyActive != true OR s.weight > 0)
                         GROUP BY s.parking
                         ORDER BY s.parking.address.city, s.parking.address.city"""
         ),
@@ -182,8 +182,8 @@ public class Parking extends AbstractEntity {
      * @param maxPlaces Total number of parking spots in the sector.
      * @param weight    Sector's weight in the spot assigning algorithms. If set to 0, the sector is disabled.
      */
-    public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight, Boolean active) {
-        sectors.add(new Sector(this, name, type, maxPlaces, weight, active));
+    public void addSector(String name, SectorType type, Integer maxPlaces, Integer weight) {
+        sectors.add(new Sector(this, name, type, maxPlaces, weight));
     }
 
     /**

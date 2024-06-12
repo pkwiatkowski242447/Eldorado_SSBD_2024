@@ -54,49 +54,49 @@ public class SectorUnitTest {
 
     @Test
     void sectorConstructorNotNullObjectPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         assertNotNull(sector);
     }
 
     @Test
     void sectorGetParkingPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(PARKING, sector.getParking());
     }
 
     @Test
     void sectorGetSectorNamePositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(SECTOR_NAME_NO_1, sector.getName());
     }
 
     @Test
     void sectorGetSectorTypePositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(SECTOR_TYPE_NO_1, sector.getType());
     }
 
     @Test
     void sectorGetSectorMaxPlacesPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(MAX_PLACES_NO_1, sector.getMaxPlaces());
     }
 
     @Test
     void sectorGetSectorWeightPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(MAX_WEIGHT_NO_1, sector.getWeight());
     }
 
     @Test
     void sectorGetAvailablePlacesPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         Assertions.assertEquals(MAX_PLACES_NO_1, sector.getOccupiedPlaces());
     }
 
     @Test
     void sectorSetSectorNamePositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         sector.setName(SECTOR_NAME_NO_2);
 
         Assertions.assertEquals(SECTOR_NAME_NO_2, sector.getName());
@@ -104,7 +104,7 @@ public class SectorUnitTest {
 
     @Test
     void sectorSetSectorTypePositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         sector.setType(SECTOR_TYPE_NO_2);
 
         Assertions.assertEquals(SECTOR_TYPE_NO_2, sector.getType());
@@ -112,7 +112,7 @@ public class SectorUnitTest {
 
     @Test
     void sectorSetMaxPlacesPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         sector.setMaxPlaces(MAX_PLACES_NO_2);
 
         Assertions.assertEquals(MAX_PLACES_NO_2, sector.getMaxPlaces());
@@ -120,7 +120,7 @@ public class SectorUnitTest {
 
     @Test
     void sectorSetAvailablePlacesPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         sector.setOccupiedPlaces(AVAILABLE_PLACES_NO_1);
 
         Assertions.assertEquals(AVAILABLE_PLACES_NO_1, sector.getOccupiedPlaces());
@@ -128,7 +128,7 @@ public class SectorUnitTest {
 
     @Test
     void sectorSetSectorWeightPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         sector.setWeight(MAX_WEIGHT_NO_2);
 
         Assertions.assertEquals(MAX_WEIGHT_NO_2, sector.getWeight());
@@ -136,7 +136,7 @@ public class SectorUnitTest {
 
     @Test
     void sectorToStringPositiveTest() {
-        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1, true);
+        Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
         String testString = sector.toString();
         assertNotNull(testString);
         assertFalse(testString.isEmpty());
