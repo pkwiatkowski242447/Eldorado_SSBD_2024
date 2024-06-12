@@ -194,7 +194,7 @@ function ActiveParkingInfoPage() {
                                 <TableCell>{sector?.name}</TableCell>
                                 <TableCell><Badge variant={"default"}>{sector?.type} </Badge></TableCell>
                                 <TableCell>{sector?.maxPlaces}</TableCell>
-                                <TableCell>{sector?.availablePlaces}</TableCell>
+                                <TableCell>{sector?.occupiedPlaces}</TableCell>
                                 <TableCell>
                                     <Dialog>
                                         <DialogTrigger>

@@ -12,7 +12,7 @@ import {useTranslation} from "react-i18next";
 import {useEffect, useState} from "react";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
-import {ParkingType, SectorListType, sectorStrategy} from "@/types/Parking.ts";
+import {ParkingType, sectorDTOtoSectorListType, SectorListType, sectorStrategy} from "@/types/Parking.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -50,6 +50,7 @@ export function ParkingManagementInfoPage() {
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [isActivateDialogOpen, setActivateDialogOpen] = useState(false);
     const [sectorId, setSectorId] = useState("");
+    const [isSectorActive, setSectorActive] = useState<boolean>(true);
     const {t} = useTranslation();
     const {id} = useParams<{ id: string }>();
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -63,8 +64,9 @@ export function ParkingManagementInfoPage() {
         setAlertDialogOpen(true);
     };
 
-    const handleEditSectorClick = (sectorId: string) => {
+    const handleEditSectorClick = (sectorId: string, isActive:boolean) => {
         setSectorId(sectorId);
+        setSectorActive(isActive);
         setEditDialogOpen(true);
     };
 
@@ -108,7 +110,10 @@ export function ParkingManagementInfoPage() {
             .then(response => {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
-                    setSectors(response.data);
+                    let sectorsTemp:any[] = response.data;
+                    let sectorsCopy:SectorListType[] = [];
+                    sectorsTemp.forEach((s) => {sectorsCopy.push(sectorDTOtoSectorListType(s))})
+                    setSectors(sectorsCopy);
                 } else if (response.status === 204 && actualPage > 0) {
                     fetchSectors(actualPage -1)
                 } else if (response.status === 204 && actualPage <= 0) {
@@ -120,6 +125,10 @@ export function ParkingManagementInfoPage() {
                 handleApiError(error);
             });
     };
+
+    useEffect(() => {
+        console.log(sectors)
+    }, [sectors]);
 
     const fetchParking = () => {
         api.getParkingById(id ? id : "0")
@@ -223,6 +232,8 @@ export function ParkingManagementInfoPage() {
                             <TableHead
                                 className="text-center">{t("Name")}</TableHead>
                             <TableHead
+                                className="text-center">{t("Deactivation Time")}</TableHead>
+                            <TableHead
                                 className="text-center">{t("Occupies Places")}</TableHead>
                             <TableHead
                                 className="text-center">{t("Max Places")}</TableHead>
@@ -237,7 +248,8 @@ export function ParkingManagementInfoPage() {
                         {sectors.map(sector => (
                             <TableRow key={sector.id} className="flex-auto">
                                 <TableCell>{sector.name}</TableCell>
-                                <TableCell>{sector.availablePlaces}</TableCell>
+                                <TableCell>{sector.deactivationTime}</TableCell>
+                                <TableCell>{sector.occupiedPlaces}</TableCell>
                                 <TableCell>{sector.maxPlaces}</TableCell>
                                 <TableCell><Badge variant={"default"}>{sector.type} </Badge></TableCell>
                                 <TableCell>{sector.weight}</TableCell>
@@ -247,16 +259,16 @@ export function ParkingManagementInfoPage() {
                                             <FiSettings/>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem
+                                            {sector.deactivationTime !== "" && <DropdownMenuItem
                                                 onClick={() => handleActivateSectorClick(sector.id)}>
                                                 Activate sector
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
+                                            </DropdownMenuItem>}
+                                            {sector.deactivationTime === "" && <DropdownMenuItem
                                                 onClick={() => handleDeactivateSectorClick(sector.id)}>
                                                 Deactivate sector
-                                            </DropdownMenuItem>
+                                            </DropdownMenuItem>}
                                             <DropdownMenuItem
-                                                onClick={() => handleEditSectorClick(sector.id)}>
+                                                onClick={() => handleEditSectorClick(sector.id, sector.deactivationTime === "")}>
                                                 Edit sector
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
@@ -272,7 +284,7 @@ export function ParkingManagementInfoPage() {
                     <Dialog open={isDeactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Edit Parking</DialogTitle>
+                                <DialogTitle>Deactivate Parking</DialogTitle>
                             </DialogHeader>
                             <DeactivateSectorForm setDialogOpen={setDeactivateDialogOpen} refresh={refresh} sectorId={sectorId}/>
                         </DialogContent>
@@ -282,7 +294,7 @@ export function ParkingManagementInfoPage() {
                             <DialogHeader>
                                 <DialogTitle>Edit Parking</DialogTitle>
                             </DialogHeader>
-                            <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId}/>
+                            <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId} isSectorActive={isSectorActive}/>
                         </DialogContent>
                     </Dialog>
                     <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
