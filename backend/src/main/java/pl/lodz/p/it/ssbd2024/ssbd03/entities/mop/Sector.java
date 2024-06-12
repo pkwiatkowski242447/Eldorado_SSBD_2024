@@ -153,7 +153,7 @@ public class Sector extends AbstractEntity implements Serializable {
     @Setter
     private Integer weight;
 
-    @FutureOrPresent(message = SectorMessages.DEACTIVATION_TIME_PAST)
+    // @FutureOrPresent(message = SectorMessages.DEACTIVATION_TIME_PAST)
     @Column(name = DatabaseConsts.SECTOR_DEACTIVATION_TIME_COLUMN)
     private LocalDateTime deactivationTime;
 
