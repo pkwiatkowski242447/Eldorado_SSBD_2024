@@ -47,7 +47,6 @@ export interface SectorListType {
 
 export interface CreateSectorType {
     name:string;
-    active:boolean;
     type: SectorType;
     maxPlaces: number;
     weight: number;

@@ -31,7 +31,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [newSector, setNewSector] = useState<CreateSectorType>({name:"", active:true, type:SectorType.UNCOVERED, maxPlaces:0, weight:1 })
+    const [newSector, setNewSector] = useState<CreateSectorType>({name:"", type:SectorType.UNCOVERED, maxPlaces:0, weight:1 })
     const formSchema = z.object({
         name: z.string().min(5, {message: "ZMIEN"})
             .max(5, {message: "ZMIEN"}).regex(RegExp("^[A-Z]{2}-[0-9]{2}$"), {message: "ZMIEN"}),
@@ -67,7 +67,6 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
         try {
             setNewSector({
                 name: values.name,
-                active: true,
                 type: SectorType[values.type],
                 maxPlaces: values.maxPlaces,
                 weight: values.weight
