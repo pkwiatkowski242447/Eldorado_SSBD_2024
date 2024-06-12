@@ -22,11 +22,15 @@ export const Pathnames = {
     },
     staff: {
         allReservations: '/all-reservations',
+        reservationDetails: '/all-reservations/:id',
         parkingManagement: '/manage-parking',
         parkingManagementInfo: '/manage-parking/:id'
     },
     client: {
         myReservations: '/my-reservations',
+        myReservationDetails: '/my-reservations/:id',
+        parkingManagement: '/manage-parking',
+        parkingManagementInfo: '/manage-parking/:id',
         parkingList: '/parking-list',
         parkingInfo: '/parking-list/parking-info/:id',
     },

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/breadcrumb.tsx";
 import {Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
+import {useNavigate} from "react-router-dom";
 
 function AllReservationsPage() {
     const {t} = useTranslation();
@@ -29,6 +30,7 @@ function AllReservationsPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [pageSize] = useState(4);
+    const navigate = useNavigate();
 
     const fetchAllReservations = async () => {
         setIsLoading(true);
@@ -50,6 +52,10 @@ function AllReservationsPage() {
             setIsLoading(false);
         });
     }
+
+    const handleViewDetails = (id: string) => {
+        navigate(`/all-reservations/${id}`);
+    };
 
     useEffect(() => {
         fetchAllReservations();
@@ -96,8 +102,10 @@ function AllReservationsPage() {
                                         className="text-center">{t("allReservationsPage.table.zipCode")}</TableHead>
                                     <TableHead
                                         className="text-center">{t("allReservationsPage.table.sectorName")}</TableHead>
+                                    {/*<TableHead*/}
+                                    {/*    className="text-center">{t("allReservationsPage.table.reservationId")}</TableHead>*/}
                                     <TableHead
-                                        className="text-center">{t("allReservationsPage.table.reservationId")}</TableHead>
+                                        className="text-center"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className={"text-center"}>
@@ -110,7 +118,12 @@ function AllReservationsPage() {
                                         <TableCell>{reservation.street}</TableCell>
                                         <TableCell>{reservation.zipCode}</TableCell>
                                         <TableCell>{reservation.sectorName}</TableCell>
-                                        <TableCell>{reservation.id}</TableCell>
+                                        {/*<TableCell>{reservation.id}</TableCell>*/}
+                                        <TableCell>
+                                            <Button onClick={() => handleViewDetails(reservation.id)}>
+                                                View Details
+                                            </Button>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

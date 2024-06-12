@@ -18,6 +18,8 @@ import RestoreAccessPage from "@/pages/RestoreAccessPage.tsx";
 import RestoreTokenPage from "@/pages/RestoreTokenPage.tsx";
 import MyReservationsPage from "@/pages/MyReservationsPage.tsx";
 import AllReservationsPage from "@/pages/AllReservationsPage.tsx";
+import MyReservationDetailsPage from "@/pages/MyReservationDetailsPage.tsx";
+import ReservationDetailsPage from "@/pages/ReservationDetailsPage.tsx";
 import ActiveParkingPage from "@/pages/ActiveParkingPage.tsx";
 import ActiveParkingInfoPage from "@/pages/ActiveParkingInfoPage.tsx";
 import ParkingManagementPage from "@/pages/ParkingManagementPage.tsx";
@@ -138,6 +140,10 @@ export const StaffRoutes: RouteType[] = [
         path: Pathnames.staff.allReservations,
         Component: AllReservationsPage
     },
+    {
+        path: Pathnames.staff.reservationDetails,
+        Component: ReservationDetailsPage
+    }
 ]
 
 export const ClientRoutes: RouteType[] = [
@@ -160,6 +166,10 @@ export const ClientRoutes: RouteType[] = [
     {
         path: Pathnames.client.myReservations,
         Component: MyReservationsPage
+    },
+    {
+        path: Pathnames.client.myReservationDetails,
+        Component: MyReservationDetailsPage
     },
     {
         path: Pathnames.client.parkingList,
