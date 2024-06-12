@@ -54,7 +54,6 @@ function ReservationDetailsPage() {
         }
     };
 
-
     useEffect(() => {
         fetchParkingSectors();
     }, []);
