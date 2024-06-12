@@ -10,6 +10,7 @@ public class SectorClientListMapper {
                 sector.getName(),
                 sector.getType(),
                 sector.getMaxPlaces(),
-                sector.getOccupiedPlaces());
+                sector.getOccupiedPlaces(),
+                sector.getDeactivationTime());
     }
 }

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -32,6 +33,9 @@ public class SectorClientListDTO {
 
     @Schema(description = "The current number of available parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer availablePlaces;
+
+    @Schema(description = "Date and time marking deactivation time of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime deactivationTime;
 
     /**
      * Custom toString() method implementation that
