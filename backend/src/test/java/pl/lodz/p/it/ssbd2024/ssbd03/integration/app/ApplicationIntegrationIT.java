@@ -2,6 +2,9 @@ package pl.lodz.p.it.ssbd2024.ssbd03.integration.app;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.restassured.RestAssured;
 import io.restassured.config.LogConfig;
 import io.restassured.filter.log.LogDetail;
@@ -45,6 +48,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.SectorMessages;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -3164,7 +3168,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 parking.getStrategy().toString());
     }
 
-    private String decodeJwtTokenAndExtractValue (String payload, String key) {
+    private String decodeJwtTokenAndExtractValue(String payload, String key) {
         String[] parts = payload.split("\\.");
         for (String part : parts) {
             byte[] dec = Base64.getDecoder().decode(part);
@@ -4094,17 +4098,45 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
     }
 
-//    @Test
-//    public void activateSectorAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
-//        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-//        RestAssured.given()
-//                .header("Authorization", "Bearer " + loginToken)
-//                .when()
-//                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
-//                .then()
-//                .assertThat()
-//                .statusCode(HttpStatus.OK.value());
-//    }
+    @Test
+    public void activateSectorAsAuthenticatedAndAuthorizedUserSectorAlreadyActivated() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/activate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value()).body(
+                "message", Matchers.equalTo(I18n.SECTOR_ALREADY_ACTIVE)
+        );
+    }
+
+    @Test
+    public void activateSectorAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/activate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+    }
 
     // MOP.10 Deactivate sector
     @Test
@@ -4118,23 +4150,101 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION));
     }
 
-//    @Test
-//    public void deactivateSectorAsAuthenticatedAndUnauthorizedUser() throws JsonProcessingException {
-//        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
-//
-//        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
-//
-//        String requestBody = mapper.writeValueAsString(sectorDeactivationTimeDTO);
-//
-//        RestAssured.given()
-//                .header("Authorization", "Bearer " + loginToken)
-//                .header("Content-Type", "application/json")
-//                .body(requestBody)
-//                .when()
-//                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
-//                .then()
-//                .assertThat()
-//                .statusCode(HttpStatus.FORBIDDEN.value())
-//                .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
-//    }
+    @Test
+    public void deactivateSectorAsAuthenticatedAndUnauthorizedUser() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+
+        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
+    }
+
+    @Test
+    public void deactivateSectorAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void deactivateSectorAsAuthenticatedAndAuthorizedUserSectorAlreadyDeactivated() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        RestAssured.given().header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.SECTOR_ALREADY_INACTIVE));
+    }
+
+    @Test
+    public void deactivateSectorAsAuthenticatedAndAuthorizedUserSectorDoesNotExist() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6c/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.SECTOR_NOT_FOUND));
+    }
+
+    @Test
+    public void deactivateSectorAsAuthenticatedAndAuthorizedUserInvalidDeactivationTime() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().minusDays(1));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.SECTOR_DEACTIVATION_INVALID_TIME));
+    }
 }
