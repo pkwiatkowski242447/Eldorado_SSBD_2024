@@ -21,6 +21,8 @@ export const Pathnames = {
     },
     staff: {
         allReservations: '/all-reservations',
+        parkingManagement: '/manage-parking',
+        parkingManagementInfo: '/manage-parking/:id'
     },
     client: {
         myReservations: '/my-reservations',

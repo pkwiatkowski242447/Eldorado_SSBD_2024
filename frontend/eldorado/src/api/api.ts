@@ -1,6 +1,7 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
+import {CreateParkingType, CreateSectorType, ParkingType, SectorType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -232,18 +233,96 @@ export const api = {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
 
-    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    getParking: (details: string) => {
+        return apiWithConfig.get('/parking' + details)
+    },
+    
+    createParking: (parking: CreateParkingType) => {
+        return apiWithConfig.post('/parking', {...parking})
+    },
+    
+    deleteParking: (parkingId: string) => {
+        return apiWithConfig.delete(`/parking/${parkingId}`)
+    },
+
+    getParkingById: (parkingId: string) => {
+        return apiWithConfig.get(`/parking/get/${parkingId}`)
+    },
+
+    getSectorsStaff: (id:string | undefined, details: string) => {
+        return apiWithConfig.get(`/parking/${id}/sectors${details}`)
+    },
+
+    createSector: (parkingId: string, sector: CreateSectorType) => {
+        return apiWithConfig.post(`/parking/${parkingId}/sectors`, {...sector})
+    },
+
+    deleteSector: (sectorId: string) => {
+        return apiWithConfig.delete(`/parking/sectors/${sectorId}`)
     },
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
     getAllReservations: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
+
     getActiveParking: (details: string) => {
         return apiWithConfig.get('/parking/active' + details)
+    },
+
+    getSectorById: (sectorId: string) => {
+        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
+    },
+
+    modifyParking: (parking: ParkingType) => {
+        const cleanedEtag = parking.signature.replace(/^"|"$/g, '');
+        const temp = {
+            parkingId: parking.parkingId,
+            version: parking.version,
+            city:parking.city,
+            street:parking.street,
+            zipCode:parking.zipCode,
+            strategy:parking.strategy,
+        };
+        return apiWithConfig.put('/parking',
+            {...temp},
+            {
+                headers:
+                    {
+                        'If-Match':
+                        cleanedEtag
+                    }
+            }
+        )
+    },
+
+    modifySector: (sector: SectorType) => {
+        const cleanedEtag = sector.signature.replace(/^"|"$/g, '');
+        const temp = {
+            id: sector.id,
+            parkingId: sector.parkingId,
+            version: sector.version,
+            name: sector.name,
+            type: sector.type,
+            maxPlaces: sector.maxPlaces,
+            weight: sector.weight,
+        };
+        return apiWithConfig.put('/parking/sectors',
+            {...temp},
+            {
+                headers:
+                    {
+                        'If-Match':
+                        cleanedEtag
+                    }
+            }
+        )
     },
 }

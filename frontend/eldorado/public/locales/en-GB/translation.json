@@ -33,6 +33,9 @@
   "breadcrumb.myAccount": "My account",
   "breadcrumb.userAccount": "Edit user account",
   "breadcrumb.createUser": "Create new user",
+  "breadcrumb.manageParking": "Parking management",
+  "breadcrumb.manageParkingInfo": "Parking Details",
+  "breadcrumb.createParking": "Create new parking",
 
   "notFound.title": "Page not found",
   "notFound.description": "The page you are looking for does not exist",
@@ -313,6 +316,8 @@
   "allReservationsPage.table.zipCode": "Zip code",
   "allReservationsPage.table.sectorName": "Sector",
   "allReservationsPage.table.reservationId": "Reservation ID",
+
+  "parkingManagementPage.createParking": "Create Parking",
 
 
   "account.constraint.violation.exception" : "Account constraint violation",
