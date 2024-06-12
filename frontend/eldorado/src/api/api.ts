@@ -1,7 +1,6 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
-import {CreateParkingType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -217,38 +216,34 @@ export const api = {
         return apiWithConfig.post(`/accounts/restore-token/${token}`)
     },
 
-    getPasswordAdminResetStatus:() => {
+    getPasswordAdminResetStatus: () => {
         return apiWithConfig.get('/accounts/admin-password-reset-status')
     },
 
-    getAllAttributes:() => {
+    getAllAttributes: () => {
         return apiWithConfig.get('/accounts/attributes?pageNumber=0&pageSize=2')
     },
 
-    getMyAttributes:() => {
+    getMyAttributes: () => {
         return apiWithConfig.get('/accounts/attributes/account/me/get')
     },
 
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
-    getParking: (details: string) => {
-        return apiWithConfig.get('/parking' + details)
-    },
 
-    createParking: (parking: CreateParkingType) => {
-        return apiWithConfig.post('/parking', {...parking})
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
-    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
-    },
-
     getAllReservations: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
-    }
+    },
+    getActiveParking: (details: string) => {
+        return apiWithConfig.get('/parking/active' + details)
+    },
 }

@@ -15,12 +15,6 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
-// import {
-//     DropdownMenu,
-//     DropdownMenuContent,
-//     DropdownMenuItem,
-//     DropdownMenuTrigger
-// } from "@/components/ui/dropdown-menu.tsx";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -29,56 +23,20 @@ import {Button} from "@/components/ui/button.tsx";
 import {ParkingListType} from "@/types/Parking.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog.tsx";
-import CreateParkingForm from "@/components/forms/CreateParkingForm.tsx";
-// import {FiSettings} from 'react-icons/fi';
-
-function ParkingManagementPage() {
-    const [currentPage, setCurrentPage] = useState(0);
+function ActiveParkingPage() {
+    // @ts-expect-error no time
+    const [currentPage, setCurrentPage] = useState(() => parseInt(0));
     const [parking, setParking] = useState<ParkingListType[]>([]);
-    const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const {t} = useTranslation();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
-    const pageSize = 4;
-
-    // const handleSettingsClick = (userId: string) => {
-    //     navigator(`/manage-users/${userId}`);
-    // };
-
-    // const handleBlockUnblockClick = (user: ManagedUserType) => {
-    //     setSelectedUser(user);
-    //     setAlertDialogOpen(true);
-    // };
-
-    // const handleConfirmBlockUnblock = () => {
-    //     if (selectedUser) {
-    //         const apiCall = selectedUser.blocked ? api.unblockAccount : api.blockAccount;
-    //         apiCall(selectedUser.id).then(() => {
-    //             fetchUsers();
-    //             setAlertDialogOpen(false);
-    //             toast({
-    //                 title: t("accountSettings.popUp.changeUserDataOK.title"),
-    //                 description: selectedUser.blocked ? t("general.userUnblocked") : t("general.userBlocked")
-    //             })
-    //         }).catch((error) => {
-    //             handleApiError(error);
-    //         });
-    //     }
-    //     setAlertDialogOpen(false);
-    // };
+    const pageSize = 5;
 
     const fetchParking = (page?: number) => {
         const actualPage = page != undefined ? page : currentPage;
         const details = `?pageNumber=${actualPage}&pageSize=${pageSize}`;
 
-        api.getParking(details)
+        api.getActiveParking(details)
             .then(response => {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
@@ -128,20 +86,7 @@ function ParkingManagementPage() {
                     )}
                 </Button>
             </div>
-            <div className="flex justify-start pt-2.5">
-                <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button variant="default">Create Parking</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Edit profile</DialogTitle>
-                        </DialogHeader>
-                        <CreateParkingForm setDialogOpen={setCreateDialogOpen}/>
-                    </DialogContent>
-                </Dialog>
-            </div>
-            <div className={"pt-1"}>
+            <div className={"pt-5"}>
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
@@ -170,39 +115,9 @@ function ParkingManagementPage() {
                                         return <Badge key={level} variant={"secondary"}>{level} </Badge>;
                                     })}
                                 </TableCell>
-                                {/*<TableCell>*/}
-                                {/*    <DropdownMenu>*/}
-                                {/*        <DropdownMenuTrigger>*/}
-                                {/*            <FiSettings/>*/}
-                                {/*        </DropdownMenuTrigger>*/}
-                                {/*        <DropdownMenuContent>*/}
-                                {/*            <DropdownMenuItem onClick={() => handleSettingsClick(user.id)}>*/}
-                                {/*                {t("accountSettings.users.table.settings.manage")}*/}
-                                {/*            </DropdownMenuItem>*/}
-                                {/*            <DropdownMenuItem*/}
-                                {/*                onClick={() => handleBlockUnblockClick(user)}*/}
-                                {/*                disabled={user.id === account?.id}*/}
-                                {/*            >*/}
-                                {/*                {user.blocked ? t("accountSettings.users.table.settings.unblock") : t("accountSettings.users.table.settings.block")}*/}
-                                {/*            </DropdownMenuItem>*/}
-                                {/*        </DropdownMenuContent>*/}
-                                {/*    </DropdownMenu>*/}
-                                {/*</TableCell>*/}
                             </TableRow>
                         ))}
                     </TableBody>
-                    {/*<AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>*/}
-                    {/*    <AlertDialogContent>*/}
-                    {/*        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>*/}
-                    {/*        <AlertDialogDescription>*/}
-                    {/*            {t("accountSettings.users.table.settings.block.confirm1")}*/}
-                    {/*            {selectedUser?.blocked ? t("accountSettings.users.table.settings.unblock2") : t("accountSettings.users.table.settings.block2")}*/}
-                    {/*            {t("accountSettings.users.table.settings.block.confirm2")}*/}
-                    {/*        </AlertDialogDescription>*/}
-                    {/*        <AlertDialogAction onClick={handleConfirmBlockUnblock}>{t("general.ok")}</AlertDialogAction>*/}
-                    {/*        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>*/}
-                    {/*    </AlertDialogContent>*/}
-                    {/*</AlertDialog>*/}
                 </Table>
                 <div className={"pt-5"}>
                     <Pagination>
@@ -232,4 +147,4 @@ function ParkingManagementPage() {
     );
 }
 
-export default ParkingManagementPage;
+export default ActiveParkingPage;
