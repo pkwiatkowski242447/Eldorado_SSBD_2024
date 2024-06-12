@@ -67,7 +67,6 @@ export const PublicRoutes: RouteType[] = [
         path: Pathnames.public.restoreToken,
         Component: RestoreTokenPage
     },
-
 ]
 
 export const AdminRoutes: RouteType[] = [
