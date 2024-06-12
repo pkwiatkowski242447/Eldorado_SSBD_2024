@@ -23,6 +23,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClient
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationExceedingMaximumTime;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationInvalidTimeframe;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationSectorNonActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
@@ -90,6 +91,10 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
+        // Check begin time
+        if (beginTime.isBefore(LocalDateTime.now()) ||
+                endTime.isBefore(beginTime) || endTime.isEqual(beginTime)) throw new ReservationInvalidTimeframe();
+
         // Check reservation duration
         if (Duration.between(beginTime, endTime).toMinutes() > reservationMaxHours * 60) throw new ReservationExceedingMaximumTime();
 
