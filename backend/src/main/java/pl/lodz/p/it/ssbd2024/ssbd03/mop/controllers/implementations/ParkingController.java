@@ -58,6 +58,9 @@ public class ParkingController implements ParkingControllerInterface {
     @Value("${created.parking.resource.url}")
     private String createdParkingResourceURL;
 
+    @Value("${created.sector.resource.url}")
+    private String createdSectorResourceURL;
+
     private final ParkingServiceInterface parkingService;
 
     /**
@@ -86,14 +89,15 @@ public class ParkingController implements ParkingControllerInterface {
     @Override
     @RolesAllowed({Authorities.ADD_SECTOR})
     public ResponseEntity<?> createSector(String parkingId, @Valid SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
+        Sector sector;
         try {
-            parkingService.createSector(UUID.fromString(parkingId),
+            sector = parkingService.createSector(UUID.fromString(parkingId),
                     sectorCreateDTO.getName(), Sector.SectorType.valueOf(sectorCreateDTO.getType()),
                     sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight());
         } catch (IllegalArgumentException exception) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(URI.create(this.createdSectorResourceURL + sector.getId())).build();
     }
 
     // MOP.1 - Get all parking

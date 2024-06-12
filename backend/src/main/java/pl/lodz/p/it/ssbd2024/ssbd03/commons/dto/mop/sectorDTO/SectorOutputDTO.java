@@ -9,6 +9,7 @@ import lombok.Setter;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -26,17 +27,22 @@ public class SectorOutputDTO extends SectorSignableDTO {
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
 
+    @Schema(description = "Date and time marking deactivation time of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime deactivationTime;
+
     public SectorOutputDTO(UUID id,
                            UUID parkingId,
                            Long version,
                            String name,
                            Sector.SectorType type,
                            Integer maxPlaces,
-                           Integer weight) {
+                           Integer weight,
+                           LocalDateTime deactivationTime) {
         super(id, parkingId, version, name);
         this.type = type;
         this.maxPlaces = maxPlaces;
         this.weight = weight;
+        this.deactivationTime = deactivationTime;
     }
 
     /**
