@@ -53,11 +53,31 @@ export interface CreateSectorType {
 
 export interface SectorType {
     id: string;
+    name: string;
+    type: sectorType;
+    maxPlaces: number;
+    availablePlaces: number;
+    signature: string;
+}
+
+export interface SectorType {
+    id: string;
+    parkingId: string;
+    name:string;
+    type: sectorType;
+    maxPlaces: number;
+    weight: number;
+    version: string;
+    signature: string;
+}
+
+export interface SectorInfoType {
+    id: string;
     parkingId: string;
     version: string;
     name: string;
     type: sectorType;
     maxPlaces: number;
     weight: number;
-    signature: string;
+    active: boolean;
 }

@@ -277,6 +277,14 @@ export const api = {
         return apiWithConfig.get(`/parking/get/${id}`)
     },
 
+    getParkingSectors: (id: string, details: string) => {
+        return apiWithConfig.get(`/parking/client/sectors/${id}` + details)
+    },
+
+    getSectorInfo: (id: string) => {
+        return apiWithConfig.get(`/parking/sectors/get/${id}`)
+    },
+
     modifyParking: (parking: ParkingType) => {
         const cleanedEtag = parking.signature.replace(/^"|"$/g, '');
         const temp = {
@@ -320,13 +328,5 @@ export const api = {
                     }
             }
         )
-    },
-
-    activateSector: (sectorId: string) => {
-        return apiWithConfig.post(`/parking/sectors/${sectorId}/activate`)
-    },
-
-    deactivateSector: (sectorId: string, time: Date) => {
-        return apiWithConfig.post(`/parking/sectors/${sectorId}/deactivate`, {deactivationTime: time})
     },
 }

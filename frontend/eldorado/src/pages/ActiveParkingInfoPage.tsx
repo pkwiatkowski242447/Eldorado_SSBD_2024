@@ -10,7 +10,7 @@ import {useTranslation} from "react-i18next";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {useEffect, useState} from "react";
-import {ParkingListType, SectorType} from "@/types/Parking.ts";
+import {ParkingListType, SectorInfoType, SectorType} from "@/types/Parking.ts";
 import {useParams} from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
@@ -19,14 +19,25 @@ import {
     Pagination,
     PaginationContent,
     PaginationItem,
-    PaginationLink, PaginationNext,
+    PaginationLink,
+    PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog.tsx";
 
 function ActiveParkingInfoPage() {
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
     const [parking, setParking] = useState<ParkingListType>();
-    const [sector, setSector] = useState<SectorType[]>();
+    const [sector, setSector] = useState<SectorType[]>([]);
+    const [selectedSector, setSelectedSector] = useState<SectorType | null>(null);
+    const [sectorInfo, setSectorInfo] = useState<SectorInfoType | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const {t} = useTranslation();
     const {id} = useParams<{ id: string }>();
@@ -61,13 +72,37 @@ function ActiveParkingInfoPage() {
         }
     };
 
+    const fetchSectorInfo = (sectorId: string) => {
+        if (sectorId) {
+            api.getSectorInfo(sectorId)
+                .then(response => {
+                    setSectorInfo(response.data);
+                })
+                .catch(error => {
+                    handleApiError(error);
+                });
+        }
+    };
+
+    const setActiveSector = (sector: SectorType) => {
+        setSelectedSector(sector);
+    };
+
     useEffect(() => {
         fetchParkingInfo();
         fetchParkingSectors();
     }, []);
 
+    useEffect(() => {
+        if (selectedSector) {
+            fetchSectorInfo(selectedSector.id);
+        }
+    }, [selectedSector]);
+
     function refresh() {
+        setIsRefreshing(true);
         fetchParkingInfo();
+        fetchParkingSectors();
         setTimeout(() => setIsRefreshing(false), 1000);
     }
 
@@ -145,6 +180,7 @@ function ActiveParkingInfoPage() {
                                 className="text-center">{t("Total parking spaces")}</TableHead>
                             <TableHead
                                 className="text-center">{t("Free parking spaces")}</TableHead>
+                            <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -154,7 +190,28 @@ function ActiveParkingInfoPage() {
                                 <TableCell><Badge variant={"default"}>{sector?.type} </Badge></TableCell>
                                 <TableCell>{sector?.maxPlaces}</TableCell>
                                 <TableCell>{sector?.availablePlaces}</TableCell>
-
+                                <TableCell>
+                                    <Dialog>
+                                        <DialogTrigger>
+                                            <Button onClick={() => setActiveSector(sector)}>{"View Info"}</Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle className={"text-center"}>Sector Info</DialogTitle>
+                                                <DialogDescription>
+                                                    {sectorInfo && (
+                                                        <>
+                                                            <p><strong>Name:</strong> {sectorInfo.name}</p>
+                                                            <p><strong>Type:</strong> {sectorInfo.type}</p>
+                                                            <p><strong>Max Places:</strong> {sectorInfo.maxPlaces}</p>
+                                                            <p><strong>Active:</strong> {sectorInfo.active ? "Yes" : "No"}</p>
+                                                        </>
+                                                    )}
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                        </DialogContent>
+                                    </Dialog>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
