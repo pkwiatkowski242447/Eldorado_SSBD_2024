@@ -70,8 +70,7 @@ public interface ReservationServiceInterface {
      * @return Reservation entity object retrieved from the database.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Reservation getOwnReservationById(UUID reservationId, String userLogin)
-            throws ApplicationBaseException;
+    Reservation getOwnReservationById(UUID reservationId, String userLogin) throws ApplicationBaseException;
 
     /**
      * Retrieve reservation from the database by its identifier.
@@ -80,8 +79,7 @@ public interface ReservationServiceInterface {
      * @return Reservation entity object retrieved from the database.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Reservation getAnyReservationById(UUID reservationId)
-            throws ApplicationBaseException;
+    Reservation getAnyReservationById(UUID reservationId) throws ApplicationBaseException;
 
     /**
      * Retrieve parking events for given reservation, identified by its identifier, which is UUID.

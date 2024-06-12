@@ -88,7 +88,7 @@ public class ReservationService implements ReservationServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
         // Check reservation duration
         if (Duration.between(beginTime, endTime).toMinutes() > reservationMaxHours * 60) throw new ReservationExceedingMaximumTime();
