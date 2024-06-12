@@ -337,4 +337,12 @@ export const api = {
             }
         )
     },
+
+    createReservation: (sectorId: string, beginTime: string, endTime: string) => {
+        return apiWithConfig.post('/reservations/make-reservation', {
+            sectorId: sectorId,
+            beginTime: beginTime,
+            endTime: endTime
+        })
+    }
 }

@@ -51,14 +51,6 @@ export interface CreateSectorType {
     weight: number;
 }
 
-export interface SectorType {
-    id: string;
-    name: string;
-    type: sectorType;
-    maxPlaces: number;
-    availablePlaces: number;
-    signature: string;
-}
 
 export interface SectorType {
     id: string;
@@ -69,6 +61,7 @@ export interface SectorType {
     weight: number;
     version: string;
     signature: string;
+    availablePlaces: number;
 }
 
 export interface SectorInfoType {
@@ -79,5 +72,4 @@ export interface SectorInfoType {
     type: sectorType;
     maxPlaces: number;
     weight: number;
-    active: boolean;
 }

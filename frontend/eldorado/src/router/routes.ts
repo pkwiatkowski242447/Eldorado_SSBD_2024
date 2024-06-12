@@ -24,6 +24,7 @@ import ActiveParkingPage from "@/pages/ActiveParkingPage.tsx";
 import ActiveParkingInfoPage from "@/pages/ActiveParkingInfoPage.tsx";
 import ParkingManagementPage from "@/pages/ParkingManagementPage.tsx";
 import { ParkingManagementInfoPage } from "@/pages/ParkingManagementInfoPage.tsx";
+import CreateReservationInSectorPage from "@/pages/CreateReservationInSectorPage.tsx";
 
 export const PublicRoutes: RouteType[] = [
     {
@@ -179,4 +180,8 @@ export const ClientRoutes: RouteType[] = [
         path: Pathnames.client.parkingInfo,
         Component: ActiveParkingInfoPage
     },
+    {
+        path: Pathnames.client.makeReservation,
+        Component: CreateReservationInSectorPage
+    }
 ]
