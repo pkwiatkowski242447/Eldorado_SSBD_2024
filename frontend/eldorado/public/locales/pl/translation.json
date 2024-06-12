@@ -1,8 +1,4 @@
 {
-  "general.pickDate": "Wybierz datę",
-  "general.hours": "Godzina",
-  "general.minutes": "Minuta",
-  "general.seconds": "Sekunda",
   "general.ok": "OK",
   "general.cancel": "Anuluj",
   "general.confirm": "Potwierdzenie",
@@ -37,8 +33,6 @@
   "breadcrumb.myAccount": "Moje konto",
   "breadcrumb.userAccount": "Edytuj konto",
   "breadcrumb.createUser" : "Utwórz nowe konto",
-  "breadcrumb.manageParking": "Zarządzanie parkingami",
-  "breadcrumb.manageParkingInfo": "Informacje o parkingu",
 
   "notFound.title": "Strona nie znaleziona",
   "notFound.description": "Strona, której szukasz, nie istnieje",
@@ -309,7 +303,16 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Twoje hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Zaloguj się",
 
-  "parkingManagementPage.createParking": "Create Parking",
+  "allReservationsPage.title": "Wszystkie rezerwacje w systemie",
+  "allReservationsPage.table.clientID": "ID Klienta",
+  "allReservationsPage.table.beginTime": "Czas rozpoczęcia",
+  "allReservationsPage.table.endingTime": "Czas zakończenia",
+  "allReservationsPage.table.city": "Parking",
+  "allReservationsPage.table.street": "Ulica",
+  "allReservationsPage.table.zipCode": "Kod pocztowy",
+  "allReservationsPage.table.sectorName": "Sektor",
+  "allReservationsPage.table.reservationId": "ID rezerwacji",
+
 
 
   "account.constraint.violation.exception" : "Naruszenie ograniczeń konta",
