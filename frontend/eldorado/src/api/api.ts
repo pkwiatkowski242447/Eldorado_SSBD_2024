@@ -1,7 +1,7 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
-import {CreateParkingType, CreateSectorType, ParkingType, SectorType} from "@/types/Parking.ts";
+import {CreateParkingType, CreateSectorType, EditSectorType, ParkingType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -262,7 +262,7 @@ export const api = {
     getSectorById: (sectorId: string) => {
         return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
     },
-    modifySector: (sector: SectorType) => {
+    modifySector: (sector: EditSectorType) => {
         const cleanedEtag = sector.signature.replace(/^"|"$/g, '');
         let temp = {
             id: sector.id,

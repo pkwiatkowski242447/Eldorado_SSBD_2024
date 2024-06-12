@@ -1,5 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,10 +35,12 @@ public class SectorClientListDTO {
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
 
-    @Schema(description = "The current number of available parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Integer availablePlaces;
+    @Schema(description = "The current number of occupied parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer occupiedPlaces;
 
     @Schema(description = "Date and time marking deactivation time of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime deactivationTime;
 
     /**

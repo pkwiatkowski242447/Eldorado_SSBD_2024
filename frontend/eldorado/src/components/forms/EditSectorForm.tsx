@@ -17,7 +17,7 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {SectorType, sectorType} from "@/types/Parking.ts";
+import {EditSectorType, sectorType} from "@/types/Parking.ts";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
@@ -25,14 +25,15 @@ type editSectorFormProps = {
     setDialogOpen: Dispatch<SetStateAction<boolean>>
     refresh: () => void
     sectorId: string
+    isSectorActive: boolean
 }
 
-function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) {
+function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editSectorFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [editedSector, setEditedSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""})
-    const [sector, setSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""});
+    const [editedSector, setEditedSector] = useState<EditSectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""})
+    const [sector, setSector] = useState<EditSectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""});
     const formSchema = z.object({
         maxPlaces: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(0, {message: "ZMIEN"}).max(1000,{message: "ZMIEN"}),
         type: z.enum(["UNCOVERED", "COVERED", "UNDERGROUND"]),
@@ -103,7 +104,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
+                {!isSectorActive && <FormField
                     control={form.control}
                     name="maxPlaces"
                     render={({field}) => (
@@ -117,7 +118,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) 
                             </div>
                         </FormItem>
                     )}
-                />
+                />}
                 <FormField
                     control={form.control}
                     name="weight"
@@ -133,7 +134,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) 
                         </FormItem>
                     )}
                 />
-                <FormField
+                {!isSectorActive && <FormField
                     control={form.control}
                     name="type"
                     render={({field}) => (
@@ -155,7 +156,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) 
                             </div>
                         </FormItem>
                     )}
-                />
+                />}
                 <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? (
                         <>

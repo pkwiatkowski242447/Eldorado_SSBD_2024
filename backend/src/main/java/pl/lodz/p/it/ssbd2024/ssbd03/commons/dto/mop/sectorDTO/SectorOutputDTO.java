@@ -1,5 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +31,12 @@ public class SectorOutputDTO extends SectorSignableDTO {
     @Schema(description = "The weight of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer weight;
 
+    @Schema(description = "Number of occupied places in a sector.", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer occupiedPlaces;
+
     @Schema(description = "Date and time marking deactivation time of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime deactivationTime;
 
     public SectorOutputDTO(UUID id,
