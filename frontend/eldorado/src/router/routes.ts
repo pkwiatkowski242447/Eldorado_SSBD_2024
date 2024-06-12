@@ -160,5 +160,5 @@ export const ClientRoutes: RouteType[] = [
     {
         path: Pathnames.client.parkingList,
         Component: ActiveParkingPage
-    }
+    },
 ]
