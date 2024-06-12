@@ -19,11 +19,13 @@ export interface ParkingListType {
 }
 
 export interface ParkingType {
-    id: string;
+    parkingId: string;
+    version: string;
     city: string;
     zipCode: string;
     street: string;
     strategy: SectorStrategy;
+    signature: string;
 }
 
 export interface CreateParkingType {
@@ -31,4 +33,22 @@ export interface CreateParkingType {
     zipCode: string;
     street: string;
     strategy: SectorStrategy;
+}
+
+export interface SectorListType {
+    id: string;
+    name:string;
+    active:boolean;
+    type: SectorType;
+    maxPlaces: number;
+    availablePlaces: number;    //todo change to occupiedSpaces
+    weight: number;
+}
+
+export interface CreateSectorType {
+    name:string;
+    active:boolean;
+    type: SectorType;
+    maxPlaces: number;
+    weight: number;
 }
