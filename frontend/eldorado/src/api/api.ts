@@ -256,7 +256,40 @@ export const api = {
     createSector: (parkingId: string, sector: CreateSectorType) => {
         return apiWithConfig.post(`/parking/${parkingId}/sectors`, {...sector})
     },
-
+    deleteSector: (sectorId: string) => {
+        return apiWithConfig.delete(`/parking/sectors/${sectorId}`)
+    },
+    getSectorById: (sectorId: string) => {
+        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
+    },
+    modifySector: (sector: SectorType) => {
+        const cleanedEtag = sector.signature.replace(/^"|"$/g, '');
+        let temp = {
+            id: sector.id,
+            parkingId: sector.parkingId,
+            version: sector.version,
+            name: sector.name,
+            type: sector.type,
+            maxPlaces: sector.maxPlaces,
+            weight: sector.weight,
+        };
+        return apiWithConfig.put('/parking/sectors',
+            {...temp},
+            {
+                headers:
+                    {
+                        'If-Match':
+                        cleanedEtag
+                    }
+            }
+        )
+    },
+    deactivateSector: (sectorId: string, time: Date) => {
+        return apiWithConfig.post(`/parking/sectors/${sectorId}/deactivate`, {deactivationTime: time})
+    },
+    activateSector: (sectorId: string) => {
+        return apiWithConfig.post(`/parking/sectors/${sectorId}/activate`)
+    },
     getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
@@ -304,29 +337,6 @@ export const api = {
             strategy: parking.strategy,
         };
         return apiWithConfig.put('/parking',
-            {...temp},
-            {
-                headers:
-                    {
-                        'If-Match':
-                        cleanedEtag
-                    }
-            }
-        )
-    },
-
-    modifySector: (sector: SectorType) => {
-        const cleanedEtag = sector.signature.replace(/^"|"$/g, '');
-        const temp = {
-            id: sector.id,
-            parkingId: sector.parkingId,
-            version: sector.version,
-            name: sector.name,
-            type: sector.type,
-            maxPlaces: sector.maxPlaces,
-            weight: sector.weight,
-        };
-        return apiWithConfig.put('/parking/sectors',
             {...temp},
             {
                 headers:

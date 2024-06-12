@@ -84,21 +84,27 @@ const SiteHeader = () => {
 
                 )}
                 {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
-                    <Button variant="link" onClick={() => navigate("/my-reservations")}
+                    <Button variant="link" onClick={() => navigate(Pathnames.client.myReservations)}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                       My Reservations
+                        {t("siteHeader.myReservations")}
                     </Button>
                 )}
                 {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
-                    <Button variant="link" onClick={() => navigate("/parking-list")}
+                    <Button variant="link" onClick={() => navigate(Pathnames.client.parkingList)}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                       Active Parking List
+                        {t("siteHeader.activeParkingList")}
                     </Button>
                 )}
                 {account?.activeUserLevel?.roleName === RolesEnum.STAFF && (
-                    <Button variant="link" onClick={() => navigate("/all-reservations")}
+                    <Button variant="link" onClick={() => navigate(Pathnames.staff.allReservations)}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                        All Reservations
+                        {t("siteHeader.allReservations")}
+                    </Button>
+                )}
+                {account?.activeUserLevel?.roleName === RolesEnum.STAFF && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.staff.parkingManagement)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        {t("siteHeader.manageParking")}
                     </Button>
                 )}
             </nav>

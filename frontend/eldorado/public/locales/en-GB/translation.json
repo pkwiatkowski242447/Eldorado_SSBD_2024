@@ -33,6 +33,7 @@
   "breadcrumb.myAccount": "My account",
   "breadcrumb.userAccount": "Edit user account",
   "breadcrumb.createUser": "Create new user",
+  "breadcrumb.manageParking": "Manage Parking",
 
   "notFound.title": "Page not found",
   "notFound.description": "The page you are looking for does not exist",
@@ -150,6 +151,10 @@
   "siteHeader.changeLevel.select": "Select your active role:",
   "siteHeader.changeLevel.select.save": "Save",
   "siteHeader.login": "Log In",
+  "siteHeader.myReservations": "My Reservations",
+  "siteHeader.activeParkingList": "Parking List",
+  "siteHeader.allReservations": "All Reservations",
+  "siteHeader.manageParking": "Manage Parking",
 
 
   "accountSettings.title": "Account settings",
