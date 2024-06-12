@@ -16,7 +16,6 @@ import {ParkingType, SectorListType, SectorStrategy} from "@/types/Parking.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
-import {FiCheck, FiX} from "react-icons/fi";
 import {
     Pagination,
     PaginationContent,
@@ -24,43 +23,82 @@ import {
     PaginationLink, PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu.tsx";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog.tsx";
 import CreateSectorForm from "@/components/forms/CreateSectorForm.tsx";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
+import EditSectorForm from "@/components/forms/EditSectorForm.tsx";
+import {FiSettings} from "react-icons/fi";
+import {DeactivateSectorForm} from "@/components/forms/DeactivateSectorForm.tsx";
 export function ParkingManagementInfoPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [sectors, setSectors] = useState<SectorListType[]>([]);
     const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
-    // const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-    // const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    // const [parkingId, setParkingId] = useState("");
+    const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+    const [isDeactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+    const [isActivateDialogOpen, setActivateDialogOpen] = useState(false);
+    const [sectorId, setSectorId] = useState("");
     const {t} = useTranslation();
     const {id} = useParams<{ id: string }>();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
     const navigate = useNavigate();
     const pageSize = 4;
+    // const [date, setDate] = useState<Date>();
 
-    // const handleDeleteParkingClick = (parkingId: string) => {
-    //     setParkingId(parkingId);
-    //     setAlertDialogOpen(true);
-    // };
-    //
-    // const handleEditParkingClick = (parkingId: string) => {
-    //     setParkingId(parkingId);
-    //     setEditDialogOpen(true);
-    // };
-    //
-    // const handleDeleteParking = () => {
-    //     api.deleteParking(parkingId)
-    //         .then(() =>{
-    //             fetchSectors();
-    //             setAlertDialogOpen(false);
-    //         })
-    //         .catch(error => {
-    //             handleApiError(error);
-    //         });
-    // };
+    const handleDeleteParkingClick = (sectorId: string) => {
+        setSectorId(sectorId);
+        setAlertDialogOpen(true);
+    };
+
+    const handleEditSectorClick = (sectorId: string) => {
+        setSectorId(sectorId);
+        setEditDialogOpen(true);
+    };
+
+    const handleDeactivateSectorClick = (sectorId: string) => {
+        setSectorId(sectorId);
+        setDeactivateDialogOpen(true);
+    };
+
+    const handleActivateSectorClick = (sectorId: string) => {
+        setSectorId(sectorId);
+        setActivateDialogOpen(true);
+    };
+
+    const handleDeleteSector = () => {
+        api.deleteSector(sectorId)
+            .then(() =>{
+                fetchSectors();
+                setAlertDialogOpen(false);
+            })
+            .catch(error => {
+                handleApiError(error);
+            });
+    };
+
+    const handleActivateSector = () => {
+        api.activateSector(sectorId)
+            .then(() =>{
+                fetchSectors();
+                setAlertDialogOpen(false);
+            })
+            .catch(error => {
+                handleApiError(error);
+            });
+    };
 
     const fetchSectors = (page?: number) => {
         const actualPage = page != undefined ? page : currentPage;
@@ -185,8 +223,6 @@ export function ParkingManagementInfoPage() {
                             <TableHead
                                 className="text-center">{t("Name")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Active")}</TableHead>
-                            <TableHead
                                 className="text-center">{t("Occupies Places")}</TableHead>
                             <TableHead
                                 className="text-center">{t("Max Places")}</TableHead>
@@ -201,61 +237,74 @@ export function ParkingManagementInfoPage() {
                         {sectors.map(sector => (
                             <TableRow key={sector.id} className="flex-auto">
                                 <TableCell>{sector.name}</TableCell>
-                                <TableCell className="flex-col">
-                                    <div className="flex justify-center items-center">
-                                        {sector.active ? <FiCheck color="green"/> : <FiX color="red"/>}
-                                    </div>
-                                </TableCell>
                                 <TableCell>{sector.availablePlaces}</TableCell>
                                 <TableCell>{sector.maxPlaces}</TableCell>
                                 <TableCell><Badge variant={"default"}>{sector.type} </Badge></TableCell>
                                 <TableCell>{sector.weight}</TableCell>
                                 <TableCell>
-                                    {/*<DropdownMenu>*/}
-                                    {/*    <DropdownMenuTrigger>*/}
-                                    {/*        <FiSettings/>*/}
-                                    {/*    </DropdownMenuTrigger>*/}
-                                    {/*    <DropdownMenuContent>*/}
-                                    {/*        <DropdownMenuItem*/}
-                                    {/*            onClick={() => navigate(`/manage-parking/${parking.id}`)}*/}
-                                    {/*        >*/}
-                                    {/*            Show Sectors*/}
-                                    {/*        </DropdownMenuItem>*/}
-                                    {/*        <DropdownMenuItem*/}
-                                    {/*            onClick={() => handleEditParkingClick(parking.id)}*/}
-                                    {/*        >*/}
-                                    {/*            Edit parking*/}
-                                    {/*        </DropdownMenuItem>*/}
-                                    {/*        <DropdownMenuItem*/}
-                                    {/*            onClick={() => handleDeleteParkingClick(parking.id)}*/}
-                                    {/*            disabled={parking.sectorTypes.length !== 0}*/}
-                                    {/*        >*/}
-                                    {/*            Delete parking*/}
-                                    {/*        </DropdownMenuItem>*/}
-                                    {/*    </DropdownMenuContent>*/}
-                                    {/*</DropdownMenu>*/}
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <FiSettings/>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem
+                                                onClick={() => handleActivateSectorClick(sector.id)}>
+                                                Activate sector
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => handleDeactivateSectorClick(sector.id)}>
+                                                Deactivate sector
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => handleEditSectorClick(sector.id)}>
+                                                Edit sector
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => handleDeleteParkingClick(sector.id)}>
+                                                Delete parking
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
-                    {/*<Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>*/}
-                    {/*    <DialogContent className="sm:max-w-[425px]">*/}
-                    {/*        <DialogHeader>*/}
-                    {/*            <DialogTitle>Edit Parking</DialogTitle>*/}
-                    {/*        </DialogHeader>*/}
-                    {/*        <EditParkingForm setDialogOpen={setEditDialogOpen} refresh={refresh} parkingId={parkingId}/>*/}
-                    {/*    </DialogContent>*/}
-                    {/*</Dialog>*/}
-                    {/*<AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>*/}
-                    {/*    <AlertDialogContent>*/}
-                    {/*        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>*/}
-                    {/*        <AlertDialogDescription>*/}
-                    {/*            Are you sure you want to delete this parking?*/}
-                    {/*        </AlertDialogDescription>*/}
-                    {/*        <AlertDialogAction onClick={handleDeleteParking}>{t("general.ok")}</AlertDialogAction>*/}
-                    {/*        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>*/}
-                    {/*    </AlertDialogContent>*/}
-                    {/*</AlertDialog>*/}
+                    <Dialog open={isDeactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit Parking</DialogTitle>
+                            </DialogHeader>
+                            <DeactivateSectorForm setDialogOpen={setDeactivateDialogOpen} refresh={refresh} sectorId={sectorId}/>
+                        </DialogContent>
+                    </Dialog>
+                    <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit Parking</DialogTitle>
+                            </DialogHeader>
+                            <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId}/>
+                        </DialogContent>
+                    </Dialog>
+                    <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to delete this sector?
+                            </AlertDialogDescription>
+                            <AlertDialogAction onClick={handleDeleteSector}>{t("general.ok")}</AlertDialogAction>
+                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog open={isActivateDialogOpen} onOpenChange={setActivateDialogOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to activate this sector?
+                            </AlertDialogDescription>
+                            <AlertDialogAction onClick={handleActivateSector}>{t("general.ok")}</AlertDialogAction>
+                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </Table>
                 <div className={"pt-5"}>
                     <Pagination>
