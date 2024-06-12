@@ -2034,23 +2034,22 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
     }
 
-    // Returns 204 for some reason
-    //@Test
-    //public void showAllAvailableParkingsListTestSuccessful() throws JsonProcessingException {
-    //    String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
-    //    RestAssured.given()
-    //        .header("Authorization", "Bearer " + loginToken)
-    //        .when()
-    //        .param("pageNumber", 0)
-    //        .param("pageSize", 10)
-    //        .get(BASE_URL + "/parking/active")
-    //        .then()
-    //        .assertThat()
-    //        .statusCode(HttpStatus.OK.value());
-    //}
+    @Test
+    public void showAllAvailableParkingListTestSuccessful() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", 0)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/parking/active")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value());
+    }
 
     @Test
-    public void showAllAvailableParkingsListTestUnauthorized() throws JsonProcessingException {
+    public void showAllAvailableParkingListTestUnauthorized() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
         RestAssured.given()
             .header("Authorization", "Bearer " + loginToken)
@@ -2063,21 +2062,20 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
             .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
-    // Returns 204 for some reason
-    //@Test
-    //public void showAllAvailableParkingsListTestUnauthenticated() {
-    //    RestAssured.given()
-    //        .when()
-    //        .param("pageNumber", 0)
-    //        .param("pageSize", 10)
-    //        .get(BASE_URL + "/parking/active")
-    //        .then()
-    //        .assertThat()
-    //        .statusCode(HttpStatus.UNAUTHORIZED.value());
-    //}
+    @Test
+    public void showAllAvailableParkingListTestUnauthenticated() {
+        RestAssured.given()
+            .when()
+            .param("pageNumber", 0)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/parking/active")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value());
+    }
 
     @Test
-    public void showAllAvailableParkingsListTestNoContent() throws JsonProcessingException {
+    public void showAllAvailableParkingListTestNoContent() throws JsonProcessingException {
         String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
         RestAssured.given()
             .header("Authorization", "Bearer " + loginToken)
@@ -2091,7 +2089,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @Test
-    public void showAllAvailableParkingsListTestWithoutParameters() throws JsonProcessingException {
+    public void showAllAvailableParkingListTestWithoutParameters() throws JsonProcessingException {
         String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
         RestAssured.given()
             .header("Authorization", "Bearer " + loginToken)
@@ -2103,7 +2101,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @Test
-    public void showAllAvailableParkingsListWithInvalidParameters() throws JsonProcessingException {
+    public void showAllAvailableParkingListWithInvalidParameters() throws JsonProcessingException {
         String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
         RestAssured.given()
             .header("Authorization", "Bearer " + loginToken)
@@ -2159,23 +2157,21 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
             .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
-    // Returns 404 or some reason
-    //@Test
-    //public void getSectorByIdTestSuccessful() throws JsonProcessingException {
-    //    String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
-    //    String sectorId = "3e6a85db-d751-4549-bbb7-9705f0b2fa6b";
-    //    RestAssured.given()
-    //        .header("Authorization", "Bearer " + loginToken)
-    //        .when()
-    //        .get(BASE_URL + "/parking/sectors/get/" + sectorId)
-    //        .then()
-    //        .assertThat()
-    //        .statusCode(HttpStatus.OK.value())
-    //        .body("type", equalTo("UNCOVERED"))
-    //        .body("maxPlaces", equalTo(50))
-    //        .body("weight", equalTo(1))
-    //        .body("active", equalTo(true));
-    //}
+    @Test
+    public void getSectorByIdTestSuccessful() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        String sectorId = "3e6a85db-d751-4549-bbb7-9705f0b2fa6b";
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/parking/sectors/get/" + sectorId)
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .body("type", equalTo("UNCOVERED"))
+            .body("maxPlaces", equalTo(50))
+            .body("weight", equalTo(1));
+    }
 
     @Test
     public void getSectorByIdTestWithInvalidUUID() throws JsonProcessingException {
@@ -2203,20 +2199,19 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
             .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
-    // Returns 204 for some reason
-    //@Test
-    //public void getAllReservationsTestSuccessfull() throws JsonProcessingException {
-    //    String loginToken = login("tkarol", "P@ssw0rd!", "pl");
-    //    RestAssured.given()
-    //        .header("Authorization", "Bearer " + loginToken)
-    //        .when()
-    //        .param("pageNumber", 0)
-    //        .param("pageSize", 10)
-    //        .get(BASE_URL + "/reservations")
-    //        .then()
-    //        .assertThat()
-    //        .statusCode(HttpStatus.OK.value());
-    //}
+    @Test
+    public void getAllReservationsTestSuccessful() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", 0)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/reservations")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value());
+    }
 
     @Test
     public void getAllReservationsListTestNoContent() throws JsonProcessingException {
@@ -2394,9 +2389,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     //----MOP 1. IT Tests----
-    //Show all parkings list as unauthenticated user -> Response: code 401, message "application.unauthorized.exception"
+    //Show all parking list as unauthenticated user -> Response: code 401, message "application.unauthorized.exception"
     @Test
-    public void showAllParkingsListAsUnauthenticatedUserTest() {
+    public void showAllParkingListAsUnauthenticatedUserTest() {
         //request without Authorization Bearer
         RestAssured.given()
                 .when()
@@ -2409,9 +2404,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION));
     }
 
-    //Show all parkings list as authenticated and unauthorized user -> Response: code 401, message "application.unauthorized.exception"
+    //Show all parking list as authenticated and unauthorized user -> Response: code 401, message "application.unauthorized.exception"
     @Test
-    public void showAllParkingsListAsAuthenticatedAndUnauthorizedUserTest() throws JsonProcessingException {
+    public void showAllParkingListAsAuthenticatedAndUnauthorizedUserTest() throws JsonProcessingException {
         //login as unauthorized user level: CLIENT user: jakubkoza
         String loginToken = login("jakubkoza", "P@ssw0rd!", "pl");
         //request with Authorization Bearer
@@ -2427,9 +2422,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
     }
 
-    //Show all parkings list as authenticated and authorized user - request without parameters
+    //Show all parking list as authenticated and authorized user - request without parameters
     @Test
-    public void showAllParkingsListAsAuthenticatedAndUnauthorizedUserRequestWithoutParameters()
+    public void showAllParkingListAsAuthenticatedAndUnauthorizedUserRequestWithoutParameters()
             throws JsonProcessingException {
         //login as authorized user level: STAFF user: tkarol
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
@@ -2444,9 +2439,9 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.INTERNAL_SERVER_ERROR));
     }
 
-    //Show all parkings with invalid param
+    //Show all parking with invalid param
     @Test
-    public void showAllParkingsListWithInvalidParameters() throws JsonProcessingException {
+    public void showAllParkingListWithInvalidParameters() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
@@ -2461,7 +2456,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @Test
-    public void showAllParkingsListEmpty() throws JsonProcessingException {
+    public void showAllParkingListEmpty() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
@@ -2477,7 +2472,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     @Test
     public void showAllParkingListAsAuthenticated() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
-        List<String> allParkings = RestAssured.given()
+        List<String> allParking = RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
                 .when()
                 .param("pageNumber", 0)
@@ -2496,7 +2491,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .jsonPath()
                 .getList("id");
 
-        assertFalse(allParkings.isEmpty());
+        assertFalse(allParking.isEmpty());
     }
 
     //----MOP 2. IT Tests----
