@@ -148,6 +148,7 @@ public class DatabaseConsts {
 
     public static final String CLIENT_DATA_TABLE = "client_data";
     public static final String CLIENT_DATA_TYPE_COLUMN = "type";
+    public static final String TOTAL_RESERVATION_HOURS_COLUMN = "total_reservation_hours";
 
     public static final String CLIENT_DATA_USER_LEVEL_ID_INDEX = "idx_client_data_user_level_id";
     public static final String CLIENT_DATA_USER_LEVEL_ID_FK = "client_data_user_level_id_fk";
