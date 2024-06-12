@@ -217,28 +217,43 @@ export const api = {
         return apiWithConfig.post(`/accounts/restore-token/${token}`)
     },
 
-    getPasswordAdminResetStatus:()=>{
+    getPasswordAdminResetStatus:() => {
         return apiWithConfig.get('/accounts/admin-password-reset-status')
     },
 
-    getAllAttributes:()=>{
+    getAllAttributes:() => {
         return apiWithConfig.get('/accounts/attributes?pageNumber=0&pageSize=2')
     },
 
-    getMyAttributes:()=>{
+    getMyAttributes:() => {
         return apiWithConfig.get('/accounts/attributes/account/me/get')
     },
 
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
+
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
+
     createParking: (parking: CreateParkingType) => {
         return apiWithConfig.post('/parking', {...parking})
     },
+
     deleteParking: (parkingId: string) => {
         return apiWithConfig.delete(`/parking/${parkingId}`)
     },
+
+    getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getAllReservations: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    }
 }

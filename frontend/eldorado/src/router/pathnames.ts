@@ -19,10 +19,11 @@ export const Pathnames = {
         adminCreateUser: '/manage-users/create',
     },
     staff: {
+        allReservations: '/all-reservations',
         parkingManagement: '/manage-parking'
     },
     client: {
-
+        myReservations: '/my-reservations',
     },
     loggedIn: {
         landingPage: '/',
