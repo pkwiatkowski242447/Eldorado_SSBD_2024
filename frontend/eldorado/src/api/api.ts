@@ -232,12 +232,17 @@ export const api = {
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
+
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
 
     createParking: (parking: CreateParkingType) => {
         return apiWithConfig.post('/parking', {...parking})
+    },
+
+    deleteParking: (parkingId: string) => {
+        return apiWithConfig.delete(`/parking/${parkingId}`)
     },
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {

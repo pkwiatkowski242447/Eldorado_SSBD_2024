@@ -306,6 +306,16 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Your password has been successfully changed. You can log in now.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Log In",
 
+  "allReservationsPage.title": "All reservations",
+  "allReservationsPage.table.clientID": "Client ID",
+  "allReservationsPage.table.beginTime": "Beginning time",
+  "allReservationsPage.table.endingTime": "Ending time",
+  "allReservationsPage.table.city": "Parking",
+  "allReservationsPage.table.street": "Street",
+  "allReservationsPage.table.zipCode": "Zip code",
+  "allReservationsPage.table.sectorName": "Sector",
+  "allReservationsPage.table.reservationId": "Reservation ID",
+  
   "parkingManagementPage.createParking": "Create Parking",
 
   "account.constraint.violation.exception" : "Account constraint violation",

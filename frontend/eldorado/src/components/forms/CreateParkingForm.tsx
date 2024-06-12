@@ -23,9 +23,10 @@ import handleApiError from "@/components/HandleApiError.ts";
 
 type createParkingFormProps = {
     setDialogOpen: Dispatch<SetStateAction<boolean>>
+    refresh: () => void
 }
 
-function CreateParkingForm({setDialogOpen}:createParkingFormProps) {
+function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -53,6 +54,7 @@ function CreateParkingForm({setDialogOpen}:createParkingFormProps) {
     async function handleAlertDialog(){
         api.createParking(newParking)
             .then(() => {
+                refresh();
                 setAlertDialogOpen(false);
                 setDialogOpen(false)})
             .catch(error => {
