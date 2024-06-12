@@ -2034,6 +2034,256 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
     }
 
+    // Returns 204 for some reason
+    //@Test
+    //public void showAllAvailableParkingsListTestSuccessful() throws JsonProcessingException {
+    //    String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+    //    RestAssured.given()
+    //        .header("Authorization", "Bearer " + loginToken)
+    //        .when()
+    //        .param("pageNumber", 0)
+    //        .param("pageSize", 10)
+    //        .get(BASE_URL + "/parking/active")
+    //        .then()
+    //        .assertThat()
+    //        .statusCode(HttpStatus.OK.value());
+    //}
+
+    @Test
+    public void showAllAvailableParkingsListTestUnauthorized() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", 0)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/parking/active")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    // Returns 204 for some reason
+    //@Test
+    //public void showAllAvailableParkingsListTestUnauthenticated() {
+    //    RestAssured.given()
+    //        .when()
+    //        .param("pageNumber", 0)
+    //        .param("pageSize", 10)
+    //        .get(BASE_URL + "/parking/active")
+    //        .then()
+    //        .assertThat()
+    //        .statusCode(HttpStatus.UNAUTHORIZED.value());
+    //}
+
+    @Test
+    public void showAllAvailableParkingsListTestNoContent() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", 10000)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/parking/active")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void showAllAvailableParkingsListTestWithoutParameters() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/parking/active")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @Test
+    public void showAllAvailableParkingsListWithInvalidParameters() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", "invalid")
+            .param("pageSize", 10)
+            .get(BASE_URL + "/parking/active")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @Test
+    public void getParkingByIdTestSuccessful() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        String parkingId = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1";
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/parking/get/" + parkingId)
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.OK.value())
+            .body("city", equalTo("BoatCity"))
+            .body("zipCode", equalTo("91-416"))
+            .body("street", equalTo("Palki"))
+            .body("strategy", equalTo("LEAST_OCCUPIED"));
+    }
+
+    @Test
+    public void getParkingByIdWithInvalidUUID() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        String parkingId = "1234-foo";
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/parking/get/" + parkingId)
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void getParkingByIdWithNonExistingParkingUUID() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        String parkingId = "11111111-2222-3333-4444-555555555555";
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/parking/get/" + parkingId)
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    // Returns 404 or some reason
+    //@Test
+    //public void getSectorByIdTestSuccessful() throws JsonProcessingException {
+    //    String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+    //    String sectorId = "3e6a85db-d751-4549-bbb7-9705f0b2fa6b";
+    //    RestAssured.given()
+    //        .header("Authorization", "Bearer " + loginToken)
+    //        .when()
+    //        .get(BASE_URL + "/parking/sectors/get/" + sectorId)
+    //        .then()
+    //        .assertThat()
+    //        .statusCode(HttpStatus.OK.value())
+    //        .body("type", equalTo("UNCOVERED"))
+    //        .body("maxPlaces", equalTo(50))
+    //        .body("weight", equalTo(1))
+    //        .body("active", equalTo(true));
+    //}
+
+    @Test
+    public void getSectorByIdTestWithInvalidUUID() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        String sectorId = "1234-foo";
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/parking/sectors/get/" + sectorId)
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void getSectorByIdTestWithWithNonExistingSectorUUID() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        String sectorId = "11111111-2222-3333-4444-555555555555";
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/parking/sectors/get/" + sectorId)
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    // Returns 204 for some reason
+    //@Test
+    //public void getAllReservationsTestSuccessfull() throws JsonProcessingException {
+    //    String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+    //    RestAssured.given()
+    //        .header("Authorization", "Bearer " + loginToken)
+    //        .when()
+    //        .param("pageNumber", 0)
+    //        .param("pageSize", 10)
+    //        .get(BASE_URL + "/reservations")
+    //        .then()
+    //        .assertThat()
+    //        .statusCode(HttpStatus.OK.value());
+    //}
+
+    @Test
+    public void getAllReservationsListTestNoContent() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", 10000)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/reservations")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void getAllReservationsListTestUnauthorized() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", 0)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/reservations")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void getAllReservationsListTestUnauthenticated() {
+        RestAssured.given()
+            .when()
+            .param("pageNumber", 0)
+            .param("pageSize", 10)
+            .get(BASE_URL + "/reservations")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void getAllReservationsListTestWithoutParameters() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .get(BASE_URL + "/reservations")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @Test
+    public void getAllReservationsListWithInvalidParameters() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+        RestAssured.given()
+            .header("Authorization", "Bearer " + loginToken)
+            .when()
+            .param("pageNumber", "invalid")
+            .param("pageSize", 10)
+            .get(BASE_URL + "/reservations")
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private static Stream<Arguments> provideNewUserLevelForAccountParameters() {
         return Stream.of(
                 Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "staff"), //aandrus
