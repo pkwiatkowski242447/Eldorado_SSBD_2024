@@ -313,7 +313,7 @@
   "allReservationsPage.table.sectorName": "Sektor",
   "allReservationsPage.table.reservationId": "ID rezerwacji",
 
-
+  "parkingManagementPage.createParking": "Utwórz parking",
 
   "account.constraint.violation.exception" : "Naruszenie ograniczeń konta",
   "account.with.given.email.not.found.exception" : "Konto z podanym adresem e-mail nie znalezione",

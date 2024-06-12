@@ -12,7 +12,7 @@ import {useTranslation} from "react-i18next";
 import {useEffect, useState} from "react";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
-import {ParkingType, SectorListType, SectorStrategy} from "@/types/Parking.ts";
+import {ParkingType, SectorListType, sectorStrategy} from "@/types/Parking.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -43,7 +43,7 @@ import {DeactivateSectorForm} from "@/components/forms/DeactivateSectorForm.tsx"
 export function ParkingManagementInfoPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [sectors, setSectors] = useState<SectorListType[]>([]);
-    const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
+    const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""})
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const [isDeactivateDialogOpen, setDeactivateDialogOpen] = useState(false);

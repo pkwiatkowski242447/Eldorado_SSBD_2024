@@ -151,6 +151,8 @@ function ActiveParkingInfoPage() {
                                 className="text-center">{t("Street")}</TableHead>
                             <TableHead
                                 className="text-center">{t("Zip code")}</TableHead>
+                            <TableHead
+                                className="text-center">{t("Strategy")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -158,6 +160,7 @@ function ActiveParkingInfoPage() {
                             <TableCell>{parking?.city}</TableCell>
                             <TableCell>{parking?.street}</TableCell>
                             <TableCell>{parking?.zipCode}</TableCell>
+                            <TableCell><Badge variant={"default"}>{parking?.strategy} </Badge></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
