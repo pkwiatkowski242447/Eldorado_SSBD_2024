@@ -153,7 +153,7 @@
   "siteHeader.changeLevel.select": "Select your active role:",
   "siteHeader.changeLevel.select.save": "Save",
   "siteHeader.login": "Log In",
-  "siteHeader.manageParking": "Manage Parking",
+
 
   "accountSettings.title": "Account settings",
   "accountSettings.email": "E-mail",
@@ -316,7 +316,7 @@
   "allReservationsPage.table.zipCode": "Zip code",
   "allReservationsPage.table.sectorName": "Sector",
   "allReservationsPage.table.reservationId": "Reservation ID",
-  
+
   "parkingManagementPage.createParking": "Create Parking",
 
 

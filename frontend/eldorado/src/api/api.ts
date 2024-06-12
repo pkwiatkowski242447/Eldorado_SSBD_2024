@@ -265,12 +265,20 @@ export const api = {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
-    getSectorById: (sectorId: string) => {
-        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
     getAllReservations: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getActiveParking: (details: string) => {
+        return apiWithConfig.get('/parking/active' + details)
+    },
+
+    getSectorById: (sectorId: string) => {
+        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
     },
 
     modifyParking: (parking: ParkingType) => {
