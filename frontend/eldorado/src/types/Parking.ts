@@ -34,3 +34,13 @@ export interface CreateParkingType {
     street: string;
     strategy: SectorStrategy;
 }
+
+export interface SectorListType {
+    id: string;
+    name:string;
+    active:boolean;
+    type: SectorType;
+    maxPlaces: number;
+    availablePlaces: number;    //todo change to occupiedSpaces
+    weight: number;
+}

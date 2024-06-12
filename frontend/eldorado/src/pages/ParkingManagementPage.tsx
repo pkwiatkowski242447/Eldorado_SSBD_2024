@@ -44,6 +44,8 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditParkingForm from "@/components/forms/EditParkingForm.tsx";
+import {useNavigate} from "react-router-dom";
+import {Pathnames} from "@/router/pathnames.ts";
 // import {FiSettings} from 'react-icons/fi';
 
 function ParkingManagementPage() {
@@ -56,6 +58,7 @@ function ParkingManagementPage() {
     const {t} = useTranslation();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
+    const navigate = useNavigate();
     const pageSize = 4;
 
     const handleDeleteParkingClick = (parkingId: string) => {
@@ -88,9 +91,9 @@ function ParkingManagementPage() {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
                     setParking(response.data);
-                } else if (response.status === 204 && currentPage > 0) {
+                } else if (response.status === 204 && actualPage > 0) {
                     fetchParking(actualPage -1)
-                } else if (response.status === 204 && currentPage <= 0) {
+                } else if (response.status === 204 && actualPage <= 0) {
                     setCurrentPage(0);
                     setParking([]);
                 }
@@ -118,7 +121,7 @@ function ParkingManagementPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
@@ -186,6 +189,11 @@ function ParkingManagementPage() {
                                             <FiSettings/>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
+                                            <DropdownMenuItem
+                                                onClick={() => navigate(`/manage-parking/${parking.id}`)}
+                                            >
+                                                Show Sectors
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleEditParkingClick(parking.id)}
                                             >

@@ -48,6 +48,9 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
             .then((response) => {
                 setParking({...response.data, signature: response.headers['etag']})
             })
+            .catch(error => {
+                handleApiError(error);
+            });
     }, []);
 
 

@@ -34,6 +34,7 @@
   "breadcrumb.userAccount": "Edit user account",
   "breadcrumb.createUser": "Create new user",
   "breadcrumb.manageParking": "Parking management",
+  "breadcrumb.manageParkingInfo": "Parking Details",
   "breadcrumb.createParking": "Create new parking",
 
   "notFound.title": "Page not found",

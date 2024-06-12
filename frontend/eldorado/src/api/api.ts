@@ -236,12 +236,21 @@ export const api = {
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
+
     createParking: (parking: CreateParkingType) => {
         return apiWithConfig.post('/parking', {...parking})
     },
 
     deleteParking: (parkingId: string) => {
         return apiWithConfig.delete(`/parking/${parkingId}`)
+    },
+
+    getParkingById: (parkingId: string) => {
+        return apiWithConfig.get(`/parking/get/${parkingId}`)
+    },
+
+    getSectorsStaff: (id:string | undefined, details: string) => {
+        return apiWithConfig.get(`/parking/${id}/sectors${details}`)
     },
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
@@ -254,10 +263,6 @@ export const api = {
 
     getAllReservations: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
-    },
-
-    getParkingById: (parkingId: string) => {
-        return apiWithConfig.get(`/parking/get/${parkingId}`)
     },
 
     modifyParking: (parking: ParkingType) => {
