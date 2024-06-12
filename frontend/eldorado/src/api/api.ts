@@ -216,15 +216,15 @@ export const api = {
         return apiWithConfig.post(`/accounts/restore-token/${token}`)
     },
 
-    getPasswordAdminResetStatus: () => {
+    getPasswordAdminResetStatus:() => {
         return apiWithConfig.get('/accounts/admin-password-reset-status')
     },
 
-    getAllAttributes: () => {
+    getAllAttributes:() => {
         return apiWithConfig.get('/accounts/attributes?pageNumber=0&pageSize=2')
     },
 
-    getMyAttributes: () => {
+    getMyAttributes:() => {
         return apiWithConfig.get('/accounts/attributes/account/me/get')
     },
 
@@ -238,6 +238,10 @@ export const api = {
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getParking: (details: string) => {
+        return apiWithConfig.get('/parking' + details)
     },
 
     getAllReservations: (pageNumber: number, pageSize: number) => {

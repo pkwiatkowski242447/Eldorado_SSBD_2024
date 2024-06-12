@@ -33,6 +33,7 @@
   "breadcrumb.myAccount": "My account",
   "breadcrumb.userAccount": "Edit user account",
   "breadcrumb.createUser": "Create new user",
+  "breadcrumb.manageParking": "Parking management",
 
   "notFound.title": "Page not found",
   "notFound.description": "The page you are looking for does not exist",
@@ -150,7 +151,7 @@
   "siteHeader.changeLevel.select": "Select your active role:",
   "siteHeader.changeLevel.select.save": "Save",
   "siteHeader.login": "Log In",
-
+  "siteHeader.manageParking": "Manage Parking",
 
   "accountSettings.title": "Account settings",
   "accountSettings.email": "E-mail",
@@ -313,7 +314,6 @@
   "allReservationsPage.table.zipCode": "Zip code",
   "allReservationsPage.table.sectorName": "Sector",
   "allReservationsPage.table.reservationId": "Reservation ID",
-
 
   "account.constraint.violation.exception" : "Account constraint violation",
   "account.with.given.email.not.found.exception" : "Account with the given email not found",
