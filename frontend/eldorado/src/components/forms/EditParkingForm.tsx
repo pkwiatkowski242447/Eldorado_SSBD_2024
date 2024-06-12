@@ -17,7 +17,7 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {ParkingType, SectorStrategy} from "@/types/Parking.ts";
+import {ParkingType, sectorStrategy} from "@/types/Parking.ts";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
@@ -31,8 +31,8 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [editedParking, setEditedParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
-    const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""});
+    const [editedParking, setEditedParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""})
+    const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""});
     const formSchema = z.object({
         city: z.string().min(2, {message: "ZMIEN"})
             .max(50, {message: "ZMIEN"}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: "ZMIEN"}),
@@ -96,7 +96,7 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                 city: values.city,
                 street:values.street,
                 zipCode:values.zipCode,
-                strategy:SectorStrategy[values.strategy],
+                strategy:sectorStrategy[values.strategy],
                 signature: parking.signature
             })
             setAlertDialogOpen(true);

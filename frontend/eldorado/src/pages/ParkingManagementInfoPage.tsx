@@ -12,11 +12,10 @@ import {useTranslation} from "react-i18next";
 import {useEffect, useState} from "react";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
-import {ParkingType, SectorListType, SectorStrategy} from "@/types/Parking.ts";
+import {ParkingType, SectorListType, sectorStrategy} from "@/types/Parking.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
-import {FiSettings} from "react-icons/fi";
 import {
     Pagination,
     PaginationContent,
@@ -39,15 +38,17 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditSectorForm from "@/components/forms/EditSectorForm.tsx";
+import {FiSettings} from "react-icons/fi";
 import {DeactivateSectorForm} from "@/components/forms/DeactivateSectorForm.tsx";
 export function ParkingManagementInfoPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [sectors, setSectors] = useState<SectorListType[]>([]);
-    const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
+    const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""})
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const [isDeactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+    const [isActivateDialogOpen, setActivateDialogOpen] = useState(false);
     const [sectorId, setSectorId] = useState("");
     const {t} = useTranslation();
     const {id} = useParams<{ id: string }>();
@@ -72,8 +73,24 @@ export function ParkingManagementInfoPage() {
         setDeactivateDialogOpen(true);
     };
 
+    const handleActivateSectorClick = (sectorId: string) => {
+        setSectorId(sectorId);
+        setActivateDialogOpen(true);
+    };
+
     const handleDeleteSector = () => {
         api.deleteSector(sectorId)
+            .then(() =>{
+                fetchSectors();
+                setAlertDialogOpen(false);
+            })
+            .catch(error => {
+                handleApiError(error);
+            });
+    };
+
+    const handleActivateSector = () => {
+        api.activateSector(sectorId)
             .then(() =>{
                 fetchSectors();
                 setAlertDialogOpen(false);
@@ -231,6 +248,10 @@ export function ParkingManagementInfoPage() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
                                             <DropdownMenuItem
+                                                onClick={() => handleActivateSectorClick(sector.id)}>
+                                                Activate sector
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
                                                 onClick={() => handleDeactivateSectorClick(sector.id)}>
                                                 Deactivate sector
                                             </DropdownMenuItem>
@@ -271,6 +292,16 @@ export function ParkingManagementInfoPage() {
                                 Are you sure you want to delete this sector?
                             </AlertDialogDescription>
                             <AlertDialogAction onClick={handleDeleteSector}>{t("general.ok")}</AlertDialogAction>
+                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog open={isActivateDialogOpen} onOpenChange={setActivateDialogOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to activate this sector?
+                            </AlertDialogDescription>
+                            <AlertDialogAction onClick={handleActivateSector}>{t("general.ok")}</AlertDialogAction>
                             <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
                         </AlertDialogContent>
                     </AlertDialog>

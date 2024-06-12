@@ -17,7 +17,7 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {SectorType, SectorTypes} from "@/types/Parking.ts";
+import {SectorType, sectorType} from "@/types/Parking.ts";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
@@ -31,8 +31,8 @@ function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) 
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [editedSector, setEditedSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:SectorTypes.UNCOVERED, maxPlaces:0, weight:0, signature:""})
-    const [sector, setSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:SectorTypes.UNCOVERED, maxPlaces:0, weight:0, signature:""});
+    const [editedSector, setEditedSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""})
+    const [sector, setSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""});
     const formSchema = z.object({
         maxPlaces: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(0, {message: "ZMIEN"}).max(1000,{message: "ZMIEN"}),
         type: z.enum(["UNCOVERED", "COVERED", "UNDERGROUND"]),
@@ -87,7 +87,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) 
                 parkingId: sector.parkingId,
                 version: sector.version,
                 name: sector.name,
-                type: SectorTypes[values.type],
+                type: sectorType[values.type],
                 maxPlaces: values.maxPlaces,
                 weight: values.weight,
                 signature: sector.signature
