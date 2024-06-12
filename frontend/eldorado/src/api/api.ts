@@ -344,5 +344,10 @@ export const api = {
             beginTime: beginTime,
             endTime: endTime
         })
-    }
+    },
+
+    cancelReservation: (id: string) => {
+        return apiWithConfig.delete(`/reservations/cancel-reservation/${id}`)
+    },
+
 }

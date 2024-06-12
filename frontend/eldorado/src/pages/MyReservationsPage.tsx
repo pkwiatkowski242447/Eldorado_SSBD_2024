@@ -14,7 +14,7 @@ import MyHistoricalReservationsPage from "@/pages/MyHistoricalReservationsPage.t
 import MyActiveReservationsPage from "@/pages/MyActiveReservationsPage.tsx";
 
 function MyReservationsPage() {
-    const [activePage, setActivePage] = useState("Historical");
+    const [activePage, setActivePage] = useState("Active");
     const {t} = useTranslation();
 
     return (
@@ -36,15 +36,15 @@ function MyReservationsPage() {
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className={"flex-auto"}>
-                <Button variant={`${activePage === 'Historical' ? 'secondary' : 'ghost'}`}
-                        onClick={() => setActivePage('Historical')}
-                        className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                    Historical
-                </Button>
                 <Button variant={`${activePage === 'Active' ? 'secondary' : 'ghost'}`}
                         onClick={() => setActivePage('Active')}
                         className={`text-muted-foreground transition-colors hover:text-foreground`}>
                     Active
+                </Button>
+                <Button variant={`${activePage === 'Historical' ? 'secondary' : 'ghost'}`}
+                        onClick={() => setActivePage('Historical')}
+                        className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                    Historical
                 </Button>
             </div>
             <div className={"grid gap-6"}>

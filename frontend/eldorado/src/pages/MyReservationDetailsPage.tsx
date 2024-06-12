@@ -8,7 +8,7 @@ import {
 import {Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {useTranslation} from "react-i18next";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {api} from "@/api/api.ts";
 import {useEffect, useState} from "react";
 import {arrayToDate, ParkingEventType, ReservationDetailsType} from "@/types/Reservations.ts";
@@ -18,9 +18,20 @@ import {
     Pagination,
     PaginationContent,
     PaginationItem,
-    PaginationLink, PaginationNext,
+    PaginationLink,
+    PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
 
 function MyReservationDetailsPage() {
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
@@ -28,23 +39,28 @@ function MyReservationDetailsPage() {
     const {id} = useParams<{ id: string }>();
     const pageSize = 5;
     const [reservation, setReservation] = useState<ReservationDetailsType | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const navigate = useNavigate();
 
     const fetchParkingSectors = (page?: number) => {
         if (id) {
-            const actualPage = page != undefined ? page : currentPage;
+            const actualPage = page !== undefined ? page : currentPage;
             const details = `?pageNumber=${actualPage}&pageSize=${pageSize}`;
             api.getMyReservationDetails(id, details)
                 .then(response => {
-                    const updatedReservation = response.data
+                    const updatedReservation = response.data;
                     updatedReservation.beginTime = arrayToDate(updatedReservation.beginTime);
                     updatedReservation.endingTime = updatedReservation.endingTime ? arrayToDate(updatedReservation.endingTime) : null;
-                    updatedReservation.parkingEvents = response.data.parkingEvents.map((parkingEvent: ParkingEventType) => {
+
+                    const parkingEvents = response.data.parkingEvents || [];
+                    updatedReservation.parkingEvents = parkingEvents.map((parkingEvent: ParkingEventType) => {
                         return {
                             ...parkingEvent,
-                            // @ts-expect-error ignore this for now
+                            // @ts-expect-error what?
                             date: arrayToDate(parkingEvent.date),
                         };
                     });
+
                     setReservation(updatedReservation);
                     setCurrentPage(actualPage);
                 })
@@ -57,6 +73,17 @@ function MyReservationDetailsPage() {
     useEffect(() => {
         fetchParkingSectors();
     }, []);
+
+    const handleCancelReservation = async () => {
+        if (id) {
+            api.cancelReservation(id).then(() => {
+                navigate("/my-reservations")
+            }).catch(error => {
+                handleApiError(error)
+            });
+        }
+    };
+
 
     return (
         <div className="flex min-h-screen w-full flex-col">
@@ -89,26 +116,19 @@ function MyReservationDetailsPage() {
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
-                            <TableHead
-                                className="text-center">{"Begin Time"}</TableHead>
-                            <TableHead
-                                className="text-center">{"Ending Time"}</TableHead>
-                            <TableHead
-                                className="text-center">{"City"}</TableHead>
-                            <TableHead
-                                className="text-center">{"Street"}</TableHead>
-                            <TableHead
-                                className="text-center">{"Zip Code"}</TableHead>
-                            <TableHead
-                                className="text-center">{"Sector Name"}</TableHead>
-                            <TableHead
-                                className="text-center">{"ID"}</TableHead>
+                            <TableHead className="text-center">{"Begin Time"}</TableHead>
+                            <TableHead className="text-center">{"Ending Time"}</TableHead>
+                            <TableHead className="text-center">{"City"}</TableHead>
+                            <TableHead className="text-center">{"Street"}</TableHead>
+                            <TableHead className="text-center">{"Zip Code"}</TableHead>
+                            <TableHead className="text-center">{"Sector Name"}</TableHead>
+                            <TableHead className="text-center">{"ID"}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
                         <TableRow key={reservation?.id} className="flex-auto">
-                            <TableCell>{reservation?.beginTime}</TableCell>
-                            <TableCell>{reservation?.endingTime}</TableCell>
+                            <TableCell>{reservation?.beginTime.toLocaleString()}</TableCell>
+                            <TableCell>{reservation?.endingTime?.toLocaleString()}</TableCell>
                             <TableCell>{reservation?.city}</TableCell>
                             <TableCell>{reservation?.street}</TableCell>
                             <TableCell>{reservation?.zipCode}</TableCell>
@@ -124,19 +144,16 @@ function MyReservationDetailsPage() {
             <Table className="p-10 flex-grow">
                 <TableHeader>
                     <TableRow className={"text-center p-10"}>
-                        <TableHead
-                            className="text-center">{"No."}</TableHead>
-                        <TableHead
-                            className="text-center">{"Date"}</TableHead>
-                        <TableHead
-                            className="text-center">{"Type"}</TableHead>
+                        <TableHead className="text-center">{"No."}</TableHead>
+                        <TableHead className="text-center">{"Date"}</TableHead>
+                        <TableHead className="text-center">{"Type"}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody className={"text-center"}>
-                    {reservation?.parkingEvents.map((parkingEvent, index) => (
+                    {reservation?.parkingEvents?.map((parkingEvent, index) => (
                         <TableRow key={parkingEvent.id} className="flex-auto">
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell>{parkingEvent.date}</TableCell>
+                            <TableCell>{parkingEvent.date.toLocaleString()}</TableCell>
                             <TableCell>{parkingEvent.type}</TableCell>
                         </TableRow>
                     ))}
@@ -158,16 +175,34 @@ function MyReservationDetailsPage() {
                         <PaginationItem>
                             <PaginationNext
                                 onClick={() => {
-                                    if (reservation?.parkingEvents.length === pageSize) setCurrentPage(currentPage + 1)
+                                    if (reservation?.parkingEvents?.length === pageSize) setCurrentPage(currentPage + 1)
                                 }}
                             />
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
+                <div className="pt-5 flex justify-center">
+                    <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
+                        Cancel Reservation
+                    </Button>
+                </div>
+                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to cancel this reservation? This action cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>No</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleCancelReservation}>Yes</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
         </div>
     );
-
 }
 
 export default MyReservationDetailsPage;
