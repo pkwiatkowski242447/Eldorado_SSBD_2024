@@ -234,7 +234,7 @@ public class ParkingController implements ParkingControllerInterface {
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Reservation reservation = parkingService.enterParkingWithoutReservation(UUID.fromString(parkingId), login, isAnonymous);
-        return ResponseEntity.ok(UserReservationListMapper.toSectorListDTO(reservation));
+        return ResponseEntity.ok(UserReservationMapper.toDTO(reservation));
     }
 
     @Override
@@ -313,11 +313,12 @@ public class ParkingController implements ParkingControllerInterface {
                 .stream()
                 .map(ParkingListMapper::toParkingListDTO)
                 .toList();
-        if (parkingList.isEmpty())
-            return ResponseEntity
-                    .noContent()
-                    .build();
-        else return ResponseEntity.ok(parkingList);
+
+        if (parkingList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(parkingList);
     }
 
 

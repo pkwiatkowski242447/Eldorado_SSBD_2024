@@ -22,14 +22,17 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationCancel
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientAccountNonEnabledException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationExceedingMaximumTime;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationSectorNonActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationAlreadyCancelledException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationAlreadyEndedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -87,6 +90,9 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
     public void makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
+        // Check reservation duration
+        if (Duration.between(beginTime, endTime).toMinutes() > reservationMaxHours * 60) throw new ReservationExceedingMaximumTime();
+
         // Obtaining Client
         Client client = userLevelMOPFacade.findGivenUserLevelForGivenAccount(clientLogin).orElseThrow(ReservationClientUserLevelNotFound::new);
 
@@ -135,6 +141,12 @@ public class ReservationService implements ReservationServiceInterface {
 
         if (reservation.getStatus() == Reservation.ReservationStatus.CANCELLED) throw new ReservationAlreadyCancelledException();
 
+        if (reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_MANUALLY ||
+                reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY ||
+                reservation.getStatus() == Reservation.ReservationStatus.TERMINATED) {
+            throw new ReservationAlreadyEndedException();
+        }
+
         if (reservation.getBeginTime().minusHours(cancellationMaxHoursBeforeReservation).isBefore(LocalDateTime.now())) {
             throw new ReservationCancellationLateAttempt();
         }
@@ -154,7 +166,7 @@ public class ReservationService implements ReservationServiceInterface {
     public Reservation getOwnReservationById(UUID reservationId, String userLogin) throws ApplicationBaseException {
         Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
         Account account = this.accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
-        if(!account.getUserLevels().contains(reservation.getClient())) throw new ReservationNotFoundException();
+        if (!account.getUserLevels().contains(reservation.getClient())) throw new ReservationNotFoundException();
         return reservation;
     }
 

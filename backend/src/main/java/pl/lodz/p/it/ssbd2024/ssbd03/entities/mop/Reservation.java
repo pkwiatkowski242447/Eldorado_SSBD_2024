@@ -49,12 +49,15 @@ import java.util.List;
                         ORDER BY r.beginTime
                         """
         ),
+        // Client reservations
         @NamedQuery(
                 name = "Reservation.findActiveReservationsByLogin",
                 query = """
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
-                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
+                          AND r.status IN (ReservationStatus.AWAITING,
+                                           ReservationStatus.IN_PROGRESS)
+                        GROUP BY r.id
                         ORDER BY r.beginTime
                        """
         ),
@@ -63,10 +66,15 @@ import java.util.List;
                 query = """
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
-                          AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
+                          AND r.status IN (ReservationStatus.COMPLETED_MANUALLY,
+                                           ReservationStatus.COMPLETED_AUTOMATICALLY,
+                                           ReservationStatus.CANCELLED,
+                                           ReservationStatus.TERMINATED)
+                        GROUP BY r.id
                         ORDER BY r.beginTime
                        """
         ),
+        // Get sector
         @NamedQuery(
                 name = "Reservation.findSectorReservations",
                 query = """
@@ -75,6 +83,7 @@ import java.util.List;
                         ORDER BY r.beginTime
                         """
         ),
+        // Schedule queries
         @NamedQuery(
                 name = "Reservation.findAllReservationsMarkedForTermination",
                 query = """
@@ -126,6 +135,8 @@ import java.util.List;
                 query = """
                         SELECT COUNT(*) FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
+                          AND r.status IN (ReservationStatus.AWAITING,
+                                           ReservationStatus.IN_PROGRESS)
                         """
         ),
         @NamedQuery(
