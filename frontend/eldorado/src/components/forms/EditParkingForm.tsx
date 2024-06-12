@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form"
 import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components/ui/form"
 import {FormLabel} from "react-bootstrap";
 import {useTranslation} from "react-i18next";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {Loader2} from "lucide-react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
@@ -17,20 +17,22 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {CreateParkingType, SectorStrategy} from "@/types/Parking.ts";
+import {ParkingType, SectorStrategy} from "@/types/Parking.ts";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
-type createParkingFormProps = {
+type editParkingFormProps = {
     setDialogOpen: Dispatch<SetStateAction<boolean>>
     refresh: () => void
+    parkingId: string
 }
 
-function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
+function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [newParking, setNewParking] = useState<CreateParkingType>({city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED})
+    const [editedParking, setEditedParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
+    const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""});
     const formSchema = z.object({
         city: z.string().min(2, {message: "ZMIEN"})
             .max(50, {message: "ZMIEN"}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: "ZMIEN"}),
@@ -41,18 +43,37 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
         strategy: z.enum(["LEAST_OCCUPIED", "MOST_OCCUPIED", "LEAST_OCCUPIED_WEIGHTED"])
     })
 
+    useEffect(() => {
+        api.getParkingById(parkingId)
+            .then((response) => {
+                setParking({...response.data, signature: response.headers['etag']})
+            })
+    }, []);
+
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            city: "",
-            street: "",
-            zipCode: "",
-            strategy: "LEAST_OCCUPIED"
+            city: parking.city,
+            street: parking.street,
+            zipCode: parking.zipCode,
+            strategy: parking.strategy
         },
     })
 
+    useEffect(() => {
+        console.log(parking);
+        form.reset({
+            city: parking.city,
+            street: parking.street,
+            zipCode: parking.zipCode,
+            strategy: parking.strategy
+        });
+    }, [parking]);
+
     async function handleAlertDialog(){
-        api.createParking(newParking)
+        console.log(editedParking);
+        api.modifyParking(editedParking)
             .then(() => {
                 refresh();
                 setAlertDialogOpen(false);
@@ -66,11 +87,14 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         try {
-            setNewParking({
+            setEditedParking({
+                parkingId: parking.parkingId,
+                version: parking.version,
                 city: values.city,
                 street:values.street,
                 zipCode:values.zipCode,
-                strategy:SectorStrategy[values.strategy]
+                strategy:SectorStrategy[values.strategy],
+                signature: parking.signature
             })
             setAlertDialogOpen(true);
         } catch (error) {
@@ -121,7 +145,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                             <div className="grid gap-4">
                                 <FormLabel className="text-left">Zip code</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="12-345" {...field} />
+                                    <Input placeholder="11-111" {...field} />
                                 </FormControl>
                                 <FormMessage/>
                             </div>
@@ -135,7 +159,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                         <FormItem>
                             <div className="grid gap-4">
                                 <FormLabel className="text-left">Strategy</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value.toString()}>
                                     <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select a sector determination strategy" />
@@ -165,7 +189,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to create a new parking?
+                        Are you sure you want edit this parking?
                     </AlertDialogDescription>
                     <AlertDialogAction onClick={handleAlertDialog}>
                         {t("general.ok")}
@@ -177,4 +201,4 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
     )
 }
 
-export default CreateParkingForm
+export default EditParkingForm

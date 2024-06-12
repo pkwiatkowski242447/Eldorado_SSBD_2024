@@ -15,12 +15,12 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
-// import {
-//     DropdownMenu,
-//     DropdownMenuContent,
-//     DropdownMenuItem,
-//     DropdownMenuTrigger
-// } from "@/components/ui/dropdown-menu.tsx";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu.tsx";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -28,7 +28,6 @@ import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {ParkingListType} from "@/types/Parking.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-
 import {
     Dialog,
     DialogContent,
@@ -37,42 +36,48 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog.tsx";
 import CreateParkingForm from "@/components/forms/CreateParkingForm.tsx";
+import {FiSettings} from "react-icons/fi";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog.tsx";
+import EditParkingForm from "@/components/forms/EditParkingForm.tsx";
 // import {FiSettings} from 'react-icons/fi';
 
 function ParkingManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [parking, setParking] = useState<ParkingListType[]>([]);
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+    const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+    const [parkingId, setParkingId] = useState("");
     const {t} = useTranslation();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
     const pageSize = 4;
 
-    // const handleSettingsClick = (userId: string) => {
-    //     navigator(`/manage-users/${userId}`);
-    // };
+    const handleDeleteParkingClick = (parkingId: string) => {
+        setParkingId(parkingId);
+        setAlertDialogOpen(true);
+    };
 
-    // const handleBlockUnblockClick = (user: ManagedUserType) => {
-    //     setSelectedUser(user);
-    //     setAlertDialogOpen(true);
-    // };
+    const handleEditParkingClick = (parkingId: string) => {
+        setParkingId(parkingId);
+        setEditDialogOpen(true);
+    };
 
-    // const handleConfirmBlockUnblock = () => {
-    //     if (selectedUser) {
-    //         const apiCall = selectedUser.blocked ? api.unblockAccount : api.blockAccount;
-    //         apiCall(selectedUser.id).then(() => {
-    //             fetchUsers();
-    //             setAlertDialogOpen(false);
-    //             toast({
-    //                 title: t("accountSettings.popUp.changeUserDataOK.title"),
-    //                 description: selectedUser.blocked ? t("general.userUnblocked") : t("general.userBlocked")
-    //             })
-    //         }).catch((error) => {
-    //             handleApiError(error);
-    //         });
-    //     }
-    //     setAlertDialogOpen(false);
-    // };
+    const handleDeleteParking = () => {
+        api.deleteParking(parkingId)
+            .then(() =>{
+                fetchParking();
+                setAlertDialogOpen(false);
+            })
+            .catch(error => {
+                handleApiError(error);
+            });
+    };
 
     const fetchParking = (page?: number) => {
         const actualPage = page != undefined ? page : currentPage;
@@ -83,6 +88,13 @@ function ParkingManagementPage() {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
                     setParking(response.data);
+                } else if (response.status === 204 && actualPage > 0) {
+                    console.log("test2")
+                    fetchParking(actualPage -1)
+                } else if (response.status === 204 && actualPage <= 0) {
+                    console.log(actualPage)
+                    setCurrentPage(0);
+                    setParking([]);
                 }
             })
             .catch(error => {
@@ -96,7 +108,7 @@ function ParkingManagementPage() {
         setIsSubmitClicked(false);
     }, [isSubmitClicked]);
 
-    function refresh() {
+    const refresh = () => {
         setIsRefreshing(true);
         fetchParking();
         setTimeout(() => setIsRefreshing(false), 1000);
@@ -135,9 +147,9 @@ function ParkingManagementPage() {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Edit profile</DialogTitle>
+                            <DialogTitle>Create Parking</DialogTitle>
                         </DialogHeader>
-                        <CreateParkingForm setDialogOpen={setCreateDialogOpen}/>
+                        <CreateParkingForm setDialogOpen={setCreateDialogOpen} refresh={refresh}/>
                     </DialogContent>
                 </Dialog>
             </div>
@@ -170,39 +182,47 @@ function ParkingManagementPage() {
                                         return <Badge key={level} variant={"secondary"}>{level} </Badge>;
                                     })}
                                 </TableCell>
-                                {/*<TableCell>*/}
-                                {/*    <DropdownMenu>*/}
-                                {/*        <DropdownMenuTrigger>*/}
-                                {/*            <FiSettings/>*/}
-                                {/*        </DropdownMenuTrigger>*/}
-                                {/*        <DropdownMenuContent>*/}
-                                {/*            <DropdownMenuItem onClick={() => handleSettingsClick(user.id)}>*/}
-                                {/*                {t("accountSettings.users.table.settings.manage")}*/}
-                                {/*            </DropdownMenuItem>*/}
-                                {/*            <DropdownMenuItem*/}
-                                {/*                onClick={() => handleBlockUnblockClick(user)}*/}
-                                {/*                disabled={user.id === account?.id}*/}
-                                {/*            >*/}
-                                {/*                {user.blocked ? t("accountSettings.users.table.settings.unblock") : t("accountSettings.users.table.settings.block")}*/}
-                                {/*            </DropdownMenuItem>*/}
-                                {/*        </DropdownMenuContent>*/}
-                                {/*    </DropdownMenu>*/}
-                                {/*</TableCell>*/}
+                                <TableCell>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <FiSettings/>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem
+                                                onClick={() => handleEditParkingClick(parking.id)}
+                                            >
+                                                Edit parking
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => handleDeleteParkingClick(parking.id)}
+                                                disabled={parking.sectorTypes.length !== 0}
+                                            >
+                                                Delete parking
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
-                    {/*<AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>*/}
-                    {/*    <AlertDialogContent>*/}
-                    {/*        <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>*/}
-                    {/*        <AlertDialogDescription>*/}
-                    {/*            {t("accountSettings.users.table.settings.block.confirm1")}*/}
-                    {/*            {selectedUser?.blocked ? t("accountSettings.users.table.settings.unblock2") : t("accountSettings.users.table.settings.block2")}*/}
-                    {/*            {t("accountSettings.users.table.settings.block.confirm2")}*/}
-                    {/*        </AlertDialogDescription>*/}
-                    {/*        <AlertDialogAction onClick={handleConfirmBlockUnblock}>{t("general.ok")}</AlertDialogAction>*/}
-                    {/*        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>*/}
-                    {/*    </AlertDialogContent>*/}
-                    {/*</AlertDialog>*/}
+                    <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit Parking</DialogTitle>
+                            </DialogHeader>
+                            <EditParkingForm setDialogOpen={setEditDialogOpen} refresh={refresh} parkingId={parkingId}/>
+                        </DialogContent>
+                    </Dialog>
+                    <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to delete this parking?
+                            </AlertDialogDescription>
+                            <AlertDialogAction onClick={handleDeleteParking}>{t("general.ok")}</AlertDialogAction>
+                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </Table>
                 <div className={"pt-5"}>
                     <Pagination>

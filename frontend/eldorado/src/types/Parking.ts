@@ -19,11 +19,13 @@ export interface ParkingListType {
 }
 
 export interface ParkingType {
-    id: string;
+    parkingId: string;
+    version: string;
     city: string;
     zipCode: string;
     street: string;
     strategy: SectorStrategy;
+    signature: string;
 }
 
 export interface CreateParkingType {
