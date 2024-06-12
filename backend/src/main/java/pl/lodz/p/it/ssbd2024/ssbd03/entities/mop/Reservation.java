@@ -46,6 +46,7 @@ import java.util.List;
                 name = "Reservation.findAll",
                 query = """
                         SELECT r FROM Reservation r
+                        GROUP BY r.id
                         ORDER BY r.beginTime
                         """
         ),
@@ -109,9 +110,10 @@ import java.util.List;
         @NamedQuery(
                 name = "Reservation.findAllParkingEventsForGivenReservation",
                 query = """
-                        SELECT p FROM ParkingEvent p
+                        SELECT DISTINCT p FROM ParkingEvent p
                         WHERE p.reservation.id = :reservationId
-                        ORDER BY p.createdBy DESC"""
+                        ORDER BY p.createdBy DESC
+                        """
         ),
         // Deactivating sector
         @NamedQuery(
@@ -120,14 +122,16 @@ import java.util.List;
                         SELECT r FROM Reservation r
                         WHERE r.sector.id = :sectorId
                             AND r.beginTime < :timestamp
-                        ORDER BY r.beginTime ASC"""
+                        ORDER BY r.beginTime ASC
+                        """
         ),
         @NamedQuery(
                 name = "Reservation.findClientReservation",
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.id = :reservationId
-                            AND r.client.account.login = :ownerLogin"""
+                            AND r.client.account.login = :ownerLogin
+                        """
         ),
         // Creating reservation
         @NamedQuery(

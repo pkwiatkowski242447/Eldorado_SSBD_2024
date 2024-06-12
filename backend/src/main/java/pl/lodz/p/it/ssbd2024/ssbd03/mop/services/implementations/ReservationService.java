@@ -22,7 +22,9 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationCancel
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientAccountNonEnabledException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationExceedingMaximumTime;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationInsufficientClientType;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.time.ReservationExceedingMaximumTime;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.time.ReservationInvalidTimeframe;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationSectorNonActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
@@ -64,6 +66,9 @@ public class ReservationService implements ReservationServiceInterface {
     @Value("${reservation.cancellation.max_hours}")
     private Long cancellationMaxHoursBeforeReservation;
 
+    @Value("${reservation.min_hours}")
+    private Integer reservationMinHours;
+
     @Autowired
     public ReservationService(ReservationFacade reservationFacade,
                               AccountMOPFacade accountFacade,
@@ -94,8 +99,12 @@ public class ReservationService implements ReservationServiceInterface {
     // MOP.14 - Reserve a parking place
 
     @Override
-    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
+    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
     public void makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
+        // Check begin time
+        if (beginTime.isBefore(LocalDateTime.now()) || endTime.isBefore(beginTime) || endTime.isEqual(beginTime)
+                || Duration.between(beginTime, endTime).toMinutes() < reservationMinHours * 60) throw new ReservationInvalidTimeframe();
+
         // Check reservation duration
         if (Duration.between(beginTime, endTime).toMinutes() > reservationMaxHours * 60) throw new ReservationExceedingMaximumTime();
 
@@ -111,6 +120,17 @@ public class ReservationService implements ReservationServiceInterface {
 
         // Obtaining Sector
         Sector sector = parkingFacade.findAndRefreshSectorById(sectorId).orElseThrow(SectorNotFoundException::new);
+
+        // Check if client type is sufficient to reserve this sector
+        switch (sector.getType()) {
+            case Sector.SectorType.COVERED -> {
+                if (client.getType() != Client.ClientType.STANDARD && client.getType() != Client.ClientType.PREMIUM)
+                    throw new ReservationInsufficientClientType();
+            }
+            case Sector.SectorType.UNDERGROUND -> {
+                if (client.getType() != Client.ClientType.PREMIUM) throw new ReservationInsufficientClientType();
+            }
+        }
 
         // Check sector availability
         if (!sector.getActive(this.reservationMaxHours)) throw new ReservationSectorNonActiveException();
@@ -147,7 +167,8 @@ public class ReservationService implements ReservationServiceInterface {
                         .getName()
         ).orElseThrow(ReservationNotFoundException::new);
 
-        if (reservation.getStatus() == Reservation.ReservationStatus.CANCELLED) throw new ReservationAlreadyCancelledException();
+        if (reservation.getStatus() == Reservation.ReservationStatus.CANCELLED)
+            throw new ReservationAlreadyCancelledException();
 
         if (reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_MANUALLY ||
                 reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY ||

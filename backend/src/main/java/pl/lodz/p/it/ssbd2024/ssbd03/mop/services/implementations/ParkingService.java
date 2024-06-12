@@ -44,6 +44,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccup
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.MostOccupied;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.SectorStrategy;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -148,7 +149,8 @@ public class ParkingService implements ParkingServiceInterface {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
 
         if (!sector.getActive(this.reservationMaxHours)) throw new SectorAlreadyInactiveException();
-        if (!deactivationTime.isAfter(LocalDateTime.now().plusHours(this.reservationMaxHours))) throw new SectorInvalidDeactivationTimeException();
+        if (!deactivationTime.isAfter(LocalDateTime.now().plusHours(this.reservationMaxHours)))
+            throw new SectorInvalidDeactivationTimeException();
 
         List<Reservation> reservations = this.reservationFacade.getAllReservationsToCancelBeforeDeactivation(sector.getId(),
                 deactivationTime.minusHours(this.reservationMaxHours));
@@ -381,7 +383,13 @@ public class ParkingService implements ParkingServiceInterface {
         // If reservation is made for anonymous user or the reservation needs to be finished
         if (reservation.getClient() == null || endReservation) {
             // Case for anonymous user - end time is being set
-            if (reservation.getClient() == null) reservation.setEndTime(LocalDateTime.now());
+            if (reservation.getClient() == null) {
+                reservation.setEndTime(LocalDateTime.now());
+            } else {
+                reservation.getClient().setTotalReservationHours(reservation.getClient().getTotalReservationHours() +
+                        Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toMinutes()
+                );
+            }
             reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
             reservation.setStatus(Reservation.ReservationStatus.COMPLETED_MANUALLY);
         }

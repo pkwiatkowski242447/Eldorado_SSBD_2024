@@ -70,6 +70,8 @@ public class I18n {
     public static final String RESERVATION_SECTOR_NON_ACTIVE = "reservation.sector.non.active.exception";
     public static final String RESERVATION_CLIENT_LIMIT_EXCEPTION = "reservation.client.limit.exception";
     public static final String RESERVATION_EXCEEDING_MAXIMUM_TIME = "reservation.exceeding.maximum.time.exception";
+    public static final String RESERVATION_INVALID_TIMEFRAME = "reservation.invalid.timeframe.exception";
+    public static final String RESERVATION_INSUFFICIENT_CLIENT_TYPE = "reservation.insufficient.client.exception";
 
     public static final String RESERVATION_CANCELLATION_LATE_ATTEMPT = "reservation.cancellation.late.attempt.exception";
     public static final String RESERVATION_ALREADY_CANCELLED_EXCEPTION = "reservation.already.cancelled.exception";
