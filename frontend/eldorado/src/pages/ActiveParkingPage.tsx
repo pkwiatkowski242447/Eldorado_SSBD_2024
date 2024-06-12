@@ -22,6 +22,7 @@ import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {ParkingListType} from "@/types/Parking.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {useNavigate} from "react-router-dom";
 
 function ActiveParkingPage() {
     // @ts-expect-error no time
@@ -31,6 +32,7 @@ function ActiveParkingPage() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
     const pageSize = 5;
+    const navigate = useNavigate();
 
     const fetchParking = (page?: number) => {
         const actualPage = page != undefined ? page : currentPage;
@@ -47,7 +49,6 @@ function ActiveParkingPage() {
                 handleApiError(error);
             });
     };
-
 
     useEffect(() => {
         fetchParking();
@@ -72,7 +73,7 @@ function ActiveParkingPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{t("breadcrumb.manageParking")}</BreadcrumbLink>
+                            <BreadcrumbLink>{"Active Parking List"}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -97,8 +98,6 @@ function ActiveParkingPage() {
                             <TableHead
                                 className="text-center">{t("Zip code")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Sector determination strategy")}</TableHead>
-                            <TableHead
                                 className="text-center">{t("Sector types")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
@@ -109,11 +108,15 @@ function ActiveParkingPage() {
                                 <TableCell>{parking.city}</TableCell>
                                 <TableCell>{parking.street}</TableCell>
                                 <TableCell>{parking.zipCode}</TableCell>
-                                <TableCell><Badge variant={"default"}>{parking.strategy} </Badge></TableCell>
                                 <TableCell>
                                     {parking.sectorTypes.map(level => {
                                         return <Badge key={level} variant={"secondary"}>{level} </Badge>;
                                     })}
+                                </TableCell>
+                                <TableCell>
+                                    <Button variant={"default"} onClick={() => {
+                                        navigate(`/parking-list/parking-info/${parking.id}`)
+                                    }}>{"View Info"}</Button>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -125,7 +128,7 @@ function ActiveParkingPage() {
                             <PaginationItem>
                                 <PaginationPrevious
                                     onClick={() => {
-                                        if (currentPage > 0) fetchParking(currentPage-1)
+                                        if (currentPage > 0) fetchParking(currentPage - 1)
                                     }}
                                 />
                             </PaginationItem>
@@ -135,7 +138,7 @@ function ActiveParkingPage() {
                             <PaginationItem>
                                 <PaginationNext
                                     onClick={() => {
-                                        if (parking.length === pageSize) fetchParking(currentPage+1)
+                                        if (parking.length === pageSize) fetchParking(currentPage + 1)
                                     }}
                                 />
                             </PaginationItem>

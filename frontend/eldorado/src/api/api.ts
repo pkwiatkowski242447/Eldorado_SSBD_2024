@@ -232,7 +232,7 @@ export const api = {
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
-    
+
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
@@ -257,16 +257,12 @@ export const api = {
         return apiWithConfig.post(`/parking/${parkingId}/sectors`, {...sector})
     },
 
-    deleteSector: (sectorId: string) => {
-        return apiWithConfig.delete(`/parking/sectors/${sectorId}`)
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
-    },
-
-    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
     getAllReservations: (pageNumber: number, pageSize: number) => {
@@ -277,8 +273,8 @@ export const api = {
         return apiWithConfig.get('/parking/active' + details)
     },
 
-    getSectorById: (sectorId: string) => {
-        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
+    getParkingInfo: (id: string) => {
+        return apiWithConfig.get(`/parking/get/${id}`)
     },
 
     modifyParking: (parking: ParkingType) => {

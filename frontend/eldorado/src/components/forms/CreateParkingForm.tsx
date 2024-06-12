@@ -17,7 +17,7 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {CreateParkingType, SectorStrategy} from "@/types/Parking.ts";
+import {CreateParkingType, sectorStrategy} from "@/types/Parking.ts";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
@@ -30,7 +30,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [newParking, setNewParking] = useState<CreateParkingType>({city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED})
+    const [newParking, setNewParking] = useState<CreateParkingType>({city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED})
     const formSchema = z.object({
         city: z.string().min(2, {message: "ZMIEN"})
             .max(50, {message: "ZMIEN"}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: "ZMIEN"}),
@@ -70,7 +70,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                 city: values.city,
                 street:values.street,
                 zipCode:values.zipCode,
-                strategy:SectorStrategy[values.strategy]
+                strategy:sectorStrategy[values.strategy]
             })
             setAlertDialogOpen(true);
         } catch (error) {

@@ -17,7 +17,7 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {CreateSectorType, SectorTypes} from "@/types/Parking.ts";
+import {CreateSectorType, sectorType} from "@/types/Parking.ts";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
@@ -31,7 +31,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [newSector, setNewSector] = useState<CreateSectorType>({name:"", type:SectorTypes.UNCOVERED, maxPlaces:0, weight:1 })
+    const [newSector, setNewSector] = useState<CreateSectorType>({name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:1 })
     const formSchema = z.object({
         name: z.string().min(5, {message: "ZMIEN"})
             .max(5, {message: "ZMIEN"}).regex(RegExp("^[A-Z]{2}-[0-9]{2}$"), {message: "ZMIEN"}),
@@ -67,7 +67,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
         try {
             setNewSector({
                 name: values.name,
-                type: SectorTypes[values.type],
+                type: sectorType[values.type],
                 maxPlaces: values.maxPlaces,
                 weight: values.weight
             })
