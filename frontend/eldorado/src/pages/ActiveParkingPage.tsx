@@ -15,12 +15,6 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu.tsx";
 import {useTranslation} from "react-i18next";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -28,73 +22,25 @@ import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {ParkingListType} from "@/types/Parking.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog.tsx";
-import CreateParkingForm from "@/components/forms/CreateParkingForm.tsx";
-import {FiSettings} from "react-icons/fi";
-import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogTitle
-} from "@/components/ui/alert-dialog.tsx";
-import EditParkingForm from "@/components/forms/EditParkingForm.tsx";
-import {useNavigate} from "react-router-dom";
-import {Pathnames} from "@/router/pathnames.ts";
 
-function ParkingManagementPage() {
-    const [currentPage, setCurrentPage] = useState(0);
+function ActiveParkingPage() {
+    // @ts-expect-error no time
+    const [currentPage, setCurrentPage] = useState(() => parseInt(0));
     const [parking, setParking] = useState<ParkingListType[]>([]);
-    const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
-    const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [parkingId, setParkingId] = useState("");
     const {t} = useTranslation();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
-    const navigate = useNavigate();
-    const pageSize = 4;
-
-    const handleDeleteParkingClick = (parkingId: string) => {
-        setParkingId(parkingId);
-        setAlertDialogOpen(true);
-    };
-
-    const handleEditParkingClick = (parkingId: string) => {
-        setParkingId(parkingId);
-        setEditDialogOpen(true);
-    };
-
-    const handleDeleteParking = () => {
-        api.deleteParking(parkingId)
-            .then(() =>{
-                fetchParking();
-                setAlertDialogOpen(false);
-            })
-            .catch(error => {
-                handleApiError(error);
-            });
-    };
+    const pageSize = 5;
 
     const fetchParking = (page?: number) => {
         const actualPage = page != undefined ? page : currentPage;
         const details = `?pageNumber=${actualPage}&pageSize=${pageSize}`;
 
-        api.getParking(details)
+        api.getActiveParking(details)
             .then(response => {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
                     setParking(response.data);
-                } else if (response.status === 204 && actualPage > 0) {
-                    fetchParking(actualPage -1)
-                } else if (response.status === 204 && actualPage <= 0) {
-                    setCurrentPage(0);
-                    setParking([]);
                 }
             })
             .catch(error => {
@@ -108,7 +54,7 @@ function ParkingManagementPage() {
         setIsSubmitClicked(false);
     }, [isSubmitClicked]);
 
-    const refresh = () => {
+    function refresh() {
         setIsRefreshing(true);
         fetchParking();
         setTimeout(() => setIsRefreshing(false), 1000);
@@ -120,7 +66,7 @@ function ParkingManagementPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
@@ -140,20 +86,7 @@ function ParkingManagementPage() {
                     )}
                 </Button>
             </div>
-            <div className="flex justify-start pt-2.5">
-                <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button variant="default">Create Parking</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Create Parking</DialogTitle>
-                        </DialogHeader>
-                        <CreateParkingForm setDialogOpen={setCreateDialogOpen} refresh={refresh}/>
-                    </DialogContent>
-                </Dialog>
-            </div>
-            <div className={"pt-1"}>
+            <div className={"pt-5"}>
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
@@ -182,52 +115,9 @@ function ParkingManagementPage() {
                                         return <Badge key={level} variant={"secondary"}>{level} </Badge>;
                                     })}
                                 </TableCell>
-                                <TableCell>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger>
-                                            <FiSettings/>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            <DropdownMenuItem
-                                                onClick={() => navigate(`/manage-parking/${parking.id}`)}
-                                            >
-                                                Show Sectors
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => handleEditParkingClick(parking.id)}
-                                            >
-                                                Edit parking
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => handleDeleteParkingClick(parking.id)}
-                                                disabled={parking.sectorTypes.length !== 0}
-                                            >
-                                                Delete parking
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
-                    <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Edit Parking</DialogTitle>
-                            </DialogHeader>
-                            <EditParkingForm setDialogOpen={setEditDialogOpen} refresh={refresh} parkingId={parkingId}/>
-                        </DialogContent>
-                    </Dialog>
-                    <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
-                        <AlertDialogContent>
-                            <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Are you sure you want to delete this parking?
-                            </AlertDialogDescription>
-                            <AlertDialogAction onClick={handleDeleteParking}>{t("general.ok")}</AlertDialogAction>
-                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                        </AlertDialogContent>
-                    </AlertDialog>
                 </Table>
                 <div className={"pt-5"}>
                     <Pagination>
@@ -257,4 +147,4 @@ function ParkingManagementPage() {
     );
 }
 
-export default ParkingManagementPage;
+export default ActiveParkingPage;

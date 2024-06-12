@@ -16,6 +16,7 @@ import {ParkingType, SectorListType, SectorStrategy} from "@/types/Parking.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
+import {FiSettings} from "react-icons/fi";
 import {
     Pagination,
     PaginationContent,
@@ -38,8 +39,6 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditSectorForm from "@/components/forms/EditSectorForm.tsx";
-import {FiSettings} from "react-icons/fi";
-import {DateTimePickerForm} from "@/components/forms/date-time-picker-form.tsx";
 import {DeactivateSectorForm} from "@/components/forms/DeactivateSectorForm.tsx";
 export function ParkingManagementInfoPage() {
     const [currentPage, setCurrentPage] = useState(0);

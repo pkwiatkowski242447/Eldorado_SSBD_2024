@@ -156,7 +156,6 @@
   "siteHeader.changeLevel.select": "Wybierz swoją aktywną rolę:",
   "siteHeader.changeLevel.select.save": "Zapisz",
   "siteHeader.login": "Zaloguj się",
-  "siteHeader.manageParking": "Zarządzaj Parkingami",
 
   "accountSettings.title": "Ustawienia konta",
   "accountSettings.email": "E-mail",
@@ -310,8 +309,17 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Twoje hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Zaloguj się",
 
-  "parkingManagementPage.createParking": "Create Parking",
+  "allReservationsPage.title": "Wszystkie rezerwacje w systemie",
+  "allReservationsPage.table.clientID": "ID Klienta",
+  "allReservationsPage.table.beginTime": "Czas rozpoczęcia",
+  "allReservationsPage.table.endingTime": "Czas zakończenia",
+  "allReservationsPage.table.city": "Parking",
+  "allReservationsPage.table.street": "Ulica",
+  "allReservationsPage.table.zipCode": "Kod pocztowy",
+  "allReservationsPage.table.sectorName": "Sektor",
+  "allReservationsPage.table.reservationId": "ID rezerwacji",
 
+  "parkingManagementPage.createParking": "Utwórz parking",
 
   "account.constraint.violation.exception" : "Naruszenie ograniczeń konta",
   "account.with.given.email.not.found.exception" : "Konto z podanym adresem e-mail nie znalezione",

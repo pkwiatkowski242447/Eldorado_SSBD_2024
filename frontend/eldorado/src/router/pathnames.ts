@@ -11,6 +11,7 @@ export const Pathnames = {
         confirmEmailChange: '/confirm-email/:token',
         restoreAccess: '/restore-access',
         restoreToken: '/restore-token/:token',
+        parkingList: '/parking-list',
     },
     admin: {
         landingPage: '/',
@@ -19,11 +20,13 @@ export const Pathnames = {
         adminCreateUser: '/manage-users/create',
     },
     staff: {
+        allReservations: '/all-reservations',
         parkingManagement: '/manage-parking',
         parkingManagementInfo: '/manage-parking/:id'
     },
     client: {
-
+        myReservations: '/my-reservations',
+        parkingList: '/parking-list',
     },
     loggedIn: {
         landingPage: '/',
