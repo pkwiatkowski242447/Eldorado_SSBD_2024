@@ -12,11 +12,17 @@ public class ParkingListMapper {
     static public ParkingOutputListDTO toParkingListDTO(Parking parking) {
         Set<String> sectorTypeList = new HashSet<>();
 
-        for (Sector sector : parking.getSectors()){
+        for (Sector sector : parking.getSectors()) {
             sectorTypeList.add(sector.getType().name());
         }
 
-        return new ParkingOutputListDTO(parking.getId(), parking.getAddress().getCity(), parking.getAddress().getZipCode(), parking.getAddress().getStreet(),
-                sectorTypeList.stream().toList(), parking.getSectorStrategy());
+        return new ParkingOutputListDTO(
+                parking.getId(),
+                parking.getAddress().getCity(),
+                parking.getAddress().getZipCode(),
+                parking.getAddress().getStreet(),
+                sectorTypeList.stream().toList(),
+                parking.getSectorStrategy()
+        );
     }
 }

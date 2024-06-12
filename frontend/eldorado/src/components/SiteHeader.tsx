@@ -89,11 +89,18 @@ const SiteHeader = () => {
                        My Reservations
                     </Button>
                 )}
-                {account?.activeUserLevel?.roleName === RolesEnum.STAFF && (
+                {account?.activeUserLevel?.roleName === RolesEnum.STAFF  && (
                     <Button variant="link" onClick={() => navigate("/all-reservations")}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                        All Reservations
+                       All Reservations
                     </Button>
+                )}
+                {account?.activeUserLevel?.roleName === RolesEnum.STAFF && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.staff.parkingManagement)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        {t("siteHeader.manageParking")}
+                    </Button>
+
                 )}
             </nav>
             <div className="flex w-full items-center gap-4 justify-end">

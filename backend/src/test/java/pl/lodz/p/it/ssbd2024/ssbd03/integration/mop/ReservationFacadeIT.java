@@ -26,7 +26,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,7 +67,7 @@ public class ReservationFacadeIT extends TestcontainersConfig {
     public void setup() {
         address = new Address("Strykow","90-000","Kosciuszki");
         parking = new Parking(address, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        sector = new Sector(parking,"AA-02", Sector.SectorType.COVERED,23,11, true);
+        sector = new Sector(parking,"AA-02", Sector.SectorType.COVERED,23,11);
         reservation = new Reservation(sector, LocalDateTime.now());
     }
 

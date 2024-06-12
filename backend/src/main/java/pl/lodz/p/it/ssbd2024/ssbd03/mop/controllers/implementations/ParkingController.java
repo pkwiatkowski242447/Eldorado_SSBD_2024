@@ -89,8 +89,7 @@ public class ParkingController implements ParkingControllerInterface {
         try {
             parkingService.createSector(UUID.fromString(parkingId),
                     sectorCreateDTO.getName(), Sector.SectorType.valueOf(sectorCreateDTO.getType()),
-                    sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
-                    sectorCreateDTO.getActive());
+                    sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight());
         } catch (IllegalArgumentException exception) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
@@ -235,7 +234,7 @@ public class ParkingController implements ParkingControllerInterface {
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Reservation reservation = parkingService.enterParkingWithoutReservation(UUID.fromString(parkingId), login, isAnonymous);
-        return ResponseEntity.ok(UserActiveReservationListMapper.toSectorListDTO(reservation));
+        return ResponseEntity.ok(UserReservationMapper.toDTO(reservation));
     }
 
     @Override
@@ -314,11 +313,12 @@ public class ParkingController implements ParkingControllerInterface {
                 .stream()
                 .map(ParkingListMapper::toParkingListDTO)
                 .toList();
-        if (parkingList.isEmpty())
-            return ResponseEntity
-                    .noContent()
-                    .build();
-        else return ResponseEntity.ok(parkingList);
+
+        if (parkingList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(parkingList);
     }
 
 

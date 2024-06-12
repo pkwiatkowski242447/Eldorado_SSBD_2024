@@ -20,6 +20,7 @@ export const Pathnames = {
     },
     staff: {
         allReservations: '/all-reservations',
+        parkingManagement: '/manage-parking'
     },
     client: {
         myReservations: '/my-reservations',

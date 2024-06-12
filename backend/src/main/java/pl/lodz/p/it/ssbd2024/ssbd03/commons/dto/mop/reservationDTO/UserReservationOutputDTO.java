@@ -16,7 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserReservationOutputListDTO {
+public class UserReservationOutputDTO {
 
     @Schema(description = "UUID identifier linked with parking", example = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID id;
