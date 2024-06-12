@@ -18,6 +18,7 @@ import RestoreAccessPage from "@/pages/RestoreAccessPage.tsx";
 import RestoreTokenPage from "@/pages/RestoreTokenPage.tsx";
 import MyReservationsPage from "@/pages/MyReservationsPage.tsx";
 import AllReservationsPage from "@/pages/AllReservationsPage.tsx";
+import MyReservationDetailsPage from "@/pages/MyReservationDetailsPage.tsx";
 
 
 export const PublicRoutes: RouteType[] = [
@@ -143,4 +144,8 @@ export const ClientRoutes: RouteType[] = [
         path: Pathnames.client.myReservations,
         Component: MyReservationsPage
     },
+    {
+        path: Pathnames.client.myReservationDetails,
+        Component: MyReservationDetailsPage
+    }
 ]

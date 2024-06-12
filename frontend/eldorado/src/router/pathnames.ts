@@ -23,6 +23,7 @@ export const Pathnames = {
     },
     client: {
         myReservations: '/my-reservations',
+        myReservationDetails: '/my-reservations/:id',
     },
     loggedIn: {
         landingPage: '/',

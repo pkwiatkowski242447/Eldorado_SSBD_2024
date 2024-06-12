@@ -242,5 +242,9 @@ export const api = {
 
     getAllReservations: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    },
+
+    getMyReservationDetails: (id: string, details: string) => {
+        return apiWithConfig.get(`/reservations/client/${id}` + details)
     }
 }
