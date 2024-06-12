@@ -96,9 +96,9 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_SECTOR})
-    public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException {
+    public void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight) throws ApplicationBaseException {
         Parking parking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
-        Sector sector = new Sector(parking, name, type, maxPlaces, weight, active);
+        Sector sector = new Sector(parking, name, type, maxPlaces, weight);
 
         parkingFacade.createSector(sector);
     }
@@ -133,8 +133,8 @@ public class ParkingService implements ParkingServiceInterface {
     @RolesAllowed(Authorities.ACTIVATE_SECTOR)
     public void activateSector(UUID id) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
-        if (sector.getActive()) throw new SectorAlreadyActiveException();
-        sector.setActive(true);
+        if (sector.getActive(this.reservationMaxHours)) throw new SectorAlreadyActiveException();
+        sector.activateSector();
         parkingFacade.editSector(sector);
     }
 
@@ -145,7 +145,7 @@ public class ParkingService implements ParkingServiceInterface {
     public void deactivateSector(UUID id, LocalDateTime deactivationTime) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
 
-        if (!sector.getActive()) throw new SectorAlreadyInactiveException();
+        if (!sector.getActive(this.reservationMaxHours)) throw new SectorAlreadyInactiveException();
         if (!deactivationTime.isAfter(LocalDateTime.now().plusHours(this.reservationMaxHours))) throw new SectorInvalidDeactivationTimeException();
 
         List<Reservation> reservations = this.reservationFacade.getAllReservationsToCancelBeforeDeactivation(sector.getId(),
@@ -156,7 +156,7 @@ public class ParkingService implements ParkingServiceInterface {
             this.reservationFacade.edit(reservation);
         }
 
-        sector.setActive(false);
+        sector.deactivateSector(LocalDateTime.now());
         parkingFacade.editSector(sector);
     }
 
@@ -241,14 +241,14 @@ public class ParkingService implements ParkingServiceInterface {
         }
 
         if (!foundSector.getType().equals(modifiedSector.getType())) {
-            if (foundSector.getActive()) {
+            if (foundSector.getActive(this.reservationMaxHours)) {
                 throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
             }
             foundSector.setType(modifiedSector.getType());
         }
 
         if (!foundSector.getMaxPlaces().equals(modifiedSector.getMaxPlaces())) {
-            if (foundSector.getActive()) {
+            if (foundSector.getActive(this.reservationMaxHours)) {
                 throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
             }
             foundSector.setMaxPlaces(modifiedSector.getMaxPlaces());

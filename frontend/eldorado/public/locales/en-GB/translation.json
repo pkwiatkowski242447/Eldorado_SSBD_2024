@@ -35,6 +35,7 @@
   "breadcrumb.createUser": "Create new user",
   "breadcrumb.manageParking": "Parking management",
   "breadcrumb.manageParkingInfo": "Parking Details",
+  "breadcrumb.createParking": "Create new parking",
 
   "notFound.title": "Page not found",
   "notFound.description": "The page you are looking for does not exist",
@@ -306,8 +307,17 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Your password has been successfully changed. You can log in now.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Log In",
 
+  "allReservationsPage.title": "All reservations",
+  "allReservationsPage.table.clientID": "Client ID",
+  "allReservationsPage.table.beginTime": "Beginning time",
+  "allReservationsPage.table.endingTime": "Ending time",
+  "allReservationsPage.table.city": "Parking",
+  "allReservationsPage.table.street": "Street",
+  "allReservationsPage.table.zipCode": "Zip code",
+  "allReservationsPage.table.sectorName": "Sector",
+  "allReservationsPage.table.reservationId": "Reservation ID",
+  
   "parkingManagementPage.createParking": "Create Parking",
-
 
   "account.constraint.violation.exception" : "Account constraint violation",
   "account.with.given.email.not.found.exception" : "Account with the given email not found",

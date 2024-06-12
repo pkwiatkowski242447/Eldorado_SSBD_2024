@@ -4,18 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DTOConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ReservationMessages;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

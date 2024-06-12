@@ -27,6 +27,8 @@ GRANT SELECT                         ON TABLE public.account                TO s
 GRANT SELECT                         ON TABLE public.personal_data          TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.user_level             TO ssbd03mop;
 GRANT SELECT                , UPDATE ON TABLE public.client_data            TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.admin_data             TO ssbd03mop;
+GRANT SELECT                         ON TABLE public.staff_data             TO ssbd03mop;
 
 GRANT SELECT                         ON TABLE public.account_attributes     TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.attribute_association  TO ssbd03mop;
@@ -108,33 +110,33 @@ INSERT INTO public.user_level (id, creation_timestamp, level, account_id, versio
 INSERT INTO public.client_data (id, type) VALUES ('248a31fa-7fef-41d5-8042-e70a38d30a9d', 'BASIC');
 
 -- Parking
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, '91-416', 'BoatCity', 'Palki', 0);
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', current_timestamp, '00-000', 'Lodz', 'Pomorska', 20);
-INSERT INTO public.parking (id, creation_timestamp, zip_code, city, street, version) VALUES ('ddcae4ec-aeb5-4ece-aa2b-46819763d55f', current_timestamp, '95-010', 'Strykow', 'Krotka', 9);
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, 'LEAST_OCCUPIED', '91-416', 'BoatCity', 'Palki', 0);
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', current_timestamp, 'LEAST_OCCUPIED', '00-000', 'Lodz', 'Pomorska', 20);
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('ddcae4ec-aeb5-4ece-aa2b-46819763d55f', current_timestamp, 'LEAST_OCCUPIED', '95-010', 'Strykow', 'Krotka', 9);
 
 -- First Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active ,occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, true, 30, 50, 1, 'SA-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('3e6a85db-d751-4549-bbb7-9705f0b2fa6b', current_timestamp, 30, 50, 1, 'SA-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
 
 -- Second Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('9f7f2969-1b7e-4bb3-ab84-6dbc31c01277', current_timestamp, true, 30, 50, 1, 'S1', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('9f7f2969-1b7e-4bb3-ab84-6dbc31c01277', current_timestamp, 30, 50, 1, 'SB-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
 
 -- Third Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('99023647-d8d2-43a5-91c7-b24781f06e13', current_timestamp, true, 30, 50, 1, 'S2', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('99023647-d8d2-43a5-91c7-b24781f06e13', current_timestamp, 30, 50, 1, 'SB-02', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
 
 -- Fourth Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('bca50310-f4fb-4911-bf3c-68e00e517b95', current_timestamp, true, 30, 50, 1, 'S3', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('bca50310-f4fb-4911-bf3c-68e00e517b95', current_timestamp, 30, 50, 1, 'SB-03', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNCOVERED', 0);
 
 -- Fifth Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('82b4ad91-a5ef-48bf-bc5b-390d7f4d1dea', current_timestamp, true, 30, 50, 1, 'S4', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'COVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('82b4ad91-a5ef-48bf-bc5b-390d7f4d1dea', current_timestamp, 30, 50, 1, 'SB-04', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'COVERED', 0);
 
 -- Sixth Sector S1
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('36e19dcd-1d5b-4258-a5df-ba9f4372c58c', current_timestamp, true, 30, 50, 1, 'S5', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNDERGROUND', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('36e19dcd-1d5b-4258-a5df-ba9f4372c58c', current_timestamp, 30, 50, 1, 'SB-05', 'a54e7ae6-ba2c-4fac-8ef6-e9d27da48921', 'UNDERGROUND', 0);
 
 -- Seventh Sector S2
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('4ce920a0-6f4d-4e95-ba24-99ba32b66491', current_timestamp, true, 30, 60, 2, 'SA-02', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('4ce920a0-6f4d-4e95-ba24-99ba32b66491', current_timestamp, 30, 60, 2, 'SA-02', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
 
 -- Eighth Sector S3
-INSERT INTO public.sector (id, creation_timestamp, active, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('c51557aa-284d-44a6-b38d-b6ceb9c23725', current_timestamp, false, 30, 70, 3, 'SA-03', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('c51557aa-284d-44a6-b38d-b6ceb9c23725', current_timestamp, 30, 70, 3, 'SA-03', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0);
 
 -- First Reservation (for michalkowal)
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('90a0035d-6265-4b53-a547-901b3bbabd1d', current_timestamp, TIMESTAMP '2024-04-10 07:00:00', TIMESTAMP '2024-04-10 09:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'AWAITING');
@@ -257,3 +259,106 @@ INSERT INTO public.attribute_value(id, version, attribute_name_id, attribute_val
 INSERT INTO public.attribute_value(id, version, attribute_name_id, attribute_value) VALUES ('a039865b-cc88-45f5-bdc6-bea68b18db2e', 0, 'bd4acadd-ce76-46ce-9fad-aebe1d502aa0', 'GMT+10');
 INSERT INTO public.attribute_value(id, version, attribute_name_id, attribute_value) VALUES ('d8aab63d-85fe-443f-ad77-2b292dc61124', 0, 'bd4acadd-ce76-46ce-9fad-aebe1d502aa0', 'GMT+11');
 INSERT INTO public.attribute_value(id, version, attribute_name_id, attribute_value) VALUES ('3eea023d-304c-4435-94af-23b7c63e19bc', 0, 'bd4acadd-ce76-46ce-9fad-aebe1d502aa0', 'GMT+12');
+
+-- Enter without reservation check methods tests
+
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('3591ced3-996e-49b4-8c56-40fe91193b1d', current_timestamp, 'LEAST_OCCUPIED', '99-999', 'test1', 'test1', 0);
+
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('14d51050-ffe2-4da2-abd2-4e6d06759ea5', current_timestamp, 0, 5, 3, 'UC-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('933bcce5-a38c-4b09-bd60-2b746d9f40e8', current_timestamp, 1, 2, 3, 'UC-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('828228e6-2fa7-418e-8cfe-7f4d79737557', current_timestamp, 1, 1, 3, 'UC-03', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('38c70882-c413-467d-bdd8-c5ed5f9128d0', current_timestamp, 1, 1, 3, 'UC-04', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNCOVERED', 0);
+
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('f274420a-1322-4530-bfcb-4e515dd5a920', current_timestamp, 0, 2, 3, 'CO-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'COVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('ae65eca6-669d-43ec-8c35-39f4eb6b72bb', current_timestamp, 1, 1, 3, 'CO-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'COVERED', 0);
+
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('65c51075-0749-4304-984a-9cb926e65aab', current_timestamp, 0, 2, 3, 'UN-01', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNDERGROUND', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('b9f5bb0c-d19f-4101-ac57-d758e063ac3e', current_timestamp, 1, 1, 3, 'UN-02', '3591ced3-996e-49b4-8c56-40fe91193b1d', 'UNDERGROUND', 0);
+
+-- Reservations to the first sector, all reservation cases
+--1 -- completed - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('98a2fa9f-3b67-4a77-842d-33fa859d1933', current_timestamp, TIMESTAMP '2023-12-12 04:00:00', TIMESTAMP '2023-12-12 06:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'COMPLETED_MANUALLY');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('ea600708-036e-43a9-8020-9589c48c3d35', '98a2fa9f-3b67-4a77-842d-33fa859d1933', TIMESTAMP '2023-12-12 06:00:00', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('d71cd61b-616b-4c09-9d77-50b15ce70ec6', '98a2fa9f-3b67-4a77-842d-33fa859d1933', TIMESTAMP '2023-12-12 06:00:00', 'EXIT', 0);
+
+--2.1 -- starts and ends in the past, but still in progress - overlaps - one entry - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('7a7035f8-d15b-48c9-86c2-eb1264c93993', current_timestamp, current_timestamp - interval '3 hour', current_timestamp - interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('96923bbc-3f9d-4e5c-a5c4-f3428aaa6d7e', '7a7035f8-d15b-48c9-86c2-eb1264c93993', current_timestamp - interval '1 hour', 'ENTRY', 0);
+
+--2.2 -- starts and ends in the past, but still in progress - overlaps - one entry, one exit - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('1b1282c0-ae25-4cfe-b22d-fe1f3abf4fdc', current_timestamp, current_timestamp - interval '3 hour', current_timestamp - interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('3ba9685e-3676-4331-b73e-1c63526c0d30', '1b1282c0-ae25-4cfe-b22d-fe1f3abf4fdc', current_timestamp - interval '2 hours', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('93df7dbc-030f-4b45-8c4f-b514419aa1e9', '1b1282c0-ae25-4cfe-b22d-fe1f3abf4fdc', current_timestamp - interval '1 hour 30 minutes', 'EXIT', 0);
+
+--3 -- starts and ends in the past, but still in progress - doesn't overlap - one entry, one exit - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('972dc388-7cd7-49b5-8e4d-57a693d81cc3', current_timestamp, current_timestamp - interval '48 hours', current_timestamp - interval '46 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('7a5ac6a9-654b-4845-9f34-95eccfc5342b', '972dc388-7cd7-49b5-8e4d-57a693d81cc3', current_timestamp - interval '48 hours', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('e0fd29ce-ae33-42fa-a79c-1e2b72c48ee7', '972dc388-7cd7-49b5-8e4d-57a693d81cc3', current_timestamp - interval '47 hours', 'EXIT', 0);
+
+--4.1 -- started in past ends in future - one entry - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('1fe14106-1c04-44c4-b69b-4ce46797a71b', current_timestamp, current_timestamp - interval '1 hour', current_timestamp + interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('e79969aa-e684-4f2e-840a-a4118f4c027f', '1fe14106-1c04-44c4-b69b-4ce46797a71b', current_timestamp - interval '1 hour', 'ENTRY', 0);
+
+--4.2 -- started in past ends in future - one entry, one exit - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('a6de4f42-a573-4cea-a4e4-141d2b7a2121', current_timestamp, current_timestamp - interval '1 hour', current_timestamp + interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('449da003-d227-4693-a8cf-7dc81cfd0ee6', 'a6de4f42-a573-4cea-a4e4-141d2b7a2121', current_timestamp - interval '1 hour', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('86379208-420d-42f5-b1fa-eaa90840fd97', 'a6de4f42-a573-4cea-a4e4-141d2b7a2121', current_timestamp - interval '30 minutes', 'EXIT', 0);
+
+--5 -- starts in the future - overlaps - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('0866b147-62c8-49c6-9721-6fd345597292', current_timestamp, current_timestamp + interval '1 hour', current_timestamp + interval '3 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'AWAITING');
+
+--6 -- starts in the future - doesn't overlap - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('1d86b115-9c18-4fd6-81be-e8878ad28a5d', current_timestamp, current_timestamp + interval '25 hour', current_timestamp + interval '28 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'AWAITING');
+
+--bonus -- starts past end time null - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('731c7497-19f9-44af-8143-8d5281d264f0', current_timestamp, current_timestamp - interval '1 hour', null, null, '14d51050-ffe2-4da2-abd2-4e6d06759ea5', 0, 'IN_PROGRESS');
+
+
+-- Reservations to the second sector, one blocking case and all non blocking
+--1 -- completed - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('5f2048b1-f964-4c0a-99f9-2f006c304794', current_timestamp, TIMESTAMP '2023-12-12 04:00:00', TIMESTAMP '2023-12-12 06:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'COMPLETED_MANUALLY');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('199e1411-677c-44d9-82e8-13fc12822af1', '5f2048b1-f964-4c0a-99f9-2f006c304794', TIMESTAMP '2023-12-12 06:00:00', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('b827ce01-4d40-480d-a3bd-813fc9919703', '5f2048b1-f964-4c0a-99f9-2f006c304794', TIMESTAMP '2023-12-12 06:00:00', 'EXIT', 0);
+
+--3 -- starts and ends in the past, but still in progress - doesn't overlap - one entry, one exit - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('121dc917-c508-4f03-8471-9becb82e9835', current_timestamp, current_timestamp - interval '48 hours', current_timestamp - interval '46 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('18bb2c32-3323-44cc-8eac-f7e526e3a962', '121dc917-c508-4f03-8471-9becb82e9835', current_timestamp - interval '48 hours', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('e68bc0f3-745e-4058-996a-37a330ce2c18', '121dc917-c508-4f03-8471-9becb82e9835', current_timestamp - interval '47 hours', 'EXIT', 0);
+
+--6 -- starts in the future - doesn't overlap - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('a195cf4d-5ae3-46e8-be57-85bec9089c0d', current_timestamp, current_timestamp + interval '25 hour', current_timestamp + interval '28 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'IN_PROGRESS');
+
+--5 -- starts in the future - overlaps - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('0b883304-fd50-40dc-a7df-3634cacfef9c', current_timestamp, current_timestamp + interval '1 hour', current_timestamp + interval '3 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '933bcce5-a38c-4b09-bd60-2b746d9f40e8', 0, 'IN_PROGRESS');
+
+-- Reservations to the third sector, all non blocking
+--1 -- completed - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('62de17c1-a3ff-4d2a-8d61-dc2e280f3be6', current_timestamp, TIMESTAMP '2023-12-12 04:00:00', TIMESTAMP '2023-12-12 06:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'COMPLETED_MANUALLY');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('94f62649-2962-4015-adaf-a921f384ea55', '62de17c1-a3ff-4d2a-8d61-dc2e280f3be6', TIMESTAMP '2023-12-12 06:00:00', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('2c6d47c5-1c12-46cb-869f-ba5d0068ae0d', '62de17c1-a3ff-4d2a-8d61-dc2e280f3be6', TIMESTAMP '2023-12-12 06:00:00', 'EXIT', 0);
+
+--3 -- starts and ends in the past, but still in progress - doesn't overlap - one entry, one exit - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('27b8f933-3bdf-4bfb-affe-0d19260a51cc', current_timestamp, current_timestamp - interval '48 hours', current_timestamp - interval '46 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('da4d6921-f627-48ee-960f-422e6988c67d', '27b8f933-3bdf-4bfb-affe-0d19260a51cc', current_timestamp - interval '48 hours', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('c074563c-c503-47f6-9222-0443c517e47d', '27b8f933-3bdf-4bfb-affe-0d19260a51cc', current_timestamp - interval '47 hours', 'EXIT', 0);
+
+--6 -- starts in the future - doesn't overlap - non blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('e598892e-7b3b-4e33-ad24-472fb05b0e8f', current_timestamp, current_timestamp + interval '25 hour', current_timestamp + interval '28 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'IN_PROGRESS');
+
+-- Reservations to first covered sector - no available places
+--4.2 -- started in past ends in future - one entry, one exit - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('4fcc2377-e95a-4f6a-a69b-185c2cc3bc36', current_timestamp, current_timestamp - interval '1 hour', current_timestamp + interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'f274420a-1322-4530-bfcb-4e515dd5a920', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('73f5a6b6-9d15-4ace-8fca-98afaf76f7c4', '4fcc2377-e95a-4f6a-a69b-185c2cc3bc36', current_timestamp - interval '1 hour', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('8ac1b58b-541e-4011-bdc0-d175223c7b26', '4fcc2377-e95a-4f6a-a69b-185c2cc3bc36', current_timestamp - interval '30 minutes', 'EXIT', 0);
+
+--5 -- starts in the future - overlaps - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('7b8ef319-1a84-4f7d-9cb6-933f73927682', current_timestamp, current_timestamp + interval '1 hour', current_timestamp + interval '3 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'f274420a-1322-4530-bfcb-4e515dd5a920', 0, 'IN_PROGRESS');
+
+-- Reservations to first underground sector - no available places
+--4.2 -- started in past ends in future - one entry, one exit - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('41d93d74-9d4b-4e93-a044-ec77a01c4a32', current_timestamp, current_timestamp - interval '1 hour', current_timestamp + interval '1 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '65c51075-0749-4304-984a-9cb926e65aab', 0, 'IN_PROGRESS');
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('7c22038c-e215-4479-9526-4d558cb3ac48', '41d93d74-9d4b-4e93-a044-ec77a01c4a32', current_timestamp - interval '1 hour', 'ENTRY', 0);
+INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('bb47ce52-9efb-4f65-b9f5-251f5639f538', '41d93d74-9d4b-4e93-a044-ec77a01c4a32', current_timestamp - interval '30 minutes', 'EXIT', 0);
+
+--5 -- starts in the future - overlaps - blocking
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('fcae0865-d856-4dba-8094-04dc60b8a027', current_timestamp, current_timestamp + interval '1 hour', current_timestamp + interval '3 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '65c51075-0749-4304-984a-9cb926e65aab', 0, 'IN_PROGRESS');

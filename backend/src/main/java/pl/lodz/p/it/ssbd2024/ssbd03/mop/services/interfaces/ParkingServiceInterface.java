@@ -46,7 +46,8 @@ public interface ParkingServiceInterface {
      * @throws ParkingConstraintViolationException Throws when database constraints are not followed
      * @throws ParkingAddressAlreadyTakenException Throws when database constraint unique on (zip-code, city, street) is not followed
      */
-    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException;
+    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight)
+            throws ApplicationBaseException;
 
     /**
      * Retrieves all parking in the system.
@@ -56,8 +57,7 @@ public interface ParkingServiceInterface {
      * @return A list of all parking in the system, with pagination applied.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize)
-            throws ApplicationBaseException;
+    List<Parking> getAllParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database sector by id.
@@ -66,8 +66,7 @@ public interface ParkingServiceInterface {
      * @return If Sector with the given id was found returns Sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Sector getSectorById(UUID id)
-            throws ApplicationBaseException;
+    Sector getSectorById(UUID id) throws ApplicationBaseException;
 
     /**
      * Retrieves from the database list of sectors by parking id.
@@ -88,8 +87,7 @@ public interface ParkingServiceInterface {
      * @return If parking with the given id was found returns Parking.
      * @throws ParkingNotFoundException Thrown when parking with given id cannot be found in the database.
      */
-    Parking getParkingById(UUID id)
-            throws ApplicationBaseException;
+    Parking getParkingById(UUID id) throws ApplicationBaseException;
 
     /**
      * Activates sector with given id, by setting active field to true.
@@ -103,13 +101,9 @@ public interface ParkingServiceInterface {
     /**
      * Deactivates sector with given id, by setting active field to false.
      *
-     * @param id Sector's id.
-<<<<<<< HEAD
+     * @param id               Sector's id.
      * @param deactivationTime Time of the sectors planned deactivation.
-     * @throws SectorNotFoundException Thrown when sector with given id cannot be found in the database.
-=======
      * @throws SectorNotFoundException        Thrown when sector with given id cannot be found in the database.
->>>>>>> 5c4dedbc97c2eef6f6e67fae5c6e202ff1f66c17
      * @throws SectorAlreadyInactiveException Thrown when trying to deactivate an inactive sector.
      */
     void deactivateSector(UUID id, LocalDateTime deactivationTime) throws ApplicationBaseException;
@@ -120,8 +114,7 @@ public interface ParkingServiceInterface {
      * @param id Identifier of the parking to be removed.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void removeParkingById(UUID id)
-            throws ApplicationBaseException;
+    void removeParkingById(UUID id) throws ApplicationBaseException;
 
     /**
      * Registers new entry parking event for given reservation, identified by its id.
@@ -148,8 +141,7 @@ public interface ParkingServiceInterface {
      * @param modifiedSector Sector to be edited.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    Sector editSector(UUID id, Long version, Sector modifiedSector)
-            throws ApplicationBaseException;
+    Sector editSector(UUID id, Long version, Sector modifiedSector) throws ApplicationBaseException;
 
     /**
      * Removes sector from the database by its id.
@@ -167,8 +159,7 @@ public interface ParkingServiceInterface {
      * @return If there are available parking returns these parking.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize)
-            throws ApplicationBaseException;
+    List<Parking> getAvailableParkingWithPagination(int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Uses parking's spot assignment algorithm to choose a parking spot for the requested entry. Then in creates
@@ -192,14 +183,13 @@ public interface ParkingServiceInterface {
      * Ends the parking allocation by registering the end of a parking event.
      * If the reservation ID is correct, the parking spot is freed and the reservation is marked as ended.
      *
-     * @param reservationId Identifier of the reservation, which the user uses.
-     * @param userLogin Login of the currently logged-in user, or anonymousUser string of characters if user is not
-     *                  authenticated in the application.
+     * @param reservationId  Identifier of the reservation, which the user uses.
+     * @param userLogin      Login of the currently logged-in user, or anonymousUser string of characters if user is not
+     *                       authenticated in the application.
      * @param endReservation Boolean flag indicating whether the reservation should be finished after the exit event.
      *                       By default, the endReservation flag is false, meaning that the reservation will not be finished
      *                       after exit event.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    void exitParking(UUID reservationId, String userLogin, boolean endReservation)
-            throws ApplicationBaseException;
+    void exitParking(UUID reservationId, String userLogin, boolean endReservation) throws ApplicationBaseException;
 }

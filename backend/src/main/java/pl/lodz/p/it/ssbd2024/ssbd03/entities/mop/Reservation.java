@@ -49,12 +49,15 @@ import java.util.List;
                         ORDER BY r.beginTime
                         """
         ),
+        // Client reservations
         @NamedQuery(
                 name = "Reservation.findActiveReservationsByLogin",
                 query = """
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
-                          AND (r.endTime IS NULL OR CURRENT_TIMESTAMP < r.endTime)
+                          AND r.status IN (ReservationStatus.AWAITING,
+                                           ReservationStatus.IN_PROGRESS)
+                        GROUP BY r.id
                         ORDER BY r.beginTime
                        """
         ),
@@ -63,10 +66,15 @@ import java.util.List;
                 query = """
                        SELECT r FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
-                          AND (r.endTime IS NOT NULL OR CURRENT_TIMESTAMP >= r.endTime)
+                          AND r.status IN (ReservationStatus.COMPLETED_MANUALLY,
+                                           ReservationStatus.COMPLETED_AUTOMATICALLY,
+                                           ReservationStatus.CANCELLED,
+                                           ReservationStatus.TERMINATED)
+                        GROUP BY r.id
                         ORDER BY r.beginTime
                        """
         ),
+        // Get sector
         @NamedQuery(
                 name = "Reservation.findSectorReservations",
                 query = """
@@ -75,6 +83,7 @@ import java.util.List;
                         ORDER BY r.beginTime
                         """
         ),
+        // Schedule queries
         @NamedQuery(
                 name = "Reservation.findAllReservationsMarkedForTermination",
                 query = """
@@ -126,6 +135,8 @@ import java.util.List;
                 query = """
                         SELECT COUNT(*) FROM Reservation r
                         WHERE r.client.account.login = :clientLogin
+                          AND r.status IN (ReservationStatus.AWAITING,
+                                           ReservationStatus.IN_PROGRESS)
                         """
         ),
         @NamedQuery(
@@ -167,11 +178,11 @@ import java.util.List;
                 name = "Reservation.getAvailablePremiumSectorsNow",
                 query = """
                         SELECT sectorFin FROM Sector sectorFin
-                        WHERE sectorFin.active = true
+                        WHERE (sectorFin.deactivationTime IS NULL OR sectorFin.deactivationTime > :deactivationMinimum)
                         AND sectorFin.parking.id = :parkingId
                         AND sectorFin NOT IN (
                             SELECT r.sector FROM Reservation r
-                            WHERE r.sector.active = true
+                            WHERE (r.sector.deactivationTime IS NULL OR r.sector.deactivationTime > :deactivationMinimum)
                             AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
                             AND r.sector.parking.id = :parkingId
                             AND
@@ -205,12 +216,12 @@ import java.util.List;
                 name = "Reservation.getAvailableStandardSectorsNow",
                 query = """
                         SELECT sectorFin FROM Sector sectorFin
-                        WHERE sectorFin.active = true
+                        WHERE (sectorFin.deactivationTime IS NULL OR sectorFin.deactivationTime > :deactivationMinimum)
                         AND sectorFin.type IN (SectorType.UNCOVERED, SectorType.COVERED)
                         AND sectorFin.parking.id = :parkingId
                         AND sectorFin NOT IN (
                             SELECT r.sector FROM Reservation r
-                            WHERE r.sector.active = true
+                            WHERE (r.sector.deactivationTime IS NULL OR r.sector.deactivationTime > :deactivationMinimum)
                             AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
                             AND r.sector.parking.id = :parkingId
                             AND
@@ -244,12 +255,12 @@ import java.util.List;
                 name = "Reservation.getAvailableBasicSectorsNow",
                 query = """
                         SELECT sectorFin FROM Sector sectorFin
-                        WHERE sectorFin.active = true
+                        WHERE (sectorFin.deactivationTime IS NULL OR sectorFin.deactivationTime > :deactivationMinimum)
                         AND sectorFin.type = SectorType.UNCOVERED
                         AND sectorFin.parking.id = :parkingId
                         AND sectorFin NOT IN (
                             SELECT r.sector FROM Reservation r
-                            WHERE r.sector.active = true
+                            WHERE (r.sector.deactivationTime IS NULL OR r.sector.deactivationTime > :deactivationMinimum)
                             AND r.status IN (ReservationStatus.AWAITING, ReservationStatus.IN_PROGRESS)
                             AND r.sector.parking.id = :parkingId
                             AND
