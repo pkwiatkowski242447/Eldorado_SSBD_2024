@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form"
 import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components/ui/form"
 import {FormLabel} from "react-bootstrap";
 import {useTranslation} from "react-i18next";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {Loader2} from "lucide-react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
@@ -17,42 +17,58 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
-import {CreateParkingType, SectorStrategy} from "@/types/Parking.ts";
+import {SectorType, SectorTypes} from "@/types/Parking.ts";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 
-type createParkingFormProps = {
+type editSectorFormProps = {
     setDialogOpen: Dispatch<SetStateAction<boolean>>
     refresh: () => void
+    sectorId: string
 }
 
-function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
+function EditParkingForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    const [newParking, setNewParking] = useState<CreateParkingType>({city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED})
+    const [editedSector, setEditedSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:SectorTypes.UNCOVERED, maxPlaces:0, weight:0, signature:""})
+    const [sector, setSector] = useState<SectorType>({id:"", parkingId:"", version:"", name:"", type:SectorTypes.UNCOVERED, maxPlaces:0, weight:0, signature:""});
     const formSchema = z.object({
-        city: z.string().min(2, {message: "ZMIEN"})
-            .max(50, {message: "ZMIEN"}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: "ZMIEN"}),
-        street: z.string().min(2, {message: "ZMIEN"})
-            .max(60, {message: "ZMIEN"}).regex(RegExp("^[A-Za-z0-9.-]{5,50}$"), {message: "ZMIEN"}),
-        zipCode: z.string().min(6, {message: "ZMIEN"})
-            .max(6, {message: "ZMIEN"}).regex(RegExp("^\\d{2}-\\d{3}$"), {message: "ZMIEN"}),
-        strategy: z.enum(["LEAST_OCCUPIED", "MOST_OCCUPIED", "LEAST_OCCUPIED_WEIGHTED"])
+        maxPlaces: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(0, {message: "ZMIEN"}).max(1000,{message: "ZMIEN"}),
+        type: z.enum(["UNCOVERED", "COVERED", "UNDERGROUND"]),
+        weight: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(1, {message: "ZMIEN"}).max(100,{message: "ZMIEN"})
     })
+
+    useEffect(() => {
+        api.getSectorById(sectorId)
+            .then((response) => {
+                setSector({...response.data, signature: response.headers['etag']})
+            })
+            .catch(error => {
+                handleApiError(error);
+            });
+    }, []);
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            city: "",
-            street: "",
-            zipCode: "",
-            strategy: "LEAST_OCCUPIED"
+            maxPlaces: sector.maxPlaces,
+            type: sector.type,
+            weight: sector.weight
         },
     })
 
+    useEffect(() => {
+        form.reset({
+            maxPlaces: sector.maxPlaces,
+            type: sector.type,
+            weight: sector.weight
+        });
+    }, [sector]);
+
     async function handleAlertDialog(){
-        api.createParking(newParking)
+        api.modifySector(editedSector)
             .then(() => {
                 refresh();
                 setAlertDialogOpen(false);
@@ -66,11 +82,15 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         try {
-            setNewParking({
-                city: values.city,
-                street:values.street,
-                zipCode:values.zipCode,
-                strategy:SectorStrategy[values.strategy]
+            setEditedSector({
+                id: sector.id,
+                parkingId: sector.parkingId,
+                version: sector.version,
+                name: sector.name,
+                type: SectorTypes[values.type],
+                maxPlaces: values.maxPlaces,
+                weight: values.weight,
+                signature: sector.signature
             })
             setAlertDialogOpen(true);
         } catch (error) {
@@ -85,13 +105,13 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                     control={form.control}
-                    name="city"
+                    name="maxPlaces"
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">City</FormLabel>
+                                <FormLabel className="text-left">Max places</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Warszawa" {...field} />
+                                    <Input placeholder="1" {...field} />
                                 </FormControl>
                                 <FormMessage/>
                             </div>
@@ -100,13 +120,13 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                 />
                 <FormField
                     control={form.control}
-                    name="street"
+                    name="weight"
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Street</FormLabel>
+                                <FormLabel className="text-left">Weight</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Ziemniaczana" {...field} />
+                                    <Input placeholder="1" {...field} />
                                 </FormControl>
                                 <FormMessage/>
                             </div>
@@ -115,36 +135,21 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                 />
                 <FormField
                     control={form.control}
-                    name="zipCode"
+                    name="type"
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Zip code</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="12-345" {...field} />
-                                </FormControl>
-                                <FormMessage/>
-                            </div>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="strategy"
-                    render={({field}) => (
-                        <FormItem>
-                            <div className="grid gap-4">
-                                <FormLabel className="text-left">Strategy</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormLabel className="text-left">Sector Type</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a sector determination strategy" />
+                                            <SelectValue placeholder="Select a sector type." />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="LEAST_OCCUPIED">Least occupied</SelectItem>
-                                        <SelectItem value="MOST_OCCUPIED">Most occupied</SelectItem>
-                                        <SelectItem value="LEAST_OCCUPIED_WEIGHTED">Least occupied weighted</SelectItem>
+                                        <SelectItem value="UNCOVERED">Uncovered</SelectItem>
+                                        <SelectItem value="COVERED">Covered</SelectItem>
+                                        <SelectItem value="UNDERGROUND">Underground</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -165,7 +170,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to create a new parking?
+                        Are you sure you want edit this sector?
                     </AlertDialogDescription>
                     <AlertDialogAction onClick={handleAlertDialog}>
                         {t("general.ok")}
@@ -177,4 +182,4 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
     )
 }
 
-export default CreateParkingForm
+export default EditParkingForm

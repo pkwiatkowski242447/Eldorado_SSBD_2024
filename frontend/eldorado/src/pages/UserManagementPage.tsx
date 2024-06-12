@@ -236,16 +236,22 @@ function UserManagementPage() {
                                 <TableCell>{user.name}</TableCell>
                                 <TableCell>{user.lastName}</TableCell>
                                 <TableCell className="flex-col justify-center">
-                                    {user.active ? <FiCheck color="green"/> : <FiX color="red"/>}
+                                    <div className="flex justify-center items-center">
+                                        {user.active ? <FiCheck color="green"/> : <FiX color="red"/>}
+                                    </div>
                                 </TableCell>
                                 <TableCell className="flex-col justify-center">
-                                    {user.blocked ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                    <div className="flex justify-center items-center">
+                                        {user.blocked ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                    </div>
                                 </TableCell>
                                 <TableCell className="flex-auto">
-                                    {user.suspended ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                    <div className="flex justify-center items-center">
+                                        {user.suspended ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
-                                    {user.userLevels.map(level => {
+                                {user.userLevels.map(level => {
                                         return <Badge key={level} variant={"secondary"}>{level} </Badge>;
                                     })}
                                 </TableCell>

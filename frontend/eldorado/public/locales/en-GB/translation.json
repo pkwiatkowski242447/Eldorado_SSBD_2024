@@ -34,7 +34,7 @@
   "breadcrumb.userAccount": "Edit user account",
   "breadcrumb.createUser": "Create new user",
   "breadcrumb.manageParking": "Parking management",
-  "breadcrumb.createParking": "Create new parking",
+  "breadcrumb.manageParkingInfo": "Parking Details",
 
   "notFound.title": "Page not found",
   "notFound.description": "The page you are looking for does not exist",
@@ -307,6 +307,7 @@
   "resetPasswordPage.popUp.resetPasswordOK.button": "Log In",
 
   "parkingManagementPage.createParking": "Create Parking",
+
 
   "account.constraint.violation.exception" : "Account constraint violation",
   "account.with.given.email.not.found.exception" : "Account with the given email not found",
