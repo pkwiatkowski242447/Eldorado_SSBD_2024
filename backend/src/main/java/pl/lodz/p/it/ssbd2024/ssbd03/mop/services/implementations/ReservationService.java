@@ -11,26 +11,28 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationCancellationLateAttempt;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientAccountNonEnabledException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationExceedingMaximumTime;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationSectorNonActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationAlreadyCancelledException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationAlreadyEndedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingEventFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +51,7 @@ import java.util.UUID;
 public class ReservationService implements ReservationServiceInterface {
 
     private final ReservationFacade reservationFacade;
-    private final ParkingEventFacade parkingEventFacade;
+    private final AccountMOPFacade accountFacade;
     private final UserLevelMOPFacade userLevelMOPFacade;
     private final ParkingFacade parkingFacade;
 
@@ -64,11 +66,11 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Autowired
     public ReservationService(ReservationFacade reservationFacade,
-                              ParkingEventFacade parkingEventFacade,
+                              AccountMOPFacade accountFacade,
                               UserLevelMOPFacade userLevelMOPFacade,
                               ParkingFacade parkingFacade) {
         this.reservationFacade = reservationFacade;
-        this.parkingEventFacade = parkingEventFacade;
+        this.accountFacade = accountFacade;
         this.userLevelMOPFacade = userLevelMOPFacade;
         this.parkingFacade = parkingFacade;
     }
@@ -88,6 +90,9 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
     public void makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
+        // Check reservation duration
+        if (Duration.between(beginTime, endTime).toMinutes() > reservationMaxHours * 60) throw new ReservationExceedingMaximumTime();
+
         // Obtaining Client
         Client client = userLevelMOPFacade.findGivenUserLevelForGivenAccount(clientLogin).orElseThrow(ReservationClientUserLevelNotFound::new);
 
@@ -102,7 +107,7 @@ public class ReservationService implements ReservationServiceInterface {
         Sector sector = parkingFacade.findAndRefreshSectorById(sectorId).orElseThrow(SectorNotFoundException::new);
 
         // Check sector availability
-        if (!sector.getActive()) throw new ReservationSectorNonActiveException();
+        if (!sector.getActive(this.reservationMaxHours)) throw new ReservationSectorNonActiveException();
 
         // Check sector place availability
         long numOfPlacesTaken = reservationFacade.countAllSectorReservationInTimeframe(
@@ -136,6 +141,12 @@ public class ReservationService implements ReservationServiceInterface {
 
         if (reservation.getStatus() == Reservation.ReservationStatus.CANCELLED) throw new ReservationAlreadyCancelledException();
 
+        if (reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_MANUALLY ||
+                reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY ||
+                reservation.getStatus() == Reservation.ReservationStatus.TERMINATED) {
+            throw new ReservationAlreadyEndedException();
+        }
+
         if (reservation.getBeginTime().minusHours(cancellationMaxHoursBeforeReservation).isBefore(LocalDateTime.now())) {
             throw new ReservationCancellationLateAttempt();
         }
@@ -145,9 +156,29 @@ public class ReservationService implements ReservationServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_ALL_RESERVATIONS)
+    @RolesAllowed({Authorities.GET_ALL_RESERVATIONS})
     public List<Reservation> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException {
         return reservationFacade.findAllWithPagination(pageNumber, pageSize);
     }
 
+    @Override
+    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS})
+    public Reservation getOwnReservationById(UUID reservationId, String userLogin) throws ApplicationBaseException {
+        Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
+        Account account = this.accountFacade.findByLogin(userLogin).orElseThrow(AccountNotFoundException::new);
+        if (!account.getUserLevels().contains(reservation.getClient())) throw new ReservationNotFoundException();
+        return reservation;
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_ANY_RESERVATION_DETAILS})
+    public Reservation getAnyReservationById(UUID reservationId) throws ApplicationBaseException {
+        return this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS, Authorities.GET_ANY_RESERVATION_DETAILS})
+    public List<ParkingEvent> getParkingEventsForGivenReservation(UUID reservationId, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return this.reservationFacade.findParkingEventsForGivenReservationWithPagination(reservationId, pageNumber, pageSize);
+    }
 }

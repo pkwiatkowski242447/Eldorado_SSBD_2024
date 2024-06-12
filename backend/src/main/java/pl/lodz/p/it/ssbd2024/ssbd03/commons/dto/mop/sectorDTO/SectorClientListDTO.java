@@ -20,12 +20,16 @@ public class SectorClientListDTO {
 
     @Schema(description = "Id of the sector", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID id;
+
     @Schema(description = "The name of the sector", example = "B9", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
+
     @Schema(description = "The type of the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Sector.SectorType type;
+
     @Schema(description = "The maximum number of parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxPlaces;
+
     @Schema(description = "The current number of available parking spots in the sector", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer availablePlaces;
 

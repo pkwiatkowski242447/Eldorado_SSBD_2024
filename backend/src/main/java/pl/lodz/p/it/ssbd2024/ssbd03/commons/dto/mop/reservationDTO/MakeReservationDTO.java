@@ -4,18 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DTOConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
-import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mop.ReservationMessages;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,10 +30,12 @@ public class MakeReservationDTO {
     //@Pattern(regexp = DTOConsts.UUID_REGEX, message = DTOMessages.SECTOR_UUID_REGEX_NOT_MET)
     // todo UUID -> STRING and enable annotation
     private UUID sectorId;
+
     @Schema(description = "Reservation start time.", example = "2024-07-25T13:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @FutureOrPresent(message = DTOMessages.RESERVATION_BEGIN_TIME_INVALID)
     private LocalDateTime beginTime;
+
     @Schema(description = "Reservation end time.", example = "2024-07-25T15:40:54.922Z", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @FutureOrPresent(message = DTOMessages.RESERVATION_END_TIME_INVALID)

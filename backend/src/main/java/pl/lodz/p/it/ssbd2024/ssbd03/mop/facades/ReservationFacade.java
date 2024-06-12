@@ -10,6 +10,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
@@ -107,7 +108,8 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @Override
     @RolesAllowed({
             Authorities.RESERVE_PARKING_PLACE, Authorities.ENTER_PARKING_WITH_RESERVATION,
-            Authorities.EXIT_PARKING, Authorities.CANCEL_RESERVATION
+            Authorities.EXIT_PARKING, Authorities.CANCEL_RESERVATION,
+            Authorities.GET_OWN_RESERVATION_DETAILS, Authorities.GET_ANY_RESERVATION_DETAILS
     })
     public Optional<Reservation> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
@@ -131,6 +133,46 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
                 .getResultList();
         refreshAll(list);
         return list;
+    }
+
+    /***
+     * This method is used to find all reservations, that last more than 24 hours and are no closed
+     *
+     * @param amount Length of the specified time window, used to end reservations that last more than 24 hours.
+     * @param timeUnit Time unit, indicating size of the reservation ending time window.
+     * @return List of reservation that last more than 24 hours, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForTermination(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForTermination", Reservation.class);
+            findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
+            List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
+    }
+
+
+    /**
+     * This method is used to find all reservations marked for completing
+     *
+     * @return List of reservation that should be canceled automatically, If persistence exception is thrown returns empty list.
+     * @throws ApplicationBaseException thrown when other unexpected problems occurred.
+     */
+    @RolesAllowed({Authorities.END_RESERVATION})
+    public List<Reservation> findAllReservationsMarkedForCompleting() throws ApplicationBaseException {
+        try {
+            TypedQuery<Reservation> findAllReservationMarkedForCanceling = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForCompleting", Reservation.class);
+            List<Reservation> list = findAllReservationMarkedForCanceling.getResultList();
+            super.refreshAll(list);
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -188,28 +230,6 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     }
 
     /**
-     * This method is used to find all reservations, that last more than 24 hours
-     *
-     * @param amount   Length of the specified time window, used to end reservations that last more than 24 hours.
-     * @param timeUnit Time unit, indicating size of the reservation ending time window.
-     * @return List of reservation that last more than 24 hours, If persistence exception is thrown returns empty list.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @RolesAllowed({Authorities.END_RESERVATION})
-    public List<Reservation> findAllReservationsMarkedForEnding(long amount, TimeUnit timeUnit) throws ApplicationBaseException {
-        try {
-            TypedQuery<Reservation> findAllReservationMarkedForEnding = entityManager.createNamedQuery("Reservation.findAllReservationsMarkedForEnding", Reservation.class);
-            findAllReservationMarkedForEnding.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
-            List<Reservation> list = findAllReservationMarkedForEnding.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
      * Counts all active reservations for user with specified login
      *
      * @param login The user login.
@@ -221,7 +241,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @RolesAllowed({Authorities.GET_ACTIVE_RESERVATIONS, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public long countAllActiveUserReservationByLogin(String login) throws ApplicationBaseException {
         TypedQuery<Long> countAllActiveUserReservationByLoginWithPaginationQuery =
-                entityManager.createNamedQuery("Reservation.countAllActiveUserReservationByLogin", Long.class);
+                getEntityManager().createNamedQuery("Reservation.countAllActiveUserReservationByLogin", Long.class);
         countAllActiveUserReservationByLoginWithPaginationQuery.setParameter("clientLogin", login);
         return Objects.requireNonNullElse(countAllActiveUserReservationByLoginWithPaginationQuery.getSingleResult(), 0L);
     }
@@ -241,7 +261,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE})
     public long countAllSectorReservationInTimeframe(UUID sectorId, LocalDateTime beginTime, int maxReservationHours, LocalDateTime benchmark) throws ApplicationBaseException {
         TypedQuery<Long> countAllSectorReservationInTimeframeQuery =
-                entityManager.createNamedQuery("Reservation.countAllSectorReservationInTimeframe", Long.class);
+                getEntityManager().createNamedQuery("Reservation.countAllSectorReservationInTimeframe", Long.class);
         countAllSectorReservationInTimeframeQuery.setParameter("sectorId", sectorId);
         countAllSectorReservationInTimeframeQuery.setParameter("beginTime", beginTime);
         countAllSectorReservationInTimeframeQuery.setParameter("beginTimeMinusMaxReservationTime", beginTime.minusHours(maxReservationHours));
@@ -285,7 +305,7 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
     @RolesAllowed({Authorities.CANCEL_RESERVATION})
     public Optional<Reservation> findClientReservation(UUID reservationId, String ownerLogin) throws ApplicationBaseException {
         try {
-            TypedQuery<Reservation> findClientReservationQuery = entityManager.createNamedQuery("Reservation.findClientReservation", Reservation.class);
+            TypedQuery<Reservation> findClientReservationQuery = getEntityManager().createNamedQuery("Reservation.findClientReservation", Reservation.class);
             findClientReservationQuery.setParameter("reservationId", reservationId);
             findClientReservationQuery.setParameter("ownerLogin", ownerLogin);
             Reservation reservation = findClientReservationQuery.getSingleResult();
@@ -293,6 +313,35 @@ public class ReservationFacade extends AbstractFacade<Reservation> {
             return Optional.of(reservation);
         } catch (NoResultException ignore) {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * This method is used to retrieve all parking events for certain reservation and order them by their creation
+     * time, in the descending order.
+     *
+     * @param reservationId Identifier of the reservation, which the parking events should be retrieved for.
+     * @param pageNumber Number of the page with parking event entries.
+     * @param pageSize Number of parking event entries per retrieved page.
+     * @return List of parking events for certain reservation (or empty list if there are no parking events for that
+     * reservation) with pagination.
+     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
+     *                                  facade exception handling aspect.
+     */
+    @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS, Authorities.GET_ANY_RESERVATION_DETAILS})
+    public List<ParkingEvent> findParkingEventsForGivenReservationWithPagination(UUID reservationId, int pageNumber, int pageSize) throws ApplicationBaseException {
+        try {
+            TypedQuery<ParkingEvent> findParkingEvents = getEntityManager().createNamedQuery("Reservation.findAllParkingEventsForGivenReservation", ParkingEvent.class);
+            findParkingEvents.setParameter("reservationId", reservationId);
+            findParkingEvents.setFirstResult(pageNumber * pageSize);
+            findParkingEvents.setMaxResults(pageSize);
+            List<ParkingEvent> list = findParkingEvents.getResultList();
+            for (ParkingEvent parkingEvent : list) {
+                getEntityManager().refresh(parkingEvent);
+            }
+            return list;
+        } catch (PersistenceException exception) {
+            return new ArrayList<>();
         }
     }
 }

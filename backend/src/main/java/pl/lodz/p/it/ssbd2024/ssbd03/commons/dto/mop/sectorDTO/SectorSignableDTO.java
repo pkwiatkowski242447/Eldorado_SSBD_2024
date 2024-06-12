@@ -2,10 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.SignableDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
@@ -22,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @LoggerInterceptor
 public abstract class SectorSignableDTO implements SignableDTO {
 

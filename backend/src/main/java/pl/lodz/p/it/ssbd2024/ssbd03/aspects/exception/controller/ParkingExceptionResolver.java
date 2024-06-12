@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.integrity.ParkingData
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.validation.ParkingConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.conflict.SectorDeleteException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.edit.SectorEditOfTypeOrMaxPlacesWhenActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.integrity.SectorDataIntegrityCompromisedException;
 
 /**
@@ -125,5 +126,20 @@ public class ParkingExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ParkingConstraintViolationExceptionDTO(exception));
+    }
+
+    /**
+     * This method is used to handle SectorEditOfTypeOrMaxPlacesWhenActiveException, which is thrown when sector
+     * modification occurs when the sector is active.
+     *
+     * @param exception Exception to be handled by this @ExceptionHandler method.
+     * @return HTTP Response with status 400 BAD REQUEST and internationalization key, indicating the cause of the
+     * exception.
+     */
+    @ExceptionHandler(value = {SectorEditOfTypeOrMaxPlacesWhenActiveException.class})
+    public ResponseEntity<?> handleSectorEditOfTypeOrMaxPlacesWhenActiveException(Exception exception) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(exception.getMessage()));
     }
 }
