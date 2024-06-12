@@ -16,6 +16,7 @@ public class SectorListMapper {
                 sector.getType(),
                 sector.getMaxPlaces(),
                 sector.getOccupiedPlaces(),
-                sector.getWeight());
+                sector.getWeight(),
+                sector.getDeactivationTime());
     }
 }

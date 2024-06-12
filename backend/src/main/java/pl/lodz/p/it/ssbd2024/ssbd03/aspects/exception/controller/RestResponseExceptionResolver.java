@@ -53,8 +53,6 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(I18n.TYPE_MISMATCH_EXCEPTION));
-
-        ex.getPropertyName()
     }
 
     @ExceptionHandler(value = {Exception.class})

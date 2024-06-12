@@ -42,11 +42,12 @@ public interface ParkingServiceInterface {
      * @param type      The type of the sector.
      * @param maxPlaces The maximum number of parking spots in the sector.
      * @param weight    The weight of the sector.
+     * @return Newly created sector entity object.
      * @throws ApplicationBaseException            General superclass for all exceptions thrown by aspects intercepting this method.
      * @throws ParkingConstraintViolationException Throws when database constraints are not followed
      * @throws ParkingAddressAlreadyTakenException Throws when database constraint unique on (zip-code, city, street) is not followed
      */
-    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight)
+    Sector createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight)
             throws ApplicationBaseException;
 
     /**

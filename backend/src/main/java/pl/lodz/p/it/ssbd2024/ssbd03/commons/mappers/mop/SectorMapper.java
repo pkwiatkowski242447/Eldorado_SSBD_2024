@@ -24,7 +24,8 @@ public class SectorMapper {
                 sector.getName(),
                 sector.getType(),
                 sector.getMaxPlaces(),
-                sector.getWeight()
+                sector.getWeight(),
+                sector.getDeactivationTime()
         );
     }
 

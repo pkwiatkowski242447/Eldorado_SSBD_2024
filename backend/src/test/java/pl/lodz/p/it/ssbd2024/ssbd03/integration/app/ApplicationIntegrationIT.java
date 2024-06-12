@@ -254,7 +254,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .as(AccountConstraintViolationExceptionDTO.class);
 
         assertNotNull(accountConstraintViolationExceptionDTO);
-        assertEquals(I18n.ACCOUNT_CONSTRAINT_VIOLATION, accountConstraintViolationExceptionDTO.getMessage());
+        assertEquals(I18n.INVALID_ARGUMENT_EXCEPTION, accountConstraintViolationExceptionDTO.getMessage());
         //assertTrue(accountConstraintViolationExceptionDTO.getViolations().contains(AccountMessages.LANGUAGE_REGEX_NOT_MET));
         assertEquals(2, accountConstraintViolationExceptionDTO.getViolations().size());
     }
@@ -1250,7 +1250,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body(
-                        "message", Matchers.equalTo("account.constraint.violation.exception"),
+                        "message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION),
                         "violations", Matchers.hasSize(2),
                         "violations", Matchers.containsInAnyOrder(
                                 Matchers.equalTo("bean.validation.account.first.name.too.long"),
@@ -1632,7 +1632,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body(
-                        "message", Matchers.equalTo("account.constraint.violation.exception"),
+                        "message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION),
                         "violations", Matchers.hasSize(2),
                         "violations", Matchers.containsInAnyOrder(
                                 Matchers.equalTo("bean.validation.account.first.name.too.long"),
@@ -1856,7 +1856,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body("message", equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("message", equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", equalTo(AccountMessages.EMAIL_CONSTRAINT_NOT_MET));
     }
 
@@ -1987,7 +1987,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body("message", equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("message", equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", equalTo(AccountMessages.EMAIL_CONSTRAINT_NOT_MET));
     }
 
@@ -2111,7 +2111,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
             .get(BASE_URL + "/parking/active")
             .then()
             .assertThat()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .body("message", equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
     @Test
@@ -2276,7 +2277,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
             .get(BASE_URL + "/reservations")
             .then()
             .assertThat()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
     private static Stream<Arguments> provideNewUserLevelForAccountParameters() {
@@ -2451,8 +2453,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .get(BASE_URL + "/parking")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .body("message", Matchers.equalTo(I18n.INTERNAL_SERVER_ERROR));
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
     @Test
@@ -2553,7 +2555,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 //todo I18n.PARKING_CONSTRAINT_VIOLATION
-                .body("message", Matchers.equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", Matchers.equalTo(AddressMessages.CITY_NAME_TOO_SHORT))
                 .body("violations[1]", Matchers.equalTo(AddressMessages.CITY_BLANK));
     }
@@ -2572,8 +2574,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                //todo I18n.PARKING_CONSTRAINT_VIOLATION
-                .body("message", Matchers.equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", Matchers.equalTo(AddressMessages.ZIP_CODE_REGEX_NOT_MET))
                 .body("violations[1]", Matchers.equalTo(AddressMessages.ZIP_CODE_BLANK))
                 .body("violations[2]", Matchers.equalTo(AddressMessages.ZIP_CODE_INVALID));
@@ -2593,8 +2594,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                //todo I18n.PARKING_CONSTRAINT_VIOLATION
-                .body("message", Matchers.equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", Matchers.equalTo(AddressMessages.STREET_REGEX_NOT_MET))
                 .body("violations[1]", Matchers.equalTo(AddressMessages.STREET_BLANK))
                 .body("violations[2]", Matchers.equalTo(AddressMessages.STREET_NAME_TOO_SHORT));
@@ -2614,8 +2614,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                //todo I18n.PARKING_CONSTRAINT_VIOLATION
-                .body("message", Matchers.equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", Matchers.equalTo(DTOMessages.PARKING_ENUM_INVALID));
     }
 
@@ -3030,8 +3029,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                //todo I18n.PARKING_CONSTRAINT_VIOLATION
-                .body("message", Matchers.equalTo(I18n.ACCOUNT_CONSTRAINT_VIOLATION))
+                .body("message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", Matchers.equalTo(AddressMessages.ZIP_CODE_REGEX_NOT_MET))
                 .body("violations[1]", Matchers.equalTo(AddressMessages.ZIP_CODE_BLANK))
                 .body("violations[2]", Matchers.equalTo(AddressMessages.ZIP_CODE_INVALID));
@@ -3247,8 +3245,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .get(BASE_URL + "/reservations/historical/self")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .body("message", Matchers.equalTo(I18n.INTERNAL_SERVER_ERROR));
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
     @Test
