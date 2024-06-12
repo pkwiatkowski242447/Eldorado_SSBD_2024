@@ -88,11 +88,9 @@ function ParkingManagementPage() {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
                     setParking(response.data);
-                } else if (response.status === 204 && actualPage > 0) {
-                    console.log("test2")
+                } else if (response.status === 204 && currentPage > 0) {
                     fetchParking(actualPage -1)
-                } else if (response.status === 204 && actualPage <= 0) {
-                    console.log(actualPage)
+                } else if (response.status === 204 && currentPage <= 0) {
                     setCurrentPage(0);
                     setParking([]);
                 }
