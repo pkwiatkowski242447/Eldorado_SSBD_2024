@@ -101,6 +101,8 @@ public class I18n {
     public static final String PATH_NOT_FOUND_EXCEPTION = "application.path.not.found.exception";
     public static final String UNSUPPORTED_OPERATION_EXCEPTION = "application.unsupported.operation.exception";
     public static final String UNSUPPORTED_ROLE_EXCEPTION = "application.unsupported.role.exception";
+    public static final String INVALID_ARGUMENT_EXCEPTION = "application.invalid.argument.exception";
+    public static final String TYPE_MISMATCH_EXCEPTION = "application.type.mismatch.exception";
 
     // JWT
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";

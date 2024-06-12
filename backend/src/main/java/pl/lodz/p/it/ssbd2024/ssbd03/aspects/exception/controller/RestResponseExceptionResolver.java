@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.aspects.exception.controller;
 
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.*;
@@ -9,9 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.AccountConstraintViolationExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.ApplicationConstraintViolationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.validation.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
 import java.util.stream.Collectors;
@@ -38,16 +38,23 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new AccountConstraintViolationExceptionDTO(
-                                new AccountConstraintViolationException(
-                                        ex.getBindingResult()
-                                                .getAllErrors()
-                                                .stream()
-                                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                                                .collect(Collectors.toSet())
-                                )
+                .body(new ApplicationConstraintViolationDTO(
+                        ex.getBindingResult()
+                                .getAllErrors()
+                                .stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.toSet())
                         )
                 );
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(I18n.TYPE_MISMATCH_EXCEPTION));
+
+        ex.getPropertyName()
     }
 
     @ExceptionHandler(value = {Exception.class})
