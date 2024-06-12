@@ -75,17 +75,23 @@ public class ReservationService implements ReservationServiceInterface {
         this.parkingFacade = parkingFacade;
     }
 
+    // MOP.15 - Get all active reservation
+
     @Override
     @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
     public List<Reservation> getAllActiveReservationsByUserLoginWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         return reservationFacade.findAllActiveUserReservationByLoginWithPagination(login, pageNumber, pageSize);
     }
 
+    // MOP.16 - Get all historical reservation
+
     @Override
     @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
     public List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         return reservationFacade.findAllHistoricalUserReservationByLoginWithPagination(login, pageNumber, pageSize);
     }
+
+    // MOP.14 - Reserve a parking place
 
     @Override
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
@@ -128,6 +134,8 @@ public class ReservationService implements ReservationServiceInterface {
         reservationFacade.create(newReservation);
     }
 
+    // MOP.17 - Cancel an active reservation
+
     @Override
     @RolesAllowed(Authorities.CANCEL_RESERVATION)
     public void cancelReservation(UUID reservationId) throws ApplicationBaseException {
@@ -155,11 +163,15 @@ public class ReservationService implements ReservationServiceInterface {
         reservationFacade.edit(reservation);
     }
 
+    // MOP.22 - Get reservations
+
     @Override
     @RolesAllowed({Authorities.GET_ALL_RESERVATIONS})
     public List<Reservation> getAllReservations(int pageNumber, int pageSize) throws ApplicationBaseException {
         return reservationFacade.findAllWithPagination(pageNumber, pageSize);
     }
+
+    // MOP.24 - Get own reservation
 
     @Override
     @RolesAllowed({Authorities.GET_OWN_RESERVATION_DETAILS})
@@ -170,8 +182,10 @@ public class ReservationService implements ReservationServiceInterface {
         return reservation;
     }
 
+    // MOP.25 - Get reservation details
+
     @Override
-    @RolesAllowed({Authorities.GET_ANY_RESERVATION_DETAILS})
+    @RolesAllowed(Authorities.GET_ANY_RESERVATION_DETAILS)
     public Reservation getAnyReservationById(UUID reservationId) throws ApplicationBaseException {
         return this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
     }
