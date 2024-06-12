@@ -1,7 +1,7 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
-import {CreateParkingType} from "@/types/Parking.ts";
+import {CreateParkingType, ParkingType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -236,7 +236,6 @@ export const api = {
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
-
     createParking: (parking: CreateParkingType) => {
         return apiWithConfig.post('/parking', {...parking})
     },
@@ -255,5 +254,31 @@ export const api = {
 
     getAllReservations: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
-    }
+    },
+
+    getParkingById: (parkingId: string) => {
+        return apiWithConfig.get(`/parking/get/${parkingId}`)
+    },
+
+    modifyParking: (parking: ParkingType) => {
+        const cleanedEtag = parking.signature.replace(/^"|"$/g, '');
+        const temp = {
+            parkingId: parking.parkingId,
+            version: parking.version,
+            city:parking.city,
+            street:parking.street,
+            zipCode:parking.zipCode,
+            strategy:parking.strategy,
+        };
+        return apiWithConfig.put('/parking',
+            {...temp},
+            {
+                headers:
+                    {
+                        'If-Match':
+                        cleanedEtag
+                    }
+            }
+        )
+    },
 }

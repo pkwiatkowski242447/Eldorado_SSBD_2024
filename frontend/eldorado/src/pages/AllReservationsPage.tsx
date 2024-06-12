@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {Spinner} from "react-bootstrap";
 import {api} from "@/api/api.ts";
 import {useTranslation} from "react-i18next";
-import {arrayToDate, ClientReservationType, ReservationType} from "@/types/Reservations.tsx";
+import {arrayToDate, ClientReservationType, ReservationType} from "@/types/Reservations";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {

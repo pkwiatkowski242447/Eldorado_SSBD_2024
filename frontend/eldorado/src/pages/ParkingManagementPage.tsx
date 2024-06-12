@@ -43,12 +43,14 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import EditParkingForm from "@/components/forms/EditParkingForm.tsx";
 // import {FiSettings} from 'react-icons/fi';
 
 function ParkingManagementPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [parking, setParking] = useState<ParkingListType[]>([]);
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+    const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [parkingId, setParkingId] = useState("");
     const {t} = useTranslation();
@@ -59,6 +61,11 @@ function ParkingManagementPage() {
     const handleDeleteParkingClick = (parkingId: string) => {
         setParkingId(parkingId);
         setAlertDialogOpen(true);
+    };
+
+    const handleEditParkingClick = (parkingId: string) => {
+        setParkingId(parkingId);
+        setEditDialogOpen(true);
     };
 
     const handleDeleteParking = () => {
@@ -179,9 +186,11 @@ function ParkingManagementPage() {
                                             <FiSettings/>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            {/*<DropdownMenuItem onClick={() => handleSettingsClick(user.id)}>*/}
-                                            {/*    {t("accountSettings.users.table.settings.manage")}*/}
-                                            {/*</DropdownMenuItem>*/}
+                                            <DropdownMenuItem
+                                                onClick={() => handleEditParkingClick(parking.id)}
+                                            >
+                                                Edit parking
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDeleteParkingClick(parking.id)}
                                                 disabled={parking.sectorTypes.length !== 0}
@@ -194,6 +203,14 @@ function ParkingManagementPage() {
                             </TableRow>
                         ))}
                     </TableBody>
+                    <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit Parking</DialogTitle>
+                            </DialogHeader>
+                            <EditParkingForm setDialogOpen={setEditDialogOpen} refresh={refresh} parkingId={parkingId}/>
+                        </DialogContent>
+                    </Dialog>
                     <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
