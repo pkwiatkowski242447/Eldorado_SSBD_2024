@@ -10,11 +10,13 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationCancel
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientAccountNonEnabledException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationExceedingMaximumTime;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationInsufficientClientType;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.time.ReservationExceedingMaximumTime;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationSectorNonActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationStatusException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.time.ReservationTimeException;
 
 /**
  * General exception handling component in a form of @ControllerAdvice for Reservation exceptions.
@@ -160,17 +162,34 @@ public class ReservationExceptionResolver {
     }
 
     /**
-     * This method transforms any ReservationExceedingMaximumTime, propagating from the controller layer
+     * This method transforms any ReservationTimeException, propagating from the controller layer
      * to the HTTP response containing internationalization key with status code, which in this case is
      * 400 BAD REQUEST.
      *
-     * @param exception Exception of type ReservationExceedingMaximumTime (or subclass of that exception),
+     * @param exception Exception of type ReservationTimeException (or subclass of that exception),
      *                  propagating from the controller layer.
      * @return HTTP Response with status 400 BAD REQUEST and internationalization key, which is located in the
      * Response body.
      */
-    @ExceptionHandler(value = {ReservationExceedingMaximumTime.class})
-    public ResponseEntity<?> handleReservationExceedingMaximumTime(ReservationExceedingMaximumTime exception) {
+    @ExceptionHandler(value = {ReservationTimeException.class})
+    public ResponseEntity<?> handleReservationTimeException(ReservationTimeException exception) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(exception.getMessage()));
+    }
+
+    /**
+     * This method transforms any ReservationInsufficientClientType, propagating from the controller layer
+     * to the HTTP response containing internationalization key with status code, which in this case is
+     * 400 BAD REQUEST.
+     *
+     * @param exception Exception of type ReservationInsufficientClientType (or subclass of that exception),
+     *                  propagating from the controller layer.
+     * @return HTTP Response with status 400 BAD REQUEST and internationalization key, which is located in the
+     * Response body.
+     */
+    @ExceptionHandler(value = {ReservationInsufficientClientType.class})
+    public ResponseEntity<?> handleReservationInsufficientClientType(ReservationInsufficientClientType exception) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(exception.getMessage()));
