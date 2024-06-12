@@ -89,8 +89,7 @@ public class ParkingController implements ParkingControllerInterface {
         try {
             parkingService.createSector(UUID.fromString(parkingId),
                     sectorCreateDTO.getName(), Sector.SectorType.valueOf(sectorCreateDTO.getType()),
-                    sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight(),
-                    sectorCreateDTO.getActive());
+                    sectorCreateDTO.getMaxPlaces(), sectorCreateDTO.getWeight());
         } catch (IllegalArgumentException exception) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }

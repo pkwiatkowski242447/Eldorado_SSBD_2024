@@ -71,7 +71,7 @@ public class ParkingFacadeIT extends TestcontainersConfig {
     public void setup() {
         address = new Address("Lodz", "90-000", "Pomorska");
         parking = new Parking(address, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        sector = new Sector(parking, "AA-01", Sector.SectorType.COVERED, 23, 11, true);
+        sector = new Sector(parking, "AA-01", Sector.SectorType.COVERED, 23, 11);
         reservation = new Reservation(sector, LocalDateTime.now());
     }
 
@@ -178,10 +178,10 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         parkingFacade.create(parkingNo2);
         parkingFacade.create(parkingNo3);
 
-        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("SA-02", Sector.SectorType.COVERED, 20, 200, true);
-        parkingNo2.addSector("SA-03", Sector.SectorType.UNCOVERED, 20, 200, true);
-        parkingNo3.addSector("SA-04", Sector.SectorType.UNCOVERED, 20, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200);
+        parkingNo1.addSector("SA-02", Sector.SectorType.COVERED, 20, 200);
+        parkingNo2.addSector("SA-03", Sector.SectorType.UNCOVERED, 20, 200);
+        parkingNo3.addSector("SA-04", Sector.SectorType.UNCOVERED, 20, 200);
 
         List<Parking> listOfParkingLots = parkingFacade.findAllWithPagination(0, 10, true);
         assertEquals(5, listOfParkingLots.size());
@@ -214,9 +214,9 @@ public class ParkingFacadeIT extends TestcontainersConfig {
     public void parkingFacadeFindSectorsInParkingWithPaginationTest() throws ApplicationBaseException {
         Address addressNo1 = new Address("BoatCity", "90-000", "Pomorska");
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 20, 200, true);
-        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 20, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200);
+        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 20, 200);
+        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 20, 200);
 
         parkingFacade.create(parkingNo1);
 
@@ -233,9 +233,9 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
 
         parkingFacade.create(parkingNo1);
-        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 10, 200, true);
-        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 10, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200);
+        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 10, 200);
+        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 10, 200);
 
         List<Sector> listOfSectorsNo1 = parkingNo1.getSectors();
         for (int i = 0; i < listOfSectorsNo1.size(); i++) {
@@ -258,10 +258,10 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         Parking parkingNo2 = new Parking(addressNo2, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
 
         parkingFacade.create(parkingNo1);
-        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200, true);
-        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 10, 200, true);
-        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 10, 200, true);
-        parkingNo2.addSector("SA-04", Sector.SectorType.UNCOVERED, 10, 200, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 200);
+        parkingNo1.addSector("SA-02", Sector.SectorType.UNCOVERED, 10, 200);
+        parkingNo1.addSector("SA-03", Sector.SectorType.UNCOVERED, 10, 200);
+        parkingNo2.addSector("SA-04", Sector.SectorType.UNCOVERED, 10, 200);
 
         List<Sector> listOfSectors = parkingNo1.getSectors();
         for (int i = 0; i < listOfSectors.size(); i++) {
@@ -279,8 +279,8 @@ public class ParkingFacadeIT extends TestcontainersConfig {
         Parking parkingNo1 = new Parking(addressNo1, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
 
         parkingFacade.create(parkingNo1);
-        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 100, true);
-        Sector sectorNo1 = new Sector(parkingNo1, "SA-02", Sector.SectorType.COVERED, 100, 100, true);
+        parkingNo1.addSector("SA-01", Sector.SectorType.COVERED, 100, 100);
+        Sector sectorNo1 = new Sector(parkingNo1, "SA-02", Sector.SectorType.COVERED, 100, 100);
 
         sectorNo1.setMaxPlaces(200);
 

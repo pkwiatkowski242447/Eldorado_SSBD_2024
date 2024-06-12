@@ -46,7 +46,8 @@ public interface ParkingServiceInterface {
      * @throws ParkingConstraintViolationException Throws when database constraints are not followed
      * @throws ParkingAddressAlreadyTakenException Throws when database constraint unique on (zip-code, city, street) is not followed
      */
-    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight, Boolean active) throws ApplicationBaseException;
+    void createSector(UUID parkingId, String name, Sector.SectorType type, Integer maxPlaces, Integer weight)
+            throws ApplicationBaseException;
 
     /**
      * Retrieves all parking in the system.
