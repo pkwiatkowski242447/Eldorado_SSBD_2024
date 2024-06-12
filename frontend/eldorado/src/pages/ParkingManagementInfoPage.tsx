@@ -24,11 +24,13 @@ import {
     PaginationLink, PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
+import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog.tsx";
+import CreateSectorForm from "@/components/forms/CreateSectorForm.tsx";
 export function ParkingManagementInfoPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [sectors, setSectors] = useState<SectorListType[]>([]);
     const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
-    // const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+    const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     // const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     // const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     // const [parkingId, setParkingId] = useState("");
@@ -163,19 +165,19 @@ export function ParkingManagementInfoPage() {
                     </TableBody>
                 </Table>
             </div>
-            {/*<div className="flex justify-start pt-2.5">*/}
-            {/*    <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>*/}
-            {/*        <DialogTrigger asChild>*/}
-            {/*            <Button variant="default">Create Parking</Button>*/}
-            {/*        </DialogTrigger>*/}
-            {/*        <DialogContent className="sm:max-w-[425px]">*/}
-            {/*            <DialogHeader>*/}
-            {/*                <DialogTitle>Create Parking</DialogTitle>*/}
-            {/*            </DialogHeader>*/}
-            {/*            <CreateParkingForm setDialogOpen={setCreateDialogOpen} refresh={refresh}/>*/}
-            {/*        </DialogContent>*/}
-            {/*    </Dialog>*/}
-            {/*</div>*/}
+            <div className="flex justify-start pt-2.5">
+                <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="default">Create Sector</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Create Sector</DialogTitle>
+                        </DialogHeader>
+                        <CreateSectorForm setDialogOpen={setCreateDialogOpen} refresh={refresh} parkingId={parking.parkingId}/>
+                    </DialogContent>
+                </Dialog>
+            </div>
             <div className={"pt-1"}>
                 <Table className="p-10 flex-grow">
                     <TableHeader>

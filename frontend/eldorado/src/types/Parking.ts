@@ -44,3 +44,10 @@ export interface SectorListType {
     availablePlaces: number;    //todo change to occupiedSpaces
     weight: number;
 }
+
+export interface CreateSectorType {
+    name:string;
+    type: SectorType;
+    maxPlaces: number;
+    weight: number;
+}

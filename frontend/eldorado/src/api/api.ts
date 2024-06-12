@@ -1,7 +1,7 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
-import {CreateParkingType, ParkingType} from "@/types/Parking.ts";
+import {CreateParkingType, CreateSectorType, ParkingType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -236,11 +236,11 @@ export const api = {
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
-
+    
     createParking: (parking: CreateParkingType) => {
         return apiWithConfig.post('/parking', {...parking})
     },
-
+    
     deleteParking: (parkingId: string) => {
         return apiWithConfig.delete(`/parking/${parkingId}`)
     },
@@ -253,8 +253,8 @@ export const api = {
         return apiWithConfig.get(`/parking/${id}/sectors${details}`)
     },
 
-    getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    createSector: (parkingId: string, sector: CreateSectorType) => {
+        return apiWithConfig.post(`/parking/${parkingId}/sectors`, {...sector})
     },
 
     getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
