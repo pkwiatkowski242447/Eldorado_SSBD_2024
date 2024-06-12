@@ -308,7 +308,6 @@
 
   "parkingManagementPage.createParking": "Create Parking",
 
-
   "account.constraint.violation.exception" : "Account constraint violation",
   "account.with.given.email.not.found.exception" : "Account with the given email not found",
   "account.with.given.id.not.found.exception" : "Account with the given ID not found",
