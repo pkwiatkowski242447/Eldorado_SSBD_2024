@@ -55,6 +55,7 @@ public class I18n {
     public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
     public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
     public static final String CANNOT_EXIT_PARKING_EXCEPTION = "parking.cannot.exit.exception";
+    public static final String CANNOT_ENTER_PARKING_EXCEPTION = "parking.cannot.enter.exception";
     public static final String PARKING_ADDRESS_DUPLICATE_EXCEPTION = "parking.address.duplicate.exception";
 
     // Reservation exceptions
