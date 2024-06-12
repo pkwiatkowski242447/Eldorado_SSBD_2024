@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.util.RunAsSystem;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
@@ -28,6 +29,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ScheduleMOPServiceInterface;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,10 +145,18 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
         for (Reservation reservation : reservationsToEnd) {
             try {
                 reservation.setStatus(Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY);
-                this.reservationFacade.edit(reservation);
+                reservationFacade.edit(reservation);
+
                 Sector sector = reservation.getSector();
                 sector.setOccupiedPlaces(sanitizeInteger(sector.getOccupiedPlaces() - 1));
                 parkingFacade.editSector(sector);
+
+                Client client = reservation.getClient();
+                client.setTotalReservationHours(client.getTotalReservationHours() +
+                        Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toHours()
+                );
+                userLevelFacade.edit(client);
+
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while canceling reservation with id: {}. Cause: {}.",
                         exception.getClass().getSimpleName(), reservation.getId(), exception.getMessage());

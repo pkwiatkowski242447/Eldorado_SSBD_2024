@@ -25,7 +25,7 @@ GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.sector                 TO s
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.parking_event          TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.account                TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.personal_data          TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.user_level             TO ssbd03mop;
+GRANT SELECT                , UPDATE ON TABLE public.user_level             TO ssbd03mop;
 GRANT SELECT                , UPDATE ON TABLE public.client_data            TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.admin_data             TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.staff_data             TO ssbd03mop;
