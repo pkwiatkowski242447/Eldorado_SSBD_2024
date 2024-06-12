@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,6 +54,13 @@ public class Client extends UserLevel implements Serializable {
     @Getter
     @Setter
     private ClientType type = ClientType.BASIC;
+
+    @NotNull(message = ClientMessages.TOTAL_RESERVATION_HOURS_NULL)
+    @PositiveOrZero(message = ClientMessages.TOTAL_RESERVATION_HOURS_NEGATIVE)
+    @Column(name = DatabaseConsts.TOTAL_RESERVATION_HOURS_COLUMN, nullable = false)
+    @Getter
+    @Setter
+    private Long totalReservationHours = 0L;
 
     public Client(Long version) {
         super(version);

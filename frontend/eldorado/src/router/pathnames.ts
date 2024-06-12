@@ -33,6 +33,7 @@ export const Pathnames = {
         parkingManagementInfo: '/manage-parking/:id',
         parkingList: '/parking-list',
         parkingInfo: '/parking-list/parking-info/:id',
+        makeReservation: '/make-reservation/:id',
     },
     loggedIn: {
         landingPage: '/',

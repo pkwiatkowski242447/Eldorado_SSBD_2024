@@ -17,6 +17,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.CannotEnterParkingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.conflict.CannotExitParkingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.parking.read.ParkingNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientAccountNonEnabledException;
@@ -24,6 +25,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClient
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationAlreadyEndedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationExpiredException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.ReservationNotStartedException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.SectorInvalidDeactivationTimeException;
@@ -42,6 +44,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccup
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.MostOccupied;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.SectorStrategy;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -146,7 +149,8 @@ public class ParkingService implements ParkingServiceInterface {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
 
         if (!sector.getActive(this.reservationMaxHours)) throw new SectorAlreadyInactiveException();
-        if (!deactivationTime.isAfter(LocalDateTime.now().plusHours(this.reservationMaxHours))) throw new SectorInvalidDeactivationTimeException();
+        if (!deactivationTime.isAfter(LocalDateTime.now().plusHours(this.reservationMaxHours)))
+            throw new SectorInvalidDeactivationTimeException();
 
         List<Reservation> reservations = this.reservationFacade.getAllReservationsToCancelBeforeDeactivation(sector.getId(),
                 deactivationTime.minusHours(this.reservationMaxHours));
@@ -156,7 +160,7 @@ public class ParkingService implements ParkingServiceInterface {
             this.reservationFacade.edit(reservation);
         }
 
-        sector.deactivateSector(deactivationTime);
+        sector.deactivateSector(LocalDateTime.now());
         parkingFacade.editSector(sector);
     }
 
@@ -178,11 +182,21 @@ public class ParkingService implements ParkingServiceInterface {
         this.parkingFacade.removeParkingById(parking.getId());
     }
 
+    // MOP.21 - Enter parking with reservation
+
     @Override
     @RolesAllowed({Authorities.ENTER_PARKING_WITH_RESERVATION})
     public void enterParkingWithReservation(UUID reservationId, String userName) throws ApplicationBaseException {
         Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
         Account account = this.accountFacade.findByLogin(userName).orElseThrow(AccountNotFoundException::new);
+
+        // Check reservation status
+        if (reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_MANUALLY ||
+                reservation.getStatus() == Reservation.ReservationStatus.COMPLETED_AUTOMATICALLY ||
+                reservation.getStatus() == Reservation.ReservationStatus.TERMINATED ||
+                reservation.getStatus() == Reservation.ReservationStatus.CANCELLED) {
+            throw new ReservationAlreadyEndedException();
+        }
 
         if (reservation.getBeginTime().isAfter(LocalDateTime.now())) {
             throw new ReservationNotStartedException();
@@ -190,13 +204,28 @@ public class ParkingService implements ParkingServiceInterface {
             throw new ReservationExpiredException();
         }
 
-        if (reservation.getSector().getOccupiedPlaces() == 0) {
+        if (reservation.getSector().getOccupiedPlaces().equals(reservation.getSector().getMaxPlaces())) {
             throw new ReservationNoAvailablePlaceException();
         }
 
         // Current user is not the owner of the reservation
         if (account.getUserLevels().stream().noneMatch(userLevel -> reservation.getClient().getId().equals(userLevel.getId()))) {
             throw new UserLevelMissingException(I18n.USER_NOT_RESERVATION_OWNER_EXCEPTION);
+        }
+
+        // Check if the number of entry parking events is greater than the number of exit events
+        long entryEventsCount = reservation.getParkingEvents().stream()
+                .filter(event -> event.getType() == ParkingEvent.EventType.ENTRY)
+                .count();
+
+        long exitEventsCount = reservation.getParkingEvents().stream()
+                .filter(event -> event.getType() == ParkingEvent.EventType.EXIT)
+                .count();
+
+        // If the number of entry events is greater than the number of exit events,
+        // the user cannot enter the parking
+        if (entryEventsCount > exitEventsCount) {
+            throw new CannotEnterParkingException();
         }
 
         if (reservation.getStatus().equals(Reservation.ReservationStatus.AWAITING)) {
@@ -278,6 +307,8 @@ public class ParkingService implements ParkingServiceInterface {
         return parkingFacade.findAllAvailableParkingWithPagination(pageNumber, pageSize);
     }
 
+    // MOP.18 - Enter parking with reservation
+
     @Override
     @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
     public Reservation enterParkingWithoutReservation(UUID parkingId, String login, boolean isAnonymous) throws ApplicationBaseException {
@@ -319,6 +350,8 @@ public class ParkingService implements ParkingServiceInterface {
         return reservation;
     }
 
+    // MOP.19 Exit the parking
+
     @Override
     @RolesAllowed(Authorities.EXIT_PARKING)
     public void exitParking(UUID reservationId, String userLogin, boolean endReservation) throws ApplicationBaseException {
@@ -350,7 +383,13 @@ public class ParkingService implements ParkingServiceInterface {
         // If reservation is made for anonymous user or the reservation needs to be finished
         if (reservation.getClient() == null || endReservation) {
             // Case for anonymous user - end time is being set
-            if (reservation.getClient() == null) reservation.setEndTime(LocalDateTime.now());
+            if (reservation.getClient() == null) {
+                reservation.setEndTime(LocalDateTime.now());
+            } else {
+                reservation.getClient().setTotalReservationHours(reservation.getClient().getTotalReservationHours() +
+                        Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toMinutes()
+                );
+            }
             reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
             reservation.setStatus(Reservation.ReservationStatus.COMPLETED_MANUALLY);
         }

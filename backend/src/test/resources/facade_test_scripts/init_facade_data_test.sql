@@ -70,7 +70,7 @@ INSERT INTO public.past_password (account_id, past_password) VALUES ('0ca02f7e-d
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('0ca02f7e-d8e9-45d3-a332-a56015acb822', 'Michal', 'Kowalski', 'michalkowal@spoko.pl');
 
 INSERT INTO public.user_level (id, creation_timestamp, level, account_id, version) VALUES ('69507c7f-4c03-4087-85e6-3ae3b6fc2201', current_timestamp, 'CLIENT', '0ca02f7e-d8e9-45d3-a332-a56015acb822', 0);
-INSERT INTO public.client_data (id, type) VALUES ('69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'BASIC');
+INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'BASIC', 0);
 
 -- Second Client
 INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_timestamp, version, blocked) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'jakubkoza', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000001', current_timestamp, 0, false);
@@ -78,7 +78,7 @@ INSERT INTO public.past_password (account_id, past_password) VALUES ('902d6e5b-2
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 'Jakub', 'Koza', 'jakubkoza@adresik.net');
 
 INSERT INTO public.user_level (id, creation_timestamp, level, account_id, version) VALUES ('9428fadf-191c-4dd7-8626-01c3e0ff603c', current_timestamp, 'CLIENT', '902d6e5b-2449-4898-a4f7-a92b0d8a04e1', 0);
-INSERT INTO public.client_data (id, type) VALUES ('9428fadf-191c-4dd7-8626-01c3e0ff603c', 'BASIC');
+INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('9428fadf-191c-4dd7-8626-01c3e0ff603c', 'BASIC', 0);
 
 -- Third Client
 INSERT INTO public.account (id, login, password, suspended, active, two_factor_auth, language, phone_number, creation_timestamp, version, blocked) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'piotrnowak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', true, true, false, 'PL', '000000003', current_timestamp, 0, false);
@@ -86,7 +86,7 @@ INSERT INTO public.past_password (account_id, past_password) VALUES ('02b0d9d7-a
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'Piotr', 'Nowak', 'piotrnowak@porn.hub.pl');
 
 INSERT INTO public.user_level (id, creation_timestamp, level, account_id, version) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', current_timestamp, 'CLIENT', '02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 0);
-INSERT INTO public.client_data (id, type) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', 'BASIC');
+INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', 'BASIC', 0);
 
 -- Parking
 INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', current_timestamp, 'LEAST_OCCUPIED','00-000', 'BoatCity', 'Palki', 0);
@@ -134,7 +134,7 @@ INSERT INTO public.account (id, login, password, suspended, active, two_factor_a
 INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('f5afc042-79b0-47fe-87ee-710c14af888c', 'Tony', 'Halik', 'tonyhalik@example.com');
 
 INSERT INTO public.user_level (id, creation_timestamp, level, account_id, version) VALUES ('4d1c0c8a-3af5-4ce9-ba95-09d25d289a76', current_timestamp, 'CLIENT', 'f5afc042-79b0-47fe-87ee-710c14af888c', 0);
-INSERT INTO public.client_data (id, type) VALUES ('4d1c0c8a-3af5-4ce9-ba95-09d25d289a76', 'BASIC');
+INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('4d1c0c8a-3af5-4ce9-ba95-09d25d289a76', 'BASIC', 0);
 
 -- User 1 - Token 1
 INSERT INTO public.token (id, creation_timestamp, account_id, token_value, type, version) VALUES ('582c432a-c5d9-4758-863a-4999a7d95de5', current_timestamp, 'f5afc042-79b0-47fe-87ee-710c14af888c', 'TEST_VALUE90', 'CONFIRM_EMAIL', 0);

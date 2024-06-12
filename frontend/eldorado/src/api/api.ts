@@ -264,7 +264,7 @@ export const api = {
     },
     modifySector: (sector: EditSectorType) => {
         const cleanedEtag = sector.signature.replace(/^"|"$/g, '');
-        let temp = {
+        const temp = {
             id: sector.id,
             parkingId: sector.parkingId,
             version: sector.version,
@@ -346,5 +346,17 @@ export const api = {
                     }
             }
         )
+    },
+
+    createReservation: (sectorId: string, beginTime: string, endTime: string) => {
+        return apiWithConfig.post('/reservations/make-reservation', {
+            sectorId: sectorId,
+            beginTime: beginTime,
+            endTime: endTime
+        })
+    },
+
+    cancelReservation: (id: string) => {
+        return apiWithConfig.delete(`/reservations/cancel-reservation/${id}`)
     },
 }

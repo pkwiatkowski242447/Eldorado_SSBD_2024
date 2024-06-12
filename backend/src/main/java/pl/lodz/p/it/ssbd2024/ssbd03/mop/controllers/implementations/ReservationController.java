@@ -26,6 +26,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.utils.InvalidDataFormatException;
@@ -88,9 +89,10 @@ public class ReservationController implements ReservationControllerInterface {
     @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class,
-                    ReservationNoAvailablePlaceException.class, ReservationClientLimitException.class})
+                    ReservationNoAvailablePlaceException.class, ReservationClientLimitException.class,
+                    ApplicationOptimisticLockException.class})
     public ResponseEntity<?> makeReservation(@Valid MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
-        //TODO future test Retryable
+        //TODO future test Retryable OptimisticLock?
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -106,6 +108,8 @@ public class ReservationController implements ReservationControllerInterface {
 
     @Override
     @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
+            retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> cancelReservation(String id) throws ApplicationBaseException {
         try {
             reservationService.cancelReservation(UUID.fromString(id));

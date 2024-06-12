@@ -55,6 +55,7 @@ public class I18n {
     public static final String PARKING_CONSTRAINT_VIOLATION = "parking.constraint.violation.exception";
     public static final String PARKING_ADDRESS_ALREADY_TAKEN = "parking.address.already.taken.exception";
     public static final String CANNOT_EXIT_PARKING_EXCEPTION = "parking.cannot.exit.exception";
+    public static final String CANNOT_ENTER_PARKING_EXCEPTION = "parking.cannot.enter.exception";
     public static final String PARKING_ADDRESS_DUPLICATE_EXCEPTION = "parking.address.duplicate.exception";
 
     // Reservation exceptions
@@ -69,6 +70,8 @@ public class I18n {
     public static final String RESERVATION_SECTOR_NON_ACTIVE = "reservation.sector.non.active.exception";
     public static final String RESERVATION_CLIENT_LIMIT_EXCEPTION = "reservation.client.limit.exception";
     public static final String RESERVATION_EXCEEDING_MAXIMUM_TIME = "reservation.exceeding.maximum.time.exception";
+    public static final String RESERVATION_INVALID_TIMEFRAME = "reservation.invalid.timeframe.exception";
+    public static final String RESERVATION_INSUFFICIENT_CLIENT_TYPE = "reservation.insufficient.client.exception";
 
     public static final String RESERVATION_CANCELLATION_LATE_ATTEMPT = "reservation.cancellation.late.attempt.exception";
     public static final String RESERVATION_ALREADY_CANCELLED_EXCEPTION = "reservation.already.cancelled.exception";

@@ -12,23 +12,34 @@ import java.util.UUID;
 
 public class ReservationListMapper {
 
-    static public ReservationOutputListDTO toReservationListDTO(Reservation reservation) {
+    public static ReservationOutputListDTO toReservationListDTO(Reservation reservation) {
         Address parkingAddress = reservation.getSector().getParking().getAddress();
         UUID clientId = reservation.getClient() != null ? reservation.getClient().getId() : null;
-        return new ReservationOutputListDTO(reservation.getId(), parkingAddress.getCity(), parkingAddress.getZipCode(),
-                parkingAddress.getStreet(), reservation.getSector().getName(), reservation.getBeginTime(), reservation.getEndTime(), clientId);
+        return new ReservationOutputListDTO(
+                reservation.getId(),
+                parkingAddress.getCity(),
+                parkingAddress.getZipCode(),
+                parkingAddress.getStreet(),
+                reservation.getSector().getName(),
+                reservation.getBeginTime(),
+                reservation.getEndTime(),
+                clientId
+        );
     }
 
-    static public ParkingEventOutputDTO toParkingEventDTO(ParkingEvent event) {
-        return new ParkingEventOutputDTO(event.getId(),
+    public static ParkingEventOutputDTO toParkingEventDTO(ParkingEvent event) {
+        return new ParkingEventOutputDTO(
+                event.getId(),
                 event.getType().name(),
                 event.getDate(),
-                event.getCreatedBy());
+                event.getCreatedBy()
+        );
     }
 
-    static public ReservationParkingEventListDTO toReservationParkingEventListDTO(Reservation reservation, List<ParkingEvent> listOfParkingEvents) {
+    public static ReservationParkingEventListDTO toReservationParkingEventListDTO(Reservation reservation, List<ParkingEvent> listOfParkingEvents) {
         ReservationOutputListDTO reservationOutputListDTO = toReservationListDTO(reservation);
-        return new ReservationParkingEventListDTO(reservationOutputListDTO.getId(),
+        return new ReservationParkingEventListDTO(
+                reservationOutputListDTO.getId(),
                 reservationOutputListDTO.getCity(),
                 reservationOutputListDTO.getZipCode(),
                 reservationOutputListDTO.getStreet(),
@@ -36,6 +47,9 @@ public class ReservationListMapper {
                 reservationOutputListDTO.getBeginTime(),
                 reservationOutputListDTO.getEndingTime(),
                 reservationOutputListDTO.getClientId(),
-                listOfParkingEvents.stream().map(ReservationListMapper::toParkingEventDTO).toList());
+                listOfParkingEvents.stream()
+                        .map(ReservationListMapper::toParkingEventDTO)
+                        .toList()
+        );
     }
 }

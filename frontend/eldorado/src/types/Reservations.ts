@@ -38,7 +38,7 @@ export interface ReservationDetailsType {
     street: string,
     zipCode: string,
     sectorName: string,
-    parkingEvents: ParkingEventType[]
+    parkingEvents: ParkingEventType[] | null
 }
 
 export function arrayToDate(arr: number[]): string {
