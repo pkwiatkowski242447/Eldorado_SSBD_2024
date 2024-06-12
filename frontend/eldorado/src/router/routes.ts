@@ -16,8 +16,7 @@ import TwoFactorAuthPage from "@/pages/TwoFactorAuthPage.tsx";
 import AdminCreateUserPage from "@/pages/AdminCreateUserPage.tsx";
 import RestoreAccessPage from "@/pages/RestoreAccessPage.tsx";
 import RestoreTokenPage from "@/pages/RestoreTokenPage.tsx";
-import MyReservationsPage from "@/pages/MyReservationsPage.tsx";
-import AllReservationsPage from "@/pages/AllReservationsPage.tsx";
+import ParkingManagementPage from "@/pages/ParkingManagementPage.tsx";
 
 
 export const PublicRoutes: RouteType[] = [
@@ -117,9 +116,9 @@ export const StaffRoutes: RouteType[] = [
         Component: ChangeUserLevelPage
     },
     {
-        path: Pathnames.staff.allReservations,
-        Component: AllReservationsPage
-    },
+        path: Pathnames.staff.parkingManagement,
+        Component: ParkingManagementPage
+    }
 ]
 
 export const ClientRoutes: RouteType[] = [
@@ -138,9 +137,5 @@ export const ClientRoutes: RouteType[] = [
     {
         path: Pathnames.loggedIn.changeUserLevel,
         Component: ChangeUserLevelPage
-    },
-    {
-        path: Pathnames.client.myReservations,
-        Component: MyReservationsPage
     },
 ]
