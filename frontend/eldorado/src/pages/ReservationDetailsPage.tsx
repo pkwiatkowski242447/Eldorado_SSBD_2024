@@ -11,7 +11,7 @@ import {useTranslation} from "react-i18next";
 import {useParams} from "react-router-dom";
 import {api} from "@/api/api.ts";
 import {useEffect, useState} from "react";
-import {arrayToDate, ParkingEventType, ReservationDetailsType} from "@/types/Reservations.tsx";
+import {arrayToDate, ParkingEventType, ReservationDetailsType} from "@/types/Reservations.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {
