@@ -2140,8 +2140,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .get(BASE_URL + "/parking/{id}/sectors")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .body("message", Matchers.equalTo(I18n.INTERNAL_SERVER_ERROR));
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
 
@@ -2184,8 +2184,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .get(BASE_URL + "/reservations/active/self")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .body("message", Matchers.equalTo(I18n.INTERNAL_SERVER_ERROR));
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
     @Test
@@ -2264,7 +2264,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/parking/{id}/sectors")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
