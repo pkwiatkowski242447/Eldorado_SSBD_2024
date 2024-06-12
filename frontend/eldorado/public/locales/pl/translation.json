@@ -35,6 +35,7 @@
   "breadcrumb.createUser" : "Utwórz nowe konto",
   "breadcrumb.manageParking": "Zarządzanie parkingami",
   "breadcrumb.manageParkingInfo": "Informacje o parkingu",
+  "breadcrumb.createParking": "Utwórz nowy parking",
 
   "notFound.title": "Strona nie znaleziona",
   "notFound.description": "Strona, której szukasz, nie istnieje",
@@ -306,8 +307,17 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Twoje hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Zaloguj się",
 
-  "parkingManagementPage.createParking": "Create Parking",
+  "allReservationsPage.title": "Wszystkie rezerwacje w systemie",
+  "allReservationsPage.table.clientID": "ID Klienta",
+  "allReservationsPage.table.beginTime": "Czas rozpoczęcia",
+  "allReservationsPage.table.endingTime": "Czas zakończenia",
+  "allReservationsPage.table.city": "Parking",
+  "allReservationsPage.table.street": "Ulica",
+  "allReservationsPage.table.zipCode": "Kod pocztowy",
+  "allReservationsPage.table.sectorName": "Sektor",
+  "allReservationsPage.table.reservationId": "ID rezerwacji",
 
+  "parkingManagementPage.createParking": "Utwórz parking",
 
   "account.constraint.violation.exception" : "Naruszenie ograniczeń konta",
   "account.with.given.email.not.found.exception" : "Konto z podanym adresem e-mail nie znalezione",

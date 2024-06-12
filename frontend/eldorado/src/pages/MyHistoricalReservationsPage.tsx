@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
-import {arrayToDate, ReservationType} from "@/types/Reservations.tsx";
+import {arrayToDate, ReservationType} from "@/types/Reservations";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {
     Pagination,

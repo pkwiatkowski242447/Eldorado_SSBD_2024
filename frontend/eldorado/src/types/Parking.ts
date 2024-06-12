@@ -38,7 +38,8 @@ export interface CreateParkingType {
 export interface SectorListType {
     id: string;
     name:string;
-    type: SectorTypes;
+    active:boolean;
+    type: SectorType;
     maxPlaces: number;
     availablePlaces: number;    //todo change to occupiedSpaces
     weight: number;
