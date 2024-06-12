@@ -119,17 +119,17 @@ export const StaffRoutes: RouteType[] = [
         Component: ChangeUserLevelPage
     },
     {
-        path: Pathnames.staff.allReservations,
-        Component: AllReservationsPage
-    },
-    {
         path: Pathnames.staff.parkingManagement,
         Component: ParkingManagementPage
     },
     {
         path: Pathnames.staff.parkingManagementInfo,
         Component: ParkingManagementInfoPage
-    }
+    },
+    {
+        path: Pathnames.staff.allReservations,
+        Component: AllReservationsPage
+    },
 ]
 
 export const ClientRoutes: RouteType[] = [
