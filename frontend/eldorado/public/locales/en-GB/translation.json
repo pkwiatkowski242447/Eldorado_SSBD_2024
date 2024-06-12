@@ -314,6 +314,7 @@
   "allReservationsPage.table.sectorName": "Sector",
   "allReservationsPage.table.reservationId": "Reservation ID",
 
+  "parkingManagementPage.createParking": "Create Parking",
 
   "account.constraint.violation.exception" : "Account constraint violation",
   "account.with.given.email.not.found.exception" : "Account with the given email not found",

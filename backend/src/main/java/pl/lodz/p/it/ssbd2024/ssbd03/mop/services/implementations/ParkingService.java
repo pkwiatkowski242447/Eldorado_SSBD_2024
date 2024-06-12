@@ -156,7 +156,7 @@ public class ParkingService implements ParkingServiceInterface {
             this.reservationFacade.edit(reservation);
         }
 
-        sector.deactivateSector(LocalDateTime.now());
+        sector.deactivateSector(deactivationTime);
         parkingFacade.editSector(sector);
     }
 

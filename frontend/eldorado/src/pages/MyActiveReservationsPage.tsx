@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
-import {arrayToDate, ReservationType} from "@/types/Reservations.tsx";
+import {arrayToDate, ReservationType} from "@/types/Reservations.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {
     Pagination,
@@ -12,12 +12,15 @@ import {
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
 import {Spinner} from "react-bootstrap";
+import {useNavigate} from "react-router-dom";
+import {Button} from "@/components/ui/button.tsx";
 
 function MyActiveReservationsPage() {
     const [activeReservations, setActiveReservations] = useState<ReservationType[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [pageSize] = useState(5);
+    const navigate = useNavigate();
 
     const fetchActiveReservations = async () => {
         setIsLoading(true);
@@ -39,6 +42,10 @@ function MyActiveReservationsPage() {
             setIsLoading(false);
         });
     }
+
+    const handleViewDetails = (id: string) => {
+        navigate(`/my-reservations/${id}`);
+    };
 
     useEffect(() => {
         fetchActiveReservations();
@@ -68,6 +75,8 @@ function MyActiveReservationsPage() {
                                     className="text-center">{"Sector Name"}</TableHead>
                                 <TableHead
                                     className="text-center">{"ID"}</TableHead>
+                                <TableHead
+                                    className="text-center"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className={"text-center"}>
@@ -80,6 +89,11 @@ function MyActiveReservationsPage() {
                                     <TableCell>{historicalReservation.zipCode}</TableCell>
                                     <TableCell>{historicalReservation.sectorName}</TableCell>
                                     <TableCell>{historicalReservation.id}</TableCell>
+                                    <TableCell>
+                                        <Button onClick={() => handleViewDetails(historicalReservation.id)}>
+                                            View Details
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

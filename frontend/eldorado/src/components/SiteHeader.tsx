@@ -89,6 +89,12 @@ const SiteHeader = () => {
                        My Reservations
                     </Button>
                 )}
+                {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
+                    <Button variant="link" onClick={() => navigate("/parking-list")}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                       Active Parking List
+                    </Button>
+                )}
                 {account?.activeUserLevel?.roleName === RolesEnum.STAFF && (
                     <Button variant="link" onClick={() => navigate("/all-reservations")}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
