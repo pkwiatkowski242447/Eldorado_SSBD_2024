@@ -1,4 +1,8 @@
 {
+  "general.pickDate": "Wybierz datę",
+  "general.hours": "Godzina",
+  "general.minutes": "Minuta",
+  "general.seconds": "Sekunda",
   "general.ok": "OK",
   "general.cancel": "Anuluj",
   "general.confirm": "Potwierdzenie",
@@ -35,7 +39,6 @@
   "breadcrumb.createUser" : "Utwórz nowe konto",
   "breadcrumb.manageParking": "Zarządzanie parkingami",
   "breadcrumb.manageParkingInfo": "Informacje o parkingu",
-  "breadcrumb.createParking": "Utwórz nowy parking",
 
   "notFound.title": "Strona nie znaleziona",
   "notFound.description": "Strona, której szukasz, nie istnieje",

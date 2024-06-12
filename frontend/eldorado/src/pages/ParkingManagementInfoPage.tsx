@@ -16,7 +16,7 @@ import {ParkingType, SectorListType, SectorStrategy} from "@/types/Parking.ts";
 import {Pathnames} from "@/router/pathnames.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
-import {FiCheck, FiSettings, FiX} from "react-icons/fi";
+import {FiSettings} from "react-icons/fi";
 import {
     Pagination,
     PaginationContent,
@@ -39,12 +39,14 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditSectorForm from "@/components/forms/EditSectorForm.tsx";
+import {DeactivateSectorForm} from "@/components/forms/DeactivateSectorForm.tsx";
 export function ParkingManagementInfoPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [sectors, setSectors] = useState<SectorListType[]>([]);
     const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+    const [isDeactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [sectorId, setSectorId] = useState("");
     const {t} = useTranslation();
@@ -53,6 +55,7 @@ export function ParkingManagementInfoPage() {
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
     const navigate = useNavigate();
     const pageSize = 4;
+    // const [date, setDate] = useState<Date>();
 
     const handleDeleteParkingClick = (sectorId: string) => {
         setSectorId(sectorId);
@@ -62,6 +65,11 @@ export function ParkingManagementInfoPage() {
     const handleEditSectorClick = (sectorId: string) => {
         setSectorId(sectorId);
         setEditDialogOpen(true);
+    };
+
+    const handleDeactivateSectorClick = (sectorId: string) => {
+        setSectorId(sectorId);
+        setDeactivateDialogOpen(true);
     };
 
     const handleDeleteSector = () => {
@@ -223,6 +231,10 @@ export function ParkingManagementInfoPage() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
                                             <DropdownMenuItem
+                                                onClick={() => handleDeactivateSectorClick(sector.id)}>
+                                                Deactivate sector
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
                                                 onClick={() => handleEditSectorClick(sector.id)}>
                                                 Edit sector
                                             </DropdownMenuItem>
@@ -236,6 +248,14 @@ export function ParkingManagementInfoPage() {
                             </TableRow>
                         ))}
                     </TableBody>
+                    <Dialog open={isDeactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit Parking</DialogTitle>
+                            </DialogHeader>
+                            <DeactivateSectorForm setDialogOpen={setDeactivateDialogOpen} refresh={refresh} sectorId={sectorId}/>
+                        </DialogContent>
+                    </Dialog>
                     <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>

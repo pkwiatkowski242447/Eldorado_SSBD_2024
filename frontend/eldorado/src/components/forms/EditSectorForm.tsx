@@ -27,7 +27,7 @@ type editSectorFormProps = {
     sectorId: string
 }
 
-function EditParkingForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) {
+function EditSectorForm({setDialogOpen, refresh, sectorId}:editSectorFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -182,4 +182,4 @@ function EditParkingForm({setDialogOpen, refresh, sectorId}:editSectorFormProps)
     )
 }
 
-export default EditParkingForm
+export default EditSectorForm

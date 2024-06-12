@@ -232,15 +232,15 @@ export const api = {
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
-
+    
     getParking: (details: string) => {
         return apiWithConfig.get('/parking' + details)
     },
-    
+
     createParking: (parking: CreateParkingType) => {
         return apiWithConfig.post('/parking', {...parking})
     },
-    
+
     deleteParking: (parkingId: string) => {
         return apiWithConfig.delete(`/parking/${parkingId}`)
     },
@@ -286,10 +286,10 @@ export const api = {
         const temp = {
             parkingId: parking.parkingId,
             version: parking.version,
-            city:parking.city,
-            street:parking.street,
-            zipCode:parking.zipCode,
-            strategy:parking.strategy,
+            city: parking.city,
+            street: parking.street,
+            zipCode: parking.zipCode,
+            strategy: parking.strategy,
         };
         return apiWithConfig.put('/parking',
             {...temp},
@@ -324,5 +324,9 @@ export const api = {
                     }
             }
         )
+    },
+
+    deactivateSector: (sectorId: string, time: Date) => {
+        return apiWithConfig.post(`/parking/sectors/${sectorId}/deactivate`, {deactivationTime: time})
     },
 }

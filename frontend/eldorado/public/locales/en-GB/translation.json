@@ -1,4 +1,8 @@
 {
+  "general.pickDate": "Pick a date",
+  "general.hours": "Hours",
+  "general.minutes": "Minutes",
+  "general.seconds": "Seconds",
   "general.ok": "OK",
   "general.cancel": "Cancel",
   "general.confirm": "Confirm",
@@ -35,7 +39,6 @@
   "breadcrumb.createUser": "Create new user",
   "breadcrumb.manageParking": "Parking management",
   "breadcrumb.manageParkingInfo": "Parking Details",
-  "breadcrumb.createParking": "Create new parking",
 
   "notFound.title": "Page not found",
   "notFound.description": "The page you are looking for does not exist",
@@ -318,7 +321,6 @@
   "allReservationsPage.table.reservationId": "Reservation ID",
 
   "parkingManagementPage.createParking": "Create Parking",
-
 
   "account.constraint.violation.exception" : "Account constraint violation",
   "account.with.given.email.not.found.exception" : "Account with the given email not found",

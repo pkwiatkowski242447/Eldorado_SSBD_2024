@@ -101,6 +101,7 @@ const SiteHeader = () => {
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
                         All Reservations
                     </Button>
+
                 )}
             </nav>
             <div className="flex w-full items-center gap-4 justify-end">
