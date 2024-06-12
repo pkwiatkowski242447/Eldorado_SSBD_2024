@@ -11,7 +11,7 @@ import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {useEffect, useState} from "react";
 import {ParkingListType, SectorInfoType, SectorType} from "@/types/Parking.ts";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -42,6 +42,7 @@ function ActiveParkingInfoPage() {
     const {t} = useTranslation();
     const {id} = useParams<{ id: string }>();
     const pageSize = 5;
+    const navigate = useNavigate()
 
     const fetchParkingInfo = () => {
         if (id) {
@@ -87,6 +88,10 @@ function ActiveParkingInfoPage() {
     const setActiveSector = (sector: SectorType) => {
         setSelectedSector(sector);
     };
+
+    function handleButtonClick() {
+        navigate(`/make-reservation/${selectedSector?.id}`)
+    }
 
     useEffect(() => {
         fetchParkingInfo();
@@ -198,13 +203,14 @@ function ActiveParkingInfoPage() {
                                         <DialogContent>
                                             <DialogHeader>
                                                 <DialogTitle className={"text-center"}>Sector Info</DialogTitle>
-                                                <DialogDescription>
+                                                <DialogDescription className={"text-center p-3"}>
                                                     {sectorInfo && (
                                                         <>
                                                             <p><strong>Name:</strong> {sectorInfo.name}</p>
                                                             <p><strong>Type:</strong> {sectorInfo.type}</p>
                                                             <p><strong>Max Places:</strong> {sectorInfo.maxPlaces}</p>
-                                                            <p><strong>Active:</strong> {sectorInfo.active ? "Yes" : "No"}</p>
+                                                            <Button className={"mt-5"} onClick={() => handleButtonClick()}>Make a
+                                                                reservation</Button>
                                                         </>
                                                     )}
                                                 </DialogDescription>
