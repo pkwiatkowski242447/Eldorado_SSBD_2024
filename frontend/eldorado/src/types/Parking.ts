@@ -1,10 +1,10 @@
-export enum SectorTypes {
+export enum sectorType {
     UNCOVERED = "UNCOVERED",
     COVERED = "COVERED",
     UNDERGROUND = "UNDERGROUND"
 }
 
-export enum SectorStrategy {
+export enum sectorStrategy {
     LEAST_OCCUPIED = "LEAST_OCCUPIED",
     MOST_OCCUPIED = "MOST_OCCUPIED",
     LEAST_OCCUPIED_WEIGHTED = "LEAST_OCCUPIED_WEIGHTED"
@@ -14,50 +14,22 @@ export interface ParkingListType {
     city: string;
     zipCode: string;
     street: string;
-    strategy: SectorStrategy;
-    sectorTypes: SectorTypes[]
+    strategy: sectorStrategy;
+    sectorTypes: sectorType[]
 }
 
 export interface ParkingType {
-    parkingId: string;
-    version: string;
-    city: string;
-    zipCode: string;
-    street: string;
-    strategy: SectorStrategy;
-    signature: string;
-}
-
-export interface CreateParkingType {
-    city: string;
-    zipCode: string;
-    street: string;
-    strategy: SectorStrategy;
-}
-
-export interface SectorListType {
     id: string;
-    name:string;
-    type: SectorTypes;
-    maxPlaces: number;
-    availablePlaces: number;    //todo change to occupiedSpaces
-    weight: number;
-}
-
-export interface CreateSectorType {
-    name:string;
-    type: SectorTypes;
-    maxPlaces: number;
-    weight: number;
+    city: string;
+    zipCode: string;
+    street: string;
+    strategy: sectorStrategy;
 }
 
 export interface SectorType {
     id: string;
-    parkingId: string;
-    version: string;
-    name:string;
-    type: SectorTypes;
+    name: string;
+    type: sectorType;
     maxPlaces: number;
-    weight: number;
-    signature: string;
+    availablePlaces: number;
 }
