@@ -1,7 +1,7 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
-import {CreateParkingType, CreateSectorType, ParkingType} from "@/types/Parking.ts";
+import {CreateParkingType, CreateSectorType, ParkingType, SectorType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -217,15 +217,15 @@ export const api = {
         return apiWithConfig.post(`/accounts/restore-token/${token}`)
     },
 
-    getPasswordAdminResetStatus:()=>{
+    getPasswordAdminResetStatus: () => {
         return apiWithConfig.get('/accounts/admin-password-reset-status')
     },
 
-    getAllAttributes:()=>{
+    getAllAttributes: () => {
         return apiWithConfig.get('/accounts/attributes?pageNumber=0&pageSize=2')
     },
 
-    getMyAttributes:()=>{
+    getMyAttributes: () => {
         return apiWithConfig.get('/accounts/attributes/account/me/get')
     },
 
@@ -265,8 +265,8 @@ export const api = {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
-    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    getSectorById: (sectorId: string) => {
+        return apiWithConfig.get(`/parking/sectors/get/${sectorId}`)
     },
 
     getAllReservations: (pageNumber: number, pageSize: number) => {
@@ -284,6 +284,29 @@ export const api = {
             strategy:parking.strategy,
         };
         return apiWithConfig.put('/parking',
+            {...temp},
+            {
+                headers:
+                    {
+                        'If-Match':
+                        cleanedEtag
+                    }
+            }
+        )
+    },
+
+    modifySector: (sector: SectorType) => {
+        const cleanedEtag = sector.signature.replace(/^"|"$/g, '');
+        const temp = {
+            id: sector.id,
+            parkingId: sector.parkingId,
+            version: sector.version,
+            name: sector.name,
+            type: sector.type,
+            maxPlaces: sector.maxPlaces,
+            weight: sector.weight,
+        };
+        return apiWithConfig.put('/parking/sectors',
             {...temp},
             {
                 headers:

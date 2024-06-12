@@ -38,12 +38,13 @@ import {
     AlertDialogDescription,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import EditSectorForm from "@/components/forms/EditSectorForm.tsx";
 export function ParkingManagementInfoPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [sectors, setSectors] = useState<SectorListType[]>([]);
     const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:SectorStrategy.LEAST_OCCUPIED, signature:""})
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
-    // const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+    const [isEditDialogOpen, setEditDialogOpen] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [sectorId, setSectorId] = useState("");
     const {t} = useTranslation();
@@ -58,10 +59,10 @@ export function ParkingManagementInfoPage() {
         setAlertDialogOpen(true);
     };
 
-    // const handleEditParkingClick = (parkingId: string) => {
-    //     setParkingId(parkingId);
-    //     setEditDialogOpen(true);
-    // };
+    const handleEditSectorClick = (sectorId: string) => {
+        setSectorId(sectorId);
+        setEditDialogOpen(true);
+    };
 
     const handleDeleteSector = () => {
         api.deleteSector(sectorId)
@@ -197,8 +198,6 @@ export function ParkingManagementInfoPage() {
                             <TableHead
                                 className="text-center">{t("Name")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Active")}</TableHead>
-                            <TableHead
                                 className="text-center">{t("Occupies Places")}</TableHead>
                             <TableHead
                                 className="text-center">{t("Max Places")}</TableHead>
@@ -213,11 +212,6 @@ export function ParkingManagementInfoPage() {
                         {sectors.map(sector => (
                             <TableRow key={sector.id} className="flex-auto">
                                 <TableCell>{sector.name}</TableCell>
-                                <TableCell className="flex-col">
-                                    <div className="flex justify-center items-center">
-                                        {sector.active ? <FiCheck color="green"/> : <FiX color="red"/>}
-                                    </div>
-                                </TableCell>
                                 <TableCell>{sector.availablePlaces}</TableCell>
                                 <TableCell>{sector.maxPlaces}</TableCell>
                                 <TableCell><Badge variant={"default"}>{sector.type} </Badge></TableCell>
@@ -228,16 +222,10 @@ export function ParkingManagementInfoPage() {
                                             <FiSettings/>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            {/*<DropdownMenuItem*/}
-                                            {/*    onClick={() => navigate(`/manage-parking/${parking.id}`)}*/}
-                                            {/*>*/}
-                                            {/*    Show Sectors*/}
-                                            {/*</DropdownMenuItem>*/}
-                                            {/*<DropdownMenuItem*/}
-                                            {/*    onClick={() => handleEditParkingClick(parking.id)}*/}
-                                            {/*>*/}
-                                            {/*    Edit parking*/}
-                                            {/*</DropdownMenuItem>*/}
+                                            <DropdownMenuItem
+                                                onClick={() => handleEditSectorClick(sector.id)}>
+                                                Edit sector
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDeleteParkingClick(sector.id)}>
                                                 Delete parking
@@ -248,14 +236,14 @@ export function ParkingManagementInfoPage() {
                             </TableRow>
                         ))}
                     </TableBody>
-                    {/*<Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>*/}
-                    {/*    <DialogContent className="sm:max-w-[425px]">*/}
-                    {/*        <DialogHeader>*/}
-                    {/*            <DialogTitle>Edit Parking</DialogTitle>*/}
-                    {/*        </DialogHeader>*/}
-                    {/*        <EditParkingForm setDialogOpen={setEditDialogOpen} refresh={refresh} parkingId={parkingId}/>*/}
-                    {/*    </DialogContent>*/}
-                    {/*</Dialog>*/}
+                    <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit Parking</DialogTitle>
+                            </DialogHeader>
+                            <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId}/>
+                        </DialogContent>
+                    </Dialog>
                     <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
