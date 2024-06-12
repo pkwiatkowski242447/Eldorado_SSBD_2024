@@ -1,6 +1,7 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
+import {CreateParkingType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -231,17 +232,20 @@ export const api = {
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
+    getParking: (details: string) => {
+        return apiWithConfig.get('/parking' + details)
+    },
 
-    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    createParking: (parking: CreateParkingType) => {
+        return apiWithConfig.post('/parking', {...parking})
     },
 
     getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
         return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
-    getParking: (details: string) => {
-        return apiWithConfig.get('/parking' + details)
+    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
+        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
     },
 
     getAllReservations: (pageNumber: number, pageSize: number) => {

@@ -28,20 +28,25 @@ import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {ParkingListType} from "@/types/Parking.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog.tsx";
+import CreateParkingForm from "@/components/forms/CreateParkingForm.tsx";
 // import {FiSettings} from 'react-icons/fi';
 
 function ParkingManagementPage() {
-    // @ts-expect-error no time
-    const [currentPage, setCurrentPage] = useState(() => parseInt(0));
+    const [currentPage, setCurrentPage] = useState(0);
     const [parking, setParking] = useState<ParkingListType[]>([]);
-    // const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-    // const [selectedUser, setSelectedUser] = useState<ManagedUserType | null>(null);
+    const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const {t} = useTranslation();
-    // const {account} = useAccountState();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
-    // const navigator = useNavigate();
-    const pageSize = 5;
+    const pageSize = 4;
 
     // const handleSettingsClick = (userId: string) => {
     //     navigator(`/manage-users/${userId}`);
@@ -123,7 +128,20 @@ function ParkingManagementPage() {
                     )}
                 </Button>
             </div>
-            <div className={"pt-5"}>
+            <div className="flex justify-start pt-2.5">
+                <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="default">Create Parking</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Edit profile</DialogTitle>
+                        </DialogHeader>
+                        <CreateParkingForm setDialogOpen={setCreateDialogOpen}/>
+                    </DialogContent>
+                </Dialog>
+            </div>
+            <div className={"pt-1"}>
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>

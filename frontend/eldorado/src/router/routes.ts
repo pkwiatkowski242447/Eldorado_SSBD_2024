@@ -125,6 +125,10 @@ export const StaffRoutes: RouteType[] = [
         path: Pathnames.staff.allReservations,
         Component: AllReservationsPage
     },
+    {
+        path: Pathnames.staff.allReservations,
+        Component: AllReservationsPage
+    },
 ]
 
 export const ClientRoutes: RouteType[] = [
