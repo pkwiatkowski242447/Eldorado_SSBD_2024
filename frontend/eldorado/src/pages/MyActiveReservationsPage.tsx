@@ -24,23 +24,27 @@ function MyActiveReservationsPage() {
 
     const fetchActiveReservations = async () => {
         setIsLoading(true);
-        api.getActiveReservationsSelf(currentPage, pageSize).then((response) => {
+        try {
+            const response = await api.getActiveReservationsSelf(currentPage, pageSize);
+
+            if (response.data) {
                 const updatedReservations = response.data.map((reservation: ReservationType) => {
                     return {
                         ...reservation,
                         // @ts-expect-error ignore this for now
-                        beginTime: arrayToDate(reservation.beginTime),
+                        beginTime: reservation.beginTime ? arrayToDate(reservation.beginTime) : null,
                         // @ts-expect-error ignore this for now
                         endingTime: reservation.endingTime ? arrayToDate(reservation.endingTime) : null
                     };
                 });
                 setActiveReservations(updatedReservations);
-                setIsLoading(false);
             }
-        ).catch((error) => {
+        } catch (error) {
+            // @ts-expect-error ignore this for now
             handleApiError(error);
+        } finally {
             setIsLoading(false);
-        });
+        }
     }
 
     const handleViewDetails = (id: string) => {
@@ -49,7 +53,6 @@ function MyActiveReservationsPage() {
 
     useEffect(() => {
         fetchActiveReservations();
-        console.log(activeReservations);
     }, [currentPage, pageSize]);
 
     return (
