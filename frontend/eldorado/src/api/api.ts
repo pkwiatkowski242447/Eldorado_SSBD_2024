@@ -1,6 +1,7 @@
 import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
 import axios from "axios";
+import {CreateParkingType, CreateSectorType, ParkingType} from "@/types/Parking.ts";
 
 export const api = {
     logIn: (login: string, password: string) => {
@@ -216,31 +217,58 @@ export const api = {
         return apiWithConfig.post(`/accounts/restore-token/${token}`)
     },
 
-    getPasswordAdminResetStatus: () => {
+    getPasswordAdminResetStatus:()=>{
         return apiWithConfig.get('/accounts/admin-password-reset-status')
     },
 
-    getAllAttributes: () => {
+    getAllAttributes:()=>{
         return apiWithConfig.get('/accounts/attributes?pageNumber=0&pageSize=2')
     },
 
-    getMyAttributes: () => {
+    getMyAttributes:()=>{
         return apiWithConfig.get('/accounts/attributes/account/me/get')
     },
 
     addAttributes: (attributeName: string, attributeValue: string) => {
         return apiWithConfig.post(`/accounts/attributes/account/me/assign/${attributeName}/${attributeValue}`)
     },
-
-    getHistoricalReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/historical/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    getParking: (details: string) => {
+        return apiWithConfig.get('/parking' + details)
     },
-
-    getActiveReservationsSelf: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations/active/self?pageNumber=${pageNumber}&pageSize=${pageSize}`)
+    createParking: (parking: CreateParkingType) => {
+        return apiWithConfig.post('/parking', {...parking})
     },
-
-    getAllReservations: (pageNumber: number, pageSize: number) => {
-        return apiWithConfig.get(`/reservations?pageNumber=${pageNumber}&pageSize=${pageSize}`)
-    }
+    deleteParking: (parkingId: string) => {
+        return apiWithConfig.delete(`/parking/${parkingId}`)
+    },
+    getParkingById: (parkingId: string) => {
+        return apiWithConfig.get(`/parking/get/${parkingId}`)
+    },
+    modifyParking: (parking: ParkingType) => {
+        const cleanedEtag = parking.signature.replace(/^"|"$/g, '');
+        let temp = {
+            parkingId: parking.parkingId,
+            version: parking.version,
+            city:parking.city,
+            street:parking.street,
+            zipCode:parking.zipCode,
+            strategy:parking.strategy,
+        };
+        return apiWithConfig.put('/parking',
+            {...temp},
+            {
+                headers:
+                    {
+                        'If-Match':
+                        cleanedEtag
+                    }
+            }
+        )
+    },
+    getSectorsStaff: (id:string | undefined, details: string) => {
+        return apiWithConfig.get(`/parking/${id}/sectors${details}`)
+    },
+    createSector: (parkingId: string, sector: CreateSectorType) => {
+        return apiWithConfig.post(`/parking/${parkingId}/sectors`, {...sector})
+    },
 }
