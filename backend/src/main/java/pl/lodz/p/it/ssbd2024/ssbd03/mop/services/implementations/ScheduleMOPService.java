@@ -53,19 +53,23 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
      */
     @Value("${scheduler.maximum_reservation_time}")
     private String endTime;
+
+    @Value("${client_type.standard.threshold}")
+    private Integer standardThreshold;
+
+    @Value("${client_type.premium.threshold}")
+    private Integer premiumThreshold;
+
     private final ReservationFacade reservationFacade;
-    private final ParkingEventFacade parkingEventFacade;
     private final UserLevelMOPFacade userLevelFacade;
     private final ParkingFacade parkingFacade;
 
     @Autowired
     public ScheduleMOPService(ReservationFacade reservationFacade,
                               UserLevelMOPFacade userLevelFacade,
-                              ParkingEventFacade parkingEventFacade,
                               ParkingFacade parkingFacade) {
         this.reservationFacade = reservationFacade;
         this.userLevelFacade = userLevelFacade;
-        this.parkingEventFacade = parkingEventFacade;
         this.parkingFacade = parkingFacade;
     }
 
@@ -152,9 +156,19 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                 parkingFacade.editSector(sector);
 
                 Client client = reservation.getClient();
+
                 client.setTotalReservationHours(client.getTotalReservationHours() +
                         Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toHours()
                 );
+
+                long clientTotalReservationHours = client.getTotalReservationHours();
+                // Check if client type can be upgraded
+                if (clientTotalReservationHours >= premiumThreshold) {
+                    client.setType(Client.ClientType.PREMIUM);
+                } else if (clientTotalReservationHours >= standardThreshold) {
+                    client.setType(Client.ClientType.STANDARD);
+                }
+
                 userLevelFacade.edit(client);
 
             } catch (Exception exception) {
