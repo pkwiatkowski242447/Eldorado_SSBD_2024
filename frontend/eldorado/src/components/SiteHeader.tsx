@@ -107,6 +107,24 @@ const SiteHeader = () => {
                         {t("siteHeader.manageParking")}
                     </Button>
                 )}
+                {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.client.enterParkingWithoutReservation)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        Enter Parking
+                    </Button>
+                )}
+                {!account && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.public.enterParkingWithoutReservation)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        Enter Parking
+                    </Button>
+                )}
+                {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.client.enterParkingWithReservation)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        Enter Reservation
+                    </Button>
+                )}
                 {( !account || account?.activeUserLevel?.roleName === RolesEnum.CLIENT)  && (
                     <Button variant="link" onClick={() => navigate(Pathnames.public.exitParking)}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>

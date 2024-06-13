@@ -360,6 +360,14 @@ export const api = {
         return apiWithConfig.delete(`/reservations/cancel-reservation/${id}`)
     },
 
+    enterParkingWithoutReservation: (parkingId: string) => {
+        return apiWithConfig.post(`/parking/${parkingId}/enter`)
+    },
+
+    enterParkingWithReservation: (reservationId: string) => {
+        return apiWithConfig.post(`/parking/reservations/${reservationId}/enter`)
+    },
+
     exitParking: (id:string, endReservation: boolean, isAuthenticated: boolean) => {
         if (isAuthenticated) {
             return apiWithConfig.post(`/parking/reservations/${id}/exit?end=${endReservation}`)
