@@ -34,6 +34,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.UserReservationOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorDeactivationTimeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
@@ -4322,10 +4323,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body(
-                        "id", Matchers.equalTo(reservationId)
-                        ///TODO uncomment
-//                        ,
-//                        "status", Reservation.ReservationStatus.CANCELLED
+                        "id", Matchers.equalTo(reservationId),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.AWAITING.name())
                 );
 
         // Cancel reservation
@@ -4344,10 +4343,146 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body(
-                        "id", Matchers.equalTo(reservationId)
-                        ///TODO uncomment
-//                        ,
-//                        "status", Reservation.ReservationStatus.CANCELLED
+                        "id", Matchers.equalTo(reservationId),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.CANCELLED.name())
+                );
+    }
+
+    // MOP.18 Enter parking without reservation
+    @Test
+    public void enterParkingWithoutReservationTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String parkingId = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1";
+
+        // Enter parking
+        String reservationId = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.any(String.class),
+                        "city", Matchers.equalTo("BoatCity"),
+                        "zipCode", Matchers.equalTo("91-416"),
+                        "street", Matchers.equalTo("Palki"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name())
+                )
+                .extract()
+                .jsonPath().getString("id");
+
+        // Login staff
+        String loginTokenStaff = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpecStaff = RestAssured.given()
+                .header("Authorization", "Bearer " + loginTokenStaff);
+
+        // Check new reservation in DB
+        RestAssured.given()
+                .spec(requestSpecStaff)
+                .when()
+                .get(BASE_URL + String.format("/reservations/staff/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.any(String.class),
+                        "city", Matchers.equalTo("BoatCity"),
+                        "zipCode", Matchers.equalTo("91-416"),
+                        "street", Matchers.equalTo("Palki"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name())
+                );
+    }
+
+    // MOP.19 Exit parking
+    @Test
+    public void exitParkingWithoutReservationEndingTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Check reservation before exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.any(String.class),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(1)
+                );
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.any(String.class),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+    }
+
+    @Test
+    public void exitParkingWithReservationEndingTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Check reservation before exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.any(String.class),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(1)
+                );
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit?end=true", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.any(String.class),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.COMPLETED_MANUALLY.name()),
+                        "parkingEvents", Matchers.hasSize(2)
                 );
     }
 }
