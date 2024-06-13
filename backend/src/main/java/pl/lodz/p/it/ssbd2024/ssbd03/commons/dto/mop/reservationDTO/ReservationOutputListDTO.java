@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -32,6 +33,9 @@ public class ReservationOutputListDTO {
 
     @Schema(description = "Sector name", example = "SA-01", requiredMode = Schema.RequiredMode.REQUIRED)
     private String sectorName;
+
+    @Schema(description = "Status of this reservation", example = "TERMINATED", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Reservation.ReservationStatus status;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

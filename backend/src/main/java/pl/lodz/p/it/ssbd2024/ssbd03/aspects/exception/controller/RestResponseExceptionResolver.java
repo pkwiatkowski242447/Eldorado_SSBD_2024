@@ -4,6 +4,8 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,6 +55,20 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(I18n.TYPE_MISMATCH_EXCEPTION));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(I18n.HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ExceptionDTO(I18n.HTTP_MEDIA_TYPE_NOT_SUPPORTED_EXCEPTION));
     }
 
     @ExceptionHandler(value = {Exception.class})
