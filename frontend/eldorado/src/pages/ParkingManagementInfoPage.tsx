@@ -110,8 +110,8 @@ export function ParkingManagementInfoPage() {
             .then(response => {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
-                    let sectorsTemp:any[] = response.data;
-                    let sectorsCopy:SectorListType[] = [];
+                    const sectorsTemp:any[] = response.data;
+                    const sectorsCopy:SectorListType[] = [];
                     sectorsTemp.forEach((s) => {sectorsCopy.push(sectorDTOtoSectorListType(s))})
                     setSectors(sectorsCopy);
                 } else if (response.status === 204 && actualPage > 0) {

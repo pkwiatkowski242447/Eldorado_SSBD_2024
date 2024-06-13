@@ -25,6 +25,8 @@ import EmailForm from "@/components/forms/EmailForm.tsx";
 import DetailsForm from "@/components/forms/DetailsForm.tsx";
 import UserHistoryPage from "@/pages/UserHistoryPage.tsx";
 import AttributesPage from "@/pages/AttributesPage.tsx";
+import {Pathnames} from "@/router/pathnames.ts";
+import {useNavigate} from "react-router-dom";
 
 
 function AccountSettings() {
@@ -37,6 +39,7 @@ function AccountSettings() {
     const {getCurrentAccount} = useAccount();
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingReset, setIsLoadingReset] = useState(false);
+    const navigate = useNavigate();
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -213,7 +216,7 @@ function AccountSettings() {
                 <Breadcrumb className="pl-2">
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.loggedIn.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>

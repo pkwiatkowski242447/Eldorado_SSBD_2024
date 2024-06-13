@@ -106,6 +106,8 @@ public class I18n {
     public static final String UNSUPPORTED_ROLE_EXCEPTION = "application.unsupported.role.exception";
     public static final String INVALID_ARGUMENT_EXCEPTION = "application.invalid.argument.exception";
     public static final String TYPE_MISMATCH_EXCEPTION = "application.type.mismatch.exception";
+    public static final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "application.http.message.not.readable.exception";
+    public static final String HTTP_MEDIA_TYPE_NOT_SUPPORTED_EXCEPTION = "application.http.media.type.not.supported.exception";
 
     // JWT
     public static final String DATA_INTEGRITY_COMPROMISED = "controller.data.integrity.compromised.exception";
