@@ -13,6 +13,7 @@ public class UserReservationMapper {
                 parkingAddress.getZipCode(),
                 parkingAddress.getStreet(),
                 r.getSector().getName(),
+                r.getStatus(),
                 r.getBeginTime(),
                 r.getEndTime()
         );

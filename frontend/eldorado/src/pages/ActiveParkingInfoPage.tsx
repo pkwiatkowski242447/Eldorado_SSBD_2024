@@ -31,6 +31,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog.tsx";
+import {Pathnames} from "@/router/pathnames.ts";
 
 function ActiveParkingInfoPage() {
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
@@ -117,13 +118,13 @@ function ActiveParkingInfoPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/parking-list">{"Active Parking List"}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.parkingList)}>{"Active Parking List"}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
