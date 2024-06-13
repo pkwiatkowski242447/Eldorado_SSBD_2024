@@ -476,8 +476,8 @@ public class MailProvider {
         messageHelper.setSubject(emailSubject);
         messageHelper.setText(emailContent, true);
         messageHelper.setFrom(senderEmail);
-
-        this.mailSender.send(mimeMessage);
+//FIXME comment for test purposes
+//        this.mailSender.send(mimeMessage);
     }
 
     /**
