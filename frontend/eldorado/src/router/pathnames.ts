@@ -13,7 +13,7 @@ export const Pathnames = {
         restoreToken: '/restore-token/:token',
         parkingList: '/parking-list',
         parkingInfo: '/parking-list/parking-info/:id',
-        enterParkingWithoutReservation: '/enter-parking',
+        exitParking: '/exit-parking',
     },
     admin: {
         landingPage: '/',
@@ -25,7 +25,8 @@ export const Pathnames = {
         allReservations: '/all-reservations',
         reservationDetails: '/all-reservations/:id',
         parkingManagement: '/manage-parking',
-        parkingManagementInfo: '/manage-parking/:id'
+        parkingManagementInfo: '/manage-parking/:id',
+        exitParking: '/exit-parking',
     },
     client: {
         myReservations: '/my-reservations',
@@ -35,8 +36,7 @@ export const Pathnames = {
         parkingList: '/parking-list',
         parkingInfo: '/parking-list/parking-info/:id',
         makeReservation: '/make-reservation/:id',
-        enterParkingWithoutReservation: '/enter-parking',
-        enterParkingWithReservation: '/enter-reservation',
+        exitParking: '/exit-parking',
     },
     loggedIn: {
         landingPage: '/',

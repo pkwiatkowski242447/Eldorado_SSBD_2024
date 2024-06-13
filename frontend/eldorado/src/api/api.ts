@@ -360,11 +360,14 @@ export const api = {
         return apiWithConfig.delete(`/reservations/cancel-reservation/${id}`)
     },
 
-    enterParkingWithoutReservation: (parkingId: string) => {
-        return apiWithConfig.post(`/parking/${parkingId}/enter`)
+    exitParking: (id:string, endReservation: boolean, isAuthenticated: boolean) => {
+        if (isAuthenticated) {
+            return apiWithConfig.post(`/parking/reservations/${id}/exit?end=${endReservation}`)
+        }
+        return axios.create({
+            baseURL: API_TEST_URL,
+            timeout: TIMEOUT_IN_MS,
+            headers: DEFAULT_HEADERS,
+        }).post(`/parking/reservations/${id}/exit?end=${endReservation}`)
     },
-
-    enterParkingWithReservation: (reservationId: string) => {
-        return apiWithConfig.post(`/parking/reservations/${reservationId}/enter`)
-    }
 }

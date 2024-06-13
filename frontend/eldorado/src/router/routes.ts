@@ -25,8 +25,7 @@ import ActiveParkingInfoPage from "@/pages/ActiveParkingInfoPage.tsx";
 import ParkingManagementPage from "@/pages/ParkingManagementPage.tsx";
 import { ParkingManagementInfoPage } from "@/pages/ParkingManagementInfoPage.tsx";
 import CreateReservationInSectorPage from "@/pages/CreateReservationInSectorPage.tsx";
-import EnterParkingWithoutReservationPage from "@/pages/EnterParkingWithoutReservationPage.tsx";
-import EnterParkingWithReservationPage from "@/pages/EnterParkingWithReservationPage.tsx";
+import {ExitParkingPage} from "@/pages/ExitParkingPage.tsx";
 
 export const PublicRoutes: RouteType[] = [
     {
@@ -82,8 +81,8 @@ export const PublicRoutes: RouteType[] = [
         Component: ActiveParkingInfoPage
     },
     {
-        path: Pathnames.public.enterParkingWithoutReservation,
-        Component: EnterParkingWithoutReservationPage
+        path: Pathnames.public.exitParking,
+        Component: ExitParkingPage
     }
 ]
 
@@ -191,11 +190,7 @@ export const ClientRoutes: RouteType[] = [
         Component: CreateReservationInSectorPage
     },
     {
-        path: Pathnames.client.enterParkingWithoutReservation,
-        Component: EnterParkingWithoutReservationPage
-    },
-    {
-        path: Pathnames.client.enterParkingWithReservation,
-        Component: EnterParkingWithReservationPage
+        path: Pathnames.staff.exitParking,
+        Component: ExitParkingPage
     }
 ]
