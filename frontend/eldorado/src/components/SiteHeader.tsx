@@ -95,6 +95,12 @@ const SiteHeader = () => {
                         {t("siteHeader.activeParkingList")}
                     </Button>
                 )}
+                {!account && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.client.parkingList)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        {t("siteHeader.activeParkingList")}
+                    </Button>
+                )}
                 {account?.activeUserLevel?.roleName === RolesEnum.STAFF && (
                     <Button variant="link" onClick={() => navigate(Pathnames.staff.allReservations)}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
@@ -105,6 +111,18 @@ const SiteHeader = () => {
                     <Button variant="link" onClick={() => navigate(Pathnames.staff.parkingManagement)}
                             className={`text-muted-foreground transition-colors hover:text-foreground`}>
                         {t("siteHeader.manageParking")}
+                    </Button>
+                )}
+                {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.client.enterParkingWithoutReservation)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        Enter Parking
+                    </Button>
+                )}
+                {!account && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.public.enterParkingWithoutReservation)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        Enter Parking
                     </Button>
                 )}
             </nav>
