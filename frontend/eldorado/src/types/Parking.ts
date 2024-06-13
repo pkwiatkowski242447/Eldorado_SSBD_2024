@@ -83,7 +83,6 @@ export interface EditSectorType {
     weight: number;
     version: string;
     signature: string;
-    availablePlaces: number;
 }
 
 export interface SectorInfoType {

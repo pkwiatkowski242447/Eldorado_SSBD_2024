@@ -108,6 +108,4 @@ function CreateReservationInSectorPage() {
         </div>
     );
 }
-
-// @ts-expect-error ????
 export default CreateReservationInSectorPage;

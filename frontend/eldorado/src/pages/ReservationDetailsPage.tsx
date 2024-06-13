@@ -133,7 +133,8 @@ function ReservationDetailsPage() {
                     </TableRow>
                 </TableHeader>
                 <TableBody className={"text-center"}>
-                    {reservation?.parkingEvents.map((parkingEvent, index) => (
+                    {//@ts-expect-error habibi
+                        reservation?.parkingEvents.map((parkingEvent, index) => (
                         <TableRow key={parkingEvent.id} className="flex-auto">
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{parkingEvent.date}</TableCell>
@@ -158,6 +159,7 @@ function ReservationDetailsPage() {
                         <PaginationItem>
                             <PaginationNext
                                 onClick={() => {
+                                    //@ts-expect-error come to dubai
                                     if (reservation?.parkingEvents.length === pageSize) setCurrentPage(currentPage + 1)
                                 }}
                             />

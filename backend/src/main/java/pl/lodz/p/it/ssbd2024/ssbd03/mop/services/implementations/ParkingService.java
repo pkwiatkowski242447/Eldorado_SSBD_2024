@@ -348,6 +348,8 @@ public class ParkingService implements ParkingServiceInterface {
 
         Reservation reservation = new Reservation(client, chosenSector, currentTime);
         reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
+        ParkingEvent parkingEvent = new ParkingEvent(currentTime, ParkingEvent.EventType.ENTRY);
+        reservation.addParkingEvent(parkingEvent);
         reservationFacade.create(reservation);
 
         chosenSector.setOccupiedPlaces(chosenSector.getOccupiedPlaces() + 1);
@@ -387,9 +389,9 @@ public class ParkingService implements ParkingServiceInterface {
         }
 
         // If reservation is made for anonymous user or the reservation needs to be finished
-        if (reservation.getClient() == null || endReservation) {
+        if (reservation.getEndTime() == null || endReservation) {
             // Case for anonymous user - end time is being set
-            if (reservation.getClient() == null) {
+            if (reservation.getEndTime() == null) {
                 reservation.setEndTime(LocalDateTime.now());
             } else {
                 reservation.getClient().setTotalReservationHours(reservation.getClient().getTotalReservationHours() +
