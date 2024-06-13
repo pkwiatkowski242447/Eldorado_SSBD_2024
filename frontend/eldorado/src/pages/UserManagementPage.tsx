@@ -42,6 +42,7 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {toast} from "@/components/ui/use-toast.ts";
+import {Pathnames} from "@/router/pathnames.ts";
 
 function UserManagementPage() {
     // @ts-expect-error no time
@@ -54,7 +55,7 @@ function UserManagementPage() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [searchPhrase, setSearchPhrase] = useState('');
     const [isSubmitClicked, setIsSubmitClicked] = useState(false);
-    const navigator = useNavigate();
+    const navigate = useNavigate();
     // @ts-expect-error no time
     const [pageSize, setPageSize] = useState(() => parseInt(localStorage.getItem('pageSize')) || 4);
     // @ts-expect-error no time
@@ -64,7 +65,7 @@ function UserManagementPage() {
     });
 
     const handleSettingsClick = (userId: string) => {
-        navigator(`/manage-users/${userId}`);
+        navigate(`/manage-users/${userId}`);
     };
 
     const handleBlockUnblockClick = (user: ManagedUserType) => {
@@ -152,7 +153,7 @@ function UserManagementPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>

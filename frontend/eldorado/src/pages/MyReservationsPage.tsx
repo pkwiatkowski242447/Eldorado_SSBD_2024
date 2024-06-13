@@ -12,10 +12,13 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import MyHistoricalReservationsPage from "@/pages/MyHistoricalReservationsPage.tsx";
 import MyActiveReservationsPage from "@/pages/MyActiveReservationsPage.tsx";
+import {Pathnames} from "@/router/pathnames.ts";
+import {useNavigate} from "react-router-dom";
 
 function MyReservationsPage() {
     const [activePage, setActivePage] = useState("Active");
     const {t} = useTranslation();
+    const navigate = useNavigate();
 
     return (
         <div className="flex min-h-screen w-full flex-col">
@@ -23,7 +26,7 @@ function MyReservationsPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>

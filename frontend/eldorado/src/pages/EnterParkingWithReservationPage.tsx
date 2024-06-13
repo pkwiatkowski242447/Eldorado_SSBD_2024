@@ -23,11 +23,15 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
+import {Pathnames} from "@/router/pathnames.ts";
+import {useNavigate} from "react-router-dom";
 
 function EnterParkingWithReservationPage() {
     const {t} = useTranslation();
     const [reservationID, setReservationID] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const navigate = useNavigate();
+
     const handleEnterReservation = async () => {
         if (reservationID) {
             try {
@@ -49,7 +53,7 @@ function EnterParkingWithReservationPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>

@@ -8,7 +8,7 @@ import {
 import {Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {useTranslation} from "react-i18next";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {api} from "@/api/api.ts";
 import {useEffect, useState} from "react";
 import {arrayToDate, ParkingEventType, ReservationDetailsType} from "@/types/Reservations.ts";
@@ -21,6 +21,7 @@ import {
     PaginationLink, PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
+import {Pathnames} from "@/router/pathnames.ts";
 
 function ReservationDetailsPage() {
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
@@ -28,6 +29,7 @@ function ReservationDetailsPage() {
     const {id} = useParams<{ id: string }>();
     const pageSize = 5;
     const [reservation, setReservation] = useState<ReservationDetailsType | null>(null);
+    const navigate = useNavigate();
 
     const fetchParkingSectors = (page?: number) => {
         if (id) {
@@ -64,13 +66,13 @@ function ReservationDetailsPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href={"/all-reservations"}>All reservations</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.staff.allReservations)}>All reservations</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>

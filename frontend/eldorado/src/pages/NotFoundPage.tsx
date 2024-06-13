@@ -2,6 +2,7 @@ import {useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button";
 import {useTranslation} from "react-i18next";
 import eldoLogo from "@/assets/eldorado.png";
+import {Pathnames} from "@/router/pathnames.ts";
 
 const NotFoundPage = () => {
     const {t} = useTranslation();
@@ -12,7 +13,7 @@ const NotFoundPage = () => {
             <img src={eldoLogo} alt="Eldorado" className="mx-auto h-auto w-1/3"/>
             <h1 className="text-3xl font-bold mb-4">{t("notFound.title")}</h1>
             <p className="text-lg mb-8">{t("notFound.description")}</p>
-            <Button onClick={() => navigate("/home")}
+            <Button onClick={() => navigate(Pathnames.public.home)}
                     className="transition-colors hover:text-foreground">
                 {t("notFound.home")}
             </Button>

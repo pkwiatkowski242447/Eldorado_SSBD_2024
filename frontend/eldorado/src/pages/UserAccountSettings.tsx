@@ -8,7 +8,7 @@ import {isValidPhoneNumber} from "react-phone-number-input/min";
 import {api} from "@/api/api.ts";
 import {toast} from "@/components/ui/use-toast.ts";
 import {useAccount} from "@/hooks/useAccount.ts";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {AccountTypeEnum, localDateTimeToDate, UserType} from "@/types/Users.ts";
 import {
     AlertDialog,
@@ -33,6 +33,7 @@ import PersonalInfoForm from "@/components/forms/PersonalInfoForm.tsx";
 import DetailsForm from "@/components/forms/DetailsForm.tsx";
 import UserLevelsForm from "@/components/forms/UserLevelsForm.tsx";
 import UserHistoryPage from "@/pages/UserHistoryPage.tsx";
+import {Pathnames} from "@/router/pathnames.ts";
 
 function UserAccountSettings() {
     const [activeForm, setActiveForm] = useState('Details');
@@ -46,6 +47,7 @@ function UserAccountSettings() {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingButton, setIsLoadingButton] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const navigate = useNavigate();
 
     const emailSchema = z.object({
         email: z.string().email({message: t("accountSettings.wrongEmail")}),
@@ -313,13 +315,13 @@ function UserAccountSettings() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/manage-users">{t("breadcrumb.manageUsers")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.admin.userManagement)}>{t("breadcrumb.manageUsers")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
