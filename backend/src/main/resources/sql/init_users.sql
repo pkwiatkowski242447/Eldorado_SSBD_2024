@@ -362,3 +362,6 @@ INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUE
 
 --5 -- starts in the future - overlaps - blocking
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('fcae0865-d856-4dba-8094-04dc60b8a027', current_timestamp, current_timestamp + interval '1 hour', current_timestamp + interval '3 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '65c51075-0749-4304-984a-9cb926e65aab', 0, 'IN_PROGRESS');
+
+-- Test sector
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version, deactivation_time) VALUES ('0fb38d78-acdf-4617-b15b-462c4e310ad4', current_timestamp, 0, 5, 3, 'XX-01', '96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1', 'UNCOVERED', 0, current_timestamp + interval '12 hours');
