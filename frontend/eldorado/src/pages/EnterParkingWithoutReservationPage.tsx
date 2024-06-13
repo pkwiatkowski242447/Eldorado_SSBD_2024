@@ -31,6 +31,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import {Pathnames} from "@/router/pathnames.ts";
+import {useNavigate} from "react-router-dom";
 
 function EnterParkingWithoutReservationPage() {
     const [currentPage, setCurrentPage] = useState(0);
@@ -40,6 +42,7 @@ function EnterParkingWithoutReservationPage() {
     const [selectedParkingId, setSelectedParkingId] = useState<string | null>(null);
     const [parkingDetails, setParkingDetails] = useState<{ id: string, sectorName: string } | null>(null);
     const pageSize = 5;
+    const navigate = useNavigate();
 
     const fetchParking = (page?: number) => {
         const actualPage = page != undefined ? page : currentPage;
@@ -86,7 +89,7 @@ function EnterParkingWithoutReservationPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>

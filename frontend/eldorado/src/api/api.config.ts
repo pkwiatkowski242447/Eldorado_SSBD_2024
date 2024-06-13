@@ -8,7 +8,7 @@ export const DEFAULT_HEADERS = {
     'Content-type': 'application/json',
 }
 export const apiWithConfig = axios.create({
-    baseURL: API_URL,
+    baseURL: API_TEST_URL,
     timeout: TIMEOUT_IN_MS,
     headers: DEFAULT_HEADERS,
 })

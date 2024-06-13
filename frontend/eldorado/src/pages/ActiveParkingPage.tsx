@@ -23,6 +23,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {ParkingListType} from "@/types/Parking.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {useNavigate} from "react-router-dom";
+import {Pathnames} from "@/router/pathnames.ts";
 
 function ActiveParkingPage() {
     // @ts-expect-error no time
@@ -67,7 +68,7 @@ function ActiveParkingPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
