@@ -36,6 +36,7 @@ export const Pathnames = {
         parkingInfo: '/parking-list/parking-info/:id',
         makeReservation: '/make-reservation/:id',
         enterParkingWithoutReservation: '/enter-parking',
+        enterParkingWithReservation: '/enter-reservation',
     },
     loggedIn: {
         landingPage: '/',
