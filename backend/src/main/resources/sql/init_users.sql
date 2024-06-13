@@ -343,7 +343,7 @@ INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUE
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('c074563c-c503-47f6-9222-0443c517e47d', '27b8f933-3bdf-4bfb-affe-0d19260a51cc', current_timestamp - interval '47 hours', 'EXIT', 0);
 
 --6 -- starts in the future - doesn't overlap - non blocking
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('e598892e-7b3b-4e33-ad24-472fb05b0e8f', current_timestamp, current_timestamp + interval '25 hour', current_timestamp + interval '28 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'IN_PROGRESS');
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('e598892e-7b3b-4e33-ad24-472fb05b0e8f', current_timestamp, current_timestamp + interval '80 hour', current_timestamp + interval '83 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '828228e6-2fa7-418e-8cfe-7f4d79737557', 0, 'IN_PROGRESS');
 
 -- Reservations to first covered sector - no available places
 --4.2 -- started in past ends in future - one entry, one exit - blocking
