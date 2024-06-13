@@ -359,4 +359,8 @@ export const api = {
     cancelReservation: (id: string) => {
         return apiWithConfig.delete(`/reservations/cancel-reservation/${id}`)
     },
+
+    enterParkingWithoutReservation: (parkingId: string) => {
+        return apiWithConfig.post(`/parking/${parkingId}/enter`)
+    }
 }
