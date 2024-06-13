@@ -73,6 +73,12 @@ public class ParkingService implements ParkingServiceInterface {
     @Value("${reservation.client_limit}")
     private Integer clientLimit;
 
+    @Value("${client_type.standard.threshold}")
+    private Integer standardThreshold;
+
+    @Value("${client_type.premium.threshold}")
+    private Integer premiumThreshold;
+
     @Autowired
     public ParkingService(ParkingFacade parkingFacade,
                           ReservationFacade reservationFacade,
@@ -229,7 +235,7 @@ public class ParkingService implements ParkingServiceInterface {
         }
 
         if (reservation.getStatus().equals(Reservation.ReservationStatus.AWAITING)) {
-            reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
+            reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() + 1);
             reservation.setStatus(Reservation.ReservationStatus.IN_PROGRESS);
         }
 
@@ -387,8 +393,16 @@ public class ParkingService implements ParkingServiceInterface {
                 reservation.setEndTime(LocalDateTime.now());
             } else {
                 reservation.getClient().setTotalReservationHours(reservation.getClient().getTotalReservationHours() +
-                        Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toMinutes()
+                        Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toHours()
                 );
+
+                long clientTotalReservationHours = reservation.getClient().getTotalReservationHours();
+                // Check if client type can be upgraded
+                if (clientTotalReservationHours >= premiumThreshold) {
+                    reservation.getClient().setType(Client.ClientType.PREMIUM);
+                } else if (clientTotalReservationHours >= standardThreshold) {
+                    reservation.getClient().setType(Client.ClientType.STANDARD);
+                }
             }
             reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
             reservation.setStatus(Reservation.ReservationStatus.COMPLETED_MANUALLY);
