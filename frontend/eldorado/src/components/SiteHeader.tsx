@@ -125,6 +125,12 @@ const SiteHeader = () => {
                         Enter Parking
                     </Button>
                 )}
+                {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
+                    <Button variant="link" onClick={() => navigate(Pathnames.client.enterParkingWithReservation)}
+                            className={`text-muted-foreground transition-colors hover:text-foreground`}>
+                        Enter Reservation
+                    </Button>
+                )}
             </nav>
             <div className="flex w-full items-center gap-4 justify-end">
                 {(accountLS && tokenLS) && (

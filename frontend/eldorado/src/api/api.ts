@@ -362,5 +362,9 @@ export const api = {
 
     enterParkingWithoutReservation: (parkingId: string) => {
         return apiWithConfig.post(`/parking/${parkingId}/enter`)
+    },
+
+    enterParkingWithReservation: (reservationId: string) => {
+        return apiWithConfig.post(`/parking/reservations/${reservationId}/enter`)
     }
 }
