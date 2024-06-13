@@ -21,6 +21,7 @@ public class ReservationListMapper {
                 parkingAddress.getZipCode(),
                 parkingAddress.getStreet(),
                 reservation.getSector().getName(),
+                reservation.getStatus(),
                 reservation.getBeginTime(),
                 reservation.getEndTime(),
                 clientId
@@ -44,6 +45,7 @@ public class ReservationListMapper {
                 reservationOutputListDTO.getZipCode(),
                 reservationOutputListDTO.getStreet(),
                 reservationOutputListDTO.getSectorName(),
+                reservationOutputListDTO.getStatus(),
                 reservationOutputListDTO.getBeginTime(),
                 reservationOutputListDTO.getEndingTime(),
                 reservationOutputListDTO.getClientId(),
