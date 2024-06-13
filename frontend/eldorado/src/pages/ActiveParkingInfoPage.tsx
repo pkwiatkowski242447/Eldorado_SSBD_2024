@@ -184,7 +184,7 @@ function ActiveParkingInfoPage() {
                             <TableHead
                                 className="text-center">{t("Total parking spaces")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Free parking spaces")}</TableHead>
+                                className="text-center">{t("Occupied parking spaces")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>

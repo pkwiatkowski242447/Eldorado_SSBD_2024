@@ -34,7 +34,7 @@ import CreateSectorForm from "@/components/forms/CreateSectorForm.tsx";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditSectorForm from "@/components/forms/EditSectorForm.tsx";
@@ -303,8 +303,10 @@ export function ParkingManagementInfoPage() {
                             <AlertDialogDescription>
                                 Are you sure you want to delete this sector?
                             </AlertDialogDescription>
-                            <AlertDialogAction onClick={handleDeleteSector}>{t("general.ok")}</AlertDialogAction>
-                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDeleteSector}>{t("general.ok")}</AlertDialogAction>
+                            </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                     <AlertDialog open={isActivateDialogOpen} onOpenChange={setActivateDialogOpen}>
@@ -313,8 +315,10 @@ export function ParkingManagementInfoPage() {
                             <AlertDialogDescription>
                                 Are you sure you want to activate this sector?
                             </AlertDialogDescription>
-                            <AlertDialogAction onClick={handleActivateSector}>{t("general.ok")}</AlertDialogAction>
-                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleActivateSector}>{t("general.ok")}</AlertDialogAction>
+                            </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 </Table>

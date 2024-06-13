@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 export interface ReservationType {
     beginTime: string,
     city: string,
@@ -54,5 +56,5 @@ export function arrayToDate(arr: number[]): string {
         date = new Date(date.getTime() + timezoneDifference * 60 * 1000);
     }
 
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    return format(date, "dd.MM.yyyy HH:mm");
 }

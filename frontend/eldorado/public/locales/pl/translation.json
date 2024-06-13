@@ -1,4 +1,7 @@
 {
+  "general.minutes": "Minuty",
+  "general.hours": "Godziny",
+  "general.pickDate": "Wybierz datę",
   "general.ok": "OK",
   "general.cancel": "Anuluj",
   "general.confirm": "Potwierdzenie",

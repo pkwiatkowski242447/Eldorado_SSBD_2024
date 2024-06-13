@@ -60,7 +60,7 @@ export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4"/>
                                             {field.value ? (
-                                                format(field.value, "PPP HH:mm:ss", {locale: locale})
+                                                format(field.value, "PPP HH:mm", {locale: locale})
                                             ) : (
                                                 <span>{t("general.pickDate")}</span>
                                             )}
@@ -104,7 +104,7 @@ export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4"/>
                                             {field.value ? (
-                                                format(field.value, "PPP HH:mm:ss", {locale: locale})
+                                                format(field.value, "PPP HH:mm", {locale: locale})
                                             ) : (
                                                 <span>{t("general.pickDate")}</span>
                                             )}
