@@ -455,5 +455,7 @@
   "accountSettings.history": "History",
 
   "adminCreateUserPage.title": "Create a new User",
-  "operation.type.email.change": "E-Mail address change"
+  "operation.type.email.change": "E-Mail address change",
+
+  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "The reservation must end after it began."
 }

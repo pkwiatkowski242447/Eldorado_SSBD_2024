@@ -27,7 +27,7 @@ type createParkingFormProps = {
     parkingId: string
 }
 
-function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingFormProps) {
+function CreateSectorForm({setDialogOpen, refresh, parkingId}:createParkingFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -176,4 +176,4 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
     )
 }
 
-export default CreateParkingForm
+export default CreateSectorForm

@@ -1,5 +1,14 @@
 import { format } from 'date-fns';
 
+export enum ReservationStatus{
+    AWAITING = "AWAITING",
+    IN_PROGRESS = "IN_PROGRESS",
+    COMPLETED_MANUALLY = "COMPLETED_MANUALLY",
+    COMPLETED_AUTOMATICALLY = "COMPLETED_AUTOMATICALLY",
+    CANCELLED = "CANCELLED",
+    TERMINATED = "TERMINATED"
+}
+
 export interface ReservationType {
     beginTime: string,
     city: string,
@@ -8,6 +17,7 @@ export interface ReservationType {
     sectorName: string,
     street: string,
     zipCode: string,
+    status: ReservationStatus
 }
 
 export interface ClientReservationType {
@@ -19,6 +29,7 @@ export interface ClientReservationType {
     street: string,
     zipCode: string,
     clientId: string | null,
+    status: ReservationStatus
 }
 
 export enum ParkingEventTypeEnum{
@@ -40,7 +51,8 @@ export interface ReservationDetailsType {
     street: string,
     zipCode: string,
     sectorName: string,
-    parkingEvents: ParkingEventType[] | null
+    parkingEvents: ParkingEventType[] | null,
+    status: ReservationStatus
 }
 
 export function arrayToDate(arr: number[]): string {

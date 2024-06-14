@@ -14,7 +14,7 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {CreateParkingType, sectorStrategy} from "@/types/Parking.ts";
@@ -167,10 +167,12 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                     <AlertDialogDescription>
                         Are you sure you want to create a new parking?
                     </AlertDialogDescription>
-                    <AlertDialogAction onClick={handleAlertDialog}>
-                        {t("general.ok")}
-                    </AlertDialogAction>
-                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleAlertDialog}>
+                            {t("general.ok")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </Form>
