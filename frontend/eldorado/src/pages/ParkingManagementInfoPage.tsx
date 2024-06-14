@@ -121,6 +121,7 @@ export function ParkingManagementInfoPage() {
             .then(response => {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
+                    // ts-expext-error foff
                     const sectorsTemp:any[] = response.data;
                     const sectorsCopy:SectorListType[] = [];
                     sectorsTemp.forEach((s) => {sectorsCopy.push(sectorDTOtoSectorListType(s))})
@@ -214,7 +215,7 @@ export function ParkingManagementInfoPage() {
                             <TableCell>{parking.city}</TableCell>
                             <TableCell>{parking.street}</TableCell>
                             <TableCell>{parking.zipCode}</TableCell>
-                            <TableCell><Badge variant={"default"}>{parking.strategy} </Badge></TableCell>
+                            <TableCell><Badge variant={"default"}>{t(parking.strategy)} </Badge></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -258,7 +259,7 @@ export function ParkingManagementInfoPage() {
                                 <TableCell>{sector.deactivationTime}</TableCell>
                                 <TableCell>{sector.occupiedPlaces}</TableCell>
                                 <TableCell>{sector.maxPlaces}</TableCell>
-                                <TableCell><Badge variant={"default"}>{sector.type} </Badge></TableCell>
+                                <TableCell><Badge variant={"default"}>{t(sector.type)} </Badge></TableCell>
                                 <TableCell>{sector.weight}</TableCell>
                                 <TableCell>
                                     <DropdownMenu>

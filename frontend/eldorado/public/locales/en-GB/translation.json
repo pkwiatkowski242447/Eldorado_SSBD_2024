@@ -770,5 +770,24 @@
   "exit.parking.success.message": "You have successfully exited the parking. See you soon!",
 
   "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "The reservation must end after it began.",
-  "breadcrumb.exitParking": "Exit parking"
+  "breadcrumb.exitParking": "Exit parking",
+
+  "AWAITING" : "Awaiting",
+  "IN_PROGRESS" : "In progress",
+  "COMPLETED_MANUALLY" : "Completed manually",
+  "COMPLETED_AUTOMATICALLY" : "Completed automatically",
+  "CANCELLED" : "Cancelled",
+  "TERMINATED" : "Terminated",
+
+  "ENTRY" : "Entry",
+    "EXIT" : "Exit",
+  "UNCOVERED" : "Uncovered",
+  "COVERED" : "Covered",
+  "UNDERGROUND" : "Underground",
+
+  "LEAST_OCCUPIED" : "Least occupied",
+    "MOST_OCCUPIED" : "Most occupied",
+    "LEAST_OCCUPIED_WEIGHTED" : "Least occupied weighted",
+
+  "exit.parking.form.exitParking": "End reservation"
 }

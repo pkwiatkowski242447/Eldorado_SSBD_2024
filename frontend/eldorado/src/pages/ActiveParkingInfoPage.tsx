@@ -145,7 +145,7 @@ function ActiveParkingInfoPage() {
                 </Button>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">{t("active.parking.info.page.parking.info")}{parking?.city}, {parking?.street} {t("active.parking.info.page.street")}</h1>
+                <h1 className="text-3xl font-semibold">{t("active.parking.info.page.parking.info")}{parking?.city}, {parking?.street}</h1>
             </div>
             <div>
                 <Table className="p-10 flex-grow">
@@ -166,7 +166,8 @@ function ActiveParkingInfoPage() {
                             <TableCell>{parking?.city}</TableCell>
                             <TableCell>{parking?.street}</TableCell>
                             <TableCell>{parking?.zipCode}</TableCell>
-                            <TableCell><Badge variant={"default"}>{parking?.strategy} </Badge></TableCell>
+                            {/* @ts-expect-error what? */}
+                            <TableCell><Badge variant={"default"}>{t(parking?.strategy)} </Badge></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -193,7 +194,7 @@ function ActiveParkingInfoPage() {
                         {sector?.map(sector => (
                             <TableRow key={sector?.id} className="flex-auto">
                                 <TableCell>{sector?.name}</TableCell>
-                                <TableCell><Badge variant={"default"}>{sector?.type} </Badge></TableCell>
+                                <TableCell><Badge variant={"default"}>{t(sector?.type)} </Badge></TableCell>
                                 <TableCell>{sector?.maxPlaces}</TableCell>
                                 <TableCell>{sector?.occupiedPlaces}</TableCell>
                                 <TableCell>
@@ -208,7 +209,7 @@ function ActiveParkingInfoPage() {
                                                     {sectorInfo && (
                                                         <>
                                                             <p><strong>{t("active.parking.info.page.name")}</strong> {sectorInfo.name}</p>
-                                                            <p><strong>{t("active.parking.info.page.type")}</strong> {sectorInfo.type}</p>
+                                                            <p><strong>{t("active.parking.info.page.type")}</strong> {t(sectorInfo.type)}</p>
                                                             <p><strong>{t("active.parking.info.page.max.places")}</strong> {sectorInfo.maxPlaces}</p>
                                                             <Button className={"mt-5"} onClick={() => handleButtonClick()}>{t("active.parking.info.page.make.reservation")}</Button>
                                                         </>

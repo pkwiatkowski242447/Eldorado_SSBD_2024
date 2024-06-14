@@ -22,6 +22,7 @@ import {
     PaginationPrevious
 } from "@/components/ui/pagination.tsx";
 import {Pathnames} from "@/router/pathnames.ts";
+import {Badge} from "@/components/ui/badge.tsx";
 
 function ReservationDetailsPage() {
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
@@ -117,7 +118,8 @@ function ReservationDetailsPage() {
                             <TableCell>{reservation?.street}</TableCell>
                             <TableCell>{reservation?.zipCode}</TableCell>
                             <TableCell>{reservation?.sectorName}</TableCell>
-                            <TableCell>{reservation?.status}</TableCell>
+                            {/* @ts-expect-error what? */}
+                            <TableCell><Badge variant={"secondary"}>{t(reservation?.status)} </Badge></TableCell>
                             <TableCell>{reservation?.id}</TableCell>
                         </TableRow>
                     </TableBody>
@@ -143,7 +145,7 @@ function ReservationDetailsPage() {
                         <TableRow key={parkingEvent.id} className="flex-auto">
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{parkingEvent.date}</TableCell>
-                            <TableCell>{parkingEvent.type}</TableCell>
+                            <TableCell>{t(parkingEvent.type)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

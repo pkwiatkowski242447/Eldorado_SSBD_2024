@@ -176,10 +176,10 @@ function ParkingManagementPage() {
                                 <TableCell>{parking.city}</TableCell>
                                 <TableCell>{parking.street}</TableCell>
                                 <TableCell>{parking.zipCode}</TableCell>
-                                <TableCell><Badge variant={"default"}>{parking.strategy} </Badge></TableCell>
+                                <TableCell><Badge variant={"default"}>{t(parking.strategy)} </Badge></TableCell>
                                 <TableCell>
                                     {parking.sectorTypes.map(level => {
-                                        return <Badge key={level} variant={"secondary"}>{level} </Badge>;
+                                        return <Badge key={level} variant={"secondary"}>{t(level)} </Badge>;
                                     })}
                                 </TableCell>
                                 <TableCell>

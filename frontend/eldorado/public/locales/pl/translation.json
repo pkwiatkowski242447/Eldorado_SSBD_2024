@@ -759,5 +759,24 @@
 
 
   "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "Rezerwacja musi kończyć się po tym jak sie zaczęła.",
-  "breadcrumb.exitParking": "Wyjedź z parkingu"
+  "breadcrumb.exitParking": "Wyjedź z parkingu",
+
+  "AWAITING" : "Oczekująca",
+  "IN_PROGRESS" : "W realizacji",
+  "COMPLETED_MANUALLY" : "Zakończona ręcznie",
+  "COMPLETED_AUTOMATICALLY" : "Zakończona automatycznie",
+  "CANCELLED" : "Anulowana",
+  "TERMINATED" : "Zakończona",
+
+  "ENTRY" : "Wjazd",
+  "EXIT" : "Wyjazd",
+  "UNCOVERED" : "Odkryty",
+  "COVERED" : "Kryty",
+  "UNDERGROUND" : "Podziemny",
+
+  "LEAST_OCCUPIED" : "Najmniej zajęty",
+  "MOST_OCCUPIED" : "Najbardziej zajęty",
+  "LEAST_OCCUPIED_WEIGHTED" : "Ważony najmniej zajęty",
+
+  "exit.parking.form.exitParking": "Zakończ rezerwację"
 }

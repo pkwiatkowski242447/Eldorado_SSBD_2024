@@ -33,6 +33,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {Pathnames} from "@/router/pathnames.ts";
+import {Badge} from "@/components/ui/badge.tsx";
 
 function MyReservationDetailsPage() {
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
@@ -123,6 +124,8 @@ function MyReservationDetailsPage() {
                             <TableHead className="text-center">{t("reservation.details.page.street")}</TableHead>
                             <TableHead className="text-center">{t("reservation.details.page.zip.code")}</TableHead>
                             <TableHead className="text-center">{t("reservation.details.page.sector.name")}</TableHead>
+                            <TableHead
+                                className="text-center">{"Status"}</TableHead>
                             <TableHead className="text-center">{t("reservation.details.page.id")}</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -134,7 +137,8 @@ function MyReservationDetailsPage() {
                             <TableCell>{reservation?.street}</TableCell>
                             <TableCell>{reservation?.zipCode}</TableCell>
                             <TableCell>{reservation?.sectorName}</TableCell>
-                            <TableCell>{reservation?.status}</TableCell>
+                            {/* @ts-expect-error what? */}
+                            <TableCell><Badge variant={"secondary"}>{t(reservation?.status)}</Badge></TableCell>
                             <TableCell>{reservation?.id}</TableCell>
                         </TableRow>
                     </TableBody>
@@ -156,7 +160,7 @@ function MyReservationDetailsPage() {
                         <TableRow key={parkingEvent.id} className="flex-auto">
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{parkingEvent.date.toLocaleString()}</TableCell>
-                            <TableCell>{parkingEvent.type}</TableCell>
+                            <TableCell>{t(parkingEvent.type)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

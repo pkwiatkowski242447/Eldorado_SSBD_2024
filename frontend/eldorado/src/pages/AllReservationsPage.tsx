@@ -106,8 +106,6 @@ function AllReservationsPage() {
                                         className="text-center">{t("allReservationsPage.table.sectorName")}</TableHead>
                                     <TableHead
                                         className="text-center">{t("Status")}</TableHead>
-                                    {/*<TableHead*/}
-                                    {/*    className="text-center">{t("allReservationsPage.table.reservationId")}</TableHead>*/}
                                     <TableHead
                                         className="text-center"></TableHead>
                                 </TableRow>
@@ -122,7 +120,7 @@ function AllReservationsPage() {
                                         <TableCell>{reservation.street}</TableCell>
                                         <TableCell>{reservation.zipCode}</TableCell>
                                         <TableCell>{reservation.sectorName}</TableCell>
-                                        <TableCell><Badge variant={"secondary"}>{reservation.status} </Badge></TableCell>
+                                        <TableCell><Badge variant={"secondary"}>{t(reservation.status)} </Badge></TableCell>
                                         <TableCell>
                                             <Button onClick={() => handleViewDetails(reservation.id)}>
                                                 {t("allReservationsPage.table.viewInfo")}

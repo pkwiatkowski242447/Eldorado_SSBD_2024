@@ -111,7 +111,7 @@ function ActiveParkingPage() {
                                 <TableCell>{parking.zipCode}</TableCell>
                                 <TableCell>
                                     {parking.sectorTypes.map(level => {
-                                        return <Badge key={level} variant={"secondary"}>{level} </Badge>;
+                                        return <Badge key={level} variant={"secondary"}>{t(level)} </Badge>;
                                     })}
                                 </TableCell>
                                 <TableCell>

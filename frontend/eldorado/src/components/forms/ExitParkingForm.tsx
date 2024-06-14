@@ -100,7 +100,7 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                             </FormControl>
                             <div className="space-y-1 leading-none">
                                 <FormLabel>
-                                    {t("exit.parking.form.end.reservation")}
+                                    {t("exit.parking.form.exitParking")}
                                 </FormLabel>
                             </div>
                         </FormItem>

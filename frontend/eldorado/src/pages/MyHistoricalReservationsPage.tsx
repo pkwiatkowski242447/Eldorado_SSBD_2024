@@ -15,6 +15,8 @@ import {Spinner} from "react-bootstrap";
 import {Button} from "@/components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
+import {Badge} from "@/components/ui/badge.tsx";
+
 
 function MyHistoricalReservationsPage() {
     const [historicalReservations, setHistoricalReservations] = useState<ReservationType[]>([]);
@@ -22,7 +24,7 @@ function MyHistoricalReservationsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [pageSize] = useState(5);
     const navigate = useNavigate();
-    const t = useTranslation();
+    const {t} = useTranslation();
 
     const fetchHistoricalReservations = async () => {
         setIsLoading(true);
@@ -94,11 +96,11 @@ function MyHistoricalReservationsPage() {
                                     <TableCell>{historicalReservation.street}</TableCell>
                                     <TableCell>{historicalReservation.zipCode}</TableCell>
                                     <TableCell>{historicalReservation.sectorName}</TableCell>
-                                    <TableCell>{historicalReservation.status}</TableCell>
+                                    <TableCell><Badge variant={"secondary"}>{t(historicalReservation.status)} </Badge></TableCell>
                                     <TableCell>{historicalReservation.id}</TableCell>
                                     <TableCell>
                                         <Button onClick={() => handleViewDetails(historicalReservation.id)}>
-                                            View Details
+                                            {t("active.parking.info.page.view.info")}
                                         </Button>
                                     </TableCell>
                                 </TableRow>
