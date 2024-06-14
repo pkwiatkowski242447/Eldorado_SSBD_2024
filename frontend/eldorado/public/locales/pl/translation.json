@@ -778,5 +778,9 @@
   "MOST_OCCUPIED" : "Najbardziej zajęty",
   "LEAST_OCCUPIED_WEIGHTED" : "Ważony najmniej zajęty",
 
-  "exit.parking.form.exitParking": "Zakończ rezerwację"
+  "exit.parking.form.exitParking": "Zakończ rezerwację",
+  "createReservationPage.name": "Nazwa sektora",
+  "createReservationPage.maxPlaces": "Maksymalna liczba miejsc",
+  "createReservationPage.type": "Typ"
+
 }

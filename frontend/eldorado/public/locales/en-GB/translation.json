@@ -789,5 +789,8 @@
     "MOST_OCCUPIED" : "Most occupied",
     "LEAST_OCCUPIED_WEIGHTED" : "Least occupied weighted",
 
-  "exit.parking.form.exitParking": "End reservation"
+  "exit.parking.form.exitParking": "End reservation",
+  "createReservationPage.name": "Name",
+  "createReservationPage.maxPlaces": "Max places",
+  "createReservationPage.type": "Type"
 }

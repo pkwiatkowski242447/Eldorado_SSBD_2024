@@ -1,4 +1,5 @@
--- -- GRAND PRIVILEGES dev
+\c ssbd03 ssbd03admin
+-- -- GRAND PRIVILEGES
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.account                TO ssbd03mok;
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.past_password          TO ssbd03mok;
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.personal_data          TO ssbd03mok;
@@ -277,8 +278,8 @@ INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, 
 INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('2dda962e-0fbe-4c9c-9dd5-59b945b7764f', current_timestamp, 1, 10, 99, 'CR-02', 'c94a751b-77e3-4a4d-bb64-74bfbe9c8857', 'UNCOVERED', 0);
 INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('74151bef-7b38-4915-85ce-b8691f5fa4a1', current_timestamp, 0, 10, 3, 'CR-03', 'c94a751b-77e3-4a4d-bb64-74bfbe9c8857', 'UNCOVERED', 0);
 
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('17fc3479-43c7-49ad-96f4-5299304e8015', current_timestamp, TIMESTAMP '2024-06-14 10:00:00', TIMESTAMP '2024-06-14 20:00:00', 'c276cb93-5cfe-4bf5-9998-ecdeee8ba06b', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('d92e7d7b-9f82-4391-8d36-27cb92e140cf', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '0ca02f7e-d8e9-45d3-a332-a56015acb822', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('62f21719-9470-4c75-8980-87eb835968dc', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '9428fadf-191c-4dd7-8626-01c3e0ff603c', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('17fc3479-43c7-49ad-96f4-5299304e8015', current_timestamp, TIMESTAMP '2024-06-14 10:00:00', TIMESTAMP '2024-06-14 20:00:00', '900cbc37-2a95-4bd6-96f2-897c12155f85', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('d92e7d7b-9f82-4391-8d36-27cb92e140cf', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '9428fadf-191c-4dd7-8626-01c3e0ff603c', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('62f21719-9470-4c75-8980-87eb835968dc', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
 
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('fbec4998-23fa-4e11-9d18-cd8c066a4530', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '2dda962e-0fbe-4c9c-9dd5-59b945b7764f', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('fbec4998-23fa-4e11-9d18-cd8c066a4530', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '900cbc37-2a95-4bd6-96f2-897c12155f85', '2dda962e-0fbe-4c9c-9dd5-59b945b7764f', 0, 'IN_PROGRESS');

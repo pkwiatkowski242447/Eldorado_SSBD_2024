@@ -87,17 +87,18 @@ function CreateReservationInSectorPage() {
                         <TableHeader>
                             <TableRow className={"text-center p-10"}>
                                 <TableHead
-                                    className="text-center">{t("Name")}</TableHead>
+                                    className="text-center">{t("createReservationPage.name")}</TableHead>
                                 <TableHead
-                                    className="text-center">{t("Type")}</TableHead>
+                                    className="text-center">{t("createReservationPage.type")}</TableHead>
                                 <TableHead
-                                    className="text-center">{t("Max places")}</TableHead>
+                                    className="text-center">{t("createReservationPage.maxPlaces")}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className={"text-center"}>
                             <TableRow key={sectorInfo?.id} className="flex-auto">
                                 <TableCell>{sectorInfo?.name}</TableCell>
-                                <TableCell><Badge variant={"default"}>{sectorInfo?.type} </Badge></TableCell>
+                                {/* @ts-expect-error what? */}
+                                <TableCell><Badge variant={"default"}>{t(sectorInfo?.type)}</Badge></TableCell>
                                 <TableCell>{sectorInfo?.maxPlaces}</TableCell>
                             </TableRow>
                         </TableBody>
