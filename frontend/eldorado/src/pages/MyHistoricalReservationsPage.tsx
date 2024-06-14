@@ -78,6 +78,8 @@ function MyHistoricalReservationsPage() {
                                 <TableHead
                                     className="text-center">{"Sector Name"}</TableHead>
                                 <TableHead
+                                    className="text-center">{"Status"}</TableHead>
+                                <TableHead
                                     className="text-center">{"ID"}</TableHead>
                                 <TableHead
                                     className="text-center"></TableHead>
@@ -92,6 +94,7 @@ function MyHistoricalReservationsPage() {
                                     <TableCell>{historicalReservation.street}</TableCell>
                                     <TableCell>{historicalReservation.zipCode}</TableCell>
                                     <TableCell>{historicalReservation.sectorName}</TableCell>
+                                    <TableCell>{historicalReservation.status}</TableCell>
                                     <TableCell>{historicalReservation.id}</TableCell>
                                     <TableCell>
                                         <Button onClick={() => handleViewDetails(historicalReservation.id)}>

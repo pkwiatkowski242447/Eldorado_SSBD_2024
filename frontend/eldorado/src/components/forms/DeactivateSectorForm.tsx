@@ -28,7 +28,7 @@ import {
     AlertDialog,
     AlertDialogAction, AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {api} from "@/api/api.ts";
@@ -104,7 +104,7 @@ export function DeactivateSectorForm({setDialogOpen, refresh, sectorId}:deactiva
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4" />
                                             {field.value ? (
-                                                format(field.value, "PPP HH:mm:ss", {locale:locale})
+                                                format(field.value, "PPP HH:mm", {locale:locale})
                                             ) : (
                                                 <span>{t("general.pickDate")}</span>
                                             )}
@@ -134,7 +134,7 @@ export function DeactivateSectorForm({setDialogOpen, refresh, sectorId}:deactiva
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                                     </>
                                 ) : (
-                                    t("Deactivate")
+                                    t("deactivate.sector.form.deactivate")
                                 )}
                             </Button>
                         </FormItem>
@@ -145,12 +145,14 @@ export function DeactivateSectorForm({setDialogOpen, refresh, sectorId}:deactiva
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want edit this sector?
+                        {t("deactivate.sector.form.are.you.sure.you.want.to.edit.this.sector")}
                     </AlertDialogDescription>
-                    <AlertDialogAction onClick={handleAlertDialog}>
-                        {t("general.ok")}
-                    </AlertDialogAction>
-                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleAlertDialog}>
+                            {t("general.ok")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </Form>

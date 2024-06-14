@@ -1,3 +1,5 @@
+import {format} from "date-fns";
+
 export enum sectorType {
     UNCOVERED = "UNCOVERED",
     COVERED = "COVERED",
@@ -111,7 +113,7 @@ export function dtoTimeToString(arr: number[]): string {
         date = new Date(date.getTime() + timezoneDifference * 60 * 1000);
     }
 
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    return format(date, "dd.MM.yyyy HH:mm");
 }
 
 export function sectorDTOtoSectorListType(object:any):SectorListType {
