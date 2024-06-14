@@ -34,12 +34,12 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
     const [editedParking, setEditedParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""})
     const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""});
     const formSchema = z.object({
-        city: z.string().min(2, {message: "ZMIEN"})
-            .max(50, {message: "ZMIEN"}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: "ZMIEN"}),
-        street: z.string().min(2, {message: "ZMIEN"})
-            .max(60, {message: "ZMIEN"}).regex(RegExp("^[A-Za-z0-9.-]{5,50}$"), {message: "ZMIEN"}),
-        zipCode: z.string().min(6, {message: "ZMIEN"})
-            .max(6, {message: "ZMIEN"}).regex(RegExp("^\\d{2}-\\d{3}$"), {message: "ZMIEN"}),
+        city: z.string().min(2, {message: t("edit.parking.form.city.too.short")})
+            .max(50, {message: t("edit.parking.form.city.too.long")}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: t("edit.parking.form.city.regex.not.met")}),
+        street: z.string().min(2, {message: t("edit.parking.form.street.too.short")})
+            .max(60, {message: t("edit.parking.form.street.too.long")}).regex(RegExp("^[A-Za-z0-9.-]{5,50}$"), {message: t("edit.parking.form.street.regex.not.met")}),
+        zipCode: z.string().min(6, {message: t("edit.parking.form.zip.code.too.short")})
+            .max(6, {message: t("edit.parking.form.zip.code.too.long")}).regex(RegExp("^\\d{2}-\\d{3}$"), {message: t("edit.parking.form.zip.code.regex.not.met")}),
         strategy: z.enum(["LEAST_OCCUPIED", "MOST_OCCUPIED", "LEAST_OCCUPIED_WEIGHTED"])
     })
 
@@ -116,7 +116,7 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">City</FormLabel>
+                                <FormLabel className="text-left">{t("edit.parking.form.city")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Warszawa" {...field} />
                                 </FormControl>
@@ -131,7 +131,7 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Street</FormLabel>
+                                <FormLabel className="text-left">{t("edit.parking.form.street")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Ziemniaczana" {...field} />
                                 </FormControl>
@@ -146,7 +146,7 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Zip code</FormLabel>
+                                <FormLabel className="text-left">{t("edit.parking.form.zip.code")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="11-111" {...field} />
                                 </FormControl>
@@ -161,7 +161,7 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Strategy</FormLabel>
+                                <FormLabel className="text-left">{t("edit.parking.form.strategy")}</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value.toString()}>
                                     <FormControl>
                                         <SelectTrigger>
@@ -169,9 +169,9 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="LEAST_OCCUPIED">Least occupied</SelectItem>
-                                        <SelectItem value="MOST_OCCUPIED">Most occupied</SelectItem>
-                                        <SelectItem value="LEAST_OCCUPIED_WEIGHTED">Least occupied weighted</SelectItem>
+                                        <SelectItem value="LEAST_OCCUPIED">{t("edit.parking.form.least.occupied")}</SelectItem>
+                                        <SelectItem value="MOST_OCCUPIED">{t("edit.parking.form.most.occupied")}</SelectItem>
+                                        <SelectItem value="LEAST_OCCUPIED_WEIGHTED">{t("edit.parking.form.least.occupied.weighted")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -183,16 +183,16 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                         </>
-                    ) : (
-                        t("parkingManagementPage.createParking")
-                    )}
+                    ) :
+                        t("edit.parking.form.edit")
+                    }
                 </Button>
             </form>
             <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want edit this parking?
+                        {t("edit.parking.form.are.you.sure.you.want.to.edit.this.parking")}
                     </AlertDialogDescription>
                     <AlertDialogAction onClick={handleAlertDialog}>
                         {t("general.ok")}

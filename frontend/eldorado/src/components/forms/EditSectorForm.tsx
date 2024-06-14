@@ -35,9 +35,9 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
     const [editedSector, setEditedSector] = useState<EditSectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""})
     const [sector, setSector] = useState<EditSectorType>({id:"", parkingId:"", version:"", name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:0, signature:""});
     const formSchema = z.object({
-        maxPlaces: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(0, {message: "ZMIEN"}).max(1000,{message: "ZMIEN"}),
+        maxPlaces: z.coerce.number({message: t("edit.sector.form.sector.max.places.has.to.be.number")}).int({message: t("edit.sector.form.sector.max.places.has.to.be.integer")}).min(0, {message: t("edit.sector.form.sector.max.places.at.least.zero")}).max(1000,{message: t("edit.sector.form.sector.max.places.at.most.thousand")}),
         type: z.enum(["UNCOVERED", "COVERED", "UNDERGROUND"]),
-        weight: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(1, {message: "ZMIEN"}).max(100,{message: "ZMIEN"})
+        weight: z.coerce.number({message: t("edit.sector.form.sector.weight.has.to.be.number")}).int({message: t("edit.sector.form.sector.weight.has.to.be.integer")}).min(1, {message: t("edit.sector.form.sector.weight.too.low")}).max(100,{message: t("edit.sector.form.sector.weight.too.high")})
     })
 
     useEffect(() => {
@@ -110,7 +110,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Max places</FormLabel>
+                                <FormLabel className="text-left">{t("edit.sector.form.max.places")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="1" {...field} />
                                 </FormControl>
@@ -125,7 +125,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Weight</FormLabel>
+                                <FormLabel className="text-left">{t("edit.sector.form.weight")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="1" {...field} />
                                 </FormControl>
@@ -140,7 +140,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Sector Type</FormLabel>
+                                <FormLabel className="text-left">{t("edit.sector.form.sector.type")}</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
@@ -148,9 +148,9 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="UNCOVERED">Uncovered</SelectItem>
-                                        <SelectItem value="COVERED">Covered</SelectItem>
-                                        <SelectItem value="UNDERGROUND">Underground</SelectItem>
+                                        <SelectItem value="UNCOVERED">{t("edit.sector.form.sector.type.uncovered")}</SelectItem>
+                                        <SelectItem value="COVERED">{t("edit.sector.form.sector.type.covered")}</SelectItem>
+                                        <SelectItem value="UNDERGROUND">{t("edit.sector.form.sector.type.underground")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -163,7 +163,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                         </>
                     ) : (
-                        t("parkingManagementPage.createParking")
+                        t("edit.sector.form.edit")
                     )}
                 </Button>
             </form>
@@ -171,7 +171,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want edit this sector?
+                        {t("edit.sector.form.are.you.sure.you.want.to.edit.this.sector")}
                     </AlertDialogDescription>
                     <AlertDialogAction onClick={handleAlertDialog}>
                         {t("general.ok")}

@@ -74,7 +74,7 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">ID of the reservation</FormLabel>
+                                <FormLabel className="text-left">{t("exit.parking.form.id.of.reservation")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="25268941-b7ad-4288-b4bd-e0a3946b0bd8" {...field} />
                                 </FormControl>
@@ -96,7 +96,7 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                             </FormControl>
                             <div className="space-y-1 leading-none">
                                 <FormLabel>
-                                   End Reservation
+                                    {t("exit.parking.form.end.reservation")}
                                 </FormLabel>
                             </div>
                         </FormItem>
@@ -108,7 +108,7 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                         </>
                     ) : (
-                        t("Exit")
+                        t("exit.parking.form.exit")
                     )}
                 </Button>
             </form>
@@ -116,7 +116,7 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to exit the parking?
+                        {t("exit.parking.form.are.you.sure.you.want.to.edit.this.parking")}
                     </AlertDialogDescription>
                     <AlertDialogAction onClick={handleAlertDialog}>
                         {t("general.ok")}

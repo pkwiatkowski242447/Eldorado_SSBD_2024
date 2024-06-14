@@ -33,11 +33,11 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [newSector, setNewSector] = useState<CreateSectorType>({name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:1 })
     const formSchema = z.object({
-        name: z.string().min(5, {message: "ZMIEN"})
-            .max(5, {message: "ZMIEN"}).regex(RegExp("^[A-Z]{2}-[0-9]{2}$"), {message: "ZMIEN"}),
-        maxPlaces: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(0, {message: "ZMIEN"}).max(1000,{message: "ZMIEN"}),
+        name: z.string().min(5, {message:t("create.sector.form.sector.name.too.short")})
+            .max(5, {message: t("create.sector.form.sector.name.too.long")}).regex(RegExp("^[A-Z]{2}-[0-9]{2}$"), {message: t("create.sector.form.sector.name.regex.not.met")}),
+        maxPlaces: z.coerce.number({message: t("create.sector.form.sector.max.places.has.to.be.number")}).int({message: t("create.sector.form.sector.max.places.has.to.be.integer")}).min(0, {message: t("create.sector.form.sector.max.places.at.least.zero")}).max(1000,{message: t("create.sector.form.sector.max.places.at.most.thousand")}),
         type: z.enum(["UNCOVERED", "COVERED", "UNDERGROUND"]),
-        weight: z.coerce.number({message: "ZMIEN"}).int({message: "ZMIEN"}).min(1, {message: "ZMIEN"}).max(100,{message: "ZMIEN"})
+        weight: z.coerce.number({message: t("create.sector.form.sector.weight.has.to.be.number")}).int({message: t("create.sector.form.sector.weight.has.to.be.integer")}).min(1, {message: t("create.sector.form.sector.weight.too.low")}).max(100,{message: t("create.sector.form.sector.weight.too.high")})
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -88,7 +88,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Name</FormLabel>
+                                <FormLabel className="text-left">{t("create.sector.form.name")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="AA-01" {...field} />
                                 </FormControl>
@@ -103,7 +103,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                 render={({field}) => (
                     <FormItem>
                         <div className="grid gap-4">
-                            <FormLabel className="text-left">Max places</FormLabel>
+                            <FormLabel className="text-left">{t("create.sector.form.max.places")}</FormLabel>
                             <FormControl>
                                 <Input placeholder="0" {...field} />
                             </FormControl>
@@ -118,7 +118,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Weight</FormLabel>
+                                <FormLabel className="text-left">{t("create.sector.form.weight")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="0" {...field} />
                                 </FormControl>
@@ -133,7 +133,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Sector Type</FormLabel>
+                                <FormLabel className="text-left">{t("create.sector.form.sector.type")}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
@@ -141,9 +141,9 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="UNCOVERED">Uncovered</SelectItem>
-                                        <SelectItem value="COVERED">Covered</SelectItem>
-                                        <SelectItem value="UNDERGROUND">Underground</SelectItem>
+                                        <SelectItem value="UNCOVERED">{t("create.sector.form.sector.type.uncovered")}</SelectItem>
+                                        <SelectItem value="COVERED">{t("create.sector.form.sector.type.covered")}</SelectItem>
+                                        <SelectItem value="UNDERGROUND">{t("create.sector.form.sector.type.underground")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -156,7 +156,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                         </>
                     ) : (
-                        t("Create Sector")
+                        t("create.sector.form.create")
                     )}
                 </Button>
             </form>
@@ -164,7 +164,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to create a new sector?
+                        {t("create.sector.form.sector.are.you.sure.you.want.to.create.new.sector")}
                     </AlertDialogDescription>
                     <AlertDialogAction onClick={handleAlertDialog}>
                         {t("general.ok")}

@@ -32,12 +32,12 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [newParking, setNewParking] = useState<CreateParkingType>({city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED})
     const formSchema = z.object({
-        city: z.string().min(2, {message: "ZMIEN"})
-            .max(50, {message: "ZMIEN"}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: "ZMIEN"}),
-        street: z.string().min(2, {message: "ZMIEN"})
-            .max(60, {message: "ZMIEN"}).regex(RegExp("^[A-Za-z0-9.-]{5,50}$"), {message: "ZMIEN"}),
-        zipCode: z.string().min(6, {message: "ZMIEN"})
-            .max(6, {message: "ZMIEN"}).regex(RegExp("^\\d{2}-\\d{3}$"), {message: "ZMIEN"}),
+        city: z.string().min(2, {message: t("create.parking.form.city.too.short")})
+            .max(50, {message: t("create.parking.form.city.too.long")}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: t("create.parking.form.city.regex.not.met")}),
+        street: z.string().min(2, {message: t("create.parking.form.street.too.short")})
+            .max(60, {message: t("create.parking.form.street.too.long")}).regex(RegExp("^[A-Za-z0-9.-]{5,50}$"), {message: t("create.parking.form.street.regex.not.met")}),
+        zipCode: z.string().min(6, {message: t("create.parking.form.zip.code.too.short")})
+            .max(6, {message: t( "create.parking.form.zip.code.too.long")}).regex(RegExp("^\\d{2}-\\d{3}$"), {message: t("create.parking.form.zip.code.regex.not.met")}),
         strategy: z.enum(["LEAST_OCCUPIED", "MOST_OCCUPIED", "LEAST_OCCUPIED_WEIGHTED"])
     })
 
@@ -89,7 +89,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">City</FormLabel>
+                                <FormLabel className="text-left">{t("create.parking.form.city")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Warszawa" {...field} />
                                 </FormControl>
@@ -104,7 +104,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Street</FormLabel>
+                                <FormLabel className="text-left">{t("create.parking.form.street")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Ziemniaczana" {...field} />
                                 </FormControl>
@@ -119,7 +119,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Zip code</FormLabel>
+                                <FormLabel className="text-left">{t("create.parking.form.zip.code")}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="12-345" {...field} />
                                 </FormControl>
@@ -134,7 +134,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">Strategy</FormLabel>
+                                <FormLabel className="text-left">{t("create.parking.form.strategy")}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
@@ -142,9 +142,9 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="LEAST_OCCUPIED">Least occupied</SelectItem>
-                                        <SelectItem value="MOST_OCCUPIED">Most occupied</SelectItem>
-                                        <SelectItem value="LEAST_OCCUPIED_WEIGHTED">Least occupied weighted</SelectItem>
+                                        <SelectItem value="LEAST_OCCUPIED">{t("create.parking.form.least.occupied")}</SelectItem>
+                                        <SelectItem value="MOST_OCCUPIED">{t("create.parking.form.most.occupied")}</SelectItem>
+                                        <SelectItem value="LEAST_OCCUPIED_WEIGHTED">{t("create.parking.form.least.occupied.weighted")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -165,7 +165,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to create a new parking?
+                        {t("create.parking.form.are.you.sure.you.want.to.create.new.parking")}
                     </AlertDialogDescription>
                     <AlertDialogAction onClick={handleAlertDialog}>
                         {t("general.ok")}
