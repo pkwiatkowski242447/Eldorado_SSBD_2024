@@ -5,7 +5,7 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
-import {Slash} from "lucide-react";
+import {Loader2, Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {useTranslation} from "react-i18next";
 import {useEffect, useState} from "react";
@@ -41,6 +41,7 @@ function EnterParkingWithoutReservationPage() {
     const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
     const [selectedParkingId, setSelectedParkingId] = useState<string | null>(null);
     const [parkingDetails, setParkingDetails] = useState<{ id: string, sectorName: string } | null>(null);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const pageSize = 5;
     const navigate = useNavigate();
 
@@ -63,6 +64,12 @@ function EnterParkingWithoutReservationPage() {
     useEffect(() => {
         fetchParking();
     }, [currentPage, pageSize]);
+
+    const refresh = () => {
+        setIsRefreshing(true);
+        fetchParking();
+        setTimeout(() => setIsRefreshing(false), 1000);
+    }
 
     const handleEnterParking = async () => {
         if (selectedParkingId) {
@@ -99,7 +106,15 @@ function EnterParkingWithoutReservationPage() {
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <Button variant={"ghost"} disabled={true}/>
+                <Button onClick={refresh} variant={"ghost"} className="w-auto" disabled={isRefreshing}>
+                    {isRefreshing ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                        </>
+                    ) : (
+                        t("general.refresh")
+                    )}
+                </Button>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
                 <h1 className="text-3xl font-semibold">{t("enter.parking.without.reservation.page.enter.parking")}</h1>

@@ -40,7 +40,7 @@ import {FiSettings} from "react-icons/fi";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditParkingForm from "@/components/forms/EditParkingForm.tsx";
@@ -224,8 +224,10 @@ function ParkingManagementPage() {
                             <AlertDialogDescription>
                                 {t("parking.management.page.are.you.sure.you.want.to.delete.this.parking")}
                             </AlertDialogDescription>
-                            <AlertDialogAction onClick={handleDeleteParking}>{t("general.ok")}</AlertDialogAction>
-                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDeleteParking}>{t("general.ok")}</AlertDialogAction>
+                            </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 </Table>

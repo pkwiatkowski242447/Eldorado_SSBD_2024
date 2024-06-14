@@ -11,7 +11,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {api} from "@/api/api.ts";
 import {useEffect, useState} from "react";
-import {arrayToDate, ParkingEventType, ReservationDetailsType} from "@/types/Reservations.ts";
+import {arrayToDate, ParkingEventType, ReservationDetailsType, ReservationStatus} from "@/types/Reservations.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {
@@ -123,7 +123,7 @@ function MyReservationDetailsPage() {
                             <TableHead className="text-center">{t("reservation.details.page.street")}</TableHead>
                             <TableHead className="text-center">{t("reservation.details.page.zip.code")}</TableHead>
                             <TableHead className="text-center">{t("reservation.details.page.sector.name")}</TableHead>
-                            <TableHead className="text-center">{t("reservation.details.page.id": "ID")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.id")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -134,6 +134,7 @@ function MyReservationDetailsPage() {
                             <TableCell>{reservation?.street}</TableCell>
                             <TableCell>{reservation?.zipCode}</TableCell>
                             <TableCell>{reservation?.sectorName}</TableCell>
+                            <TableCell>{reservation?.status}</TableCell>
                             <TableCell>{reservation?.id}</TableCell>
                         </TableRow>
                     </TableBody>
@@ -182,11 +183,12 @@ function MyReservationDetailsPage() {
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
-                <div className="pt-5 flex justify-center">
+                {reservation?.status === ReservationStatus.AWAITING &&
+                    <div className="pt-5 flex justify-center">
                     <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
                         {t("my.reservation.details.page.cancel.reservation")}
                     </Button>
-                </div>
+                </div>}
                 <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>

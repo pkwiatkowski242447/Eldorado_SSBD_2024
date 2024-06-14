@@ -104,6 +104,8 @@ function ReservationDetailsPage() {
                             <TableHead
                                 className="text-center">{t("reservation.details.page.sector.name")}</TableHead>
                             <TableHead
+                                className="text-center">{"Status"}</TableHead>
+                            <TableHead
                                 className="text-center">{t("reservation.details.page.id")}</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -115,6 +117,7 @@ function ReservationDetailsPage() {
                             <TableCell>{reservation?.street}</TableCell>
                             <TableCell>{reservation?.zipCode}</TableCell>
                             <TableCell>{reservation?.sectorName}</TableCell>
+                            <TableCell>{reservation?.status}</TableCell>
                             <TableCell>{reservation?.id}</TableCell>
                         </TableRow>
                     </TableBody>

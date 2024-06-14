@@ -14,6 +14,7 @@ import {
 import {Spinner} from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
+import {useTranslation} from "react-i18next";
 
 function MyActiveReservationsPage() {
     const [activeReservations, setActiveReservations] = useState<ReservationType[]>([]);
@@ -92,6 +93,7 @@ function MyActiveReservationsPage() {
                                     <TableCell>{historicalReservation.street}</TableCell>
                                     <TableCell>{historicalReservation.zipCode}</TableCell>
                                     <TableCell>{historicalReservation.sectorName}</TableCell>
+                                    <TableCell>{historicalReservation.status}</TableCell>
                                     <TableCell>{historicalReservation.id}</TableCell>
                                     <TableCell>
                                         <Button onClick={() => handleViewDetails(historicalReservation.id)}>
