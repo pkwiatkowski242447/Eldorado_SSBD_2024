@@ -1,4 +1,7 @@
 {
+  "general:hours": "Hours",
+  "general:minutes": "Minutes",
+  "general:pickDate": "Pick date",
   "general.ok": "OK",
   "general.cancel": "Cancel",
   "general.confirm": "Confirm",
@@ -543,7 +546,7 @@
   "exit.parking.form.id.of.reservation": "ID of the reservation",
   "exit.parking.form.end.reservation": "End Reservation",
   "exit.parking.form.exit": "Exit",
-  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Are you sure you want to exit the parking?"
+  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Are you sure you want to exit the parking?",
 
-
+  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "The reservation must end after it began."
 }

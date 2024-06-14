@@ -14,7 +14,7 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {ParkingType, sectorStrategy} from "@/types/Parking.ts";
@@ -194,10 +194,12 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                     <AlertDialogDescription>
                         {t("edit.parking.form.are.you.sure.you.want.to.edit.this.parking")}
                     </AlertDialogDescription>
-                    <AlertDialogAction onClick={handleAlertDialog}>
-                        {t("general.ok")}
-                    </AlertDialogAction>
-                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleAlertDialog}>
+                            {t("general.ok")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </Form>

@@ -14,7 +14,7 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {EditSectorType, sectorType} from "@/types/Parking.ts";
@@ -25,10 +25,10 @@ type editSectorFormProps = {
     setDialogOpen: Dispatch<SetStateAction<boolean>>
     refresh: () => void
     sectorId: string
-    isSectorActive: boolean
+    sectorDeactivate: Date
 }
 
-function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editSectorFormProps) {
+function EditSectorForm({setDialogOpen, refresh, sectorId, sectorDeactivate}:editSectorFormProps) {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -61,6 +61,8 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
     })
 
     useEffect(() => {
+        console.log(sectorDeactivate);
+        console.log(new Date());
         form.reset({
             maxPlaces: sector.maxPlaces,
             type: sector.type,
@@ -104,7 +106,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {!isSectorActive && <FormField
+                {sectorDeactivate < (new Date()) && <FormField
                     control={form.control}
                     name="maxPlaces"
                     render={({field}) => (
@@ -134,7 +136,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                         </FormItem>
                     )}
                 />
-                {!isSectorActive && <FormField
+                {sectorDeactivate < (new Date()) && <FormField
                     control={form.control}
                     name="type"
                     render={({field}) => (
@@ -173,10 +175,12 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                     <AlertDialogDescription>
                         {t("edit.sector.form.are.you.sure.you.want.to.edit.this.sector")}
                     </AlertDialogDescription>
-                    <AlertDialogAction onClick={handleAlertDialog}>
-                        {t("general.ok")}
-                    </AlertDialogAction>
-                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleAlertDialog}>
+                            {t("general.ok")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </Form>

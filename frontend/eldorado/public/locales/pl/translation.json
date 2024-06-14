@@ -1,4 +1,7 @@
 {
+  "general.minutes": "Minuty",
+  "general.hours": "Godziny",
+  "general.pickDate": "Wybierz datę",
   "general.ok": "OK",
   "general.cancel": "Anuluj",
   "general.confirm": "Potwierdzenie",
@@ -537,5 +540,7 @@
   "exit.parking.form.id.of.reservation": "ID rezerwacji",
   "exit.parking.form.end.reservation": "Zakończ rezerwację",
   "exit.parking.form.exit": "Wyjdź",
-  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Czy na pewno chcesz zedytować parking?"
+  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Czy na pewno chcesz zedytować parking?",
+
+  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "Rezerwacja musi kończyć się po tym jak sie zaczęła."
 }
