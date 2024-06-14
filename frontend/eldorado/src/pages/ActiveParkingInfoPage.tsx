@@ -124,13 +124,13 @@ function ActiveParkingInfoPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.parkingList)}>{"Active Parking List"}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.parkingList)}>{t("breadcrumb.active.parking.list")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{"Parking Info"}</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrumb.parking.info")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -145,20 +145,20 @@ function ActiveParkingInfoPage() {
                 </Button>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Parking Info - {parking?.city}, {parking?.street} Street</h1>
+                <h1 className="text-3xl font-semibold">{t("active.parking.info.page.parking.info")}{parking?.city}, {parking?.street} {t("active.parking.info.page.street")}</h1>
             </div>
             <div>
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("City")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.city")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Street")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.street")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Zip code")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.zip.code")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Strategy")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.strategy")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -172,20 +172,20 @@ function ActiveParkingInfoPage() {
                 </Table>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Sectors</h1>
+                <h1 className="text-3xl font-semibold">{t("active.parking.info.page.sectors")}</h1>
             </div>
             <div>
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("Name")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.name")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Type")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.type")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Total parking spaces")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.total.parking.spaces")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Free parking spaces")}</TableHead>
+                                className="text-center">{t("active.parking.info.page.free.parking.spaces")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -199,19 +199,18 @@ function ActiveParkingInfoPage() {
                                 <TableCell>
                                     <Dialog>
                                         <DialogTrigger>
-                                            <Button onClick={() => setActiveSector(sector)}>{"View Info"}</Button>
+                                            <Button onClick={() => setActiveSector(sector)}>{t("active.parking.info.page.view.info")}</Button>
                                         </DialogTrigger>
                                         <DialogContent>
                                             <DialogHeader>
-                                                <DialogTitle className={"text-center"}>Sector Info</DialogTitle>
+                                                <DialogTitle className={"text-center"}>{t("active.parking.info.page.sector.info")}</DialogTitle>
                                                 <DialogDescription className={"text-center p-3"}>
                                                     {sectorInfo && (
                                                         <>
-                                                            <p><strong>Name:</strong> {sectorInfo.name}</p>
-                                                            <p><strong>Type:</strong> {sectorInfo.type}</p>
-                                                            <p><strong>Max Places:</strong> {sectorInfo.maxPlaces}</p>
-                                                            <Button className={"mt-5"} onClick={() => handleButtonClick()}>Make a
-                                                                reservation</Button>
+                                                            <p><strong>{t("active.parking.info.page.name")}</strong> {sectorInfo.name}</p>
+                                                            <p><strong>{t("active.parking.info.page.type")}</strong> {sectorInfo.type}</p>
+                                                            <p><strong>{t("active.parking.info.page.max.places")}</strong> {sectorInfo.maxPlaces}</p>
+                                                            <Button className={"mt-5"} onClick={() => handleButtonClick()}>{t("active.parking.info.page.make.reservation")}</Button>
                                                         </>
                                                     )}
                                                 </DialogDescription>

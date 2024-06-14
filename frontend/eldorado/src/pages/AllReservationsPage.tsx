@@ -122,7 +122,7 @@ function AllReservationsPage() {
                                         {/*<TableCell>{reservation.id}</TableCell>*/}
                                         <TableCell>
                                             <Button onClick={() => handleViewDetails(reservation.id)}>
-                                                View Details
+                                                {t("allReservationsPage.table.sectorName")}
                                             </Button>
                                         </TableCell>
                                     </TableRow>

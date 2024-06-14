@@ -193,13 +193,13 @@ export function ParkingManagementInfoPage() {
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("City")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.city")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Street")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.street")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Zip code")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.zip.code")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Strategy")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.strategy")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -215,11 +215,11 @@ export function ParkingManagementInfoPage() {
             <div className="flex justify-start pt-2.5">
                 <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="default">Create Sector</Button>
+                        <Button variant="default">{t("parking.management.info.page.create.sector")}</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Create Sector</DialogTitle>
+                            <DialogTitle>{t("parking.management.info.page.create.sector")}</DialogTitle>
                         </DialogHeader>
                         <CreateSectorForm setDialogOpen={setCreateDialogOpen} refresh={refresh} parkingId={parking.parkingId}/>
                     </DialogContent>
@@ -230,17 +230,17 @@ export function ParkingManagementInfoPage() {
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("Name")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.name")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Deactivation Time")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.deactivation.time")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Occupies Places")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.occupies.pleces")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Max Places")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.max.pleces")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Type")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.type")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Weight")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.weight")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -261,19 +261,19 @@ export function ParkingManagementInfoPage() {
                                         <DropdownMenuContent>
                                             {sector.deactivationTime !== "" && <DropdownMenuItem
                                                 onClick={() => handleActivateSectorClick(sector.id)}>
-                                                Activate sector
+                                                {t("parking.management.info.page.activate.sector")}
                                             </DropdownMenuItem>}
                                             {sector.deactivationTime === "" && <DropdownMenuItem
                                                 onClick={() => handleDeactivateSectorClick(sector.id)}>
-                                                Deactivate sector
+                                                {t("parking.management.info.page.deactivate.sector")}
                                             </DropdownMenuItem>}
                                             <DropdownMenuItem
                                                 onClick={() => handleEditSectorClick(sector.id, sector.deactivationTime === "")}>
-                                                Edit sector
+                                                {t("parking.management.info.page.edit.sector")}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDeleteParkingClick(sector.id)}>
-                                                Delete parking
+                                                {t("parking.management.info.page.delete.parking")}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -284,7 +284,7 @@ export function ParkingManagementInfoPage() {
                     <Dialog open={isDeactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Deactivate Parking</DialogTitle>
+                                <DialogTitle>{t("parking.management.info.page.deactivate.parking")}</DialogTitle>
                             </DialogHeader>
                             <DeactivateSectorForm setDialogOpen={setDeactivateDialogOpen} refresh={refresh} sectorId={sectorId}/>
                         </DialogContent>
@@ -292,7 +292,7 @@ export function ParkingManagementInfoPage() {
                     <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Edit Parking</DialogTitle>
+                                <DialogTitle>{t("parking.management.info.page.edit.parking")}</DialogTitle>
                             </DialogHeader>
                             <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId} isSectorActive={isSectorActive}/>
                         </DialogContent>
@@ -301,7 +301,7 @@ export function ParkingManagementInfoPage() {
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to delete this sector?
+                                {t("parking.management.info.page.are.you.sure.you.want.to.delete.this.sector")}
                             </AlertDialogDescription>
                             <AlertDialogAction onClick={handleDeleteSector}>{t("general.ok")}</AlertDialogAction>
                             <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
@@ -311,7 +311,7 @@ export function ParkingManagementInfoPage() {
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to activate this sector?
+                                {t("parking.management.info.page.are.you.sure.you.want.to.activate.this.sector")}
                             </AlertDialogDescription>
                             <AlertDialogAction onClick={handleActivateSector}>{t("general.ok")}</AlertDialogAction>
                             <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>

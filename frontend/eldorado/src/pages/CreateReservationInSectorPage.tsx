@@ -68,20 +68,20 @@ function CreateReservationInSectorPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.parkingList)}>{"Active Parking List"}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.parkingList)}>{t("breadcrumb.active.parking.list")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{"Create a reservation"}</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrumb.create.reservation")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Create a reservation</h1>
+                <h1 className="text-3xl font-semibold">{t("create.reservation.in.sector.page.create.reservation")}</h1>
                 <div>
                     <Table className="p-10 flex-grow mt-2">
                         <TableHeader>

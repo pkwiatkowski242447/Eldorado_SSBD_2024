@@ -98,20 +98,20 @@ function MyReservationDetailsPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.client.myReservations)}>My Reservations</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.client.myReservations)}>{t("breadcrumb.my.reservations")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>Reservation Details</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrumb.my.reservation.details")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Reservation Info</h1>
+                <h1 className="text-3xl font-semibold">{t("my.reservation.details.page.reservation.info")}</h1>
             </div>
             <div>
                 <Table className="p-10 flex-grow">
@@ -140,14 +140,14 @@ function MyReservationDetailsPage() {
                 </Table>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Parking Events</h1>
+                <h1 className="text-3xl font-semibold">{t("my.reservation.details.page.parking.events")}</h1>
             </div>
             <Table className="p-10 flex-grow">
                 <TableHeader>
                     <TableRow className={"text-center p-10"}>
-                        <TableHead className="text-center">{"No."}</TableHead>
-                        <TableHead className="text-center">{"Date"}</TableHead>
-                        <TableHead className="text-center">{"Type"}</TableHead>
+                        <TableHead className="text-center">{t("my.reservation.details.page.parking.no")}</TableHead>
+                        <TableHead className="text-center">{t("my.reservation.details.page.parking.date")}</TableHead>
+                        <TableHead className="text-center">{t("my.reservation.details.page.parking.type")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody className={"text-center"}>
@@ -184,15 +184,15 @@ function MyReservationDetailsPage() {
                 </Pagination>
                 <div className="pt-5 flex justify-center">
                     <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
-                        Cancel Reservation
+                        {t("my.reservation.details.page.cancel.reservation")}
                     </Button>
                 </div>
                 <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
+                            <AlertDialogTitle>{t("my.reservation.details.page.cancel.reservation")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to cancel this reservation? This action cannot be undone.
+                                {t("my.reservation.details.page.cancel.are.you.sure.you.want.to.cancel")}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

@@ -59,18 +59,18 @@ function EnterParkingWithReservationPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{"Enter Reservation"}</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrum.enter.reservation")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className="mx-auto grid w-full max-w-4xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Enter Parking with Reservation</h1>
+                <h1 className="text-3xl font-semibold">{t("enter.parking.without.reservation.page.enter.parking.with.reservation")}</h1>
                 <Card className={"mt-5"}>
                     <CardHeader>
-                        <CardTitle>Enter Your Reservation ID</CardTitle>
-                        <CardDescription>Please provide your reservation ID to enter the parking</CardDescription>
+                        <CardTitle>{t("enter.parking.without.reservation.page.enter.your.reservation.id"}</CardTitle>
+                        <CardDescription>{t("enter.parking.without.reservation.page.please,provide,your,reservation.id.to.enter.parking")}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Input
@@ -79,7 +79,7 @@ function EnterParkingWithReservationPage() {
                             onChange={(e) => setReservationID(e.target.value)}
                         />
                         <Button onClick={() => setIsDialogOpen(true)} className="mt-4">
-                            Submit
+                            {t("enter.parking.without.reservation.page.submit")
                         </Button>
                     </CardContent>
                 </Card>
@@ -87,21 +87,21 @@ function EnterParkingWithReservationPage() {
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Enter Reservation</AlertDialogTitle>
+                        <AlertDialogTitle>{t("enter.parking.without.reservation.page.enter.reservation")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to enter the parking with this reservation ID?
+                            {t("enter.parking.without.reservation.page.are.you.sure")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>No</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleEnterReservation}>Yes</AlertDialogAction>
+                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("enter.parking.without.reservation.page.no")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleEnterReservation}>{t("enter.parking.without.reservation.page.yes")</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
             <AlertDialog open={isResultDialogOpen} onOpenChange={setIsResultDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Parking has been entered successfully!</AlertDialogTitle>
+                        <AlertDialogTitle>{t("enter.parking.without.reservation.page.parking.has.been.entered.successfully")</AlertDialogTitle>
                         <AlertDialogDescription>
                             :)
                         </AlertDialogDescription>

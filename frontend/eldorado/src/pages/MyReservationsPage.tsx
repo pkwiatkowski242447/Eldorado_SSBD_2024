@@ -32,7 +32,7 @@ function MyReservationsPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>My Reservations</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrumb.my.reservations")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -42,12 +42,12 @@ function MyReservationsPage() {
                 <Button variant={`${activePage === 'Active' ? 'secondary' : 'ghost'}`}
                         onClick={() => setActivePage('Active')}
                         className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                    Active
+                    {t("my.reservation.page.active")}
                 </Button>
                 <Button variant={`${activePage === 'Historical' ? 'secondary' : 'ghost'}`}
                         onClick={() => setActivePage('Historical')}
                         className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                    Historical
+                    {t("my.reservation.page.historical")}
                 </Button>
             </div>
             <div className={"grid gap-6"}>
