@@ -98,20 +98,23 @@ public class ReservationController implements ReservationControllerInterface {
             retryFor = {ApplicationDatabaseException.class, RollbackException.class,
                     ReservationNoAvailablePlaceException.class, ReservationClientLimitException.class,
                     ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> makeReservation(@Valid MakeReservationDTO makeReservationDTO,
-                                             HttpServletRequest request) throws ApplicationBaseException {
+    public ResponseEntity<?> makeReservation(@Valid MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
         //TODO future test Retryable OptimisticLock?
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Reservation newReservation = reservationService.makeReservation(
-                login,
-                makeReservationDTO.getSectorId(),
-                makeReservationDTO.getBeginTime(),
-                makeReservationDTO.getEndTime()
-        );
+        try {
+            Reservation newReservation = reservationService.makeReservation(
+                    login,
+                    UUID.fromString(makeReservationDTO.getSectorId()),
+                    makeReservationDTO.getBeginTime(),
+                    makeReservationDTO.getEndTime()
+            );
 
-        return ResponseEntity.created(URI.create(this.createdReservationResourceURL + newReservation.getId())).build();
+            return ResponseEntity.created(URI.create(this.createdReservationResourceURL + newReservation.getId())).build();
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
     }
 
     @Override

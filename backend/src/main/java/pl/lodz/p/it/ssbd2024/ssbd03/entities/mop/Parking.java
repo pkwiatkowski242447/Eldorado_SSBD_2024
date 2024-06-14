@@ -199,14 +199,6 @@ public class Parking extends AbstractEntity {
                 .collect(Collectors.toList());
     }
 
-    public void assignClient() {
-        ///TODO implement
-    }
-
-    public void changeSectorWeight(String sectorName, Integer newWeight) {
-        ///TODO implement
-    }
-
     /**
      * Custom toString() method implementation that
      * does not return any information relating to the business

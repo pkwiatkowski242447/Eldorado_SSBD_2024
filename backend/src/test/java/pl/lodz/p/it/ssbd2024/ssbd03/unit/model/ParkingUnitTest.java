@@ -115,19 +115,4 @@ public class ParkingUnitTest {
         assertFalse(testString.isEmpty());
         assertFalse(testString.isBlank());
     }
-
-    @Test
-    void parkingAssignClient() {
-        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        parking.assignClient();
-        ///TODO implement
-
-    }
-
-    @Test
-    void parkingChangeSectorWeight() {
-        Parking parking = new Parking(ADDRESS, Parking.SectorDeterminationStrategy.LEAST_OCCUPIED);
-        parking.changeSectorWeight(SECTOR_NAME_NO_1, 12);
-        ///TODO implement
-    }
 }

@@ -79,8 +79,7 @@ public interface ReservationControllerInterface {
                     "or sector blockage, including insufficient number of sector's places"),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> makeReservation(@Valid @RequestBody MakeReservationDTO makeReservationDTO,
-                                      HttpServletRequest request) throws ApplicationBaseException;
+    ResponseEntity<?> makeReservation(@Valid @RequestBody MakeReservationDTO makeReservationDTO) throws ApplicationBaseException;
 
     /**
      * This endpoint allows to cancel active parking place reservation by identifier.

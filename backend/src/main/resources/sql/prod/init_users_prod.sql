@@ -1,4 +1,4 @@
--- -- GRAND PRIVILEGES
+-- -- GRAND PRIVILEGES - PRODUCTION
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.account                TO ssbd03mok;
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.past_password          TO ssbd03mok;
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.personal_data          TO ssbd03mok;
