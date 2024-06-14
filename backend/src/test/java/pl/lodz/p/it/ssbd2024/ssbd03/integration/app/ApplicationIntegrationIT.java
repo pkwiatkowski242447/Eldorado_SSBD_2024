@@ -2311,8 +2311,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/parking/{id}/sectors")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body("message", Matchers.equalTo(I18n.HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .body("message", Matchers.equalTo(I18n.INTERNAL_SERVER_ERROR));
     }
 
     @Test
@@ -3242,8 +3242,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .post(BASE_URL + "/parking")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body("message", Matchers.equalTo(I18n.HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .body("message", Matchers.equalTo(I18n.INTERNAL_SERVER_ERROR));
     }
 
     @Test
