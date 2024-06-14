@@ -259,6 +259,7 @@ public class ParkingService implements ParkingServiceInterface {
                 modifiedParking.getAddress().getZipCode(),
                 modifiedParking.getAddress().getStreet());
 
+        foundParking.setSectorStrategy(modifiedParking.getSectorStrategy());
         foundParking.setAddress(address);
         parkingFacade.edit(foundParking);
         return foundParking;

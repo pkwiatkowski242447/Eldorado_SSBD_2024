@@ -116,6 +116,7 @@ public class Parking extends AbstractEntity {
     @NotNull(message = ParkingMessages.SECTOR_STRATEGY_NULL)
     @Column(name = DatabaseConsts.PARKING_SECTOR_STRATEGY_COLUMN)
     @Enumerated(EnumType.STRING)
+    @Setter
     private SectorDeterminationStrategy sectorStrategy;
 
     // Other fields - used for access control, and storing historical data
