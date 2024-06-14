@@ -13,6 +13,12 @@ export const apiWithConfig = axios.create({
     headers: DEFAULT_HEADERS,
 })
 
+export const apiAnonymous = axios.create({
+    baseURL: API_TEST_URL,
+    timeout: TIMEOUT_IN_MS,
+    headers: DEFAULT_HEADERS,
+})
+
 apiWithConfig.interceptors.response.use(
     (response) => response,
     (error) => {

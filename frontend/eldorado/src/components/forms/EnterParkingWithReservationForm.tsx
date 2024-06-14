@@ -4,7 +4,6 @@ import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {Form, FormControl, FormField, FormItem, FormMessage,} from "@/components/ui/form"
-import {FormLabel} from "react-bootstrap";
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {Loader2} from "lucide-react";
@@ -13,47 +12,41 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription, AlertDialogFooter,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {toast} from "@/components/ui/use-toast.ts";
 
-type ExitParkingFormProps = {
-    isAuthenticated: boolean
-}
-
-function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
+function EnterParkingWithReservationForm() {
     const {t} = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
-    const [exitValues, setExitValues] = useState<{id:string, endReservation:boolean}>({id:"",endReservation:true});
-    const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+    const [enterValues, setEnterValues] = useState<{id:string}>({id:""});
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
     const formSchema = z.object({
         id: z.string().min(36, {message: "ZMIEN"})
             .max(36, {message: "ZMIEN"}).regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: "ZMIEN"}),
-        endReservation: z.boolean({message:"ZMIEN"})
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            id: "",
-            endReservation: !isAuthenticated
+            id: ""
         },
     })
 
-    async function handleAlertDialog(){
-        api.exitParking(exitValues.id, exitValues.endReservation, isAuthenticated)
+    async function handleEnterReservation(){
+        api.enterParkingWithReservation(enterValues.id)
             .then(() => {
-                setAlertDialogOpen(false);
+                setIsDialogOpen(false);
                 toast({
                     title: t("Success"),
-                    description: t("You successfully exited the parking. See you soon.")
+                    description: t("You successfully exited the parking. Enjoy your stay.")
                 });
             }).catch(error => {
-                setAlertDialogOpen(false);
+                setIsDialogOpen(false);
                 handleApiError(error);
             });
     }
@@ -61,8 +54,8 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         try {
-            setExitValues(values);
-            setAlertDialogOpen(true);
+            setEnterValues(values);
+            setIsDialogOpen(true);
         } catch (error) {
             console.log(error);
         } finally {
@@ -87,46 +80,40 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                         </FormItem>
                     )}
                 />
-                {isAuthenticated && <FormField
-                    control={form.control}
-                    name="endReservation"
-                    render={({field}) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel>
-                                   End Reservation
-                                </FormLabel>
-                            </div>
-                        </FormItem>
-                    )}
-                />}
                 <Button type="submit" className="mt-4" disabled={isLoading}>
                     {isLoading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                         </>
                     ) : (
-                        t("Exit")
+                        t("Enter parking")
                     )}
                 </Button>
             </form>
-            <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogContent>
-                    <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Are you sure you want to exit the parking?
-                    </AlertDialogDescription>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Enter Reservation</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to enter the parking with this reservation ID?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleAlertDialog}>
-                            {t("general.ok")}
-                        </AlertDialogAction>
+                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>No</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleEnterReservation}>Yes</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog open={isResultDialogOpen} onOpenChange={setIsResultDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Parking has been entered successfully!</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            :)
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction onClick={() => setIsResultDialogOpen(false)}>OK</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -134,4 +121,4 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
     )
 }
 
-export default ExitParkingForm
+export default EnterParkingWithReservationForm

@@ -1,6 +1,5 @@
-import {API_TEST_URL, apiWithConfig, DEFAULT_HEADERS, TIMEOUT_IN_MS} from "./api.config";
+import {apiWithConfig, apiAnonymous} from "./api.config";
 import {UserLevelType} from "@/types/Users.ts";
-import axios from "axios";
 import {CreateParkingType, CreateSectorType, EditSectorType, ParkingType} from "@/types/Parking.ts";
 
 export const api = {
@@ -138,11 +137,7 @@ export const api = {
     },
 
     confirmEmail: (token: string) => {
-        return axios.create({
-            baseURL: API_TEST_URL,
-            timeout: TIMEOUT_IN_MS,
-            headers: DEFAULT_HEADERS,
-        }).post(`/accounts/confirm-email/${token}`)
+        return apiAnonymous.post(`/accounts/confirm-email/${token}`)
     },
 
     resendEmailConfirmation: () => {
@@ -372,10 +367,6 @@ export const api = {
         if (isAuthenticated) {
             return apiWithConfig.post(`/parking/reservations/${id}/exit?end=${endReservation}`)
         }
-        return axios.create({
-            baseURL: API_TEST_URL,
-            timeout: TIMEOUT_IN_MS,
-            headers: DEFAULT_HEADERS,
-        }).post(`/parking/reservations/${id}/exit?end=${endReservation}`)
+        return apiAnonymous.post(`/parking/reservations/${id}/exit?end=${endReservation}`)
     },
 }

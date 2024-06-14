@@ -1,4 +1,7 @@
 {
+  "general.minutes": "Minuty",
+  "general.hours": "Godziny",
+  "general.pickDate": "Wybierz datę",
   "general.ok": "OK",
   "general.cancel": "Anuluj",
   "general.confirm": "Potwierdzenie",
@@ -442,5 +445,6 @@
   "accountSettings.history": "Historia",
 
   "adminCreateUserPage.title": "Utwórz nowe konto",
-  "operation.type.email.change": "Zmiana adresu e-mail"
+  "operation.type.email.change": "Zmiana adresu e-mail",
+  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "Rezerwacja musi kończyć się po tym jak sie zaczęła."
 }
