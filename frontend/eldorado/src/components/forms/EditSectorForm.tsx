@@ -144,7 +144,7 @@ function EditSectorForm({setDialogOpen, refresh, sectorId, isSectorActive}:editS
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a sector type." />
+                                            <SelectValue placeholder={t("create.sector.form.select.sector.type")} />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>

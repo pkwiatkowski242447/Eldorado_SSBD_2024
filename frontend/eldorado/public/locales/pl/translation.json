@@ -462,6 +462,7 @@
   "create.parking.form.street.too.short": "Nazwa ulicy musi mieć co najmniej 2 znaki",
   "create.parking.form.street.too.long": "Nazwa ulicy może mieć maksymalnie 60 znaków",
   "create.parking.form.street.regex.not.met": "Nazwa ulicy nie spełnia wymagań formatowania",
+  "create.parking.form.select.strategy": "Wybierz strategię do wyboru sektora",
 
   "create.reservation.form.submit": "Zatwierdź",
 
@@ -485,6 +486,8 @@
   "create.sector.form.sector.weight.too.low": "Waga jest za niska",
   "create.sector.form.sector.weight.too.high": "Waga jest za wysoka",
   "create.sector.form.sector.weight.has.to.be.integer": "Waga musi być liczbą całkowitą",
+  "create.sector.form.select.sector.type": "Wybierz typ sektora.",
+
 
   "date.time.picker.form.submit": "Zatwierdź",
 
@@ -534,5 +537,5 @@
   "exit.parking.form.id.of.reservation": "ID rezerwacji",
   "exit.parking.form.end.reservation": "Zakończ rezerwację",
   "exit.parking.form.exit": "Wyjdź",
-  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Czy na pewno chcesz zakończyć parkowanie?"
+  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Czy na pewno chcesz zedytować parking?"
 }

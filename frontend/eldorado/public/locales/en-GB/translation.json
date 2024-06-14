@@ -472,6 +472,7 @@
   "create.parking.form.street.too.short": "Street has to be at least 2 characters long",
   "create.parking.form.street.too.long": "Street has to be at most 60 characters long",
   "create.parking.form.street.regex.not.met": "Street does not meet format requirements",
+  "create.parking.form.select.strategy": "Select a sector determination strategy",
 
   "create.reservation.form.submit": "Submit",
 
@@ -495,6 +496,7 @@
   "create.sector.form.sector.weight.too.low": "Weight is too low",
   "create.sector.form.sector.weight.too.high": "Weight is too high",
   "create.sector.form.sector.weight.has.to.be.integer": "Weight has to be integer",
+  "create.sector.form.select.sector.type": "Select a sector type.",
 
   "date.time.picker.form.submit": "Submit",
 

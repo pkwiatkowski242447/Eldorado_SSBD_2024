@@ -137,7 +137,7 @@ function CreateParkingForm({setDialogOpen, refresh, parkingId}:createParkingForm
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a sector type." />
+                                            <SelectValue placeholder={t("create.sector.form.select.sector.type")}/>
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>

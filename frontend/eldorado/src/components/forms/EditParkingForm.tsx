@@ -165,7 +165,7 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
                                 <Select onValueChange={field.onChange} value={field.value.toString()}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a sector determination strategy" />
+                                            <SelectValue placeholder={t( "create.parking.form.select.strategy")} />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>

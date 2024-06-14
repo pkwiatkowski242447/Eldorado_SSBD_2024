@@ -138,7 +138,7 @@ function CreateParkingForm({setDialogOpen, refresh}:createParkingFormProps) {
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a sector determination strategy" />
+                                            <SelectValue placeholder={t("create.parking.form.select.strategy")} />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
