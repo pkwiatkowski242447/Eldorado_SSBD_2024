@@ -366,8 +366,10 @@ INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, cl
 
 -- michalkowal cancelled reservation
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('28eb349e-e190-4aa0-ad77-76ecf0067f7e', current_timestamp, current_timestamp + interval '5 hour', current_timestamp + interval '7 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '65c51075-0749-4304-984a-9cb926e65aab', 1, 'CANCELLED');
-
--- parking with one available place
 INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('153bcb2f-6487-4897-9805-f56db73b565f', current_timestamp, 'LEAST_OCCUPIED', '99-997', 'oneplace', 'oneplace', 0);
 
+-- parking with one available place
 INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('e6d15888-960f-4aa8-adb5-743009d57a7a', current_timestamp, 0, 1, 3, 'XD-07', '153bcb2f-6487-4897-9805-f56db73b565f', 'UNCOVERED', 0);
+
+-- michalkowal
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('91c6cd8b-8f04-4ca5-a156-c695b4ba1cec', current_timestamp, current_timestamp - interval '1 hour', current_timestamp + interval '7 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', 'b9f5bb0c-d19f-4101-ac57-d758e063ac3e', 0, 'IN_PROGRESS');

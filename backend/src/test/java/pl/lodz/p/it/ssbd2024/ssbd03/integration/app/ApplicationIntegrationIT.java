@@ -4263,8 +4263,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         );
     }
 
-    /* Michałowe testy */
-
     // MOP.14 Reserve a parking place
     @Test
     public void makeReservationTestSuccessful() throws IOException {
@@ -4983,21 +4981,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
     }
 
-//    @Test
-//    public void enterParkingWithoutReservationTestFailedInvalidUUID() throws IOException {
-//        String parkingId = "trąbka";
-//
-//        // Enter parking
-//        RestAssured.given()
-//                .when()
-//                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
-//                .then()
-//                .statusCode(HttpStatus.BAD_REQUEST.value())
-//                .body(
-//                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
-//                );
-//    }
-
     // MOP.19 Exit parking
     @Test
     public void exitParkingWithoutReservationEndingTestSuccessful() throws IOException {
@@ -5089,6 +5072,150 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
     }
 
+    @Test
+    public void exitParkingWithoutReservationEndingTestFailedForbidden() throws IOException {
+        // Login client
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestFailedInvalidUUID() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "trąbka";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestReservationNotFound() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "a10e8e3c-f012-4423-adca-aa8d55d3f2af";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_FOUND_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestTryToExitOnOtherUserReservation() throws IOException {
+        // Login client
+        String loginToken = this.login("piotrnowak", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_FOUND_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestTryToExitWhenOutTheParking() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "27b8f933-3bdf-4bfb-affe-0d19260a51cc";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.CANNOT_EXIT_PARKING_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationAsGuestSuccessful() throws IOException {
+        String parkingId = "153bcb2f-6487-4897-9805-f56db73b565f";
+
+        // Enter parking
+        String reservationId = RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.matchesPattern(DTOConsts.UUID_REGEX),
+                        "city", Matchers.equalTo("oneplace"),
+                        "zipCode", Matchers.equalTo("99-997"),
+                        "street", Matchers.equalTo("oneplace"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name())
+                )
+                .extract()
+                .jsonPath().getString("id");
+
+        // Exit parking
+        RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Staff
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/staff/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("XD-07"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.COMPLETED_MANUALLY.name()),
+                        "endingTime", Matchers.notNullValue(),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+    }
+
     // MOP.21 Enter parking with reservation
     @Test
     public void enterParkingWithReservationTestSuccessful() throws IOException {
@@ -5132,6 +5259,115 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                         "sectorName", Matchers.equalTo("CO-01"),
                         "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
                         "parkingEvents", Matchers.hasSize(3)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedNoLogin() {
+        String reservationId = "4fcc2377-e95a-4f6a-a69b-185c2cc3bc36";
+
+        // Enter parking
+        RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedForbidden() throws IOException {
+        // Login client
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "4fcc2377-e95a-4f6a-a69b-185c2cc3bc36";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedInvalidUUID() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "trąbka";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedReservationNotFound() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "3a9062de-f1d4-4776-8185-dbba1b08fc68";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_FOUND_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedFutureReservation() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1d86b115-9c18-4fd6-81be-e8878ad28a5d";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_STARTED_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedReservationAlreadyEnded() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "98a2fa9f-3b67-4a77-842d-33fa859d1933";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_ALREADY_ENDED_EXCEPTION)
                 );
     }
 
