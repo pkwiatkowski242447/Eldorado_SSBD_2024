@@ -121,7 +121,7 @@ function ReservationDetailsPage() {
                 </Table>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Parking Events</h1>
+                <h1 className="text-3xl font-semibold">{t("reservation.details.parking.events")}</h1>
             </div>
             <Table className="p-10 flex-grow">
                 <TableHeader>

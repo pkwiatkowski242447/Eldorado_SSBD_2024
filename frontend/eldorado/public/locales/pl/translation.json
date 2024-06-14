@@ -563,5 +563,7 @@
   "reservation.details.page.parking.events": "Zdarzenia parkingowe",
   "reservation.details.page.no": "Nr",
   "reservation.details.page.date": "Data",
-  "reservation.details.page.type": "Typ"
+  "reservation.details.page.type": "Typ",
+
+  "reservation.details.parking.events": "Zdarzenia parkingowe"
 }

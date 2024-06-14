@@ -117,13 +117,13 @@ function MyReservationDetailsPage() {
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
-                            <TableHead className="text-center">{"Begin Time"}</TableHead>
-                            <TableHead className="text-center">{"Ending Time"}</TableHead>
-                            <TableHead className="text-center">{"City"}</TableHead>
-                            <TableHead className="text-center">{"Street"}</TableHead>
-                            <TableHead className="text-center">{"Zip Code"}</TableHead>
-                            <TableHead className="text-center">{"Sector Name"}</TableHead>
-                            <TableHead className="text-center">{"ID"}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.begin.time")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.ending.time")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.city")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.street")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.zip.code")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.sector.name")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.id": "ID")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -196,8 +196,8 @@ function MyReservationDetailsPage() {
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>No</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleCancelReservation}>Yes</AlertDialogAction>
+                            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("enter.parking.without.reservation.page.yes")}</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleCancelReservation}>{t("enter.parking.without.reservation.page.no")}</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

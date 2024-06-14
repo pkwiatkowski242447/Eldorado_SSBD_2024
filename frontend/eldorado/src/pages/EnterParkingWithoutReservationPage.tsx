@@ -164,7 +164,7 @@ function EnterParkingWithoutReservationPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("enter.parking.without.reservation.page.no")}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleEnterParking}>Yes</AlertDialogAction>
+                        <AlertDialogAction onClick={handleEnterParking}>{t("enter.parking.without.reservation.page.yes")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -176,7 +176,7 @@ function EnterParkingWithoutReservationPage() {
                             {parkingDetails && (
                                 <>
                                     <p><strong>{t("enter.parking.without.reservation.id")}</strong> {parkingDetails.id}</p>
-                                    <p><strong>Sector Name:</strong> {parkingDetails.sectorName}</p>
+                                    <p><strong>{t("enter.parking.without.reservation.sector.name")}</strong> {parkingDetails.sectorName}</p>
                                 </>
                             )}
                         </AlertDialogDescription>

@@ -580,7 +580,7 @@
   "reservation.details.page.parking.events": "Parking Events",
   "reservation.details.page.no": "No.",
   "reservation.details.page.date": "Date",
-  "reservation.details.page.type": "Type"
+  "reservation.details.page.type": "Type",
 
-
+  "reservation.details.parking.events": "Parking Events"
 }
