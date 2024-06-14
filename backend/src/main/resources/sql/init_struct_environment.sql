@@ -1,29 +1,30 @@
+\c ssbd03 ssbd03admin
 --
 -- Name: account; Type: TABLE; Schema: public; Owner: ssbd03admin
 --
 
 CREATE TABLE public.account (
-    active boolean NOT NULL,
-    blocked boolean NOT NULL,
-    suspended boolean NOT NULL,
-    two_factor_auth boolean NOT NULL,
-    unsuccessful_login_counter integer,
-    activation_timestamp timestamp(6) without time zone,
-    blocked_timestamp timestamp(6) without time zone,
-    creation_timestamp timestamp(6) without time zone NOT NULL,
-    last_successful_login_time timestamp(6) without time zone,
-    last_unsuccessful_login_time timestamp(6) without time zone,
-    update_timestamp timestamp(6) without time zone,
-    version bigint NOT NULL,
-    id uuid NOT NULL,
-    language character varying(16) NOT NULL,
-    last_successful_login_ip character varying(17),
-    last_unsuccessful_login_ip character varying(17),
-    login character varying(32) NOT NULL,
-    phone_number character varying(32) NOT NULL,
-    password character varying(60) NOT NULL,
-    created_by character varying(255),
-    updated_by character varying(255)
+                                active boolean NOT NULL,
+                                blocked boolean NOT NULL,
+                                suspended boolean NOT NULL,
+                                two_factor_auth boolean NOT NULL,
+                                unsuccessful_login_counter integer,
+                                activation_timestamp timestamp(6) without time zone,
+                                blocked_timestamp timestamp(6) without time zone,
+                                creation_timestamp timestamp(6) without time zone NOT NULL,
+                                last_successful_login_time timestamp(6) without time zone,
+                                last_unsuccessful_login_time timestamp(6) without time zone,
+                                update_timestamp timestamp(6) without time zone,
+                                version bigint NOT NULL,
+                                id uuid NOT NULL,
+                                language character varying(16) NOT NULL,
+                                last_successful_login_ip character varying(17),
+                                last_unsuccessful_login_ip character varying(17),
+                                login character varying(32) NOT NULL,
+                                phone_number character varying(32) NOT NULL,
+                                password character varying(60) NOT NULL,
+                                created_by character varying(255),
+                                updated_by character varying(255)
 );
 
 
@@ -34,8 +35,8 @@ ALTER TABLE public.account OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.account_attributes (
-    account_id uuid NOT NULL,
-    attribute_name_id uuid NOT NULL
+                                           account_id uuid NOT NULL,
+                                           attribute_name_id uuid NOT NULL
 );
 
 
@@ -46,29 +47,29 @@ ALTER TABLE public.account_attributes OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.account_history (
-    active boolean NOT NULL,
-    blocked boolean NOT NULL,
-    language character varying(2) NOT NULL,
-    suspended boolean NOT NULL,
-    two_factor_auth boolean NOT NULL,
-    unsuccessful_login_counter integer NOT NULL,
-    blocked_time timestamp(6) without time zone,
-    last_successful_login_time timestamp(6) without time zone,
-    last_unsuccessful_login_time timestamp(6) without time zone,
-    modification_time timestamp(6) without time zone NOT NULL,
-    version bigint NOT NULL,
-    id uuid NOT NULL,
-    modified_by uuid,
-    phone_number character varying(16) NOT NULL,
-    last_successful_login_ip character varying(17),
-    last_unsuccessful_login_ip character varying(17),
-    login character varying(32) NOT NULL,
-    password character varying(60) NOT NULL,
-    email character varying(64) NOT NULL,
-    first_name character varying(64) NOT NULL,
-    last_name character varying(64) NOT NULL,
-    operation_type character varying(64) NOT NULL,
-    CONSTRAINT account_history_operation_type_check CHECK (((operation_type)::text = ANY ((ARRAY['REGISTRATION'::character varying, 'LOGIN'::character varying, 'ACTIVATION'::character varying, 'BLOCK'::character varying, 'UNBLOCK'::character varying, 'PASSWORD_CHANGE'::character varying, 'EMAIL_CHANGE'::character varying, 'SUSPEND'::character varying, 'RESTORE_ACCESS'::character varying, 'PERSONAL_DATA_MODIFICATION'::character varying])::text[])))
+                                        active boolean NOT NULL,
+                                        blocked boolean NOT NULL,
+                                        language character varying(2) NOT NULL,
+                                        suspended boolean NOT NULL,
+                                        two_factor_auth boolean NOT NULL,
+                                        unsuccessful_login_counter integer NOT NULL,
+                                        blocked_time timestamp(6) without time zone,
+                                        last_successful_login_time timestamp(6) without time zone,
+                                        last_unsuccessful_login_time timestamp(6) without time zone,
+                                        modification_time timestamp(6) without time zone NOT NULL,
+                                        version bigint NOT NULL,
+                                        id uuid NOT NULL,
+                                        modified_by uuid,
+                                        phone_number character varying(16) NOT NULL,
+                                        last_successful_login_ip character varying(17),
+                                        last_unsuccessful_login_ip character varying(17),
+                                        login character varying(32) NOT NULL,
+                                        password character varying(60) NOT NULL,
+                                        email character varying(64) NOT NULL,
+                                        first_name character varying(64) NOT NULL,
+                                        last_name character varying(64) NOT NULL,
+                                        operation_type character varying(64) NOT NULL,
+                                        CONSTRAINT account_history_operation_type_check CHECK (((operation_type)::text = ANY ((ARRAY['REGISTRATION'::character varying, 'LOGIN'::character varying, 'ACTIVATION'::character varying, 'BLOCK'::character varying, 'UNBLOCK'::character varying, 'PASSWORD_CHANGE'::character varying, 'EMAIL_CHANGE'::character varying, 'SUSPEND'::character varying, 'RESTORE_ACCESS'::character varying, 'PERSONAL_DATA_MODIFICATION'::character varying])::text[])))
 );
 
 
@@ -79,7 +80,7 @@ ALTER TABLE public.account_history OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.admin_data (
-    id uuid NOT NULL
+                                   id uuid NOT NULL
 );
 
 
@@ -90,10 +91,10 @@ ALTER TABLE public.admin_data OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.attribute_association (
-    version bigint NOT NULL,
-    attribute_name_id uuid NOT NULL,
-    attribute_value_id uuid NOT NULL,
-    id uuid NOT NULL
+                                              version bigint NOT NULL,
+                                              attribute_name_id uuid NOT NULL,
+                                              attribute_value_id uuid NOT NULL,
+                                              id uuid NOT NULL
 );
 
 
@@ -104,9 +105,9 @@ ALTER TABLE public.attribute_association OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.attribute_name (
-    version bigint NOT NULL,
-    id uuid NOT NULL,
-    attribute_name character varying(255) NOT NULL
+                                       version bigint NOT NULL,
+                                       id uuid NOT NULL,
+                                       attribute_name character varying(255) NOT NULL
 );
 
 
@@ -117,10 +118,10 @@ ALTER TABLE public.attribute_name OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.attribute_value (
-    version bigint NOT NULL,
-    attribute_name_id uuid NOT NULL,
-    id uuid NOT NULL,
-    attribute_value character varying(255)
+                                        version bigint NOT NULL,
+                                        attribute_name_id uuid NOT NULL,
+                                        id uuid NOT NULL,
+                                        attribute_value character varying(255)
 );
 
 
@@ -131,44 +132,31 @@ ALTER TABLE public.attribute_value OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.client_data (
-    id uuid NOT NULL,
-    type character varying(255) NOT NULL,
-    CONSTRAINT client_data_type_check CHECK (((type)::text = ANY ((ARRAY['BASIC'::character varying, 'STANDARD'::character varying, 'PREMIUM'::character varying])::text[])))
+                                    total_reservation_hours bigint NOT NULL,
+                                    id uuid NOT NULL,
+                                    type character varying(255) NOT NULL,
+                                    CONSTRAINT client_data_type_check CHECK (((type)::text = ANY ((ARRAY['BASIC'::character varying, 'STANDARD'::character varying, 'PREMIUM'::character varying])::text[])))
 );
 
 
 ALTER TABLE public.client_data OWNER TO ssbd03admin;
 
 --
--- Name: entry_code; Type: TABLE; Schema: public; Owner: ssbd03admin
---
-
-CREATE TABLE public.entry_code (
-    creation_timestamp timestamp(6) without time zone NOT NULL,
-    version bigint NOT NULL,
-    id uuid NOT NULL,
-    reservation_id uuid NOT NULL,
-    created_by character varying(255),
-    entry_code character varying(255) NOT NULL
-);
-
-
-ALTER TABLE public.entry_code OWNER TO ssbd03admin;
-
---
 -- Name: parking; Type: TABLE; Schema: public; Owner: ssbd03admin
 --
 
 CREATE TABLE public.parking (
-    zip_code character varying(6) NOT NULL,
-    creation_timestamp timestamp(6) without time zone NOT NULL,
-    update_timestamp timestamp(6) without time zone,
-    version bigint NOT NULL,
-    id uuid NOT NULL,
-    city character varying(255) NOT NULL,
-    created_by character varying(255),
-    street character varying(255) NOT NULL,
-    updated_by character varying(255)
+                                zip_code character varying(6) NOT NULL,
+                                creation_timestamp timestamp(6) without time zone NOT NULL,
+                                update_timestamp timestamp(6) without time zone,
+                                version bigint NOT NULL,
+                                id uuid NOT NULL,
+                                city character varying(50) NOT NULL,
+                                street character varying(50) NOT NULL,
+                                created_by character varying(255),
+                                sector_strategy character varying(255) NOT NULL,
+                                updated_by character varying(255),
+                                CONSTRAINT parking_sector_strategy_check CHECK (((sector_strategy)::text = ANY ((ARRAY['LEAST_OCCUPIED'::character varying, 'MOST_OCCUPIED'::character varying, 'LEAST_OCCUPIED_WEIGHTED'::character varying])::text[])))
 );
 
 
@@ -179,13 +167,13 @@ ALTER TABLE public.parking OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.parking_event (
-    date timestamp(6) without time zone NOT NULL,
-    version bigint NOT NULL,
-    id uuid NOT NULL,
-    reservation_id uuid NOT NULL,
-    created_by character varying(255),
-    type character varying(255) NOT NULL,
-    CONSTRAINT parking_event_type_check CHECK (((type)::text = ANY ((ARRAY['ENTRY'::character varying, 'EXIT'::character varying])::text[])))
+                                      date timestamp(6) without time zone NOT NULL,
+                                      version bigint NOT NULL,
+                                      id uuid NOT NULL,
+                                      reservation_id uuid NOT NULL,
+                                      created_by character varying(255),
+                                      type character varying(255) NOT NULL,
+                                      CONSTRAINT parking_event_type_check CHECK (((type)::text = ANY ((ARRAY['ENTRY'::character varying, 'EXIT'::character varying])::text[])))
 );
 
 
@@ -196,8 +184,8 @@ ALTER TABLE public.parking_event OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.past_password (
-    account_id uuid NOT NULL,
-    past_password character varying(255)
+                                      account_id uuid NOT NULL,
+                                      past_password character varying(255)
 );
 
 
@@ -208,10 +196,10 @@ ALTER TABLE public.past_password OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.personal_data (
-    id uuid NOT NULL,
-    email character varying(32) NOT NULL,
-    lastname character varying(32) NOT NULL,
-    name character varying(32) NOT NULL
+                                      id uuid NOT NULL,
+                                      email character varying(32) NOT NULL,
+                                      lastname character varying(32) NOT NULL,
+                                      name character varying(32) NOT NULL
 );
 
 
@@ -222,16 +210,18 @@ ALTER TABLE public.personal_data OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.reservation (
-    begin_time timestamp(6) without time zone,
-    creation_timestamp timestamp(6) without time zone NOT NULL,
-    end_time timestamp(6) without time zone,
-    update_timestamp timestamp(6) without time zone,
-    version bigint NOT NULL,
-    client_id uuid,
-    id uuid NOT NULL,
-    sector_id uuid NOT NULL,
-    created_by character varying(255),
-    updated_by character varying(255)
+                                    begin_time timestamp(6) without time zone,
+                                    creation_timestamp timestamp(6) without time zone NOT NULL,
+                                    end_time timestamp(6) without time zone,
+                                    update_timestamp timestamp(6) without time zone,
+                                    version bigint NOT NULL,
+                                    client_id uuid,
+                                    id uuid NOT NULL,
+                                    sector_id uuid NOT NULL,
+                                    created_by character varying(255),
+                                    status character varying(255) NOT NULL,
+                                    updated_by character varying(255),
+                                    CONSTRAINT reservation_status_check CHECK (((status)::text = ANY ((ARRAY['AWAITING'::character varying, 'IN_PROGRESS'::character varying, 'COMPLETED_MANUALLY'::character varying, 'COMPLETED_AUTOMATICALLY'::character varying, 'CANCELLED'::character varying, 'TERMINATED'::character varying])::text[])))
 );
 
 
@@ -242,22 +232,22 @@ ALTER TABLE public.reservation OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.sector (
-    active boolean NOT NULL,
-    available_places integer NOT NULL,
-    max_places integer NOT NULL,
-    weight integer NOT NULL,
-    name character varying(5) NOT NULL,
-    creation_timestamp timestamp(6) without time zone NOT NULL,
-    update_timestamp timestamp(6) without time zone,
-    version bigint NOT NULL,
-    id uuid NOT NULL,
-    parking_id uuid NOT NULL,
-    created_by character varying(255),
-    type character varying(255) NOT NULL,
-    updated_by character varying(255),
-    CONSTRAINT sector_max_places_check CHECK ((max_places <= 1000)),
-    CONSTRAINT sector_type_check CHECK (((type)::text = ANY ((ARRAY['COVERED'::character varying, 'UNCOVERED'::character varying, 'UNDERGROUND'::character varying])::text[]))),
-    CONSTRAINT sector_weight_check CHECK (((weight <= 100) AND (weight >= 1)))
+                               max_places integer NOT NULL,
+                               occupied_places integer NOT NULL,
+                               weight integer NOT NULL,
+                               name character varying(5) NOT NULL,
+                               creation_timestamp timestamp(6) without time zone NOT NULL,
+                               deactivation_time timestamp(6) without time zone,
+                               update_timestamp timestamp(6) without time zone,
+                               version bigint NOT NULL,
+                               id uuid NOT NULL,
+                               parking_id uuid NOT NULL,
+                               created_by character varying(255),
+                               type character varying(255) NOT NULL,
+                               updated_by character varying(255),
+                               CONSTRAINT sector_max_places_check CHECK ((max_places <= 1000)),
+                               CONSTRAINT sector_type_check CHECK (((type)::text = ANY ((ARRAY['COVERED'::character varying, 'UNCOVERED'::character varying, 'UNDERGROUND'::character varying])::text[]))),
+                               CONSTRAINT sector_weight_check CHECK (((weight <= 100) AND (weight >= 1)))
 );
 
 
@@ -268,7 +258,7 @@ ALTER TABLE public.sector OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.staff_data (
-    id uuid NOT NULL
+                                   id uuid NOT NULL
 );
 
 
@@ -279,14 +269,14 @@ ALTER TABLE public.staff_data OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.token (
-    creation_timestamp timestamp(6) without time zone NOT NULL,
-    version bigint NOT NULL,
-    account_id uuid NOT NULL,
-    id uuid NOT NULL,
-    token_value character varying(512) NOT NULL,
-    created_by character varying(255),
-    type character varying(255) NOT NULL,
-    CONSTRAINT token_type_check CHECK (((type)::text = ANY ((ARRAY['REFRESH_TOKEN'::character varying, 'MULTI_FACTOR_AUTHENTICATION_CODE'::character varying, 'REGISTER'::character varying, 'RESET_PASSWORD'::character varying, 'CONFIRM_EMAIL'::character varying, 'CHANGE_OVERWRITTEN_PASSWORD'::character varying, 'RESTORE_ACCESS_TOKEN'::character varying])::text[])))
+                              creation_timestamp timestamp(6) without time zone NOT NULL,
+                              version bigint NOT NULL,
+                              account_id uuid NOT NULL,
+                              id uuid NOT NULL,
+                              token_value character varying(512) NOT NULL,
+                              created_by character varying(255),
+                              type character varying(255) NOT NULL,
+                              CONSTRAINT token_type_check CHECK (((type)::text = ANY ((ARRAY['REFRESH_TOKEN'::character varying, 'MULTI_FACTOR_AUTHENTICATION_CODE'::character varying, 'REGISTER'::character varying, 'RESET_PASSWORD'::character varying, 'CONFIRM_EMAIL'::character varying, 'CHANGE_OVERWRITTEN_PASSWORD'::character varying, 'RESTORE_ACCESS_TOKEN'::character varying])::text[])))
 );
 
 
@@ -297,13 +287,13 @@ ALTER TABLE public.token OWNER TO ssbd03admin;
 --
 
 CREATE TABLE public.user_level (
-    creation_timestamp timestamp(6) without time zone NOT NULL,
-    update_timestamp timestamp(6) without time zone,
-    version bigint NOT NULL,
-    account_id uuid NOT NULL,
-    id uuid NOT NULL,
-    level character varying(31) NOT NULL,
-    created_by character varying(255)
+                                   creation_timestamp timestamp(6) without time zone NOT NULL,
+                                   update_timestamp timestamp(6) without time zone,
+                                   version bigint NOT NULL,
+                                   account_id uuid NOT NULL,
+                                   id uuid NOT NULL,
+                                   level character varying(31) NOT NULL,
+                                   created_by character varying(255)
 );
 
 
@@ -398,22 +388,6 @@ ALTER TABLE ONLY public.client_data
 
 
 --
--- Name: entry_code entry_code_pkey; Type: CONSTRAINT; Schema: public; Owner: ssbd03admin
---
-
-ALTER TABLE ONLY public.entry_code
-    ADD CONSTRAINT entry_code_pkey PRIMARY KEY (id);
-
-
---
--- Name: entry_code entry_code_reservation_id_key; Type: CONSTRAINT; Schema: public; Owner: ssbd03admin
---
-
-ALTER TABLE ONLY public.entry_code
-    ADD CONSTRAINT entry_code_reservation_id_key UNIQUE (reservation_id);
-
-
---
 -- Name: parking parking_city_zip_code_street_key; Type: CONSTRAINT; Schema: public; Owner: ssbd03admin
 --
 
@@ -470,11 +444,11 @@ ALTER TABLE ONLY public.reservation
 
 
 --
--- Name: sector sector_name_key; Type: CONSTRAINT; Schema: public; Owner: ssbd03admin
+-- Name: sector sector_name_parking_id_key; Type: CONSTRAINT; Schema: public; Owner: ssbd03admin
 --
 
 ALTER TABLE ONLY public.sector
-    ADD CONSTRAINT sector_name_key UNIQUE (name);
+    ADD CONSTRAINT sector_name_parking_id_key UNIQUE (name, parking_id);
 
 
 --
@@ -699,14 +673,6 @@ ALTER TABLE ONLY public.attribute_value
 
 ALTER TABLE ONLY public.client_data
     ADD CONSTRAINT client_data_user_level_id_fk FOREIGN KEY (id) REFERENCES public.user_level(id);
-
-
---
--- Name: entry_code entry_code_reservation_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: ssbd03admin
---
-
-ALTER TABLE ONLY public.entry_code
-    ADD CONSTRAINT entry_code_reservation_id_fk FOREIGN KEY (reservation_id) REFERENCES public.reservation(id);
 
 
 --

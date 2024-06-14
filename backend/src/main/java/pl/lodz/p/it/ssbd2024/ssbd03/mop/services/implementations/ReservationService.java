@@ -100,7 +100,7 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Override
     @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
-    public void makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
+    public Reservation makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
         // Check begin time
         if (beginTime.isBefore(LocalDateTime.now()) || endTime.isBefore(beginTime) || endTime.isEqual(beginTime)
                 || Duration.between(beginTime, endTime).toMinutes() < reservationMinHours * 60) throw new ReservationInvalidTimeframe();
@@ -152,6 +152,8 @@ public class ReservationService implements ReservationServiceInterface {
         parkingFacade.forceVersionUpdate(sector);
 
         reservationFacade.create(newReservation);
+
+        return newReservation;
     }
 
     // MOP.17 - Cancel an active reservation

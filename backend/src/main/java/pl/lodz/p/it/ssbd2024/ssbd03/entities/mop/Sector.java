@@ -141,7 +141,7 @@ public class Sector extends AbstractEntity implements Serializable {
     @PositiveOrZero(message = SectorMessages.SECTOR_OCCUPIED_PLACES_NEGATIVE)
     @Column(name = DatabaseConsts.SECTOR_OCCUPIED_PLACES_COLUMN, nullable = false)
     @Setter
-    private Integer occupiedPlaces = maxPlaces;
+    private Integer occupiedPlaces = 0;
 
     /**
      * The weight of this sector in spot assigning algorithms.

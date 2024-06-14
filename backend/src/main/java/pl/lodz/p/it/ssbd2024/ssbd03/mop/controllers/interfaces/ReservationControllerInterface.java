@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -73,7 +74,7 @@ public interface ReservationControllerInterface {
     @PostMapping(value = "/make-reservation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Reserve a parking place", description = "The endpoint is used to reserve a place in selected Sector.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "The reservation has been created successfully."),
+            @ApiResponse(responseCode = "201", description = "The reservation has been created successfully."),
             @ApiResponse(responseCode = "400", description = "The reservation has not been created due to the correctness of the request " +
                     "or sector blockage, including insufficient number of sector's places"),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")

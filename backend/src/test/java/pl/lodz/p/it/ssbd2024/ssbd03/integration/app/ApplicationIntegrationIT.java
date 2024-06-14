@@ -32,11 +32,15 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.AccessAndRefreshTokens
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.reservationDTO.MakeReservationDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorCreateDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorDeactivationTimeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorModifyDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.SectorOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DTOConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.DTOMessages;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountMessages;
@@ -53,7 +57,11 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
@@ -2036,6 +2044,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
     }
 
+
+    // MOP.5 Show sectors list
     @Test
     public void getAllSectorsByParkingIdReturnListAndOKStatusCode() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
@@ -2144,6 +2154,30 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
+    // MOP.15 Show active reservations list
+    @Test
+    public void getAllActiveReservationsReturnListAndOKStatusCode() throws JsonProcessingException {
+        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
+
+        List<String> reservations =
+                RestAssured
+                        .given()
+                        .header("Authorization", "Bearer " + loginToken)
+                        .param("pageNumber", 0)
+                        .param("pageSize", 3)
+                        .get(BASE_URL + "/reservations/active/self")
+                        .then()
+                        .assertThat()
+                        .statusCode(HttpStatus.OK.value())
+                        .extract()
+                        .jsonPath()
+                        .getList("id");
+
+        assertFalse(reservations.isEmpty());
+
+        assertEquals(3, reservations.size());
+
+    }
 
     @Test
     public void getAllActiveReservationsAsAuthenticatedAndAuthorizedUserReturnNoContent() throws JsonProcessingException {
@@ -2219,31 +2253,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.UNAUTHORIZED_EXCEPTION));
     }
 
-
-    @Test
-    public void getAllActiveReservationsReturnListAndOKStatusCode() throws JsonProcessingException {
-        String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
-
-        List<String> reservations =
-                RestAssured
-                        .given()
-                        .header("Authorization", "Bearer " + loginToken)
-                        .param("pageNumber", 0)
-                        .param("pageSize", 3)
-                        .get(BASE_URL + "/reservations/active/self")
-                        .then()
-                        .assertThat()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract()
-                        .jsonPath()
-                        .getList("id");
-
-        assertFalse(reservations.isEmpty());
-
-        assertEquals(3, reservations.size());
-
-    }
-
+    // MOP.6 Create sector
     @Test
     public void addNewSectorSuccessful() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
@@ -2436,6 +2446,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
+    // MOP.7 Remove sector
     @Test
     public void removeSectorTestSuccessful() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
@@ -2524,60 +2535,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
     }
 
-    @Test
-    public void editSectorTestInvalidName() throws JsonProcessingException {
-        String loginToken = this.login("tkarol", "P@ssw0rd!", "pl");
-        RequestSpecification requestSpec = RestAssured.given()
-                .header("Authorization", "Bearer " + loginToken);
-
-
-        Response responseBefore = RestAssured.given()
-                .spec(requestSpec)
-                .when()
-                .pathParam("id", "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277")
-                .get(BASE_URL + "/parking/sectors/get/{id}")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body(
-                        "name", Matchers.equalTo("SB-01"),
-                        "type", Matchers.equalTo("UNCOVERED"),
-                        "maxPlaces", Matchers.not(40),
-                        "weight", Matchers.equalTo(1)
-                )
-                .extract()
-                .response();
-
-        SectorOutputDTO sectorOutputDTO = responseBefore.as(SectorOutputDTO.class);
-
-        SectorModifyDTO sectorModifyDTO = toSectorModifyDTO(sectorOutputDTO);
-        sectorModifyDTO.setName("ABCDEFGH");
-
-
-        RestAssured.given()
-                .spec(requestSpec)
-                .when()
-                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE)
-                .body(sectorModifyDTO)
-                .put(BASE_URL + "/parking/sectors")
-                .then()
-                .statusCode(HttpStatus.CONFLICT.value())
-                .body(
-                        "weight", Matchers.not("ABCDEFGH")
-                );
-
-        RestAssured.given()
-                .spec(requestSpec)
-                .when()
-                .pathParam("id", "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277")
-                .get(BASE_URL + "/parking/sectors/get/{id}")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body(
-                        "name", Matchers.equalTo("SB-01")
-                );
-    }
-
+    // MOP.8 Edit sector
     @Test
     public void editSectorTestSuccessful() throws JsonProcessingException {
         String loginToken = this.login("tkarol", "P@ssw0rd!", "pl");
@@ -2629,6 +2587,60 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.OK.value())
                 .body(
                         "weight", Matchers.equalTo(2)
+                );
+    }
+
+    @Test
+    public void editSectorTestInvalidName() throws JsonProcessingException {
+        String loginToken = this.login("tkarol", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+
+
+        Response responseBefore = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .pathParam("id", "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277")
+                .get(BASE_URL + "/parking/sectors/get/{id}")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "name", Matchers.equalTo("SB-01"),
+                        "type", Matchers.equalTo("UNCOVERED"),
+                        "maxPlaces", Matchers.not(40),
+                        "weight", Matchers.equalTo(1)
+                )
+                .extract()
+                .response();
+
+        SectorOutputDTO sectorOutputDTO = responseBefore.as(SectorOutputDTO.class);
+
+        SectorModifyDTO sectorModifyDTO = toSectorModifyDTO(sectorOutputDTO);
+        sectorModifyDTO.setName("ABCDEFGH");
+
+
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .header("If-Match", responseBefore.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE)
+                .body(sectorModifyDTO)
+                .put(BASE_URL + "/parking/sectors")
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value())
+                .body(
+                        "weight", Matchers.not("ABCDEFGH")
+                );
+
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .pathParam("id", "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277")
+                .get(BASE_URL + "/parking/sectors/get/{id}")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "name", Matchers.equalTo("SB-01")
                 );
     }
 
@@ -2817,6 +2829,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 );
     }
 
+    // MOP.11 Show available parking list
+    @Test
     public void showAllAvailableParkingListTestSuccessful() throws JsonProcessingException {
         String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
         RestAssured.given()
@@ -2886,17 +2900,18 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     public void showAllAvailableParkingListWithInvalidParameters() throws JsonProcessingException {
         String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
         RestAssured.given()
-            .header("Authorization", "Bearer " + loginToken)
-            .when()
-            .param("pageNumber", "invalid")
-            .param("pageSize", 10)
-            .get(BASE_URL + "/parking/active")
-            .then()
-            .assertThat()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .body("message", equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .param("pageNumber", "invalid")
+                .param("pageSize", 10)
+                .get(BASE_URL + "/parking/active")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
+    // MOP.12 Show parking info
     @Test
     public void getParkingByIdTestSuccessful() throws JsonProcessingException {
         String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
@@ -2940,6 +2955,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
+    // MOP.13 Show sector info
     @Test
     public void getSectorByIdTestSuccessful() throws JsonProcessingException {
         String loginToken = login("michalkowal", "P@ssw0rd!", "pl");
@@ -2982,6 +2998,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
+    // MOP.22 Show all reservations
     @Test
     public void getAllReservationsTestSuccessful() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
@@ -3052,149 +3069,43 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     public void getAllReservationsListWithInvalidParameters() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
         RestAssured.given()
-            .header("Authorization", "Bearer " + loginToken)
-            .when()
-            .param("pageNumber", "invalid")
-            .param("pageSize", 10)
-            .get(BASE_URL + "/reservations")
-            .then()
-            .assertThat()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .param("pageNumber", "invalid")
+                .param("pageSize", 10)
+                .get(BASE_URL + "/reservations")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.TYPE_MISMATCH_EXCEPTION));
     }
 
-    private static Stream<Arguments> provideNewUserLevelForAccountParameters() {
-        return Stream.of(
-                Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "staff"), //aandrus
-                Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "client"), //aandrus
-                Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "admin") //kwotyla
-        );
+    // MOP.1 Show parking list
+    @Test
+    public void showAllParkingListAsAuthenticated() throws JsonProcessingException {
+        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
+        List<String> allParking = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .param("pageNumber", 0)
+                .param("pageSize", 10)
+                .get(BASE_URL + "/parking")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("[0].id", anything())
+                .body("[0].city", anything())
+                .body("[0].zipCode", anything())
+                .body("[0].street", anything())
+                .body("[0].sectorTypes", anything())
+                .body("[0].strategy", anything())
+                .extract()
+                .jsonPath()
+                .getList("id");
+
+        assertFalse(allParking.isEmpty());
     }
 
-    private static Stream<Arguments> provideOldUserLevelForAccountParameters() {
-        return Stream.of(
-                Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "admin"), //aandrus
-                Arguments.of("f512c0b6-40b2-4bcb-8541-46077ac02101", "staff"), //tkarol
-                Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "client") //kwotyla
-        );
-    }
-
-    private static Stream<Arguments> provideConflictingUserLevelForAccountParameters() {
-        return Stream.of(
-                Arguments.of("f512c0b6-40b2-4bcb-8541-46077ac02101", "client"), //tkarol
-                Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "staff") //kwotyla
-        );
-    }
-
-    private String login(String login, String password, String language) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO(login, password, language);
-
-        RequestSpecification request = RestAssured.given();
-        request.contentType(CONTENT_TYPE);
-        request.body(mapper.writeValueAsString(accountLoginDTO));
-
-        Response response = request.post(BASE_URL + "/auth/login-credentials");
-        return response.as(AccessAndRefreshTokensDTO.class).getAccessToken();
-    }
-
-    private static Stream<Arguments> provideNoAdminLevelAccountsParameters() {
-        return Stream.of(
-                Arguments.of("tonyhalik"),          // tonyhalik staff
-                Arguments.of("adamn")               // adamn client
-        );
-    }
-
-    private static Stream<Arguments> provideAllLevelAccountsParameters() {
-        return Stream.of(
-                Arguments.of("tonyhalik"),          // tonyhalik staff
-                Arguments.of("adamn"),              // adamn client
-                Arguments.of("jerzybem")            // jerzybem admin
-        );
-    }
-
-    private static Stream<Arguments> provideAllLevelAccountsParametersAndNotValidIfMatch() {
-        return Stream.of(
-                Arguments.of("tonyhalik", ""),      // tonyhalik staff
-                Arguments.of("tonyhalik", "  "),    // tonyhalik staff
-                Arguments.of("adamn", ""),          // adamn client
-                Arguments.of("adamn", "  "),        // adamn client
-                Arguments.of("jerzybem", ""),       // jerzybem admin
-                Arguments.of("jerzybem", "  ")      // jerzybem admin
-        );
-    }
-
-    private static Stream<Arguments> provideNotValidIfMatch() {
-        return Stream.of(
-                Arguments.of(""),      // tonyhalik staff
-                Arguments.of(""),    // tonyhalik staff
-                Arguments.of(""),          // adamn client
-                Arguments.of(""),        // adamn client
-                Arguments.of(""),       // jerzybem admin
-                Arguments.of("")      // jerzybem admin
-        );
-    }
-
-    private static Stream<Arguments> provideInvalidUUIDParameters() {
-        return Stream.of(
-                Arguments.of("  "),     // blank
-                Arguments.of("db85e820-69a0-469c-bdb2-2fa38ae6e1c0bdb2"),   // too long
-                Arguments.of("db85e820-69a0-469c-bdb2"),   // too short
-                Arguments.of("db85e820-69a0-469c-bdb2-2fa38ae6e1X0")   // too invalid character
-        );
-    }
-
-    private static AccountModifyDTO toAccountModifyDTO(AccountOutputDTO account) {
-        return new AccountModifyDTO(
-                account.getLogin(),
-                account.getVersion(),
-                account.getUserLevelsDto(),
-                account.getName(),
-                account.getLastname(),
-                account.getPhoneNumber(),
-                account.isTwoFactorAuth()
-        );
-    }
-
-    private static ParkingModifyDTO toParkingModifyDTO(ParkingOutputDTO parking) {
-        return new ParkingModifyDTO(
-                parking.getVersion(),
-                parking.getParkingId(),
-                parking.getCity(),
-                parking.getZipCode(),
-                parking.getStreet(),
-                parking.getStrategy().toString());
-    }
-
-    private String decodeJwtTokenAndExtractValue(String payload, String key) {
-        String[] parts = payload.split("\\.");
-        for (String part : parts) {
-            byte[] dec = Base64.getDecoder().decode(part);
-            String str = new String(dec);
-
-            if (str.contains(key)) {
-                // In JWT token key and value pair comes in "key":"value",
-                // so the first letter of value is equal to the length of key plus 3 characters.
-                str = str.substring(str.indexOf(key) + key.length() + 3);
-                return str.substring(0, str.indexOf("\","));
-            }
-        }
-        return null;
-    }
-
-    private static SectorModifyDTO toSectorModifyDTO(SectorOutputDTO sector) {
-        return new SectorModifyDTO(
-                sector.getId(),
-                sector.getParkingId(),
-                sector.getVersion(),
-                sector.getName(),
-                sector.getType(),
-                sector.getMaxPlaces(),
-                sector.getWeight()
-        );
-    }
-
-    //----MOP 1. IT Tests----
     //Show all parking list as unauthenticated user -> Response: code 401, message "application.unauthorized.exception"
     @Test
     public void showAllParkingListAsUnauthenticatedUserTest() {
@@ -3275,32 +3186,23 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
+    // MOP.2 Create parking
     @Test
-    public void showAllParkingListAsAuthenticated() throws JsonProcessingException {
+    public void createParkingAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
-        List<String> allParking = RestAssured.given()
+        ObjectMapper mapper = new ObjectMapper();
+        ParkingCreateDTO parkingCreateDTO = new ParkingCreateDTO("City", "11-116", "Street", "LEAST_OCCUPIED");
+        RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
+                .contentType(CONTENT_TYPE)
+                .body(mapper.writeValueAsString(parkingCreateDTO))
                 .when()
-                .param("pageNumber", 0)
-                .param("pageSize", 10)
-                .get(BASE_URL + "/parking")
+                .post(BASE_URL + "/parking")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.OK.value())
-                .body("[0].id", anything())
-                .body("[0].city", anything())
-                .body("[0].zipCode", anything())
-                .body("[0].street", anything())
-                .body("[0].sectorTypes", anything())
-                .body("[0].strategy", anything())
-                .extract()
-                .jsonPath()
-                .getList("id");
-
-        assertFalse(allParking.isEmpty());
+                .statusCode(HttpStatus.CREATED.value());
     }
 
-    //----MOP 2. IT Tests----
     @Test
     public void createParkingAsUnauthenticatedUserTest() {
         RestAssured.given()
@@ -3440,20 +3342,17 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.PARKING_ADDRESS_DUPLICATE_EXCEPTION));
     }
 
+    // MOP.3 Remove parking
     @Test
-    public void createParkingAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
+    public void deleteParkingAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
-        ObjectMapper mapper = new ObjectMapper();
-        ParkingCreateDTO parkingCreateDTO = new ParkingCreateDTO("City", "11-116", "Street", "LEAST_OCCUPIED");
         RestAssured.given()
                 .header("Authorization", "Bearer " + loginToken)
-                .contentType(CONTENT_TYPE)
-                .body(mapper.writeValueAsString(parkingCreateDTO))
                 .when()
-                .post(BASE_URL + "/parking")
+                .delete(BASE_URL + "/parking/ddcae4ec-aeb5-4ece-aa2b-46819763d55f")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -3522,18 +3421,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
     }
 
     @Test
-    public void deleteParkingAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
-        String loginToken = login("tkarol", "P@ssw0rd!", "pl");
-        RestAssured.given()
-                .header("Authorization", "Bearer " + loginToken)
-                .when()
-                .delete(BASE_URL + "/parking/ddcae4ec-aeb5-4ece-aa2b-46819763d55f")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-    }
-
-    @Test
     public void deleteParkingAsAuthenticatedAndAuthorizedUserUnsuccessfully() throws JsonProcessingException {
         String loginToken = login("tkarol", "P@ssw0rd!", "pl");
         RestAssured.given()
@@ -3544,6 +3431,44 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("message", Matchers.equalTo(I18n.PARKING_DELETE_EXCEPTION));
+    }
+
+    // MOP.4 Edit parking
+    @Test
+    public void editParkingAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
+        String uuid = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1";
+        String loginTokenNo1 = login("tkarol", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpecNo1 = RestAssured.given()
+                .header("Authorization", "Bearer " + loginTokenNo1);
+
+        //response to get etag
+        Response responseNo1 = RestAssured.given()
+                .spec(requestSpecNo1)
+                .when()
+                .get(BASE_URL + "/parking/get/" + uuid)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .response();
+
+        //Create Modify DTO
+        ParkingOutputDTO parkingOutputDTO = responseNo1.as(ParkingOutputDTO.class);
+        ParkingModifyDTO parkingModifyDTO = toParkingModifyDTO(parkingOutputDTO);
+        parkingModifyDTO.setCity("Cityyy");
+
+        //Modify as unauthenticated
+        RestAssured.given()
+                .spec(requestSpecNo1)
+                .when()
+                .header("If-Match", responseNo1.getHeader("ETag").replace("\"", ""))
+                .contentType(CONTENT_TYPE)
+                .body(parkingModifyDTO)
+                .put(BASE_URL + "/parking")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("version", Matchers.equalTo(1))
+                .body("city", Matchers.equalTo(parkingModifyDTO.getCity()));
     }
 
     @Test
@@ -3618,43 +3543,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
                 .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
-    }
-
-    @Test
-    public void editParkingAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
-        String uuid = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1";
-        String loginTokenNo1 = login("tkarol", "P@ssw0rd!", "pl");
-        RequestSpecification requestSpecNo1 = RestAssured.given()
-                .header("Authorization", "Bearer " + loginTokenNo1);
-
-        //response to get etag
-        Response responseNo1 = RestAssured.given()
-                .spec(requestSpecNo1)
-                .when()
-                .get(BASE_URL + "/parking/get/" + uuid)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .response();
-
-        //Create Modify DTO
-        ParkingOutputDTO parkingOutputDTO = responseNo1.as(ParkingOutputDTO.class);
-        ParkingModifyDTO parkingModifyDTO = toParkingModifyDTO(parkingOutputDTO);
-        parkingModifyDTO.setCity("Cityyy");
-
-        //Modify as unauthenticated
-        RestAssured.given()
-                .spec(requestSpecNo1)
-                .when()
-                .header("If-Match", responseNo1.getHeader("ETag").replace("\"", ""))
-                .contentType(CONTENT_TYPE)
-                .body(parkingModifyDTO)
-                .put(BASE_URL + "/parking")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.OK.value())
-                .body("version", Matchers.equalTo(1))
-                .body("city", Matchers.equalTo(parkingModifyDTO.getCity()));
     }
 
     @Test
@@ -3973,6 +3861,31 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .body("message", Matchers.equalTo(I18n.PARKING_NOT_FOUND_EXCEPTION));
     }
 
+    // MOP.16 Show historical reservations list
+    @Test
+    public void getAllHistoricalReservationsAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
+        String loginTokenNo1 = login("jakubkoza", "P@ssw0rd!", "pl");
+        List<String> allReservations = RestAssured.given()
+                .header("Authorization", "Bearer " + loginTokenNo1)
+                .when()
+                .param("pageNumber", 0)
+                .param("pageSize", 10)
+                .get(BASE_URL + "/reservations/historical/self")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("[0].id", anything())
+                .body("[0].city", anything())
+                .body("[0].zipCode", anything())
+                .body("[0].street", anything())
+                .body("[0].sectorName", anything())
+                .extract()
+                .jsonPath()
+                .getList("id");
+
+        assertFalse(allReservations.isEmpty());
+    }
+
     @Test
     public void getAllHistoricalReservationsAsUnauthenticatedUser() {
         RestAssured.given()
@@ -3999,30 +3912,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
                 .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
-    }
-
-    @Test
-    public void getAllHistoricalReservationsAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
-        String loginTokenNo1 = login("jakubkoza", "P@ssw0rd!", "pl");
-        List<String> allReservations = RestAssured.given()
-                .header("Authorization", "Bearer " + loginTokenNo1)
-                .when()
-                .param("pageNumber", 0)
-                .param("pageSize", 10)
-                .get(BASE_URL + "/reservations/historical/self")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.OK.value())
-                .body("[0].id", anything())
-                .body("[0].city", anything())
-                .body("[0].zipCode", anything())
-                .body("[0].street", anything())
-                .body("[0].sectorName", anything())
-                .extract()
-                .jsonPath()
-                .getList("id");
-
-        assertFalse(allReservations.isEmpty());
     }
 
     @Test
@@ -4069,6 +3958,32 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     // MOP.9 Activate sector
     @Test
+    public void activateSectorAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
+        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
+
+        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .header("Content-Type", "application/json")
+                .body(sectorDeactivationTimeDTO)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken)
+                .when()
+                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/activate")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+    }
+
+    @Test
     public void activateSectorAsUnauthenticatedUser() {
         RestAssured.given()
                 .when()
@@ -4102,12 +4017,1177 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value()).body(
-                "message", Matchers.equalTo(I18n.SECTOR_ALREADY_ACTIVE)
+                        "message", Matchers.equalTo(I18n.SECTOR_ALREADY_ACTIVE)
+                );
+    }
+
+    // MOP.14 Reserve a parking place
+    @Test
+    public void makeReservationTestSuccessful() throws IOException {
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277";
+        LocalDateTime beginTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(5);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
         );
+
+        // Make reservation
+        String reservationCreatedUrl = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .header(HttpHeaders.LOCATION, Matchers.any(String.class))
+                .extract()
+                .header(HttpHeaders.LOCATION);
+
+        String reservationId = reservationCreatedUrl.substring(reservationCreatedUrl.lastIndexOf('/') + 1);
+
+        // Check new reservation in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("SB-01")
+                );
     }
 
     @Test
-    public void activateSectorAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
+    public void makeReservationTestFailedUnauthorized() throws IOException {
+        String sectorId = "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277";
+        LocalDateTime beginTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(5);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
+        );
+
+        // Try to make reservation
+        RestAssured.given()
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void makeReservationTestFailedForbidden() throws IOException {
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277";
+        LocalDateTime beginTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(5);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
+        );
+
+        // Try to make reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void makeReservationTestFailedSectorNotFound() throws IOException {
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "a731477c-0afc-490e-89d1-59bf583087c6";
+        LocalDateTime beginTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(5);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
+        );
+
+        // Try to make reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", Matchers.equalTo(I18n.SECTOR_NOT_FOUND));
+    }
+
+    @Test
+    public void makeReservationTestFailedInvalidUUID() throws IOException {
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "trąbka";
+        LocalDateTime beginTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(5);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
+        );
+
+        // Try to make reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION),
+                        "violations[0]", equalTo(DTOMessages.SECTOR_UUID_REGEX_NOT_MET)
+                );
+    }
+
+    @Test
+    public void makeReservationTestFailedInvalidTimeframe() throws IOException {
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277";
+        LocalDateTime beginTime = LocalDateTime.now().minusHours(8);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(5);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
+        );
+
+        // Try to make reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_INVALID_TIMEFRAME)
+                );
+    }
+
+    @Test
+    public void makeReservationTestFailedExceedReservationMaximumTime() throws IOException {
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277";
+        LocalDateTime beginTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(26);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
+        );
+
+        // Try to make reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_EXCEEDING_MAXIMUM_TIME)
+                );
+    }
+
+    @Test
+    public void makeReservationTestFailedExceedClientReservationLimit() throws IOException {
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "9f7f2969-1b7e-4bb3-ab84-6dbc31c01277";
+        LocalDateTime beginTime1 = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime1 = LocalDateTime.now().plusHours(5);
+
+        MakeReservationDTO makeReservationDTO1 = new MakeReservationDTO(
+                sectorId,
+                beginTime1,
+                endTime1
+        );
+
+        // Make 1st reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO1)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .header(HttpHeaders.LOCATION, Matchers.any(String.class))
+                .extract()
+                .header(HttpHeaders.LOCATION);
+
+        // Make 2nd reservation
+        LocalDateTime beginTime2 = LocalDateTime.now().plusHours(25);
+        LocalDateTime endTime2 = LocalDateTime.now().plusHours(29);
+
+        MakeReservationDTO makeReservationDTO2 = new MakeReservationDTO(
+                sectorId,
+                beginTime2,
+                endTime2
+        );
+
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO2)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .header(HttpHeaders.LOCATION, Matchers.any(String.class))
+                .extract()
+                .header(HttpHeaders.LOCATION);
+
+        // Make 3rd reservation
+        LocalDateTime beginTime3 = LocalDateTime.now().plusHours(25);
+        LocalDateTime endTime3 = LocalDateTime.now().plusHours(29);
+
+        MakeReservationDTO makeReservationDTO3 = new MakeReservationDTO(
+                sectorId,
+                beginTime3,
+                endTime3
+        );
+
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO3)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .header(HttpHeaders.LOCATION, Matchers.any(String.class))
+                .extract()
+                .header(HttpHeaders.LOCATION);
+
+        // Check reservation count
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + "/reservations/active/self?pageNumber=0&pageSize=5")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "reservations", Matchers.hasSize(3)
+                );
+
+
+        // Try to make 4th reservation
+        LocalDateTime beginTime4 = LocalDateTime.now().plusHours(100);
+        LocalDateTime endTime4 = LocalDateTime.now().plusHours(102);
+
+        MakeReservationDTO makeReservationDTO4 = new MakeReservationDTO(
+                sectorId,
+                beginTime4,
+                endTime4
+        );
+
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO4)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_CLIENT_LIMIT_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void makeReservationTestFailedInsufficientClientType() throws IOException {
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String sectorId = "36e19dcd-1d5b-4258-a5df-ba9f4372c58c";
+
+
+        // Check sector type
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/parking/sectors/get/%s", sectorId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "type", Matchers.equalTo(Sector.SectorType.UNDERGROUND.name())
+                );
+
+
+        LocalDateTime beginTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(3);
+
+        MakeReservationDTO makeReservationDTO = new MakeReservationDTO(
+                sectorId,
+                beginTime,
+                endTime
+        );
+
+        // Try to make reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_INSUFFICIENT_CLIENT_TYPE)
+                );
+    }
+
+    //Hazard
+    @Test
+    public void makeReservationTestNoParkingPlace() throws IOException {
+        // First client
+        String loginTokenClient1 = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpecClient1 = RestAssured.given()
+                .header("Authorization", "Bearer " + loginTokenClient1);
+
+        // Second client
+        String loginTokenClient2 = this.login("piotrnowak", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpecClient2 = RestAssured.given()
+                .header("Authorization", "Bearer " + loginTokenClient2);
+
+        // Max places = 1
+        String sectorId = "828228e6-2fa7-418e-8cfe-7f4d79737557";
+
+        // Try to make 1st reservation
+        LocalDateTime beginTime1 = LocalDateTime.now().plusHours(48);
+        LocalDateTime endTime1 = LocalDateTime.now().plusHours(52);
+
+        MakeReservationDTO makeReservationDTO1 = new MakeReservationDTO(
+                sectorId,
+                beginTime1,
+                endTime1
+        );
+
+        RestAssured.given()
+                .spec(requestSpecClient1)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO1)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .header(HttpHeaders.LOCATION, Matchers.any(String.class))
+                .extract()
+                .header(HttpHeaders.LOCATION);
+
+        // Try to make 2nd reservation
+        LocalDateTime beginTime2 = LocalDateTime.now().plusHours(49);
+        LocalDateTime endTime2 = LocalDateTime.now().plusHours(55);
+
+        MakeReservationDTO makeReservationDTO2 = new MakeReservationDTO(
+                sectorId,
+                beginTime2,
+                endTime2
+        );
+
+        RestAssured.given()
+                .spec(requestSpecClient2)
+                .when()
+                .contentType(CONTENT_TYPE)
+                .body(makeReservationDTO2)
+                .post(BASE_URL + "/reservations/make-reservation")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    // MOP.17 Cancel reservation
+    @Test
+    public void cancelReservationTestSuccessful() throws IOException {
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "e598892e-7b3b-4e33-ad24-472fb05b0e8f";
+
+        // Check new reservation in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.AWAITING.name())
+                );
+
+        // Cancel reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Check new reservation in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.CANCELLED.name())
+                );
+    }
+
+    @Test
+    public void cancelReservationTestFailedNoLogin() throws IOException {
+        String reservationId = "e598892e-7b3b-4e33-ad24-472fb05b0e8f";
+
+        // Cancel reservation
+        RestAssured.given()
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void cancelReservationTestFailedForbidden() throws IOException {
+        String loginToken = this.login("aandrus", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "trąbka";
+
+        // Cancel reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void cancelReservationTestFailedInvalidUUID() throws IOException {
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "trąbka";
+
+        // Cancel reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void cancelReservationTestFailedReservationNotFound() throws IOException {
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "e4655ab5-f94e-4573-941d-061ecce32a54";
+
+        // Cancel reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_FOUND_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void cancelReservationTestFailedReservationAlreadyCancelled() throws IOException {
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "28eb349e-e190-4aa0-ad77-76ecf0067f7e";
+
+        // Cancel reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_ALREADY_CANCELLED_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void cancelReservationTestFailedReservationInEndedStatus() throws IOException {
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "90a0035d-6265-4b53-a547-901b3bbabd1d";
+
+        // Cancel reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_ALREADY_ENDED_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void cancelReservationTestFailedTooLateAttempt() throws IOException {
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "7b8ef319-1a84-4f7d-9cb6-933f73927682";
+
+        // Cancel reservation
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .delete(String.format(BASE_URL + "/reservations/cancel-reservation/%s", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_CANCELLATION_LATE_ATTEMPT)
+                );
+    }
+
+    // MOP.18 Enter parking without reservation
+    @Test
+    public void enterParkingWithoutReservationTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("jakubkoza", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String parkingId = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1";
+
+        // Enter parking
+        String reservationId = RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.matchesPattern(DTOConsts.UUID_REGEX),
+                        "city", Matchers.equalTo("BoatCity"),
+                        "zipCode", Matchers.equalTo("91-416"),
+                        "street", Matchers.equalTo("Palki"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name())
+                )
+                .extract()
+                .jsonPath().getString("id");
+
+        // Login staff
+        String loginTokenStaff = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpecStaff = RestAssured.given()
+                .header("Authorization", "Bearer " + loginTokenStaff);
+
+        // Check new reservation in DB
+        RestAssured.given()
+                .spec(requestSpecStaff)
+                .when()
+                .get(BASE_URL + String.format("/reservations/staff/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.matchesPattern(DTOConsts.UUID_REGEX),
+                        "city", Matchers.equalTo("BoatCity"),
+                        "zipCode", Matchers.equalTo("91-416"),
+                        "street", Matchers.equalTo("Palki"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(1)
+                );
+    }
+
+    @Test
+    public void enterParkingWithoutReservationGuestTestSuccessful() throws IOException {
+        String parkingId = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1";
+
+        // Enter parking
+        String reservationId = RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.matchesPattern(DTOConsts.UUID_REGEX),
+                        "city", Matchers.equalTo("BoatCity"),
+                        "zipCode", Matchers.equalTo("91-416"),
+                        "street", Matchers.equalTo("Palki"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name())
+                )
+                .extract()
+                .jsonPath().getString("id");
+
+        // Login staff
+        String loginTokenStaff = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpecStaff = RestAssured.given()
+                .header("Authorization", "Bearer " + loginTokenStaff);
+
+        // Check new reservation in DB
+        RestAssured.given()
+                .spec(requestSpecStaff)
+                .when()
+                .get(BASE_URL + String.format("/reservations/staff/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.matchesPattern(DTOConsts.UUID_REGEX),
+                        "city", Matchers.equalTo("BoatCity"),
+                        "zipCode", Matchers.equalTo("91-416"),
+                        "street", Matchers.equalTo("Palki"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(1)
+                );
+    }
+
+    @Test
+    public void enterParkingWithoutReservationTestFailedForbidden() throws IOException {
+        // Login client
+        String loginToken = this.login("aandrus", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String parkingId = "96a36faa-f2a2-41b8-9c3c-b6bef04ce6d1";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void enterParkingWithoutReservationTestFailedNoAvailablePlaces() throws IOException {
+        // Max places = 1
+        String parkingId = "153bcb2f-6487-4897-9805-f56db73b565f";
+
+        // Enter parking one
+        RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.matchesPattern(DTOConsts.UUID_REGEX),
+                        "city", Matchers.equalTo("oneplace"),
+                        "zipCode", Matchers.equalTo("99-997"),
+                        "street", Matchers.equalTo("oneplace"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name())
+                )
+                .extract()
+                .jsonPath().getString("id");
+
+        // Enter parking two
+        RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_SECTOR_NO_AVAILABLE_PLACES_EXCEPTION)
+                );
+    }
+
+    // MOP.19 Exit parking
+    @Test
+    public void exitParkingWithoutReservationEndingTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Check reservation before exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(1)
+                );
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+    }
+
+    @Test
+    public void exitParkingWithReservationEndingTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Check reservation before exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(1)
+                );
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit?end=true", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("UC-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.COMPLETED_MANUALLY.name()),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestFailedForbidden() throws IOException {
+        // Login client
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestFailedInvalidUUID() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "trąbka";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestReservationNotFound() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "a10e8e3c-f012-4423-adca-aa8d55d3f2af";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_FOUND_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestTryToExitOnOtherUserReservation() throws IOException {
+        // Login client
+        String loginToken = this.login("piotrnowak", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1fe14106-1c04-44c4-b69b-4ce46797a71b";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_FOUND_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationEndingTestTryToExitWhenOutTheParking() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "27b8f933-3bdf-4bfb-affe-0d19260a51cc";
+
+        // Exit parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.CANNOT_EXIT_PARKING_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void exitParkingWithoutReservationAsGuestSuccessful() throws IOException {
+        String parkingId = "153bcb2f-6487-4897-9805-f56db73b565f";
+
+        // Enter parking
+        String reservationId = RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/%s/enter", parkingId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.matchesPattern(DTOConsts.UUID_REGEX),
+                        "city", Matchers.equalTo("oneplace"),
+                        "zipCode", Matchers.equalTo("99-997"),
+                        "street", Matchers.equalTo("oneplace"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name())
+                )
+                .extract()
+                .jsonPath().getString("id");
+
+        // Exit parking
+        RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/exit", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Staff
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/staff/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("XD-07"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.COMPLETED_MANUALLY.name()),
+                        "endingTime", Matchers.notNullValue(),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+    }
+
+    // MOP.21 Enter parking with reservation
+    @Test
+    public void enterParkingWithReservationTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "4fcc2377-e95a-4f6a-a69b-185c2cc3bc36";
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("CO-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "sectorName", Matchers.equalTo("CO-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "parkingEvents", Matchers.hasSize(3)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedNoLogin() {
+        String reservationId = "4fcc2377-e95a-4f6a-a69b-185c2cc3bc36";
+
+        // Enter parking
+        RestAssured.given()
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedForbidden() throws IOException {
+        // Login client
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "4fcc2377-e95a-4f6a-a69b-185c2cc3bc36";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedInvalidUUID() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "trąbka";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedReservationNotFound() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "3a9062de-f1d4-4776-8185-dbba1b08fc68";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_FOUND_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedFutureReservation() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "1d86b115-9c18-4fd6-81be-e8878ad28a5d";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_NOT_STARTED_EXCEPTION)
+                );
+    }
+
+    @Test
+    public void enterParkingWithReservationTestFailedReservationAlreadyEnded() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "98a2fa9f-3b67-4a77-842d-33fa859d1933";
+
+        // Enter parking
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .post(String.format(BASE_URL + "/parking/reservations/%s/enter", reservationId))
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(
+                        "message", Matchers.equalTo(I18n.RESERVATION_ALREADY_ENDED_EXCEPTION)
+                );
+    }
+
+    // MOP.24 Shown own reservation info
+    @Test
+    public void shownOwnReservationTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("michalkowal", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "4fcc2377-e95a-4f6a-a69b-185c2cc3bc36";
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/client/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "city", Matchers.equalTo("test1"),
+                        "zipCode", Matchers.equalTo("99-999"),
+                        "street", Matchers.equalTo("test1"),
+                        "sectorName", Matchers.equalTo("CO-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "clientId", Matchers.equalTo("69507c7f-4c03-4087-85e6-3ae3b6fc2201"),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+    }
+
+    // MOP.25 Shown other user reservation info
+    @Test
+    public void shownOtherUserReservationTestSuccessful() throws IOException {
+        // Login client
+        String loginToken = this.login("jerzybem", "P@ssw0rd!", "pl");
+        RequestSpecification requestSpec = RestAssured.given()
+                .header("Authorization", "Bearer " + loginToken);
+        String reservationId = "4fcc2377-e95a-4f6a-a69b-185c2cc3bc36";
+
+        // Check reservation after exiting in DB
+        RestAssured.given()
+                .spec(requestSpec)
+                .when()
+                .get(BASE_URL + String.format("/reservations/staff/%s?pageNumber=0&pageSize=5", reservationId))
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body(
+                        "id", Matchers.equalTo(reservationId),
+                        "city", Matchers.equalTo("test1"),
+                        "zipCode", Matchers.equalTo("99-999"),
+                        "street", Matchers.equalTo("test1"),
+                        "sectorName", Matchers.equalTo("CO-01"),
+                        "status", Matchers.equalTo(Reservation.ReservationStatus.IN_PROGRESS.name()),
+                        "clientId", Matchers.equalTo("69507c7f-4c03-4087-85e6-3ae3b6fc2201"),
+                        "parkingEvents", Matchers.hasSize(2)
+                );
+    }
+
+    // MOP.10 Deactivate sector
+    @Test
+    public void deactivateSectorAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
         String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
 
         SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
@@ -4121,18 +5201,8 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
-
-        RestAssured.given()
-                .header("Authorization", "Bearer " + loginToken)
-                .when()
-                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/activate")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-
     }
 
-    // MOP.10 Deactivate sector
     @Test
     public void deactivateSectorAsUnauthenticatedUser() {
         RestAssured.given()
@@ -4160,23 +5230,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .assertThat()
                 .statusCode(HttpStatus.FORBIDDEN.value())
                 .body("message", Matchers.equalTo(I18n.ACCESS_DENIED_EXCEPTION));
-    }
-
-    @Test
-    public void deactivateSectorAsAuthenticatedAndAuthorizedUserSuccessfully() throws JsonProcessingException {
-        String loginToken = login("jerzybem", "P@ssw0rd!", "pl");
-
-        SectorDeactivationTimeDTO sectorDeactivationTimeDTO = new SectorDeactivationTimeDTO(LocalDateTime.now().plusDays(1));
-
-        RestAssured.given()
-                .header("Authorization", "Bearer " + loginToken)
-                .header("Content-Type", "application/json")
-                .body(sectorDeactivationTimeDTO)
-                .when()
-                .post(BASE_URL + "/parking/sectors/3e6a85db-d751-4549-bbb7-9705f0b2fa6b/deactivate")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -4240,5 +5293,136 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("message", Matchers.equalTo(I18n.SECTOR_DEACTIVATION_INVALID_TIME));
+    }
+
+    private static Stream<Arguments> provideNewUserLevelForAccountParameters() {
+        return Stream.of(
+                Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "staff"), //aandrus
+                Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "client"), //aandrus
+                Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "admin") //kwotyla
+        );
+    }
+
+    private static Stream<Arguments> provideOldUserLevelForAccountParameters() {
+        return Stream.of(
+                Arguments.of("9a333f13-5ccc-4109-bce3-0ad629843edf", "admin"), //aandrus
+                Arguments.of("f512c0b6-40b2-4bcb-8541-46077ac02101", "staff"), //tkarol
+                Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "client") //kwotyla
+        );
+    }
+
+    private static Stream<Arguments> provideConflictingUserLevelForAccountParameters() {
+        return Stream.of(
+                Arguments.of("f512c0b6-40b2-4bcb-8541-46077ac02101", "client"), //tkarol
+                Arguments.of("f14ac5b1-16f3-42ff-8df3-dd95de69c368", "staff") //kwotyla
+        );
+    }
+
+    private String login(String login, String password, String language) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO(login, password, language);
+
+        RequestSpecification request = RestAssured.given();
+        request.contentType(CONTENT_TYPE);
+        request.body(mapper.writeValueAsString(accountLoginDTO));
+
+        Response response = request.post(BASE_URL + "/auth/login-credentials");
+        return response.as(AccessAndRefreshTokensDTO.class).getAccessToken();
+    }
+
+    private static Stream<Arguments> provideNoAdminLevelAccountsParameters() {
+        return Stream.of(
+                Arguments.of("tonyhalik"),          // tonyhalik staff
+                Arguments.of("adamn")               // adamn client
+        );
+    }
+
+    private static Stream<Arguments> provideAllLevelAccountsParameters() {
+        return Stream.of(
+                Arguments.of("tonyhalik"),          // tonyhalik staff
+                Arguments.of("adamn"),              // adamn client
+                Arguments.of("jerzybem")            // jerzybem admin
+        );
+    }
+
+    private static Stream<Arguments> provideAllLevelAccountsParametersAndNotValidIfMatch() {
+        return Stream.of(
+                Arguments.of("tonyhalik", ""),      // tonyhalik staff
+                Arguments.of("tonyhalik", "  "),    // tonyhalik staff
+                Arguments.of("adamn", ""),          // adamn client
+                Arguments.of("adamn", "  "),        // adamn client
+                Arguments.of("jerzybem", ""),       // jerzybem admin
+                Arguments.of("jerzybem", "  ")      // jerzybem admin
+        );
+    }
+
+    private static Stream<Arguments> provideNotValidIfMatch() {
+        return Stream.of(
+                Arguments.of(""),      // tonyhalik staff
+                Arguments.of(""),    // tonyhalik staff
+                Arguments.of(""),          // adamn client
+                Arguments.of(""),        // adamn client
+                Arguments.of(""),       // jerzybem admin
+                Arguments.of("")      // jerzybem admin
+        );
+    }
+
+    private static Stream<Arguments> provideInvalidUUIDParameters() {
+        return Stream.of(
+                Arguments.of("  "),     // blank
+                Arguments.of("db85e820-69a0-469c-bdb2-2fa38ae6e1c0bdb2"),   // too long
+                Arguments.of("db85e820-69a0-469c-bdb2"),   // too short
+                Arguments.of("db85e820-69a0-469c-bdb2-2fa38ae6e1X0")   // too invalid character
+        );
+    }
+
+    private static AccountModifyDTO toAccountModifyDTO(AccountOutputDTO account) {
+        return new AccountModifyDTO(
+                account.getLogin(),
+                account.getVersion(),
+                account.getUserLevelsDto(),
+                account.getName(),
+                account.getLastname(),
+                account.getPhoneNumber(),
+                account.isTwoFactorAuth()
+        );
+    }
+
+    private static ParkingModifyDTO toParkingModifyDTO(ParkingOutputDTO parking) {
+        return new ParkingModifyDTO(
+                parking.getVersion(),
+                parking.getParkingId(),
+                parking.getCity(),
+                parking.getZipCode(),
+                parking.getStreet(),
+                parking.getStrategy().toString());
+    }
+
+    private String decodeJwtTokenAndExtractValue(String payload, String key) {
+        String[] parts = payload.split("\\.");
+        for (String part : parts) {
+            byte[] dec = Base64.getDecoder().decode(part);
+            String str = new String(dec);
+
+            if (str.contains(key)) {
+                // In JWT token key and value pair comes in "key":"value",
+                // so the first letter of value is equal to the length of key plus 3 characters.
+                str = str.substring(str.indexOf(key) + key.length() + 3);
+                return str.substring(0, str.indexOf("\","));
+            }
+        }
+        return null;
+    }
+
+    private static SectorModifyDTO toSectorModifyDTO(SectorOutputDTO sector) {
+        return new SectorModifyDTO(
+                sector.getId(),
+                sector.getParkingId(),
+                sector.getVersion(),
+                sector.getName(),
+                sector.getType(),
+                sector.getMaxPlaces(),
+                sector.getWeight()
+        );
     }
 }

@@ -156,21 +156,21 @@ INSERT INTO public.token (id, creation_timestamp, account_id, token_value, type,
 -- Multi reservations
 -- 1
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('78d0c4cc-8e7e-4b07-9e8f-eea3fa991fb1', current_timestamp, TIMESTAMP '2024-12-12 03:00:00', NULL, '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'IN_PROGRESS');
-    -- Parking event - ENTRY
+-- Parking event - ENTRY
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('a75547a9-6ea9-4454-aba5-0db6a2d160f4', '78d0c4cc-8e7e-4b07-9e8f-eea3fa991fb1', TIMESTAMP '2024-12-12 03:00:00', 'ENTRY', 0);
 
 
 -- 2
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('075a099b-3447-43ae-b3db-5c66bbcc23df', current_timestamp, TIMESTAMP '2024-12-12 07:00:00', TIMESTAMP '2024-12-12 09:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'IN_PROGRESS');
-    -- Parking event - ENTRY
+-- Parking event - ENTRY
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('47cbef03-0d2d-4ebc-b14d-47c9b13cc0ee', '075a099b-3447-43ae-b3db-5c66bbcc23df', TIMESTAMP '2024-12-12 07:00:00', 'ENTRY', 0);
 
 
 -- 3
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('799926b4-0a9a-4bec-b475-a6908ca95558', current_timestamp, TIMESTAMP '2024-12-12 07:00:00', TIMESTAMP '2024-12-12 10:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'IN_PROGRESS');
-    -- Parking event - ENTRY
+-- Parking event - ENTRY
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('5c476b72-e5ba-47a4-8026-4599a4006333', '799926b4-0a9a-4bec-b475-a6908ca95558', TIMESTAMP '2024-12-12 07:00:00', 'ENTRY', 0);
-    -- Parking event - EXIT
+-- Parking event - EXIT
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('2e5b65a2-8e87-4023-b621-9035a0cb6ed4', '799926b4-0a9a-4bec-b475-a6908ca95558', TIMESTAMP '2024-12-12 08:00:00', 'EXIT', 0);
 
 
@@ -179,12 +179,12 @@ INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, cl
 
 -- 5
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('b793547e-a164-4bc8-b4ff-1c59a736a6f4', current_timestamp, TIMESTAMP '2024-12-11 14:00:00', TIMESTAMP '2024-12-11 20:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'IN_PROGRESS');
-    -- Parking event - ENTRY
+-- Parking event - ENTRY
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('15c018aa-ab03-4ad9-9d1f-fa38e5f23126', 'b793547e-a164-4bc8-b4ff-1c59a736a6f4', TIMESTAMP '2024-12-11 14:00:00', 'ENTRY', 0);
 
 -- 6
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('5345ca26-6104-44f6-807d-2aab9bb80c5c', current_timestamp, TIMESTAMP '2024-12-12 06:00:00', TIMESTAMP '2024-12-12 13:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'IN_PROGRESS');
-    -- Parking event - ENTRY
+-- Parking event - ENTRY
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('91cc92ce-d39b-42ce-ac7d-a81ff2178f92', '5345ca26-6104-44f6-807d-2aab9bb80c5c', TIMESTAMP '2024-12-12 06:00:00', 'ENTRY', 0);
 
 -- 7
@@ -199,9 +199,9 @@ INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, cl
 
 -- 10
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('548e6ad8-bd84-456a-aee5-ed4f82af80ec', current_timestamp, TIMESTAMP '2024-12-12 04:00:00', TIMESTAMP '2024-12-12 06:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'COMPLETED_MANUALLY');
-    -- Parking event - ENTRY
+-- Parking event - ENTRY
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('3681a70e-ad56-47f5-93b5-ffa7cffb5944', '548e6ad8-bd84-456a-aee5-ed4f82af80ec', TIMESTAMP '2024-12-12 04:00:00', 'ENTRY', 0);
-    -- Parking event - EXIT
+-- Parking event - EXIT
 INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('c552ef81-832c-42fd-983a-e6d285fdfcef', '548e6ad8-bd84-456a-aee5-ed4f82af80ec', TIMESTAMP '2024-12-12 05:00:00', 'EXIT', 0);
 
 -- 11

@@ -2,9 +2,11 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -34,6 +36,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.interfaces.ReservationContro
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.I18n;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +50,10 @@ import java.util.UUID;
 @TxTracked
 @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = ApplicationBaseException.class)
 public class ReservationController implements ReservationControllerInterface {
+
+    @Value("${created.reservation.resource.url}")
+    private String createdReservationResourceURL;
+
 
     private final ReservationServiceInterface reservationService;
 
@@ -96,14 +103,18 @@ public class ReservationController implements ReservationControllerInterface {
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        reservationService.makeReservation(
-                login,
-                makeReservationDTO.getSectorId(),
-                makeReservationDTO.getBeginTime(),
-                makeReservationDTO.getEndTime()
-        );
+        try {
+            Reservation newReservation = reservationService.makeReservation(
+                    login,
+                    UUID.fromString(makeReservationDTO.getSectorId()),
+                    makeReservationDTO.getBeginTime(),
+                    makeReservationDTO.getEndTime()
+            );
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.created(URI.create(this.createdReservationResourceURL + newReservation.getId())).build();
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
     }
 
     @Override

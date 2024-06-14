@@ -242,8 +242,12 @@ public class ParkingController implements ParkingControllerInterface {
         boolean isAnonymous = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString().isEmpty();
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Reservation reservation = parkingService.enterParkingWithoutReservation(UUID.fromString(parkingId), login, isAnonymous);
-        return ResponseEntity.ok(UserReservationMapper.toDTO(reservation));
+        try {
+            Reservation reservation = parkingService.enterParkingWithoutReservation(UUID.fromString(parkingId), login, isAnonymous);
+            return ResponseEntity.ok(UserReservationMapper.toDTO(reservation));
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
+        }
     }
 
     @Override
