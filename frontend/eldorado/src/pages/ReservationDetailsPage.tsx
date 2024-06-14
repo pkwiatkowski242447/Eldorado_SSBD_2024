@@ -72,41 +72,41 @@ function ReservationDetailsPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.staff.allReservations)}>All reservations</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.staff.allReservations)}>{t("breadcrumb.all.reservations")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>Reservation details</BreadcrumbLink>
+                            <BreadcrumbLink>{t("reservation.details.page.reservation.details")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Reservation Info</h1>
+                <h1 className="text-3xl font-semibold">{t("reservation.details.page.reservation.info")}</h1>
             </div>
             <div>
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{"Begin Time"}</TableHead>
+                                className="text-center">{t("reservation.details.page.begin.time")}</TableHead>
                             <TableHead
-                                className="text-center">{"Ending Time"}</TableHead>
+                                className="text-center">{t("reservation.details.page.ending.time")}</TableHead>
                             <TableHead
-                                className="text-center">{"City"}</TableHead>
+                                className="text-center">{t("reservation.details.page.city")}</TableHead>
                             <TableHead
-                                className="text-center">{"Street"}</TableHead>
+                                className="text-center">{t("reservation.details.page.street")}</TableHead>
                             <TableHead
-                                className="text-center">{"Zip Code"}</TableHead>
+                                className="text-center">{t("reservation.details.page.zip.code")}</TableHead>
                             <TableHead
-                                className="text-center">{"Sector Name"}</TableHead>
+                                className="text-center">{t("reservation.details.page.sector.name")}</TableHead>
                             <TableHead
                                 className="text-center">{"Status"}</TableHead>
                             <TableHead
-                                className="text-center">{"ID"}</TableHead>
+                                className="text-center">{t("reservation.details.page.id")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -124,17 +124,17 @@ function ReservationDetailsPage() {
                 </Table>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Parking Events</h1>
+                <h1 className="text-3xl font-semibold">{t("reservation.details.parking.events")}</h1>
             </div>
             <Table className="p-10 flex-grow">
                 <TableHeader>
                     <TableRow className={"text-center p-10"}>
                         <TableHead
-                            className="text-center">{"No."}</TableHead>
+                            className="text-center">{t("reservation.details.page.no")}</TableHead>
                         <TableHead
-                            className="text-center">{"Date"}</TableHead>
+                            className="text-center">{t("reservation.details.page.date")}</TableHead>
                         <TableHead
-                            className="text-center">{"Type"}</TableHead>
+                            className="text-center">{t("reservation.details.page.type")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody className={"text-center"}>

@@ -158,15 +158,15 @@ function ParkingManagementPage() {
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("City")}</TableHead>
+                                className="text-center">{t("parking.management.page.city")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Street")}</TableHead>
+                                className="text-center">{t("parking.management.page.street")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Zip code")}</TableHead>
+                                className="text-center">{t("parking.management.page.zip.code")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Sector determination strategy")}</TableHead>
+                                className="text-center">{t("parking.management.page.sector.determination.strategy")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Sector types")}</TableHead>
+                                className="text-center">{t("parking.management.page.sector.types")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -191,18 +191,18 @@ function ParkingManagementPage() {
                                             <DropdownMenuItem
                                                 onClick={() => navigate(`/manage-parking/${parking.id}`)}
                                             >
-                                                Show Sectors
+                                                {t("parking.management.page.show.sectors")}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleEditParkingClick(parking.id)}
                                             >
-                                                Edit parking
+                                                {t("parking.management.page.edit.parking")}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDeleteParkingClick(parking.id)}
                                                 disabled={parking.sectorTypes.length !== 0}
                                             >
-                                                Delete parking
+                                                {t("parking.management.page.delete.parking")}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -213,7 +213,7 @@ function ParkingManagementPage() {
                     <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Edit Parking</DialogTitle>
+                                <DialogTitle>{t("parking.management.page.edit.parking")}</DialogTitle>
                             </DialogHeader>
                             <EditParkingForm setDialogOpen={setEditDialogOpen} refresh={refresh} parkingId={parkingId}/>
                         </DialogContent>
@@ -222,7 +222,7 @@ function ParkingManagementPage() {
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to delete this parking?
+                                {t("parking.management.page.are.you.sure.you.want.to.delete.this.parking")}
                             </AlertDialogDescription>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>

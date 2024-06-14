@@ -30,18 +30,18 @@ function EnterParkingWithReservationPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{"Enter Reservation"}</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrum.enter.reservation")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className="mx-auto grid w-full max-w-4xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Enter Parking with Reservation</h1>
+                <h1 className="text-3xl font-semibold">{t("enter.parking.without.reservation.page.enter.parking.with.reservation")}</h1>
                 <Card className={"mt-5"}>
                     <CardHeader>
-                        <CardTitle>Enter Your Reservation ID</CardTitle>
-                        <CardDescription>Please provide your reservation ID to enter the parking</CardDescription>
+                        <CardTitle>{t("enter.parking.without.reservation.page.enter.your.reservation.id")}</CardTitle>
+                        <CardDescription>{t("enter.parking.without.reservation.page.please,provide,your,reservation.id.to.enter.parking")}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <EnterParkingWithReservationForm/>

@@ -102,7 +102,7 @@ function EnterParkingWithoutReservationPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{"Enter Parking"}</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrum.enter.parking")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -117,7 +117,7 @@ function EnterParkingWithoutReservationPage() {
                 </Button>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Enter Parking</h1>
+                <h1 className="text-3xl font-semibold">{t("enter.parking.without.reservation.page.enter.parking")}</h1>
             </div>
             <div className={"pt-5"}>
                 <Table className="p-10 flex-grow">
@@ -139,7 +139,7 @@ function EnterParkingWithoutReservationPage() {
                                     <Button variant={"default"} onClick={() => {
                                         setSelectedParkingId(parking.id);
                                         setIsDialogOpen(true);
-                                    }}>{"Enter"}</Button>
+                                    }}>{t("enter.parking.without.reservation.page.enter")}</Button>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -172,27 +172,26 @@ function EnterParkingWithoutReservationPage() {
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Enter Parking</AlertDialogTitle>
+                        <AlertDialogTitle>{t("enter.parking.without.reservation.page.enter.parking")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to park here?
+                            {t("enter.parking.without.reservation.page.are.you.sure.you.want.to.park.here")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>No</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleEnterParking}>Yes</AlertDialogAction>
+                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("enter.parking.without.reservation.page.no")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleEnterParking}>{t("enter.parking.without.reservation.page.yes")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
             <AlertDialog open={isResultDialogOpen} onOpenChange={setIsResultDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>You have entered the parking. Write down the information provided
-                            below.</AlertDialogTitle>
+                        <AlertDialogTitle>{t("enter.parking.without.reservation.you.have.entered.the.parking")}</AlertDialogTitle>
                         <AlertDialogDescription>
                             {parkingDetails && (
                                 <>
-                                    <p><strong>ID:</strong> {parkingDetails.id}</p>
-                                    <p><strong>Sector Name:</strong> {parkingDetails.sectorName}</p>
+                                    <p><strong>{t("enter.parking.without.reservation.id")}</strong> {parkingDetails.id}</p>
+                                    <p><strong>{t("enter.parking.without.reservation.sector.name")}</strong> {parkingDetails.sectorName}</p>
                                 </>
                             )}
                         </AlertDialogDescription>

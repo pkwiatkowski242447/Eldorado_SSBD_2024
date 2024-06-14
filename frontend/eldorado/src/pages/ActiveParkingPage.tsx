@@ -74,7 +74,7 @@ function ActiveParkingPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>{"Active Parking List"}</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrumb.active.parking.list")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -93,13 +93,13 @@ function ActiveParkingPage() {
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("City")}</TableHead>
+                                className="text-center">{t("active.parking.page.city")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Street")}</TableHead>
+                                className="text-center">{t("active.parking.page.street")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Zip code")}</TableHead>
+                                className="text-center">{t("active.parking.page.zip.code")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Sector types")}</TableHead>
+                                className="text-center">{t("active.parking.page.sector.types")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -117,7 +117,7 @@ function ActiveParkingPage() {
                                 <TableCell>
                                     <Button variant={"default"} onClick={() => {
                                         navigate(`/parking-list/parking-info/${parking.id}`)
-                                    }}>{"View Info"}</Button>
+                                    }}>{t("active.parking.page.view.info")}</Button>
                                 </TableCell>
                             </TableRow>
                         ))}
