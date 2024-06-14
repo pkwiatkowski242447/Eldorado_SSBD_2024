@@ -259,6 +259,7 @@ public class ParkingService implements ParkingServiceInterface {
                 modifiedParking.getAddress().getZipCode(),
                 modifiedParking.getAddress().getStreet());
 
+        foundParking.setSectorStrategy(modifiedParking.getSectorStrategy());
         foundParking.setAddress(address);
         parkingFacade.edit(foundParking);
         return foundParking;
@@ -276,14 +277,16 @@ public class ParkingService implements ParkingServiceInterface {
         }
 
         if (!foundSector.getType().equals(modifiedSector.getType())) {
-            if (foundSector.getActive(this.reservationMaxHours)) {
+            if (foundSector.getDeactivationTime() == null ||
+                    LocalDateTime.now().isBefore(foundSector.getDeactivationTime())) {
                 throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
             }
             foundSector.setType(modifiedSector.getType());
         }
 
         if (!foundSector.getMaxPlaces().equals(modifiedSector.getMaxPlaces())) {
-            if (foundSector.getActive(this.reservationMaxHours)) {
+            if (foundSector.getDeactivationTime() == null ||
+                    LocalDateTime.now().isBefore(foundSector.getDeactivationTime())) {
                 throw new SectorEditOfTypeOrMaxPlacesWhenActiveException();
             }
             foundSector.setMaxPlaces(modifiedSector.getMaxPlaces());

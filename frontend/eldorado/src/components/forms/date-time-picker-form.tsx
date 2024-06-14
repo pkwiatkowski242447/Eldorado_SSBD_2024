@@ -97,7 +97,7 @@ export function DateTimePickerForm() {
                                     </div>
                                 </PopoverContent>
                             </Popover>
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">{t("date.time.picker.form.submit")}</Button>
                         </FormItem>
                     )}
                 />

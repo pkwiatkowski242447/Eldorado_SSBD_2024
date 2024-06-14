@@ -58,13 +58,6 @@ public class RestResponseExceptionResolver extends ResponseEntityExceptionHandle
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.badRequest()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(new ExceptionDTO(I18n.HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
-    }
-
-    @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)

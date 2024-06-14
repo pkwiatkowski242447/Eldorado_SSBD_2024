@@ -24,6 +24,7 @@ import {Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import {Pathnames} from "@/router/pathnames.ts";
+import {Badge} from "@/components/ui/badge.tsx";
 
 function AllReservationsPage() {
     const {t} = useTranslation();
@@ -103,8 +104,8 @@ function AllReservationsPage() {
                                         className="text-center">{t("allReservationsPage.table.zipCode")}</TableHead>
                                     <TableHead
                                         className="text-center">{t("allReservationsPage.table.sectorName")}</TableHead>
-                                    {/*<TableHead*/}
-                                    {/*    className="text-center">{t("allReservationsPage.table.reservationId")}</TableHead>*/}
+                                    <TableHead
+                                        className="text-center">{t("Status")}</TableHead>
                                     <TableHead
                                         className="text-center"></TableHead>
                                 </TableRow>
@@ -119,10 +120,10 @@ function AllReservationsPage() {
                                         <TableCell>{reservation.street}</TableCell>
                                         <TableCell>{reservation.zipCode}</TableCell>
                                         <TableCell>{reservation.sectorName}</TableCell>
-                                        {/*<TableCell>{reservation.id}</TableCell>*/}
+                                        <TableCell><Badge variant={"secondary"}>{t(reservation.status)} </Badge></TableCell>
                                         <TableCell>
                                             <Button onClick={() => handleViewDetails(reservation.id)}>
-                                                View Details
+                                                {t("allReservationsPage.table.viewInfo")}
                                             </Button>
                                         </TableCell>
                                     </TableRow>

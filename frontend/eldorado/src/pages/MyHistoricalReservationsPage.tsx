@@ -14,6 +14,9 @@ import {
 import {Spinner} from "react-bootstrap";
 import {Button} from "@/components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
+import {useTranslation} from "react-i18next";
+import {Badge} from "@/components/ui/badge.tsx";
+
 
 function MyHistoricalReservationsPage() {
     const [historicalReservations, setHistoricalReservations] = useState<ReservationType[]>([]);
@@ -21,6 +24,7 @@ function MyHistoricalReservationsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [pageSize] = useState(5);
     const navigate = useNavigate();
+    const {t} = useTranslation();
 
     const fetchHistoricalReservations = async () => {
         setIsLoading(true);
@@ -66,19 +70,19 @@ function MyHistoricalReservationsPage() {
                         <TableHeader>
                             <TableRow className={"text-center p-10"}>
                                 <TableHead
-                                    className="text-center">{"Begin Time"}</TableHead>
+                                    className="text-center">{t("my.historical.reservations.page.begin.time")}</TableHead>
                                 <TableHead
-                                    className="text-center">{"Ending Time"}</TableHead>
+                                    className="text-center">{t("my.historical.reservations.page.begin.time")}</TableHead>
                                 <TableHead
-                                    className="text-center">{"City"}</TableHead>
+                                    className="text-center">{t("my.historical.reservations.page.city")}</TableHead>
                                 <TableHead
-                                    className="text-center">{"Street"}</TableHead>
+                                    className="text-center">{t("my.historical.reservations.page.street")}</TableHead>
                                 <TableHead
-                                    className="text-center">{"Zip Code"}</TableHead>
+                                    className="text-center">{t("my.historical.reservations.page.zip.code")}</TableHead>
                                 <TableHead
-                                    className="text-center">{"Sector Name"}</TableHead>
+                                    className="text-center">{t("my.historical.reservations.page.sector.name")}</TableHead>
                                 <TableHead
-                                    className="text-center">{"ID"}</TableHead>
+                                    className="text-center">{t("my.historical.reservations.page.sector.id")}</TableHead>
                                 <TableHead
                                     className="text-center"></TableHead>
                             </TableRow>
@@ -92,10 +96,11 @@ function MyHistoricalReservationsPage() {
                                     <TableCell>{historicalReservation.street}</TableCell>
                                     <TableCell>{historicalReservation.zipCode}</TableCell>
                                     <TableCell>{historicalReservation.sectorName}</TableCell>
+                                    <TableCell><Badge variant={"secondary"}>{t(historicalReservation.status)} </Badge></TableCell>
                                     <TableCell>{historicalReservation.id}</TableCell>
                                     <TableCell>
                                         <Button onClick={() => handleViewDetails(historicalReservation.id)}>
-                                            View Details
+                                            {t("active.parking.info.page.view.info")}
                                         </Button>
                                     </TableCell>
                                 </TableRow>

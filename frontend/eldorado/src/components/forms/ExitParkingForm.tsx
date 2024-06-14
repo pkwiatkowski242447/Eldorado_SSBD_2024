@@ -13,12 +13,13 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {api} from "@/api/api.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {toast} from "@/components/ui/use-toast.ts";
 
 type ExitParkingFormProps = {
     isAuthenticated: boolean
@@ -30,9 +31,9 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
     const [exitValues, setExitValues] = useState<{id:string, endReservation:boolean}>({id:"",endReservation:true});
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const formSchema = z.object({
-        id: z.string().min(36, {message: "ZMIEN"})
-            .max(36, {message: "ZMIEN"}).regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: "ZMIEN"}),
-        endReservation: z.boolean({message:"ZMIEN"})
+        id: z.string().min(36, {message: t("exit.parking.form.tooShort")})
+            .max(36, {message: t("exit.parking.form.tooLong")}).regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: "exit.parking.form.regex.not.met"}),
+        endReservation: z.boolean({message:""})
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -47,6 +48,10 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
         api.exitParking(exitValues.id, exitValues.endReservation, isAuthenticated)
             .then(() => {
                 setAlertDialogOpen(false);
+                toast({
+                    title: t("general.success"),
+                    description: t("exit.parking.success.message")
+                });
             }).catch(error => {
                 setAlertDialogOpen(false);
                 handleApiError(error);
@@ -74,7 +79,6 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                     render={({field}) => (
                         <FormItem>
                             <div className="grid gap-4">
-                                <FormLabel className="text-left">ID of the reservation</FormLabel>
                                 <FormControl>
                                     <Input placeholder="25268941-b7ad-4288-b4bd-e0a3946b0bd8" {...field} />
                                 </FormControl>
@@ -96,19 +100,19 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                             </FormControl>
                             <div className="space-y-1 leading-none">
                                 <FormLabel>
-                                   End Reservation
+                                    {t("exit.parking.form.exitParking")}
                                 </FormLabel>
                             </div>
                         </FormItem>
                     )}
                 />}
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="mt-4" disabled={isLoading}>
                     {isLoading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                         </>
                     ) : (
-                        t("Exit")
+                        t("exit.parking.form.exit")
                     )}
                 </Button>
             </form>
@@ -116,12 +120,14 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to exit the parking?
+                        {t("exit.parking.form.are.you.sure.you.want.to.edit.this.parking")}
                     </AlertDialogDescription>
-                    <AlertDialogAction onClick={handleAlertDialog}>
-                        {t("general.ok")}
-                    </AlertDialogAction>
-                    <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleAlertDialog}>
+                            {t("general.ok")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </Form>

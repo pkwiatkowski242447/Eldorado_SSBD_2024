@@ -11,7 +11,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {api} from "@/api/api.ts";
 import {useEffect, useState} from "react";
-import {arrayToDate, ParkingEventType, ReservationDetailsType} from "@/types/Reservations.ts";
+import {arrayToDate, ParkingEventType, ReservationDetailsType, ReservationStatus} from "@/types/Reservations.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {
@@ -33,6 +33,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {Pathnames} from "@/router/pathnames.ts";
+import {Badge} from "@/components/ui/badge.tsx";
 
 function MyReservationDetailsPage() {
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
@@ -98,32 +99,34 @@ function MyReservationDetailsPage() {
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.client.myReservations)}>My Reservations</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.client.myReservations)}>{t("breadcrumb.my.reservations")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink>Reservation Details</BreadcrumbLink>
+                            <BreadcrumbLink>{t("breadcrumb.my.reservation.details")}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Reservation Info</h1>
+                <h1 className="text-3xl font-semibold">{t("my.reservation.details.page.reservation.info")}</h1>
             </div>
             <div>
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
-                            <TableHead className="text-center">{"Begin Time"}</TableHead>
-                            <TableHead className="text-center">{"Ending Time"}</TableHead>
-                            <TableHead className="text-center">{"City"}</TableHead>
-                            <TableHead className="text-center">{"Street"}</TableHead>
-                            <TableHead className="text-center">{"Zip Code"}</TableHead>
-                            <TableHead className="text-center">{"Sector Name"}</TableHead>
-                            <TableHead className="text-center">{"ID"}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.begin.time")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.ending.time")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.city")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.street")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.zip.code")}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.sector.name")}</TableHead>
+                            <TableHead
+                                className="text-center">{"Status"}</TableHead>
+                            <TableHead className="text-center">{t("reservation.details.page.id")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -134,20 +137,22 @@ function MyReservationDetailsPage() {
                             <TableCell>{reservation?.street}</TableCell>
                             <TableCell>{reservation?.zipCode}</TableCell>
                             <TableCell>{reservation?.sectorName}</TableCell>
+                            {/* @ts-expect-error what? */}
+                            <TableCell><Badge variant={"secondary"}>{t(reservation?.status)}</Badge></TableCell>
                             <TableCell>{reservation?.id}</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
             </div>
             <div className="mx-auto grid w-full max-w-6xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Parking Events</h1>
+                <h1 className="text-3xl font-semibold">{t("my.reservation.details.page.parking.events")}</h1>
             </div>
             <Table className="p-10 flex-grow">
                 <TableHeader>
                     <TableRow className={"text-center p-10"}>
-                        <TableHead className="text-center">{"No."}</TableHead>
-                        <TableHead className="text-center">{"Date"}</TableHead>
-                        <TableHead className="text-center">{"Type"}</TableHead>
+                        <TableHead className="text-center">{t("my.reservation.details.page.parking.no")}</TableHead>
+                        <TableHead className="text-center">{t("my.reservation.details.page.parking.date")}</TableHead>
+                        <TableHead className="text-center">{t("my.reservation.details.page.parking.type")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody className={"text-center"}>
@@ -155,7 +160,7 @@ function MyReservationDetailsPage() {
                         <TableRow key={parkingEvent.id} className="flex-auto">
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{parkingEvent.date.toLocaleString()}</TableCell>
-                            <TableCell>{parkingEvent.type}</TableCell>
+                            <TableCell>{t(parkingEvent.type)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -182,22 +187,23 @@ function MyReservationDetailsPage() {
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
-                <div className="pt-5 flex justify-center">
+                {reservation?.status === ReservationStatus.AWAITING &&
+                    <div className="pt-5 flex justify-center">
                     <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
-                        Cancel Reservation
+                        {t("my.reservation.details.page.cancel.reservation")}
                     </Button>
-                </div>
+                </div>}
                 <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
+                            <AlertDialogTitle>{t("my.reservation.details.page.cancel.reservation")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to cancel this reservation? This action cannot be undone.
+                                {t("my.reservation.details.page.cancel.are.you.sure.you.want.to.cancel")}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>No</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleCancelReservation}>Yes</AlertDialogAction>
+                            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("enter.parking.without.reservation.page.yes")}</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleCancelReservation}>{t("enter.parking.without.reservation.page.no")}</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

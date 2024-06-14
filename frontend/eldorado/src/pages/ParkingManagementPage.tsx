@@ -40,7 +40,7 @@ import {FiSettings} from "react-icons/fi";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditParkingForm from "@/components/forms/EditParkingForm.tsx";
@@ -143,11 +143,11 @@ function ParkingManagementPage() {
             <div className="flex justify-start pt-2.5">
                 <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="default">Create Parking</Button>
+                        <Button variant="default">{t("parking.management.page.create.parking")}</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Create Parking</DialogTitle>
+                            <DialogTitle>{t("parking.management.page.create.parking")}</DialogTitle>
                         </DialogHeader>
                         <CreateParkingForm setDialogOpen={setCreateDialogOpen} refresh={refresh}/>
                     </DialogContent>
@@ -158,15 +158,15 @@ function ParkingManagementPage() {
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("City")}</TableHead>
+                                className="text-center">{t("parking.management.page.city")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Street")}</TableHead>
+                                className="text-center">{t("parking.management.page.street")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Zip code")}</TableHead>
+                                className="text-center">{t("parking.management.page.zip.code")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Sector determination strategy")}</TableHead>
+                                className="text-center">{t("parking.management.page.sector.determination.strategy")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Sector types")}</TableHead>
+                                className="text-center">{t("parking.management.page.sector.types")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -176,10 +176,10 @@ function ParkingManagementPage() {
                                 <TableCell>{parking.city}</TableCell>
                                 <TableCell>{parking.street}</TableCell>
                                 <TableCell>{parking.zipCode}</TableCell>
-                                <TableCell><Badge variant={"default"}>{parking.strategy} </Badge></TableCell>
+                                <TableCell><Badge variant={"default"}>{t(parking.strategy)} </Badge></TableCell>
                                 <TableCell>
                                     {parking.sectorTypes.map(level => {
-                                        return <Badge key={level} variant={"secondary"}>{level} </Badge>;
+                                        return <Badge key={level} variant={"secondary"}>{t(level)} </Badge>;
                                     })}
                                 </TableCell>
                                 <TableCell>
@@ -191,18 +191,18 @@ function ParkingManagementPage() {
                                             <DropdownMenuItem
                                                 onClick={() => navigate(`/manage-parking/${parking.id}`)}
                                             >
-                                                Show Sectors
+                                                {t("parking.management.page.show.sectors")}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleEditParkingClick(parking.id)}
                                             >
-                                                Edit parking
+                                                {t("parking.management.page.edit.parking")}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDeleteParkingClick(parking.id)}
                                                 disabled={parking.sectorTypes.length !== 0}
                                             >
-                                                Delete parking
+                                                {t("parking.management.page.delete.parking")}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -213,7 +213,7 @@ function ParkingManagementPage() {
                     <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Edit Parking</DialogTitle>
+                                <DialogTitle>{t("parking.management.page.edit.parking")}</DialogTitle>
                             </DialogHeader>
                             <EditParkingForm setDialogOpen={setEditDialogOpen} refresh={refresh} parkingId={parkingId}/>
                         </DialogContent>
@@ -222,10 +222,12 @@ function ParkingManagementPage() {
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to delete this parking?
+                                {t("parking.management.page.are.you.sure.you.want.to.delete.this.parking")}
                             </AlertDialogDescription>
-                            <AlertDialogAction onClick={handleDeleteParking}>{t("general.ok")}</AlertDialogAction>
-                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDeleteParking}>{t("general.ok")}</AlertDialogAction>
+                            </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 </Table>

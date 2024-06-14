@@ -1,5 +1,3 @@
-"use client";
-
 import {format} from "date-fns";
 import {enUS, pl} from "date-fns/locale";
 import {cn} from "@/lib/utils";
@@ -15,13 +13,6 @@ import {CalendarIcon} from "lucide-react";
 import {Calendar} from "@/components/ui/calendar";
 import {useTranslation} from "react-i18next";
 
-const formSchema = z.object({
-    startDateTime: z.date().min(new Date(), {message: "You can't create a reservation which starts in the past"}),
-    endDateTime: z.date().min(new Date(), {message: "You can't create a reservation which ends right now"}),
-});
-
-type FormSchemaType = z.infer<typeof formSchema>;
-
 interface DateTimePickerFormProps {
     onSubmit: (beginTime: Date, endTime: Date) => void;
 }
@@ -29,6 +20,17 @@ interface DateTimePickerFormProps {
 export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
     const {t} = useTranslation();
     const locale = window.navigator.language == "pl" ? pl : enUS;
+
+    const formSchema = z.object({
+        startDateTime: z.date().min(new Date(), {message: "You can't create a reservation which starts in the past"}),
+        endDateTime: z.date().min(new Date(), {message: "You can't create a reservation which ends right now"}),
+    }).refine((obj) => obj.endDateTime > obj.startDateTime, {
+            message:t("createReservationForm.formSchema.endDateTime.smaller.than.startDateTime"),
+            path:["endDateTime"]
+        });
+
+    type FormSchemaType = z.infer<typeof formSchema>;
+
     const form = useForm<FormSchemaType>({
         resolver: zodResolver(formSchema),
     });
@@ -60,7 +62,7 @@ export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4"/>
                                             {field.value ? (
-                                                format(field.value, "PPP HH:mm:ss", {locale: locale})
+                                                format(field.value, "PPP HH:mm", {locale: locale})
                                             ) : (
                                                 <span>{t("general.pickDate")}</span>
                                             )}
@@ -104,7 +106,7 @@ export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4"/>
                                             {field.value ? (
-                                                format(field.value, "PPP HH:mm:ss", {locale: locale})
+                                                format(field.value, "PPP HH:mm", {locale: locale})
                                             ) : (
                                                 <span>{t("general.pickDate")}</span>
                                             )}
@@ -131,7 +133,7 @@ export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit">{t("create.reservation.form.submit")}</Button>
             </form>
         </Form>
     );

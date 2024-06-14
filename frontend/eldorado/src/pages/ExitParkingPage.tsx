@@ -11,7 +11,8 @@ import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {useAccount} from "@/hooks/useAccount.ts";
 import ExitParkingForm from "@/components/forms/ExitParkingForm.tsx";
-import {Card, CardContent} from "@/components/ui/card.tsx";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Button} from "@/components/ui/button.tsx";
 
 export function ExitParkingPage(){
     const {t} = useTranslation();
@@ -23,7 +24,8 @@ export function ExitParkingPage(){
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer"
+                                            onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
@@ -33,12 +35,20 @@ export function ExitParkingPage(){
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
+                <Button variant={"ghost"} disabled={true}/>
             </div>
-            <Card>
-                <CardContent>
-                    <ExitParkingForm isAuthenticated={isAuthenticated}/>
-                </CardContent>
-            </Card>
+            <div className="mx-auto grid w-full max-w-4xl gap-2 p-10">
+                <h1 className="text-3xl font-semibold">{t("breadcrumb.exitParking")}</h1>
+                <Card className={"mt-5"}>
+                    <CardHeader>
+                        <CardTitle>{t("exit.parking.form.id.of.reservation")}</CardTitle>
+                        <CardDescription>{t("exit.parking.form.end.reservation")}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ExitParkingForm isAuthenticated={isAuthenticated}/>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     )
 }

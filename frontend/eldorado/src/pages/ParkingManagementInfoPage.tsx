@@ -34,7 +34,7 @@ import CreateSectorForm from "@/components/forms/CreateSectorForm.tsx";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import EditSectorForm from "@/components/forms/EditSectorForm.tsx";
@@ -50,7 +50,7 @@ export function ParkingManagementInfoPage() {
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [isActivateDialogOpen, setActivateDialogOpen] = useState(false);
     const [sectorId, setSectorId] = useState("");
-    const [isSectorActive, setSectorActive] = useState<boolean>(true);
+    const [sectorDeactivate, setSectorDeactivate] = useState<Date>(new Date());
     const {t} = useTranslation();
     const {id} = useParams<{ id: string }>();
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -64,9 +64,20 @@ export function ParkingManagementInfoPage() {
         setAlertDialogOpen(true);
     };
 
-    const handleEditSectorClick = (sectorId: string, isActive:boolean) => {
+    const handleEditSectorClick = (sectorId: string, date:string) => {
         setSectorId(sectorId);
-        setSectorActive(isActive);
+
+        //hack 👌👌👌👌👌
+        if ( date !== "" ) {
+            const temp = date.split('.');
+            const temp2 = temp[2].split(' ');
+            const tempDate = temp2[0].concat('-').concat(temp[1]).concat('-').concat(temp[0]).concat('T').concat(temp2[1]).concat(":00Z");
+            const temp3 = new Date(tempDate);
+            temp3.setMinutes(temp3.getMinutes() + (new Date()).getTimezoneOffset())
+            setSectorDeactivate(temp3);
+        } else {
+            setSectorDeactivate(new Date("2099-01-01T00:00:00.000Z"));
+        }
         setEditDialogOpen(true);
     };
 
@@ -110,6 +121,7 @@ export function ParkingManagementInfoPage() {
             .then(response => {
                 if (response.status === 200) {
                     setCurrentPage(actualPage);
+                    // ts-expext-error foff
                     const sectorsTemp:any[] = response.data;
                     const sectorsCopy:SectorListType[] = [];
                     sectorsTemp.forEach((s) => {sectorsCopy.push(sectorDTOtoSectorListType(s))})
@@ -125,10 +137,6 @@ export function ParkingManagementInfoPage() {
                 handleApiError(error);
             });
     };
-
-    useEffect(() => {
-        console.log(sectors)
-    }, [sectors]);
 
     const fetchParking = () => {
         api.getParkingById(id ? id : "0")
@@ -193,13 +201,13 @@ export function ParkingManagementInfoPage() {
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("City")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.city")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Street")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.street")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Zip code")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.zip.code")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Strategy")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.strategy")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={"text-center"}>
@@ -207,7 +215,7 @@ export function ParkingManagementInfoPage() {
                             <TableCell>{parking.city}</TableCell>
                             <TableCell>{parking.street}</TableCell>
                             <TableCell>{parking.zipCode}</TableCell>
-                            <TableCell><Badge variant={"default"}>{parking.strategy} </Badge></TableCell>
+                            <TableCell><Badge variant={"default"}>{t(parking.strategy)} </Badge></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -215,11 +223,11 @@ export function ParkingManagementInfoPage() {
             <div className="flex justify-start pt-2.5">
                 <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="default">Create Sector</Button>
+                        <Button variant="default">{t("parking.management.info.page.create.sector")}</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Create Sector</DialogTitle>
+                            <DialogTitle>{t("parking.management.info.page.create.sector")}</DialogTitle>
                         </DialogHeader>
                         <CreateSectorForm setDialogOpen={setCreateDialogOpen} refresh={refresh} parkingId={parking.parkingId}/>
                     </DialogContent>
@@ -230,17 +238,17 @@ export function ParkingManagementInfoPage() {
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
                             <TableHead
-                                className="text-center">{t("Name")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.name")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Deactivation Time")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.deactivation.time")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Occupies Places")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.occupies.pleces")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Max Places")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.max.pleces")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Type")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.type")}</TableHead>
                             <TableHead
-                                className="text-center">{t("Weight")}</TableHead>
+                                className="text-center">{t("parking.management.info.page.weight")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -251,7 +259,7 @@ export function ParkingManagementInfoPage() {
                                 <TableCell>{sector.deactivationTime}</TableCell>
                                 <TableCell>{sector.occupiedPlaces}</TableCell>
                                 <TableCell>{sector.maxPlaces}</TableCell>
-                                <TableCell><Badge variant={"default"}>{sector.type} </Badge></TableCell>
+                                <TableCell><Badge variant={"default"}>{t(sector.type)} </Badge></TableCell>
                                 <TableCell>{sector.weight}</TableCell>
                                 <TableCell>
                                     <DropdownMenu>
@@ -261,19 +269,19 @@ export function ParkingManagementInfoPage() {
                                         <DropdownMenuContent>
                                             {sector.deactivationTime !== "" && <DropdownMenuItem
                                                 onClick={() => handleActivateSectorClick(sector.id)}>
-                                                Activate sector
+                                                {t("parking.management.info.page.activate.sector")}
                                             </DropdownMenuItem>}
                                             {sector.deactivationTime === "" && <DropdownMenuItem
                                                 onClick={() => handleDeactivateSectorClick(sector.id)}>
-                                                Deactivate sector
+                                                {t("parking.management.info.page.deactivate.sector")}
                                             </DropdownMenuItem>}
                                             <DropdownMenuItem
-                                                onClick={() => handleEditSectorClick(sector.id, sector.deactivationTime === "")}>
-                                                Edit sector
+                                                onClick={() => handleEditSectorClick(sector.id, sector.deactivationTime)}>
+                                                {t("parking.management.info.page.edit.sector")}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDeleteParkingClick(sector.id)}>
-                                                Delete parking
+                                                {t("parking.management.info.page.delete.parking")}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -281,40 +289,44 @@ export function ParkingManagementInfoPage() {
                             </TableRow>
                         ))}
                     </TableBody>
-                    <Dialog open={isDeactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Deactivate Parking</DialogTitle>
-                            </DialogHeader>
+                    <AlertDialog open={isDeactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
+                        <AlertDialogContent className="sm:max-w-[425px]">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>{t("parking.management.info.page.deactivate.parking")}</AlertDialogTitle>
+                            </AlertDialogHeader>
                             <DeactivateSectorForm setDialogOpen={setDeactivateDialogOpen} refresh={refresh} sectorId={sectorId}/>
-                        </DialogContent>
-                    </Dialog>
+                        </AlertDialogContent>
+                    </AlertDialog>
                     <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Edit Parking</DialogTitle>
+                                <DialogTitle>{t("parking.management.info.page.edit.parking")}</DialogTitle>
                             </DialogHeader>
-                            <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId} isSectorActive={isSectorActive}/>
+                            <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId} sectorDeactivate={sectorDeactivate}/>
                         </DialogContent>
                     </Dialog>
                     <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to delete this sector?
+                                {t("parking.management.info.page.are.you.sure.you.want.to.delete.this.sector")}
                             </AlertDialogDescription>
-                            <AlertDialogAction onClick={handleDeleteSector}>{t("general.ok")}</AlertDialogAction>
-                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDeleteSector}>{t("general.ok")}</AlertDialogAction>
+                            </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                     <AlertDialog open={isActivateDialogOpen} onOpenChange={setActivateDialogOpen}>
                         <AlertDialogContent>
                             <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to activate this sector?
+                                {t("parking.management.info.page.are.you.sure.you.want.to.activate.this.sector")}
                             </AlertDialogDescription>
-                            <AlertDialogAction onClick={handleActivateSector}>{t("general.ok")}</AlertDialogAction>
-                            <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleActivateSector}>{t("general.ok")}</AlertDialogAction>
+                            </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 </Table>
