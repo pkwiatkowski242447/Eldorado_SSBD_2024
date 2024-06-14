@@ -1,4 +1,4 @@
--- -- GRAND PRIVILEGES
+-- -- GRAND PRIVILEGES - TEST
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.account                TO ssbd03mok;
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.past_password          TO ssbd03mok;
 GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.personal_data          TO ssbd03mok;
@@ -362,3 +362,12 @@ INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUE
 
 --5 -- starts in the future - overlaps - blocking
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('fcae0865-d856-4dba-8094-04dc60b8a027', current_timestamp, current_timestamp + interval '1 hour', current_timestamp + interval '3 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '65c51075-0749-4304-984a-9cb926e65aab', 0, 'IN_PROGRESS');
+
+
+-- michalkowal cancelled reservation
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('28eb349e-e190-4aa0-ad77-76ecf0067f7e', current_timestamp, current_timestamp + interval '5 hour', current_timestamp + interval '7 hour', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '65c51075-0749-4304-984a-9cb926e65aab', 1, 'CANCELLED');
+
+-- parking with one available place
+INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('153bcb2f-6487-4897-9805-f56db73b565f', current_timestamp, 'LEAST_OCCUPIED', '99-997', 'oneplace', 'oneplace', 0);
+
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('e6d15888-960f-4aa8-adb5-743009d57a7a', current_timestamp, 0, 1, 3, 'XD-07', '153bcb2f-6487-4897-9805-f56db73b565f', 'UNCOVERED', 0);
