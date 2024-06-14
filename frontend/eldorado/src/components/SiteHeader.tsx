@@ -580,25 +580,25 @@ l196 3 233 567 232 567 -90 238 c-49 131 -93 247 -97 257 -6 15 -9 16 -13 5z"/>
                 {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
                     <Link to={Pathnames.client.enterParkingWithoutReservation}
                           className="text-muted-foreground transition-colors hover:text-gray-500 whitespace-nowrap">
-                        Enter Parking
+                        {t("siteHeader.enterParking")}
                     </Link>
                 )}
                 {!account && (
                     <Link to={Pathnames.public.enterParkingWithoutReservation}
                           className="text-muted-foreground transition-colors hover:text-gray-500 whitespace-nowrap">
-                        Enter Parking
+                        {t("siteHeader.enterParking")}
                     </Link>
                 )}
                 {account?.activeUserLevel?.roleName === RolesEnum.CLIENT && (
                     <Link to={Pathnames.client.enterParkingWithReservation}
                           className="text-muted-foreground transition-colors hover:text-gray-500 whitespace-nowrap">
-                        Enter Reservation
+                        {t("siteHeader.reservationHistory")}
                     </Link>
                 )}
                 {(!account || account?.activeUserLevel?.roleName === RolesEnum.CLIENT) && (
                     <Link to={Pathnames.public.exitParking}
                           className="text-muted-foreground transition-colors hover:text-gray-500 whitespace-nowrap">
-                        {t("Exit Parking")}
+                        {t("siteHeader.exitParking")}
                     </Link>
                 )}
             </nav>

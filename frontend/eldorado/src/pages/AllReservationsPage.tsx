@@ -24,6 +24,7 @@ import {Slash} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import {Pathnames} from "@/router/pathnames.ts";
+import {Badge} from "@/components/ui/badge.tsx";
 
 function AllReservationsPage() {
     const {t} = useTranslation();
@@ -121,11 +122,10 @@ function AllReservationsPage() {
                                         <TableCell>{reservation.street}</TableCell>
                                         <TableCell>{reservation.zipCode}</TableCell>
                                         <TableCell>{reservation.sectorName}</TableCell>
-                                        <TableCell>{reservation.status}</TableCell>
-                                        {/*<TableCell>{reservation.id}</TableCell>*/}
+                                        <TableCell><Badge variant={"secondary"}>{reservation.status} </Badge></TableCell>
                                         <TableCell>
                                             <Button onClick={() => handleViewDetails(reservation.id)}>
-                                                {t("allReservationsPage.table.sectorName")}
+                                                {t("allReservationsPage.table.viewInfo")}
                                             </Button>
                                         </TableCell>
                                     </TableRow>

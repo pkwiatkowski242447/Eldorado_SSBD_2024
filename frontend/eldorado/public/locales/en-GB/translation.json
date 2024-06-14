@@ -27,6 +27,7 @@
   "general.userUnblocked": "User has been unblocked.",
   "general.nameInvalid": "Name contains not permitted characters",
   "general.lastNameInvalid": "Last name contains not permitted characters",
+  "general.success": "Success",
 
   "loginPage.accountSuspended": "Account suspended? ",
   "loginPage.accountSuspended.text": "Go here",
@@ -38,6 +39,7 @@
   "breadcrumb.userAccount": "Edit user account",
   "breadcrumb.createUser": "Create new user",
   "breadcrumb.manageParking": "Manage Parking",
+  "breadcrumb.manageParkingInfo": "Parking Info",
 
   "notFound.title": "Page not found",
   "notFound.description": "The page you are looking for does not exist",
@@ -159,7 +161,9 @@
   "siteHeader.activeParkingList": "Parking List",
   "siteHeader.allReservations": "All Reservations",
   "siteHeader.manageParking": "Manage Parking",
-
+  "siteHeader.enterParking": "Enter parking",
+  "siteHeader.exitParking": "Exit parking",
+  "siteHeader.reservationHistory": "Enter reservation",
 
   "accountSettings.title": "Account settings",
   "accountSettings.email": "E-mail",
@@ -322,6 +326,7 @@
   "allReservationsPage.table.zipCode": "Zip code",
   "allReservationsPage.table.sectorName": "Sector",
   "allReservationsPage.table.reservationId": "Reservation ID",
+  "allReservationsPage.table.viewInfo": "Details",
 
   "parkingManagementPage.createParking": "Create Parking",
 
@@ -754,10 +759,16 @@
   "edit.sector.form.sector.weight.too.high": "Weight is too high",
   "edit.sector.form.sector.weight.has.to.be.integer": "Weight has to be integer",
 
-  "exit.parking.form.id.of.reservation": "ID of the reservation",
-  "exit.parking.form.end.reservation": "End Reservation",
+  "exit.parking.form.id.of.reservation": "Enter Your Reservation ID",
+  "exit.parking.form.end.reservation": "Please provide your reservation ID to exit the parking",
   "exit.parking.form.exit": "Exit",
   "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Are you sure you want to exit the parking?",
 
-  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "The reservation must end after it began."
+  "exit.parking.form.tooShort": "Reservation ID has to be 36 character long",
+  "exit.parking.form.tooLong": "Reservation ID has to be 36 character long",
+  "exit.parking.form.regex.not.met": "Reservation ID does not meet format requirements",
+  "exit.parking.success.message": "You have successfully exited the parking. See you soon!",
+
+  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "The reservation must end after it began.",
+  "breadcrumb.exitParking": "Exit parking"
 }

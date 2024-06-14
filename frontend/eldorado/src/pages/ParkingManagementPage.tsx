@@ -143,11 +143,11 @@ function ParkingManagementPage() {
             <div className="flex justify-start pt-2.5">
                 <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="default">Create Parking</Button>
+                        <Button variant="default">{t("parking.management.page.create.parking")}</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Create Parking</DialogTitle>
+                            <DialogTitle>{t("parking.management.page.create.parking")}</DialogTitle>
                         </DialogHeader>
                         <CreateParkingForm setDialogOpen={setCreateDialogOpen} refresh={refresh}/>
                     </DialogContent>

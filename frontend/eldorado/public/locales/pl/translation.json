@@ -26,6 +26,7 @@
   "general.userUnblocked": "Użytkownik został odblokowany.",
   "general.nameInvalid": "Imię zawiera niedozwolone znaki",
   "general.lastNameInvalid": "Nazwisko zawiera niedozwolone znaki",
+  "general.success": "Sukces",
 
   "loginPage.accountSuspended": "Konto zawieszone? ",
   "loginPage.accountSuspended.text": " Przejdź tutaj",
@@ -37,7 +38,7 @@
   "breadcrumb.userAccount": "Edytuj konto",
   "breadcrumb.createUser" : "Utwórz nowe konto",
   "breadcrumb.manageParking": "Zarządzaj Parkingami",
-
+  "breadcrumb.manageParkingInfo": "Wyświetl informacje o parkingu",
   "notFound.title": "Strona nie znaleziona",
   "notFound.description": "Strona, której szukasz, nie istnieje",
   "notFound.home": "Przejdź do strony głównej",
@@ -158,6 +159,9 @@
   "siteHeader.activeParkingList": "Lista Parkingów",
   "siteHeader.allReservations": "Wszystkie Rezerwacje",
   "siteHeader.manageParking": "Zarządzaj Parkingami",
+  "siteHeader.enterParking": "Wjedź na parking",
+    "siteHeader.exitParking": "Wyjedź z parkingu",
+    "siteHeader.reservationHistory": "Wjedź z rezerwacją",
 
   "accountSettings.title": "Ustawienia konta",
   "accountSettings.email": "E-mail",
@@ -311,7 +315,7 @@
   "resetPasswordPage.popUp.resetPasswordOK.text": "Twoje hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.",
   "resetPasswordPage.popUp.resetPasswordOK.button": "Zaloguj się",
 
-  "allReservationsPage.title": "Wszystkie rezerwacje w systemie",
+  "allReservationsPage.title": "Wszystkie rezerwacje",
   "allReservationsPage.table.clientID": "ID Klienta",
   "allReservationsPage.table.beginTime": "Czas rozpoczęcia",
   "allReservationsPage.table.endingTime": "Czas zakończenia",
@@ -320,6 +324,7 @@
   "allReservationsPage.table.zipCode": "Kod pocztowy",
   "allReservationsPage.table.sectorName": "Sektor",
   "allReservationsPage.table.reservationId": "ID rezerwacji",
+    "allReservationsPage.table.viewInfo": "Szczegóły",
 
   "parkingManagementPage.createParking": "Utwórz parking",
 
@@ -485,7 +490,7 @@
   "breadcrumb.active.parking.list": "Lisa aktywnych parkingów",
   "breadcrumb.parking.info": "Informacje o parkingu",
   "breadcrumb.create.reservation": "Utwórz rezerwację",
-  "breadcrum.enter.parking": "Wjazd na parking",
+  "breadcrum.enter.parking": "Wjedź na parking",
   "breadcrum.enter.reservation": "Wprowadź rezerwację",
   "breadcrumb.my.reservations": "Moje rezerwacje",
   "breadcrumb.my.reservation.details": "Szczegóły rezerwacji",
@@ -509,8 +514,8 @@
   "active.parking.page.zip.code": "Kod pocztowy",
   "active.parking.page.sector.types": "Typy sektorów",
   "create.reservation.in.sector.page.create.reservation": "Utwórz rezerwację",
-  "enter.parking.without.reservation.page.enter.parking": "Wjazd na parking",
-  "enter.parking.without.reservation.page.enter": "Wjazd",
+  "enter.parking.without.reservation.page.enter.parking": "Wjedź na parking",
+  "enter.parking.without.reservation.page.enter": "Wjedź na parking",
   "enter.parking.without.reservation.page.are.you.sure.you.want.to.park.here": "Czy na pewno chcesz tu zaparkować?",
   "enter.parking.without.reservation.you.have.entered.the.parking": "Wjechałeś na parking. Zanotuj poniższe informacje.",
   "enter.parking.without.reservation.id": "ID:",
@@ -559,7 +564,7 @@
   "parking.management.info.page.create.sector": "Utwórz sektor",
   "parking.management.info.page.name": "Nazwa",
   "parking.management.info.page.deactivation.time": "Czas dezaktywacji",
-  "parking.management.info.page.occupies.pleces": "Zajmuje miejsca",
+  "parking.management.info.page.occupies.pleces": "Zajęte miejsca",
   "parking.management.info.page.max.pleces": "Maksymalna liczba miejsc",
   "parking.management.info.page.type": "Typ",
   "parking.management.info.page.weight": "Waga",
@@ -742,10 +747,17 @@
   "edit.sector.form.sector.weight.too.high": "Waga jest za wysoka",
   "edit.sector.form.sector.weight.has.to.be.integer": "Waga musi być liczbą całkowitą",
 
-  "exit.parking.form.id.of.reservation": "ID rezerwacji",
-  "exit.parking.form.end.reservation": "Zakończ rezerwację",
-  "exit.parking.form.exit": "Wyjdź",
+  "exit.parking.form.id.of.reservation": "Podaj swoje ID rezerwacji",
+  "exit.parking.form.end.reservation": "Proszę podać ID rezerwacji aby wyjechać z parkingu",
+  "exit.parking.form.exit": "Wyjedź",
   "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Czy na pewno chcesz zedytować parking?",
 
-  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "Rezerwacja musi kończyć się po tym jak sie zaczęła."
+  "exit.parking.form.tooShort": "ID rezerwacji musi mieć 36 znaków",
+  "exit.parking.form.tooLong": "ID rezerwacji musi mieć 36 znaków",
+  "exit.parking.form.regex.not.met": "ID rezerwacji nie spełnia wymagań formatowania",
+  "exit.parking.success.message": "Wyjazd z parkingu zakończony pomyślnie. Do zobaczenia wkrótce!",
+
+
+  "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "Rezerwacja musi kończyć się po tym jak sie zaczęła.",
+  "breadcrumb.exitParking": "Wyjedź z parkingu"
 }

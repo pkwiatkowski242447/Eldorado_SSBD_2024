@@ -38,11 +38,11 @@ export function ExitParkingPage(){
                 <Button variant={"ghost"} disabled={true}/>
             </div>
             <div className="mx-auto grid w-full max-w-4xl gap-2 p-10">
-                <h1 className="text-3xl font-semibold">Exit Parking</h1>
+                <h1 className="text-3xl font-semibold">{t("breadcrumb.exitParking")}</h1>
                 <Card className={"mt-5"}>
                     <CardHeader>
-                        <CardTitle>Enter Your Reservation ID</CardTitle>
-                        <CardDescription>Please provide your reservation ID to exit the parking</CardDescription>
+                        <CardTitle>{t("exit.parking.form.id.of.reservation")}</CardTitle>
+                        <CardDescription>{t("exit.parking.form.end.reservation")}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ExitParkingForm isAuthenticated={isAuthenticated}/>

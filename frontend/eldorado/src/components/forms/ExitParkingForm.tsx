@@ -31,9 +31,9 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
     const [exitValues, setExitValues] = useState<{id:string, endReservation:boolean}>({id:"",endReservation:true});
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const formSchema = z.object({
-        id: z.string().min(36, {message: "ZMIEN"})
-            .max(36, {message: "ZMIEN"}).regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: "ZMIEN"}),
-        endReservation: z.boolean({message:"ZMIEN"})
+        id: z.string().min(36, {message: t("exit.parking.form.tooShort")})
+            .max(36, {message: t("exit.parking.form.tooLong")}).regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: "exit.parking.form.regex.not.met"}),
+        endReservation: z.boolean({message:""})
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -49,8 +49,8 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
             .then(() => {
                 setAlertDialogOpen(false);
                 toast({
-                    title: t("Success"),
-                    description: t("You successfully exited the parking. See you soon.")
+                    title: t("general.success"),
+                    description: t("exit.parking.success.message")
                 });
             }).catch(error => {
                 setAlertDialogOpen(false);
