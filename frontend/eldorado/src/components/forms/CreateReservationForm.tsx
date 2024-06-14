@@ -133,7 +133,7 @@ export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit">{t("create.reservation.form.submit")}</Button>
             </form>
         </Form>
     );
