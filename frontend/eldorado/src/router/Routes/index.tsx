@@ -54,7 +54,10 @@ export const RoutesComponents = () => {
 
             {!isAuthenticated && PublicRoutes.map(({path, Component}) => (
                 <Route key={path} path={path} element={
-                    <PublicLayout hideHeader={location.pathname !== Pathnames.public.home && location.pathname !== Pathnames.public.enterParkingWithoutReservation && location.pathname !== Pathnames.public.exitParking}>
+                    <PublicLayout hideHeader={!([Pathnames.public.home, Pathnames.public.enterParkingWithoutReservation,
+                            Pathnames.public.exitParking, Pathnames.public.parkingList,
+                            Pathnames.public.parkingInfo.replace(":id", location.pathname.split('/').pop() ?? "")]
+                            .includes(location.pathname))}>
                         <Component/>
                     </PublicLayout>}/>
             ))}
