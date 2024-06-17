@@ -2,7 +2,6 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.controllers.implementations;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

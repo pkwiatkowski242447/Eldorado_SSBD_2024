@@ -123,9 +123,9 @@ function EnterParkingWithoutReservationPage() {
                 <Table className="p-10 flex-grow">
                     <TableHeader>
                         <TableRow className={"text-center p-10"}>
-                            <TableHead className="text-center">{t("City")}</TableHead>
-                            <TableHead className="text-center">{t("Street")}</TableHead>
-                            <TableHead className="text-center">{t("Zip code")}</TableHead>
+                            <TableHead className="text-center">{t("enter.parking.without.reservation.table.city.column")}</TableHead>
+                            <TableHead className="text-center">{t("enter.parking.without.reservation.table.street.column")}</TableHead>
+                            <TableHead className="text-center">{t("enter.parking.without.reservation.table.zipcode.column")}</TableHead>
                             <TableHead className="text-center"></TableHead>
                         </TableRow>
                     </TableHeader>

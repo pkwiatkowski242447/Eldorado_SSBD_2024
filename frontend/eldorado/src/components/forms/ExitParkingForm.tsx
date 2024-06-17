@@ -31,8 +31,10 @@ function ExitParkingForm({isAuthenticated}:ExitParkingFormProps) {
     const [exitValues, setExitValues] = useState<{id:string, endReservation:boolean}>({id:"",endReservation:true});
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const formSchema = z.object({
-        id: z.string().min(36, {message: t("exit.parking.form.tooShort")})
-            .max(36, {message: t("exit.parking.form.tooLong")}).regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: "exit.parking.form.regex.not.met"}),
+        id: z.string()
+            .min(36, {message: t("exit.parking.form.id.too.short")})
+            .max(36, {message: t("exit.parking.form.id.too.long")})
+            .regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: t("exit.parking.form.id.regex.not.met")}),
         endReservation: z.boolean({message:""})
     })
 

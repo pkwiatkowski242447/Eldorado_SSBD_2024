@@ -82,6 +82,8 @@ function MyHistoricalReservationsPage() {
                                 <TableHead
                                     className="text-center">{t("my.historical.reservations.page.sector.name")}</TableHead>
                                 <TableHead
+                                    className="text-center">{t("my.active.reservation.page.reservation.status")}</TableHead>
+                                <TableHead
                                     className="text-center">{t("my.historical.reservations.page.sector.id")}</TableHead>
                                 <TableHead
                                     className="text-center"></TableHead>

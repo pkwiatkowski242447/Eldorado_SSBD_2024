@@ -26,8 +26,10 @@ function EnterParkingWithReservationForm() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
     const formSchema = z.object({
-        id: z.string().min(36, {message: "ZMIEN"})
-            .max(36, {message: "ZMIEN"}).regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: "ZMIEN"}),
+        id: z.string()
+            .min(36, {message: t("enter.parking.with.reservation.form.id.too.short")})
+            .max(36, {message: t("enter.parking.with.reservation.form.id.too.long")})
+            .regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: t("enter.parking.with.reservation.form.id.regex.not.met")}),
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -42,8 +44,8 @@ function EnterParkingWithReservationForm() {
             .then(() => {
                 setIsDialogOpen(false);
                 toast({
-                    title: t("Success"),
-                    description: t("You successfully exited the parking. Enjoy your stay.")
+                    title: t("general.success"),
+                    description: t("enter.parking.with.reservation.success.toast.message")
                 });
             }).catch(error => {
                 setIsDialogOpen(false);
@@ -86,28 +88,28 @@ function EnterParkingWithReservationForm() {
                             <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                         </>
                     ) : (
-                        t("Enter parking")
+                        t("enter.parking.with.reservation.enter.parking.button")
                     )}
                 </Button>
             </form>
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Enter Reservation</AlertDialogTitle>
+                        <AlertDialogTitle>{t("enter.parking.with.reservation.enter.parking.confirm")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to enter the parking with this reservation ID?
+                            {t("enter.parking.with.reservation.enter.with.given.reservation.id")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>No</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleEnterReservation}>Yes</AlertDialogAction>
+                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("general.no")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleEnterReservation}>{t("general.yes")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
             <AlertDialog open={isResultDialogOpen} onOpenChange={setIsResultDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Parking has been entered successfully!</AlertDialogTitle>
+                        <AlertDialogTitle>{t("enter.parking.with.reservation.enter.with.given.reservation.id.success")}</AlertDialogTitle>
                         <AlertDialogDescription>
                             :)
                         </AlertDialogDescription>

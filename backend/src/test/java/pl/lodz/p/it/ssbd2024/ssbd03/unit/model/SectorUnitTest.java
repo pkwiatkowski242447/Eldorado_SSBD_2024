@@ -89,9 +89,9 @@ public class SectorUnitTest {
     }
 
     @Test
-    void sectorGetAvailablePlacesPositiveTest() {
+    void sectorGetOccupiedPlacesPositiveTest() {
         Sector sector = new Sector(PARKING, SECTOR_NAME_NO_1, SECTOR_TYPE_NO_1, MAX_PLACES_NO_1, MAX_WEIGHT_NO_1);
-        Assertions.assertEquals(MAX_PLACES_NO_1, sector.getOccupiedPlaces());
+        Assertions.assertEquals(0, sector.getOccupiedPlaces());
     }
 
     @Test

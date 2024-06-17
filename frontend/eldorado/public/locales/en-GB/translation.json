@@ -28,6 +28,8 @@
   "general.nameInvalid": "Name contains not permitted characters",
   "general.lastNameInvalid": "Last name contains not permitted characters",
   "general.success": "Success",
+  "general.yes": "Yes",
+  "general.no": "No",
 
   "loginPage.accountSuspended": "Account suspended? ",
   "loginPage.accountSuspended.text": "Go here",
@@ -545,6 +547,9 @@
   "enter.parking.without.reservation.page.enter.reservation": "Enter Reservation",
   "enter.parking.without.reservation.page.are.you.sure": "Are you sure you want to enter the parking with this reservation ID?",
   "enter.parking.without.reservation.page.parking.has.been.entered.successfully": "Parking has been entered successfully!",
+  "enter.parking.without.reservation.table.city.column": "City",
+  "enter.parking.without.reservation.table.street.column": "Street",
+  "enter.parking.without.reservation.table.zipcode.column": "Zip code",
 
   "my.active.reservation.page.begin.time": "Begin Time",
   "my.active.reservation.page.ending.time": "Ending Time",
@@ -552,6 +557,7 @@
   "my.active.reservation.page.street": "Street",
   "my.active.reservation.page.zip.code": "Zip Code",
   "my.active.reservation.page.sector.name": "Sector Name",
+  "my.active.reservation.page.reservation.status": "Reservation status",
   "my.active.reservation.page.id": "ID",
 
   "my.historical.reservations.page.begin.time": "Begin Time",
@@ -768,6 +774,16 @@
   "exit.parking.form.tooLong": "Reservation ID has to be 36 character long",
   "exit.parking.form.regex.not.met": "Reservation ID does not meet format requirements",
   "exit.parking.success.message": "You have successfully exited the parking. See you soon!",
+
+  "enter.parking.with.reservation.form.id.too.short": "Given reservation identifier is too short",
+  "enter.parking.with.reservation.form.id.too.long": "Given reservation identifier is too long",
+  "enter.parking.with.reservation.form.id.does.not.match.regex": "Given reservation identifier is not a valid reservation identifier",
+  "enter.parking.with.reservation.success.toast.title": "Success",
+  "enter.parking.with.reservation.success.toast.message": "Entry event was registered successfully. Enjoy your stay!",
+  "enter.parking.with.reservation.enter.parking.button": "Enter parking",
+  "enter.parking.with.reservation.enter.parking.confirm": "Enter parking",
+  "enter.parking.with.reservation.enter.with.given.reservation.id": "Are you sure you want to enter the parking with this reservation ID?",
+  "enter.parking.with.reservation.enter.with.given.reservation.id.success": "Parking has been entered successfully!",
 
   "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "The reservation must end after it began.",
   "breadcrumb.exitParking": "Exit parking",

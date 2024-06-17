@@ -80,6 +80,8 @@ function MyActiveReservationsPage() {
                                 <TableHead
                                     className="text-center">{t("my.active.reservation.page.sector.name")}</TableHead>
                                 <TableHead
+                                    className="text-center">{t("my.active.reservation.page.reservation.status")}</TableHead>
+                                <TableHead
                                     className="text-center">{t("my.active.reservation.page.id")}</TableHead>
                                 <TableHead
                                     className="text-center"></TableHead>

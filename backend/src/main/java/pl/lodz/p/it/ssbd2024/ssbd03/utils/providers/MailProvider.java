@@ -6,8 +6,10 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -41,6 +44,8 @@ public class MailProvider {
 
     private final JavaMailSenderImpl mailSender;
 
+    private final Environment env;
+
     /**
      * Autowired constructor for the component.
      *
@@ -48,8 +53,9 @@ public class MailProvider {
      *                       e-mail addresses.
      */
     @Autowired
-    public MailProvider(JavaMailSenderImpl javaMailSender) {
+    public MailProvider(JavaMailSenderImpl javaMailSender, Environment env) {
         this.mailSender = javaMailSender;
+        this.env = env;
     }
 
     /**
@@ -61,6 +67,7 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the account creation.
      * @param language        Language of the message.
      */
+    @Async
     @RolesAllowed({
             Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL
     })
@@ -95,6 +102,7 @@ public class MailProvider {
      * @param confirmationURL URL used to restore access to the account creation.
      * @param language        Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     public void sendAccountAccessRestoreEmailMessage(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
@@ -126,6 +134,7 @@ public class MailProvider {
      * @param emailReceiver   E-mail address to which the message will be sent.
      * @param language        Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
     public void sendAccountAccessRestoreInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
@@ -155,6 +164,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.BLOCK_ACCOUNT, Authorities.LOGIN})
     public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language, boolean adminLock) {
         try {
@@ -186,6 +196,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
     public void sendUnblockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
@@ -215,6 +226,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.REMOVE_ACCOUNT})
     public void sendRemoveAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
@@ -231,7 +243,7 @@ public class MailProvider {
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.REMOVE_ACCOUNT_MESSAGE_SUBJECT, language));
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
-            log.error("Exception of type: {} was throw while sending account unblock e-mail message, due to the exception: {} being thrown. Reason: {}",
+            log.error("Exception of type: {} was throw while sending remove access level e-mail message, due to the exception: {} being thrown. Reason: {}",
                     exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
@@ -244,6 +256,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.BLOCK_ACCOUNT})
     public void sendSuspendAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
@@ -260,7 +273,7 @@ public class MailProvider {
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.SUSPEND_ACCOUNT_MESSAGE_SUBJECT, language));
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
-            log.error("Exception of type: {} was throw while sending account unblock e-mail message, due to the exception: {} being thrown. Reason: {}",
+            log.error("Exception of type: {} was throw while sending account suspension e-mail message, due to the exception: {} being thrown. Reason: {}",
                     exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }
@@ -274,6 +287,7 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the e-mail address.
      * @param language        Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.CHANGE_USER_MAIL, Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
     public void sendEmailConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
@@ -306,6 +320,7 @@ public class MailProvider {
      * @param confirmationURL URL used to confirm the account creation.
      * @param language        Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.RESET_PASSWORD, Authorities.CHANGE_USER_PASSWORD})
     public void sendPasswordResetEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
@@ -338,6 +353,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.LOGIN})
     public void sendTwoFactorAuthCode(String firstName, String lastName, String authCode, String emailReceiver, String language) {
         try {
@@ -368,6 +384,7 @@ public class MailProvider {
      * @param emailReceiver E-mail address to which the message will be sent.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION})
     public void sendActivationConfirmationEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
@@ -398,6 +415,7 @@ public class MailProvider {
      * @param userLevel     Internationalization key indicating the user level that was granted to the user account.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
     public void sendEmailNotificationAboutGrantedUserLevel(String firstName, String lastName, String emailReceiver, String userLevel, String language) {
         try {
@@ -429,6 +447,7 @@ public class MailProvider {
      * @param userLevel     Internationalization key indicating the user level connected to the account that was revoked.
      * @param language      Language of the message.
      */
+    @Async
     @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
     public void sendEmailNotificationAboutRevokedUserLevel(String firstName, String lastName, String emailReceiver, String userLevel, String language) {
         try {
@@ -460,23 +479,28 @@ public class MailProvider {
      * @param emailSubject  Topic of the e-mail message.
      * @throws MessagingException Exception thrown while the e-mail message is being sent.
      */
-    @RolesAllowed({Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER,
+    @RolesAllowed({
+            Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER,
             Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.BLOCK_ACCOUNT,
             Authorities.LOGIN, Authorities.UNBLOCK_ACCOUNT, Authorities.CHANGE_USER_MAIL,
             Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL,
             Authorities.RESET_PASSWORD, Authorities.CHANGE_USER_PASSWORD,
             Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.ADD_USER_LEVEL,
-            Authorities.REMOVE_USER_LEVEL})
+            Authorities.REMOVE_USER_LEVEL
+    })
     private void sendEmail(String emailContent, String emailReceiver, String senderEmail, String emailSubject) throws MessagingException {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+        if (!Arrays.asList(env.getActiveProfiles()).contains("test")) {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            mimeMessage.setHeader("Content-Type", "text/plain; charset=\"utf-8\"");
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-        messageHelper.setTo(emailReceiver);
+            messageHelper.setTo(emailReceiver);
 
-        messageHelper.setSubject(emailSubject);
-        messageHelper.setText(emailContent, true);
-        messageHelper.setFrom(senderEmail);
-        this.mailSender.send(mimeMessage);
+            messageHelper.setSubject(emailSubject);
+            messageHelper.setText(emailContent, true);
+            messageHelper.setFrom(senderEmail);
+            this.mailSender.send(mimeMessage);
+        }
     }
 
     /**

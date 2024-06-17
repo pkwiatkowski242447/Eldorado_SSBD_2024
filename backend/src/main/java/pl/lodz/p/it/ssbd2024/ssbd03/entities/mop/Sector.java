@@ -204,7 +204,6 @@ public class Sector extends AbstractEntity implements Serializable {
         this.name = name;
         this.type = type;
         this.maxPlaces = maxPlaces;
-        this.occupiedPlaces = maxPlaces;
         this.weight = weight;
     }
 

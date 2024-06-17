@@ -121,7 +121,7 @@ import java.util.List;
                 query = """
                         SELECT r FROM Reservation r
                         WHERE r.sector.id = :sectorId
-                            AND r.beginTime < :timestamp
+                            AND r.beginTime > :timestamp
                         ORDER BY r.beginTime ASC
                         """
         ),
