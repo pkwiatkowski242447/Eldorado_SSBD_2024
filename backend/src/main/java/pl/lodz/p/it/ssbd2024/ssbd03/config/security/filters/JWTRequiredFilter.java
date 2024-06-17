@@ -45,6 +45,7 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         // Endpoints
         put("^/api/v1/auth/login-credentials", HttpMethod.POST.name());
         put("^/api/v1/auth/login-auth-code", HttpMethod.POST.name());
+        put("^/api/v1/auth/random-image", HttpMethod.GET.name());
         put("^/api/v1/register/client", HttpMethod.POST.name());
         put("^/api/v1/accounts/forgot-password", HttpMethod.POST.name());
         put("^/api/v1/accounts/change-password/.*", HttpMethod.POST.name());

@@ -1,13 +1,19 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.implementations;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.angus.mail.iap.ByteArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -38,7 +44,13 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountSuspend
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AuthenticationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 /**
  * Controller used for authentication in the system.
@@ -193,6 +205,20 @@ public class AuthenticationController implements AuthenticationControllerInterfa
         log.info("User: {} successfully logged out from the application at {} from IPv4: {}, ending their session in the application.",
                 userName, LocalDateTime.now(), sourceAddress);
         return ResponseEntity.noContent().build();
+    }
+
+    // Fetch car image to present on login page
+
+    @Override
+    @RolesAllowed({Authorities.LOGIN})
+    public ResponseEntity<?> getRandomImage() {
+        String apiURL = "https://random-image-pepebigotes.vercel.app/api/random-image";
+        Response response = RestAssured.given().when().get(apiURL);
+
+        byte[] byteArray = response.getBody().asByteArray();
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(new String(Base64.getEncoder().encode(byteArray)));
     }
 
     // Other private methods

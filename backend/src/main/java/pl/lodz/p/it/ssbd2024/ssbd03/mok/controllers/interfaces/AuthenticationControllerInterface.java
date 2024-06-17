@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.RefreshTokenDTO;
@@ -101,6 +102,23 @@ public interface AuthenticationControllerInterface {
                                          @Valid @RequestBody RefreshTokenDTO refreshTokenDTO,
                                          HttpServletRequest request)
             throws ApplicationBaseException;
+
+    // Get random image
+
+    /**
+     * This method is used to generate a random image for authentication page in the
+     * SPA application.
+     *
+     * @return 200 OK HTTP Response is returned when image was fetched successfully and converted to byte array.
+     * Otherwise, 500 INTERNAL SERVER ERROR is returned, when some unknown error occurs.
+     */
+    @GetMapping(value = "/random-image")
+    @Operation(summary = "Random image", description = "This endpoint is used to get random image through external API.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Image was successfully sent as a byte array."),
+            @ApiResponse(responseCode = "500", description = "Some unknown error occurred while the request was being processed."),
+    })
+    ResponseEntity<?> getRandomImage();
 
     // Logout method
 
