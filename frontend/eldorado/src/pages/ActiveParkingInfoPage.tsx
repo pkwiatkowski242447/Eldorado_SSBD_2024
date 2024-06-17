@@ -32,8 +32,10 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog.tsx";
 import {Pathnames} from "@/router/pathnames.ts";
+import {useAccount} from "@/hooks/useAccount.ts";
 
 function ActiveParkingInfoPage() {
+    const {isAuthenticated} = useAccount();
     const [currentPage, setCurrentPage] = useState(() => parseInt("0"));
     const [parking, setParking] = useState<ParkingListType>();
     const [sector, setSector] = useState<SectorType[]>([]);
@@ -211,7 +213,8 @@ function ActiveParkingInfoPage() {
                                                             <p><strong>{t("active.parking.info.page.name")}</strong> {sectorInfo.name}</p>
                                                             <p><strong>{t("active.parking.info.page.type")}</strong> {t(sectorInfo.type)}</p>
                                                             <p><strong>{t("active.parking.info.page.max.places")}</strong> {sectorInfo.maxPlaces}</p>
-                                                            <Button className={"mt-5"} onClick={() => handleButtonClick()}>{t("active.parking.info.page.make.reservation")}</Button>
+                                                            {isAuthenticated &&
+                                                                <Button className={"mt-5"} onClick={() => handleButtonClick()}>{t("active.parking.info.page.make.reservation")}</Button>}
                                                         </>
                                                     )}
                                                 </DialogDescription>
