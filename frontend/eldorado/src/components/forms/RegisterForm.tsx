@@ -31,11 +31,11 @@ export function RegisterForm() {
         firstName: z.string()
             .min(2, {message: t("accountSettings.firstNameTooShort")})
             .max(32, {message: t("accountSettings.firstNameTooLong")})
-            .regex(/^[A-Za-z]+$/, {message: t("general.nameInvalid")}),
+            .regex(/^[A-Za-ząĄćĆęĘłŁńŃóÓśŚźŹżŻ]+$/, {message: t("general.nameInvalid")}),
         lastName: z.string()
             .min(2, {message: t("accountSettings.lastNameTooShort")})
             .max(32, {message: t("accountSettings.lastNameTooLong")})
-            .regex(/^[A-Za-z]+$/, {message: t("general.lastNameInvalid")}),
+            .regex(/^[A-Za-ząĄćĆęĘłŁńŃóÓśŚźŹżŻ]+$/, {message: t("general.lastNameInvalid")}),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("registerPage.phoneNumberInvalid")}),
         newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
             .max(60, {message: t("accountSettings.passwordTooLong")})

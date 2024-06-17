@@ -27,6 +27,8 @@
   "general.nameInvalid": "Imię zawiera niedozwolone znaki",
   "general.lastNameInvalid": "Nazwisko zawiera niedozwolone znaki",
   "general.success": "Sukces",
+  "general.yes": "Tak",
+  "general.no": "Nie",
 
   "loginPage.accountSuspended": "Konto zawieszone? ",
   "loginPage.accountSuspended.text": " Przejdź tutaj",
@@ -514,6 +516,7 @@
   "active.parking.page.zip.code": "Kod pocztowy",
   "active.parking.page.sector.types": "Typy sektorów",
   "create.reservation.in.sector.page.create.reservation": "Utwórz rezerwację",
+
   "enter.parking.without.reservation.page.enter.parking": "Wjedź na parking",
   "enter.parking.without.reservation.page.enter": "Wjedź na parking",
   "enter.parking.without.reservation.page.are.you.sure.you.want.to.park.here": "Czy na pewno chcesz tu zaparkować?",
@@ -529,6 +532,9 @@
   "enter.parking.without.reservation.page.yes": "Tak",
   "enter.parking.without.reservation.page.no": "Nie",
   "enter.parking.without.reservation.page.parking.has.been.entered.successfully": "Parking został pomyślnie zarejestrowany!",
+  "enter.parking.without.reservation.table.city.column": "Miasto",
+  "enter.parking.without.reservation.table.street.column": "Ulica",
+  "enter.parking.without.reservation.table.zipcode.column": "Kod pocztowy",
 
   "my.active.reservation.page.begin.time": "Czas rozpoczęcia",
   "my.active.reservation.page.ending.time": "Czas zakończenia",
@@ -536,6 +542,7 @@
   "my.active.reservation.page.street": "Ulica",
   "my.active.reservation.page.zip.code": "Kod pocztowy",
   "my.active.reservation.page.sector.name": "Nazwa sektora",
+  "my.active.reservation.page.reservation.status": "Status rezerwacji",
   "my.active.reservation.page.id": "ID",
 
   "my.historical.reservations.page.begin.time": "Czas rozpoczęcia",
@@ -750,13 +757,21 @@
   "exit.parking.form.id.of.reservation": "Podaj swoje ID rezerwacji",
   "exit.parking.form.end.reservation": "Proszę podać ID rezerwacji aby wyjechać z parkingu",
   "exit.parking.form.exit": "Wyjedź",
-  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Czy na pewno chcesz zedytować parking?",
+  "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Czy na pewno chcesz wyjechać z parkingu?",
 
-  "exit.parking.form.tooShort": "ID rezerwacji musi mieć 36 znaków",
-  "exit.parking.form.tooLong": "ID rezerwacji musi mieć 36 znaków",
-  "exit.parking.form.regex.not.met": "ID rezerwacji nie spełnia wymagań formatowania",
+  "exit.parking.form.id.too.short": "Podany identyfikator rezerwacji jest za krótki",
+  "exit.parking.form.id.too.long": "Podany identyfikator rezerwacji jest za długi",
+  "exit.parking.form.id.regex.not.met": "Podany identyfikator rezerwacji nie jest prawidłowym identyfikorem rezerwacji",
   "exit.parking.success.message": "Wyjazd z parkingu zakończony pomyślnie. Do zobaczenia wkrótce!",
 
+  "enter.parking.with.reservation.form.id.too.short": "Podany identyfikator rezerwacji jest za krótki",
+  "enter.parking.with.reservation.form.id.too.long": "Podany identyfikator rezerwacji jest za długi",
+  "enter.parking.with.reservation.form.id.regex.not.met": "Podany identyfikator rezerwacji nie jest prawidłowym identyfikorem rezerwacji",
+  "enter.parking.with.reservation.success.toast.message": "Wjazd na parking został zarejestrowany. Życzymy udanego pobytu!",
+  "enter.parking.with.reservation.enter.parking.button": "Wjedź na parking",
+  "enter.parking.with.reservation.enter.parking.confirm": "Wjazd na parking",
+  "enter.parking.with.reservation.enter.with.given.reservation.id": "Czy na pewno chcesz wjechać na parking z podanym identyfikatorem rezerwacji?",
+  "enter.parking.with.reservation.enter.with.given.reservation.id.success": "Wjazd na parking zakończył się sukcesem!",
 
   "createReservationForm.formSchema.endDateTime.smaller.than.startDateTime": "Rezerwacja musi kończyć się po tym jak sie zaczęła.",
   "breadcrumb.exitParking": "Wyjedź z parkingu",

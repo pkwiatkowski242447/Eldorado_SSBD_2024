@@ -32,12 +32,14 @@ public class AuthenticationCodeDTO {
     @Size(max = AccountsConsts.LOGIN_MAX_LENGTH, message = AccountMessages.LOGIN_TOO_LONG)
     @Schema(description = "String identifier used to authenticate to the application", example = "boleslawchrobry", requiredMode = Schema.RequiredMode.REQUIRED)
     private String userLogin;
+
     @NotBlank(message = AccountMessages.AUTH_CODE_BLANK)
     @Pattern(regexp = AccountsConsts.AUTH_CODE_REGEX, message = AccountMessages.AUTH_CODE_REGEX_NOT_MET)
     @Size(min = AccountsConsts.AUTH_CODE_MIN_LENGTH, message = AccountMessages.AUTH_CODE_TOO_SHORT)
     @Size(max = AccountsConsts.AUTH_CODE_MAX_LENGTH, message = AccountMessages.AUTH_CODE_TOO_LONG)
     @Schema(description = "Code used to authenticate the user", example = "12345678", requiredMode = Schema.RequiredMode.REQUIRED)
     private String authCodeValue;
+
     @NotBlank(message = AccountMessages.LANGUAGE_BLANK)
     @Pattern(regexp = AccountsConsts.LANGUAGE_REGEX, message = AccountMessages.LANGUAGE_REGEX_NOT_MET)
     @Schema(description = "Language used natively in user browser", example = "pl", requiredMode = Schema.RequiredMode.REQUIRED)

@@ -20,19 +20,29 @@ import java.util.UUID;
 @AllArgsConstructor
 @LoggerInterceptor
 public class AccountListDTO {
+
     private UUID id;
+
     private String login;
+
     private String name;
+
     private String lastName;
+
     private boolean active;
+
     private boolean blocked;
+
     private boolean suspended;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     private LocalDateTime lastSuccessfulLoginTime;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     private LocalDateTime lastUnsuccessfulLoginTime;
+
     private List<String> userLevels;
 
     /**

@@ -15,6 +15,7 @@ import java.util.UUID;
 @Getter @Setter
 @LoggerInterceptor
 public class ClientDTO extends UserLevelDTO {
+
     @NotNull(message = ClientMessages.CLIENT_TYPE_NULL)
     @Schema(description = "Type of client", example = "BASIC", requiredMode = Schema.RequiredMode.REQUIRED)
     private String clientType;

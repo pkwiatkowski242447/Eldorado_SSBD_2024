@@ -186,6 +186,23 @@ public class DatabaseConsts {
     public static final String PARKING_STREET_COLUMN = "street";
     public static final String PARKING_SECTOR_STRATEGY_COLUMN = "sector_strategy";
 
+    // public.parking_history
+
+    public static final String PARKING_HIST_TABLE = "parking_history";
+
+    public static final String PARKING_HIST_ID_COLUMN = "id";
+    public static final String PARKING_HIST_VERSION_COLUMN = "version";
+    public static final String PARKING_HIST_CITY_COLUMN = "city";
+    public static final String PARKING_HIST_STREET_COLUMN = "street";
+    public static final String PARKING_HIST_ZIP_CODE_COLUMN = "zip_code";
+    public static final String PARKING_HIST_STRATEGY_COLUMN = "strategy";
+
+    public static final String PARKING_HIST_MODIFICATION_TIME_COLUMN = "modification_time";
+    public static final String PARKING_HIST_MODIFIED_BY_COLUMN = "modified_by";
+
+    public static final String PARKING_HIST_ACCOUNT_ID_INDEX = "idx_parking_history_account_id";
+    public static final String PARKING_HIST_ACCOUNT_ID_FK = "parking_history_account_id_fk";
+
     // public.parking_event table
 
     public static final String PARKING_EVENT_TABLE = "parking_event";
