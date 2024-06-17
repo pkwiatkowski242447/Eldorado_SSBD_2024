@@ -111,7 +111,6 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                 if (numberOfExits != numberOfEntries) {
                     ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
                     reservation.addParkingEvent(exitEvent);
-                    System.out.println("dupa");
                     reservation.setStatus(Reservation.ReservationStatus.TERMINATED);
                     this.reservationFacade.edit(reservation);
                     Sector sector = reservation.getSector();

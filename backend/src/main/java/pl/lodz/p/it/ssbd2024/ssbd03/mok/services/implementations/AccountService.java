@@ -47,7 +47,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Service managing Accounts.
