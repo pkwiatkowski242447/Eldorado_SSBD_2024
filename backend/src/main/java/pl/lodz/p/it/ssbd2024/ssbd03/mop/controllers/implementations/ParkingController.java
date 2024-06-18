@@ -17,11 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingCreateDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingModifyDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputDTO;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.ParkingOutputListDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountHistoryDataOutputDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.*;
+import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountHistoryDataMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
@@ -350,5 +349,17 @@ public class ParkingController implements ParkingControllerInterface {
         } catch (IllegalArgumentException exception) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_PARKING_HISTORICAL_DATA})
+    @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"))
+    public ResponseEntity<?> getHistoryDataByParkingId(String id, int pageNumber, int pageSize) throws ApplicationBaseException {
+        List<ParkingHistoryDataOutputDTO> parkingList = parkingService.getHistoryDataByParkingId(UUID.fromString(id), pageNumber, pageSize)
+                .stream()
+                .map(ParkingHistoryDataMapper::toParkingHistoryDataOutputDto)
+                .toList();
+        if (parkingList.isEmpty()) return ResponseEntity.noContent().build();
+        else return ResponseEntity.ok(parkingList);
     }
 }

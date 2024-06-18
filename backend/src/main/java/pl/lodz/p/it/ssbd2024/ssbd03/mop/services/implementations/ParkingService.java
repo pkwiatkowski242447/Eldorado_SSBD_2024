@@ -12,6 +12,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -443,5 +444,11 @@ public class ParkingService implements ParkingServiceInterface {
         reservation.addParkingEvent(exitEvent);
 
         this.reservationFacade.edit(reservation);
+    }
+
+    @Override
+    @RolesAllowed({Authorities.GET_PARKING_HISTORICAL_DATA})
+    public List<ParkingHistoryData> getHistoryDataByParkingId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
+        return parkingHistoryDataFacade.findByParkingId(id, pageNumber, pageSize);
     }
 }

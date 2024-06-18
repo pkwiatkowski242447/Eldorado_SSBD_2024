@@ -81,8 +81,7 @@ public class ParkingHistoryDataFacade extends AbstractFacade<ParkingHistoryData>
      * @return If there are historic entries for the requested parking, this method returns part of the entries
      * specified by pageSize and pageNumber. Otherwise, empty list.
      */
-    //TODO to use by Kubuś
-    //@RolesAllowed(Authorities.????)
+    @RolesAllowed(Authorities.GET_ACCOUNT_HISTORICAL_DATA)
     public List<ParkingHistoryData> findByParkingId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<ParkingHistoryData> findParkingByIdQuery = entityManager.createNamedQuery("ParkingHistoryData.findByParkingId", ParkingHistoryData.class);

@@ -113,4 +113,5 @@ public class Authorities {
     public static final String GET_OWN_HISTORICAL_DATA = "GET_OWN_HISTORICAL_DATA";
     public static final String MANAGE_ATTRIBUTES = "MANAGE_ATTRIBUTES";
     public static final String MANAGE_OWN_ATTRIBUTES = "MANAGE_OWN_ATTRIBUTES";
+    public static final String GET_PARKING_HISTORICAL_DATA = "GET_PARKING_HISTORICAL_DATA";
 }
