@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -15,9 +14,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingEvent;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository used to manage Parking Entities in the database.
@@ -64,33 +60,5 @@ public class ParkingEventFacade extends AbstractFacade<ParkingEvent> {
     })
     public void create(ParkingEvent entity) throws ApplicationBaseException {
         super.create(entity);
-    }
-
-    /**
-     * Retrieves a parkingEvent by its identifier.
-     *
-     * @param id ID of the ParkingEvent to be retrieved.
-     * @return If an ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @Override
-    @DenyAll
-    public Optional<ParkingEvent> find(UUID id) throws ApplicationBaseException {
-        return super.find(id);
-    }
-
-    /**
-     * Retrieves a ParkingEvent by its identifier and forces its refresh.
-     *
-     * @param id ID of the ParkingEvent to be retrieved.
-     * @return If a ParkingEvent with the given ID was found returns an Optional containing the ParkingEvent, otherwise returns an empty Optional.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @Override
-    @DenyAll
-    public Optional<ParkingEvent> findAndRefresh(UUID id) throws ApplicationBaseException {
-        return super.findAndRefresh(id);
     }
 }

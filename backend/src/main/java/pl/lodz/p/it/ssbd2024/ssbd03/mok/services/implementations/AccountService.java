@@ -47,7 +47,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.TokenProvider;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Service managing Accounts.
@@ -168,7 +167,7 @@ public class AccountService implements AccountServiceInterface {
         clientUserLevel.setAccount(newClientAccount);
         newClientAccount.addUserLevel(clientUserLevel);
 
-        this.accountFacade.create(newClientAccount);
+        accountFacade.create(newClientAccount);
         historyDataFacade.create(new AccountHistoryData(newClientAccount,
                 OperationType.REGISTRATION,
                 accountFacade.findByLogin(SecurityContextHolder

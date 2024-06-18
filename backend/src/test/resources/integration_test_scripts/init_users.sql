@@ -29,6 +29,7 @@ GRANT SELECT                , UPDATE ON TABLE public.user_level             TO s
 GRANT SELECT                , UPDATE ON TABLE public.client_data            TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.admin_data             TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.staff_data             TO ssbd03mop;
+GRANT SELECT, INSERT                 ON TABLE public.parking_history        TO ssbd03mop;
 
 GRANT SELECT                         ON TABLE public.account_attributes     TO ssbd03mop;
 GRANT SELECT                         ON TABLE public.attribute_association  TO ssbd03mop;

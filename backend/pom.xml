@@ -629,7 +629,7 @@
                 <database.host>localhost</database.host>
                 <schema-gen.policy>create-drop</schema-gen.policy>
                 <debug-sql.log>true</debug-sql.log>
-                <logging.level>DEBUG</logging.level>
+                <logging.level>INFO</logging.level>
                 <url.host>http://localhost:3000</url.host>
                 <spring.profiles.active>dev</spring.profiles.active>
             </properties>

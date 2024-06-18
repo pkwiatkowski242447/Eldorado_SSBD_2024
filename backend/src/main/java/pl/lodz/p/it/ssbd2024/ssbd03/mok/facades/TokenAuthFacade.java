@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -65,18 +64,6 @@ public class TokenAuthFacade extends AbstractFacade<Token> {
     @RolesAllowed({Authorities.LOGIN, Authorities.REFRESH_SESSION})
     public void create(Token entity) throws ApplicationBaseException {
         super.create(entity);
-    }
-
-    /**
-     * Retrieves a Token by the ID.
-     *
-     * @param id ID of the Token to be retrieved.
-     * @return If Token with the given ID was found returns an Optional containing the Token, otherwise returns an empty Optional.
-     */
-    @Override
-    @DenyAll
-    public Optional<Token> find(UUID id) throws ApplicationBaseException {
-        return super.find(id);
     }
 
     /**

@@ -1,9 +1,9 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -16,10 +16,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository used to manage Accounts Entities in the database on behalf of MOK module.
@@ -66,71 +62,11 @@ public class AccountHistoryDataAuthFacade extends AbstractFacade<AccountHistoryD
     @Override
     @RolesAllowed({Authorities.LOGIN})
     public void create(AccountHistoryData account) throws ApplicationBaseException {
-        super.create(account);
-    }
+        TypedQuery<Integer> findParkingByIdQuery = entityManager.createNamedQuery("AccountHistoryData.checkIfEntityExists", Integer.class);
+        findParkingByIdQuery.setParameter("id", account.getId());
+        findParkingByIdQuery.setParameter("version", account.getVersion());
+        boolean exists = !findParkingByIdQuery.getResultList().isEmpty();
 
-    // R - read methods
-
-    /**
-     * Retrieves an Account by the ID.
-     *
-     * @param id ID of the Account to be retrieved.
-     * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
-     */
-    @Override
-    @DenyAll
-    public Optional<AccountHistoryData> find(UUID id) throws ApplicationBaseException {
-        Optional<AccountHistoryData> optionalAccount = super.find(id);
-        optionalAccount.ifPresent(entity -> entityManager.refresh(entity));
-        return optionalAccount;
-    }
-
-    /**
-     * Retrieves an Account by the ID and forces its refresh.
-     *
-     * @param id ID of the Account to be retrieved.
-     * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
-     */
-    @Override
-    @DenyAll
-    public Optional<AccountHistoryData> findAndRefresh(UUID id) throws ApplicationBaseException {
-        return super.findAndRefresh(id);
-    }
-
-    /**
-     * Retrieves all Accounts.
-     *
-     * @return `List` containing all Accounts.
-     */
-    @Override
-    @DenyAll
-    public List<AccountHistoryData> findAll() throws ApplicationBaseException {
-        return super.findAll();
-    }
-
-    // U - update methods
-
-    /**
-     * Forces the modification of the entity in the database.
-     *
-     * @param account Account to be modified.
-     */
-    @Override
-    @DenyAll
-    public void edit(AccountHistoryData account) throws ApplicationBaseException {
-        super.edit(account);
-    }
-
-    // D - delete methods
-
-    /**
-     * Removes an Account from the database.
-     *
-     * @param account Account to be removed from the database.
-     */
-    @Override
-    @DenyAll
-    public void remove(AccountHistoryData account) throws ApplicationBaseException {
-        super.remove(account);
+        if (!exists) super.create(account);
     }
 }

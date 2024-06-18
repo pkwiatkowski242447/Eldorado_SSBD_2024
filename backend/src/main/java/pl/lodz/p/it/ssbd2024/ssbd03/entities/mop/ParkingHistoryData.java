@@ -38,6 +38,13 @@ import java.util.UUID;
                         WHERE p.id = :id
                         ORDER BY p.modificationTime DESC
                         """
+        ),
+        @NamedQuery(
+                name = "ParkingHistoryData.checkIfEntityExists",
+                query = """
+                        SELECT 1 FROM ParkingHistoryData p
+                        WHERE p.id = :id AND p.version = :version
+                        """
         )
 })
 public class ParkingHistoryData {
@@ -53,13 +60,13 @@ public class ParkingHistoryData {
     @Column(name = DatabaseConsts.PARKING_HIST_CITY_COLUMN, nullable = false, updatable = false)
     private String city;
 
-    @Column(name = DatabaseConsts.PARKING_HIST_STREET_COLUMN, nullable = false, updatable = false, length = 6)
+    @Column(name = DatabaseConsts.PARKING_HIST_STREET_COLUMN, nullable = false, updatable = false)
     private String street;
 
-    @Column(name = DatabaseConsts.PARKING_HIST_ZIP_CODE_COLUMN, nullable = false, updatable = false)
+    @Column(name = DatabaseConsts.PARKING_HIST_ZIP_CODE_COLUMN, nullable = false, updatable = false, length = 6)
     private String zipCode;
 
-    @Column(name = DatabaseConsts.PARKING_HIST_STRATEGY_COLUMN, nullable = false, updatable = false, length = 64)
+    @Column(name = DatabaseConsts.PARKING_HIST_STRATEGY_COLUMN, nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private Parking.SectorDeterminationStrategy strategy;
 

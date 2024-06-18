@@ -2,6 +2,7 @@ DELETE FROM public.entry_code;
 DELETE FROM public.parking_event;
 DELETE FROM public.reservation;
 DELETE FROM public.sector;
+DELETE FROM public.parking_history;
 DELETE FROM public.parking;
 DELETE FROM public.token;
 

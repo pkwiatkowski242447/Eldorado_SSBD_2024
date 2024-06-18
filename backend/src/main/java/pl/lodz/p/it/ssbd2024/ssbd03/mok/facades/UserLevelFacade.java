@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -13,20 +12,19 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository used to manage UserLevel Entities in the database.
  *
  * @see UserLevel
- * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin
- * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client
- * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff
+ * @see Admin
+ * @see Client
+ * @see Staff
  */
 @Slf4j
 @Repository
@@ -90,51 +88,4 @@ public class UserLevelFacade extends AbstractFacade<UserLevel> {
     public void remove(UserLevel userLevel) throws ApplicationBaseException {
         super.remove(userLevel);
     }
-
-    /**
-     * Retrieves a UserLevel by the ID.
-     *
-     * @param id ID of the UserLevel to be retrieved.
-     * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
-     */
-    @Override
-    @DenyAll
-    public Optional<UserLevel> find(UUID id) throws ApplicationBaseException {
-        return super.find(id);
-    }
-
-    /**
-     * Retrieves a UserLevel by the ID and forces its refresh.
-     *
-     * @param id ID of the UserLevel to be retrieved.
-     * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
-     */
-    @Override
-    @DenyAll
-    public Optional<UserLevel> findAndRefresh(UUID id) throws ApplicationBaseException {
-        return super.findAndRefresh(id);
-    }
-
-    /**
-     * Retrieves all UserLevels.
-     *
-     * @return List containing all UserLevels.
-     */
-    @Override
-    @DenyAll
-    public List<UserLevel> findAll() throws ApplicationBaseException {
-        return super.findAll();
-    }
-
-    /**
-     * Counts the number of UserLevels in the database.
-     *
-     * @return Number of UserLevels in the database.
-     */
-    @Override
-    @DenyAll
-    public int count() throws ApplicationBaseException {
-        return super.count();
-    }
 }
-

@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -15,19 +14,20 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository used to manage UserLevel Entities in the database.
  *
  * @see UserLevel
- * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Admin
- * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client
- * @see pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Staff
+ * @see Admin
+ * @see Client
+ * @see Staff
  */
 @Repository
 @LoggerInterceptor
@@ -69,34 +69,6 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
     @RolesAllowed({Authorities.CHANGE_CLIENT_TYPE})
     public void edit(UserLevel userLevel) throws ApplicationBaseException {
         super.edit(userLevel);
-    }
-
-    /**
-     * Retrieves a UserLevel by its identifier.
-     *
-     * @param id ID of the UserLevel to be retrieved.
-     * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @Override
-    @DenyAll
-    public Optional<UserLevel> find(UUID id) throws ApplicationBaseException {
-        return super.find(id);
-    }
-
-    /**
-     * Retrieves a UserLevel by its identifier and forces its refresh.
-     *
-     * @param id ID of the UserLevel to be retrieved.
-     * @return If UserLevel with the given ID was found returns an Optional containing the UserLevel, otherwise returns an empty Optional.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @Override
-    @DenyAll
-    public Optional<UserLevel> findAndRefresh(UUID id) throws ApplicationBaseException {
-        return super.findAndRefresh(id);
     }
 
     /**

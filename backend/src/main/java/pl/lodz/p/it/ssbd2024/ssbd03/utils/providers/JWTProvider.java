@@ -7,7 +7,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Component used for all operations connected with JSON Web Tokens.
@@ -137,8 +140,7 @@ public class JWTProvider {
      * @param jwtToken Token from which the username will be extracted.
      * @return Returns username from the Token.
      */
-    @DenyAll
-    public String extractUsername(String jwtToken) throws TokenDataExtractionException {
+    private String extractUsername(String jwtToken) throws TokenDataExtractionException {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(this.getSignInKey())).build();
             DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
@@ -212,7 +214,7 @@ public class JWTProvider {
             return decodedJWT.getClaim(JWTConsts.CODE_VALUE).asString();
         } catch (SignatureVerificationException exception) {
             throw new TokenDataExtractionException();
-        } catch (TokenExpiredException exception){
+        } catch (TokenExpiredException exception) {
             throw new TokenNotValidException(I18n.TOKEN_INVALID_OR_EXPIRED);
         }
     }

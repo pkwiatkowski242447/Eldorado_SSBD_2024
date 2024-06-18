@@ -4,6 +4,7 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundExc
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.status.SectorAlreadyInactiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.AccountMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
+import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingHistoryDataFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ParkingServiceInterface;
@@ -66,6 +68,7 @@ public class ParkingService implements ParkingServiceInterface {
     private final ReservationFacade reservationFacade;
     private final AccountMOPFacade accountFacade;
     private final UserLevelMOPFacade userLevelMOPFacade;
+    private final ParkingHistoryDataFacade parkingHistoryDataFacade;
 
     @Value("${reservation.max_hours}")
     private Integer reservationMaxHours;
@@ -83,11 +86,13 @@ public class ParkingService implements ParkingServiceInterface {
     public ParkingService(ParkingFacade parkingFacade,
                           ReservationFacade reservationFacade,
                           AccountMOPFacade accountFacade,
-                          UserLevelMOPFacade userLevelMOPFacade) {
+                          UserLevelMOPFacade userLevelMOPFacade,
+                          ParkingHistoryDataFacade parkingHistoryDataFacade) {
         this.parkingFacade = parkingFacade;
         this.reservationFacade = reservationFacade;
         this.accountFacade = accountFacade;
         this.userLevelMOPFacade = userLevelMOPFacade;
+        this.parkingHistoryDataFacade = parkingHistoryDataFacade;
     }
 
     // MOP.2 - Add parking
@@ -97,7 +102,18 @@ public class ParkingService implements ParkingServiceInterface {
     public Parking createParking(String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) throws ApplicationBaseException {
         Address address = new Address(city, zipCode, street);
         Parking parking = new Parking(address, strategy);
-        this.parkingFacade.create(parking);
+
+        parkingFacade.create(parking);
+        parkingHistoryDataFacade.create(new ParkingHistoryData(
+                        parking,
+                        accountFacade.findByLogin(SecurityContextHolder
+                                        .getContext()
+                                        .getAuthentication()
+                                        .getName())
+                                .orElse(null)
+                )
+        );
+
         return parking;
     }
 
@@ -247,7 +263,7 @@ public class ParkingService implements ParkingServiceInterface {
     // MOP.4 - Edit parking
 
     @Override
-    @RolesAllowed({Authorities.EDIT_PARKING})
+    @RolesAllowed(Authorities.EDIT_PARKING)
     public Parking editParking(Parking modifiedParking, UUID parkingId) throws ApplicationBaseException {
         Parking foundParking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
 
@@ -261,7 +277,18 @@ public class ParkingService implements ParkingServiceInterface {
 
         foundParking.setSectorStrategy(modifiedParking.getSectorStrategy());
         foundParking.setAddress(address);
+
         parkingFacade.edit(foundParking);
+        parkingHistoryDataFacade.create(new ParkingHistoryData(
+                        foundParking,
+                        accountFacade.findByLogin(SecurityContextHolder
+                                        .getContext()
+                                        .getAuthentication()
+                                        .getName())
+                                .orElse(null)
+                )
+        );
+
         return foundParking;
     }
 
@@ -340,7 +367,6 @@ public class ParkingService implements ParkingServiceInterface {
         }
         List<Sector> result = parkingFacade.getAvailableSectorsNow(clientType, parkingId, currentTime, reservationMaxHours);
 
-        //TODO add multiple algorithms for determining sector assignment
         if (result.isEmpty()) throw new ReservationNoAvailablePlaceException();
         SectorStrategy sectorStrategy = switch (result.getFirst().getParking().getSectorStrategy()) {
             case LEAST_OCCUPIED -> new LeastOccupied();
@@ -396,7 +422,7 @@ public class ParkingService implements ParkingServiceInterface {
             // Case for anonymous user - end time is being set
             if (reservation.getEndTime() == null) {
                 reservation.setEndTime(LocalDateTime.now());
-            } else {
+            } else if (reservation.getClient() != null) {
                 reservation.getClient().setTotalReservationHours(reservation.getClient().getTotalReservationHours() +
                         Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toHours()
                 );
