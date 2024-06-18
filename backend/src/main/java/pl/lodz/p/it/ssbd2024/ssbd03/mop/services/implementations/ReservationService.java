@@ -33,9 +33,11 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.status.Reservatio
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.sector.read.SectorNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ReservationServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,6 +58,7 @@ public class ReservationService implements ReservationServiceInterface {
     private final AccountMOPFacade accountFacade;
     private final UserLevelMOPFacade userLevelMOPFacade;
     private final ParkingFacade parkingFacade;
+    private final MailProvider mailProvider;
 
     @Value("${reservation.client_limit}")
     private Integer clientLimit;
@@ -73,11 +76,13 @@ public class ReservationService implements ReservationServiceInterface {
     public ReservationService(ReservationFacade reservationFacade,
                               AccountMOPFacade accountFacade,
                               UserLevelMOPFacade userLevelMOPFacade,
-                              ParkingFacade parkingFacade) {
+                              ParkingFacade parkingFacade,
+                              MailProvider mailProvider) {
         this.reservationFacade = reservationFacade;
         this.accountFacade = accountFacade;
         this.userLevelMOPFacade = userLevelMOPFacade;
         this.parkingFacade = parkingFacade;
+        this.mailProvider = mailProvider;
     }
 
     // MOP.15 - Get all active reservation
@@ -103,10 +108,12 @@ public class ReservationService implements ReservationServiceInterface {
     public Reservation makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
         // Check begin time
         if (beginTime.isBefore(LocalDateTime.now()) || endTime.isBefore(beginTime) || endTime.isEqual(beginTime)
-                || Duration.between(beginTime, endTime).toMinutes() < reservationMinHours * 60) throw new ReservationInvalidTimeframe();
+                || Duration.between(beginTime, endTime).toMinutes() < reservationMinHours * 60)
+            throw new ReservationInvalidTimeframe();
 
         // Check reservation duration
-        if (Duration.between(beginTime, endTime).toMinutes() > reservationMaxHours * 60) throw new ReservationExceedingMaximumTime();
+        if (Duration.between(beginTime, endTime).toMinutes() > reservationMaxHours * 60)
+            throw new ReservationExceedingMaximumTime();
 
         // Obtaining Client
         Client client = userLevelMOPFacade.findGivenUserLevelForGivenAccount(clientLogin).orElseThrow(ReservationClientUserLevelNotFound::new);
@@ -153,6 +160,24 @@ public class ReservationService implements ReservationServiceInterface {
 
         reservationFacade.create(newReservation);
 
+        // Send a notification email
+        mailProvider.sendMadeReservationInfoEmail(
+                client.getAccount().getName(),
+                client.getAccount().getLastname(),
+                client.getAccount().getEmail(),
+                client.getAccount().getAccountLanguage(),
+                String.join(" ",
+                        sector.getParking().getAddress().getCity(),
+                        sector.getParking().getAddress().getZipCode(),
+                        sector.getParking().getAddress().getStreet()
+                ),
+                sector.getName(),
+                String.format("%s - %s",
+                        beginTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                        endTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
+                )
+        );
+
         return newReservation;
     }
 
@@ -184,6 +209,15 @@ public class ReservationService implements ReservationServiceInterface {
 
         reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
         reservationFacade.edit(reservation);
+
+        // Send a notification email
+        mailProvider.sendCancelledReservationInfoEmail(
+                reservation.getClient().getAccount().getName(),
+                reservation.getClient().getAccount().getLastname(),
+                reservation.getClient().getAccount().getEmail(),
+                reservation.getClient().getAccount().getAccountLanguage(),
+                reservation.getId().toString()
+        );
     }
 
     // MOP.22 - Get reservations
