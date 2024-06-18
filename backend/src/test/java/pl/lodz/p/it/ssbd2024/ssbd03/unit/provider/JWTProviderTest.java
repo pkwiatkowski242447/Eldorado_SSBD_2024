@@ -21,6 +21,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.utils.JWTConsts;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.JWTProvider;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Instant;
@@ -190,8 +191,11 @@ public class JWTProviderTest {
         id.set(accountNo1, UUID.fromString(exampleUUID));
         id.setAccessible(false);
 
+        Method extractUsername = JWTProvider.class.getDeclaredMethod("extractUsername", String.class);
+        extractUsername.setAccessible(true);
+
         String jwtToken = jwtProvider.generateJWTToken(accountNo1);
-        String userLogin = jwtProvider.extractUsername(jwtToken);
+        String userLogin = (String) extractUsername.invoke(jwtProvider, jwtToken);
 
         assertNotNull(jwtToken);
         assertEquals(accountNo1.getLogin(), userLogin);
@@ -204,6 +208,9 @@ public class JWTProviderTest {
         id.set(accountNo1, UUID.fromString(exampleUUID));
         id.setAccessible(false);
 
+        Method extractUsername = JWTProvider.class.getDeclaredMethod("extractUsername", String.class);
+        extractUsername.setAccessible(true);
+
         List<String> listOfRoles = new LinkedList<>();
         accountNo1.getUserLevels().forEach(userLevel -> listOfRoles.add("ROLE_" + userLevel.getClass().getSimpleName().toUpperCase()));
         String jwtToken = JWT.create()
@@ -214,7 +221,13 @@ public class JWTProviderTest {
                 .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                 .withIssuer(JWTConsts.TOKEN_ISSUER)
                 .sign(Algorithm.HMAC256(otherTokenKey));
-        assertThrows(TokenDataExtractionException.class, () -> jwtProvider.extractUsername(jwtToken));
+        assertThrows(TokenDataExtractionException.class, () -> {
+            try {
+                extractUsername.invoke(jwtProvider, jwtToken);
+            } catch (InvocationTargetException ite) {
+                throw ite.getTargetException();
+            }
+        });
     }
 
     @Test

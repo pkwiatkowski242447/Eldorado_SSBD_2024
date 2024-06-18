@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -82,7 +81,8 @@ public class ParkingHistoryDataFacade extends AbstractFacade<ParkingHistoryData>
      * @return If there are historic entries for the requested parking, this method returns part of the entries
      * specified by pageSize and pageNumber. Otherwise, empty list.
      */
-    @DenyAll
+    //TODO to use by Kubuś
+    //@RolesAllowed(Authorities.????)
     public List<ParkingHistoryData> findByParkingId(UUID id, int pageNumber, int pageSize) throws ApplicationBaseException {
         try {
             TypedQuery<ParkingHistoryData> findParkingByIdQuery = entityManager.createNamedQuery("ParkingHistoryData.findByParkingId", ParkingHistoryData.class);

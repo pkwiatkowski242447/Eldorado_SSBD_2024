@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,7 +17,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository used to manage Account Entities in the database on behalf of MOP module.
@@ -52,34 +50,6 @@ public class AccountMOPFacade extends AbstractFacade<Account> {
     }
 
     // R - read methods
-
-    /**
-     * Retrieves an Account by the ID.
-     *
-     * @param id ID of the Account to be retrieved.
-     * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @Override
-    @DenyAll
-    public Optional<Account> find(UUID id) throws ApplicationBaseException {
-        return super.find(id);
-    }
-
-    /**
-     * Retrieves an Account by the ID and forces its refresh.
-     *
-     * @param id ID of the Account to be retrieved.
-     * @return If Account with the given ID was found returns an Optional containing the Account, otherwise returns an empty Optional.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @Override
-    @DenyAll
-    public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
-        return super.findAndRefresh(id);
-    }
 
     /**
      * Retrieves an account entity object by login.

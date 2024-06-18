@@ -167,7 +167,7 @@ public class AccountService implements AccountServiceInterface {
         clientUserLevel.setAccount(newClientAccount);
         newClientAccount.addUserLevel(clientUserLevel);
 
-        this.accountFacade.create(newClientAccount);
+        accountFacade.create(newClientAccount);
         historyDataFacade.create(new AccountHistoryData(newClientAccount,
                 OperationType.REGISTRATION,
                 accountFacade.findByLogin(SecurityContextHolder

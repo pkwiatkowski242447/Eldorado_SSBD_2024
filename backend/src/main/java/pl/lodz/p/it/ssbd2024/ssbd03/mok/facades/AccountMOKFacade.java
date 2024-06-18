@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,7 +15,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.commons.AbstractFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.UserLevel;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.time.LocalDateTime;
@@ -110,17 +108,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     }
 
     /**
-     * Retrieves all Accounts.
-     *
-     * @return `List` containing all Accounts.
-     */
-    @Override
-    @DenyAll
-    public List<Account> findAll() throws ApplicationBaseException {
-        return super.findAll();
-    }
-
-    /**
      * This method is used to retrieve all user accounts, including pagination.
      *
      * @param pageNumber Number of the page with user accounts to be retrieved.
@@ -137,81 +124,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             findAllAccounts.setFirstResult(pageNumber * pageSize);
             findAllAccounts.setMaxResults(pageSize);
             List<Account> list = findAllAccounts.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to retrieve all user accounts, which are active, including pagination.
-     *
-     * @param pageNumber Number of the page with active user accounts to be retrieved.
-     * @param pageSize   Number of active user accounts per page.
-     * @return List of all active user accounts from a specified page, of a given page size.
-     * If a persistence exception is thrown, then empty list is returned.
-     * @note. Accounts are be default ordered (in the returned list) by the login.
-     */
-    @DenyAll
-    public List<Account> findAllActiveAccountsWithPagination(int pageNumber, int pageSize)
-            throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccountsByActive", Account.class);
-            findAllAccounts.setFirstResult(pageNumber * pageSize);
-            findAllAccounts.setMaxResults(pageSize);
-            findAllAccounts.setParameter("active", true);
-            List<Account> list = findAllAccounts.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to retrieve all user accounts, which are inactive, including pagination.
-     *
-     * @param pageNumber Number of the page with inactive user accounts to be retrieved.
-     * @param pageSize   Number of inactive user accounts per page.
-     * @return List of all inactive user accounts from a specified page, of a given page size.
-     * If a persistence exception is thrown, then empty list is returned.
-     * @note. counts are be default ordered (in the returned list) by the login.
-     */
-    @DenyAll
-    public List<Account> findAllInactiveAccountsWithPagination(int pageNumber, int pageSize)
-            throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccounts = entityManager.createNamedQuery("Account.findAllAccountsByActive", Account.class);
-            findAllAccounts.setFirstResult(pageNumber * pageSize);
-            findAllAccounts.setMaxResults(pageSize);
-            findAllAccounts.setParameter("active", false);
-            List<Account> list = findAllAccounts.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to find all user accounts with specified user level access.
-     *
-     * @param userLevel  Class reference to the user level, which is searched among users accounts.
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List containing user accounts with specified user level. If no accounts with given user level are found or
-     * persistence exception is thrown, then empty list is returned.
-     */
-    @DenyAll
-    public List<Account> findAllActiveAccountsWithGivenUserLevelWithPagination(
-            Class<? extends UserLevel> userLevel, int pageNumber, int pageSize) throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllActiveAccountsByUserLevelQuery = entityManager.createNamedQuery("Account.findAccountsByUserLevelAndActive", Account.class);
-            findAllActiveAccountsByUserLevelQuery.setFirstResult(pageNumber * pageSize);
-            findAllActiveAccountsByUserLevelQuery.setMaxResults(pageSize);
-            findAllActiveAccountsByUserLevelQuery.setParameter("userLevel", userLevel);
-            List<Account> list = findAllActiveAccountsByUserLevelQuery.getResultList();
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
@@ -270,34 +182,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     }
 
     /**
-     * This method is used to retrieve all user accounts, where login matches (contains) given phrase.
-     * It does not take size of the phrase characters into consideration.
-     *
-     * @param login      Phrase searched insider login of an account.
-     * @param active     Boolean value indication whether account is active or not.
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List of accounts, which login matches given phrase. If there are no accounts, which login matches given
-     * phrase or persistence exception is thrown, then empty list is returned.
-     */
-    @DenyAll
-    public List<Account> findAllAccountsMatchingLoginWithPagination(
-            String login, boolean active, int pageNumber, int pageSize) throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccountsMatchingLogin = entityManager.createNamedQuery("Account.findAllAccountsMatchingGivenLogin", Account.class);
-            findAllAccountsMatchingLogin.setFirstResult(pageNumber * pageSize);
-            findAllAccountsMatchingLogin.setMaxResults(pageSize);
-            findAllAccountsMatchingLogin.setParameter("login", login);
-            findAllAccountsMatchingLogin.setParameter("active", active);
-            List<Account> list = findAllAccountsMatchingLogin.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
      * This method is used to find all accounts, that were not activated within specified time window
      * since creating them.
      *
@@ -312,54 +196,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             TypedQuery<Account> findAllAccountsMarkedForDeletion = entityManager.createNamedQuery("Account.findAllAccountsMarkedForDeletion", Account.class);
             findAllAccountsMarkedForDeletion.setParameter("timestamp", LocalDateTime.now().minus(amount, timeUnit.toChronoUnit()));
             List<Account> list = findAllAccountsMarkedForDeletion.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to find a list of all users accounts by their blocked status.
-     *
-     * @param blocked    Blocked status of an account. True means that account is in fact blocked, and false means that account is not blocked.
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List of all accounts with the specified value of blocked status. In case of persistence exception
-     * empty list will be returned.
-     */
-    @DenyAll
-    public List<Account> findAllAccountsByBlocked(boolean blocked, int pageNumber, int pageSize) throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllBlockedAccounts = entityManager.createNamedQuery("Account.findAllAccountsByBlockedInAscOrder", Account.class);
-            findAllBlockedAccounts.setFirstResult(pageNumber * pageSize);
-            findAllBlockedAccounts.setMaxResults(pageSize);
-            findAllBlockedAccounts.setParameter("blocked", blocked);
-            List<Account> list = findAllBlockedAccounts.getResultList();
-            super.refreshAll(list);
-            return list;
-        } catch (PersistenceException exception) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to find all users accounts that were blocked by the admin (so basically status of the account was
-     * changed to blocked and blocked time is not set).
-     *
-     * @param pageNumber Number of the page with user accounts to be retrieved.
-     * @param pageSize   Number of user accounts per page.
-     * @return List of all users accounts that were blocked by the admin. If persistence exception is thrown, then
-     * empty list will be returned.
-     */
-    @DenyAll
-    public List<Account> findAllBlockedAccountsThatWereBlockedByAdminWithPagination(int pageNumber, int pageSize)
-            throws ApplicationBaseException {
-        try {
-            TypedQuery<Account> findAllAccountsBlockedByAdminQuery = entityManager.createNamedQuery("Account.findAllBlockedAccountsThatWereBlockedByAdmin", Account.class);
-            findAllAccountsBlockedByAdminQuery.setFirstResult(pageNumber * pageSize);
-            findAllAccountsBlockedByAdminQuery.setMaxResults(pageSize);
-            List<Account> list = findAllAccountsBlockedByAdminQuery.getResultList();
             super.refreshAll(list);
             return list;
         } catch (PersistenceException exception) {
@@ -454,27 +290,6 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             return list;
         } catch (PersistenceException exception) {
             return new ArrayList<>();
-        }
-    }
-
-    /**
-     * This method is used to count all users accounts without any recent activity.
-     *
-     * @param lastSuccessfulLogin Date and time, which account activity is checked from. If there are no successful
-     *                            login attempts from that date and time, then account is considered without recent activity.
-     * @return Optional containing a number of inactive users accounts in the system. In case of persistence exception
-     * empty optional is returned.
-     */
-    @DenyAll
-    public Optional<Long> countAllAccountsWithoutRecentActivityWithPagination(
-            LocalDateTime lastSuccessfulLogin, boolean active) throws ApplicationBaseException {
-        try {
-            TypedQuery<Long> countAllAccountsWithoutRecentActivityQuery = entityManager.createNamedQuery("Account.countAccountsWithoutAnyActivityFrom", Long.class);
-            countAllAccountsWithoutRecentActivityQuery.setParameter("lastSuccessfulLoginTime", lastSuccessfulLogin);
-            countAllAccountsWithoutRecentActivityQuery.setParameter("active", active);
-            return Optional.of(countAllAccountsWithoutRecentActivityQuery.getSingleResult());
-        } catch (PersistenceException exception) {
-            return Optional.empty();
         }
     }
 

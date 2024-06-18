@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mok.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -75,18 +74,6 @@ public class TokenFacade extends AbstractFacade<Token> {
     }
 
     /**
-     * Forces modification of the Token in the database.
-     *
-     * @param entity Token to be modified.
-     */
-    @Override
-    // @RolesAllowed(Roles.AUTHENTICATED)
-    @DenyAll
-    public void edit(Token entity) throws ApplicationBaseException {
-        super.edit(entity);
-    }
-
-    /**
      * Removes a Token from the database.
      *
      * @param entity Token to be removed from the database.
@@ -99,42 +86,6 @@ public class TokenFacade extends AbstractFacade<Token> {
     })
     public void remove(Token entity) throws ApplicationBaseException {
         super.remove(entity);
-    }
-
-    /**
-     * Retrieves a Token by the ID.
-     *
-     * @param id ID of the Token to be retrieved.
-     * @return If Token with the given ID was found returns an Optional containing the Token, otherwise returns an empty Optional.
-     */
-    @Override
-    @DenyAll
-    public Optional<Token> find(UUID id) throws ApplicationBaseException {
-        return super.find(id);
-    }
-
-    /**
-     * Retrieves all Tokens.
-     *
-     * @return List containing all Tokens.
-     */
-    @Override
-    // @RolesAllowed({Roles.ADMIN})
-    @DenyAll
-    public List<Token> findAll() throws ApplicationBaseException {
-        return super.findAll();
-    }
-
-    /**
-     * Counts the number of Tokens in the database.
-     *
-     * @return Number of Tokens in the database.
-     */
-    @Override
-    // @RolesAllowed({Roles.ADMIN})
-    @DenyAll
-    public int count() throws ApplicationBaseException {
-        return super.count();
     }
 
     /**

@@ -1,8 +1,11 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.mop.facades;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -101,20 +104,6 @@ public class ParkingFacade extends AbstractFacade<Parking> {
     })
     public Optional<Parking> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
-    }
-
-    /**
-     * Retrieves a Parking by the ID (without object refresh).
-     *
-     * @param id Identifier of the Parking to be retrieved.
-     * @return If a Parking with the given ID was found returns an Optional containing the Parking, otherwise returns an empty Optional.
-     * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
-     *                                  facade exception handling aspect.
-     */
-    @Override
-    @DenyAll
-    public Optional<Parking> find(UUID id) throws ApplicationBaseException {
-        return super.find(id);
     }
 
     /**
