@@ -211,6 +211,18 @@ public class I18n {
     public static final String CANCELLED_RESERVATION_ACTION_DESCRIPTION = "mail.cancelled.reservation.action_description";
     public static final String CANCELLED_RESERVATION_NOTE_TITLE = "mail.cancelled.reservation.note_title";
 
+    public static final String ADMINISTRATIVELY_CANCELLED_RESERVATION_GREETING_MESSAGE = "mail.administratively.cancelled.reservation.greeting.message";
+    public static final String ADMINISTRATIVELY_CANCELLED_RESERVATION_MESSAGE_SUBJECT = "mail.administratively.cancelled.reservation.message.subject";
+    public static final String ADMINISTRATIVELY_CANCELLED_RESERVATION_RESULT_MESSAGE = "mail.administratively.cancelled.reservation.result_message";
+    public static final String ADMINISTRATIVELY_CANCELLED_RESERVATION_ACTION_DESCRIPTION = "mail.administratively.cancelled.reservation.action_description";
+    public static final String ADMINISTRATIVELY_CANCELLED_RESERVATION_NOTE_TITLE = "mail.administratively.cancelled.reservation.note_title";
+
+    public static final String SYSTEM_END_RESERVATION_GREETING_MESSAGE = "mail.system.end.reservation.greeting.message";
+    public static final String SYSTEM_END_RESERVATION_MESSAGE_SUBJECT = "mail.system.end.reservation.message.subject";
+    public static final String SYSTEM_END_RESERVATION_RESULT_MESSAGE = "mail.system.end.reservation.result_message";
+    public static final String SYSTEM_END_RESERVATION_ACTION_DESCRIPTION = "mail.system.end.reservation.action_description";
+    public static final String SYSTEM_END_RESERVATION_NOTE_TITLE = "mail.system.end.reservation.note_title";
+
     public static final String AUTO_GENERATED_MESSAGE_NOTE = "mail.auto.generate.message.note";
 
     public static final String CLIENT_USER_LEVEL = "user.level.client";

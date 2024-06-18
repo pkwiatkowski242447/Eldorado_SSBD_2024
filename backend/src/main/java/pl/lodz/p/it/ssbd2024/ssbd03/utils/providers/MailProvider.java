@@ -541,7 +541,80 @@ public class MailProvider {
             this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.CANCELLED_RESERVATION_MESSAGE_SUBJECT, language));
         } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
                  NullPointerException exception) {
-            log.error("Exception of type: {} was throw while sending a new reservation notification e-mail message, due to the exception: {} being thrown. Reason: {}",
+            log.error("Exception of type: {} was throw while sending a cancellation reservation notification e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
+        }
+    }
+
+    /**
+     * Sends the administrative reservation cancellation notification e-mail to the specified e-mail address.
+     *
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language      Language of the message.
+     * @param reservationId Identifier of the reservation.
+     */
+    @Async
+    @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
+    public void sendAdministrativelyCancelledReservationInfoEmail(String firstName, String lastName, String emailReceiver,
+                                                  String language, String reservationId) {
+        try {
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.ADMINISTRATIVELY_CANCELLED_RESERVATION_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.ADMINISTRATIVELY_CANCELLED_RESERVATION_RESULT_MESSAGE, language))
+                    .replace("$action_description",
+                            String.format(I18n.getMessage(I18n.ADMINISTRATIVELY_CANCELLED_RESERVATION_ACTION_DESCRIPTION, language),
+                                    reservationId
+                            )
+                    )
+                    .replace("$note_title", I18n.getMessage(I18n.ADMINISTRATIVELY_CANCELLED_RESERVATION_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.ADMINISTRATIVELY_CANCELLED_RESERVATION_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending the administrative reservation cancellation notification e-mail message, due to the exception: {} being thrown. Reason: {}",
+                    exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
+        }
+    }
+
+    /**
+     * Sends the system end reservation notification e-mail to the specified e-mail address.
+     *
+     * @param firstName     User's first name.
+     * @param lastName      User's last name.
+     * @param emailReceiver E-mail address to which the message will be sent.
+     * @param language      Language of the message.
+     * @param reservationId Identifier of the reservation.
+     */
+    @Async
+    @RolesAllowed(Authorities.END_RESERVATION)
+    public void sendSystemEndReservationInfoEmail(String firstName, String lastName, String emailReceiver,
+                                                                  String language, String reservationId) {
+        try {
+            log.warn("CHUJ");
+            String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
+            String emailContent = this.loadTemplate("default-template.html").orElseThrow(() -> new EmailTemplateNotFoundException("Given email template not found!"))
+                    .replace("$firstname", firstName)
+                    .replace("$lastname", lastName)
+                    .replace("$greeting_message", I18n.getMessage(I18n.SYSTEM_END_RESERVATION_GREETING_MESSAGE, language))
+                    .replace("$result_message", I18n.getMessage(I18n.SYSTEM_END_RESERVATION_RESULT_MESSAGE, language))
+                    .replace("$action_description",
+                            String.format(I18n.getMessage(I18n.SYSTEM_END_RESERVATION_ACTION_DESCRIPTION, language),
+                                    reservationId
+                            )
+                    )
+                    .replace("$note_title", I18n.getMessage(I18n.SYSTEM_END_RESERVATION_NOTE_TITLE, language))
+                    .replace("$note_message", I18n.getMessage(I18n.AUTO_GENERATED_MESSAGE_NOTE, language))
+                    .replace("$eldorado_logo", "data:image/png;base64," + logo);
+            this.sendEmail(emailContent, emailReceiver, senderEmail, I18n.getMessage(I18n.SYSTEM_END_RESERVATION_MESSAGE_SUBJECT, language));
+        } catch (EmailTemplateNotFoundException | ImageNotFoundException | MessagingException |
+                 NullPointerException exception) {
+            log.error("Exception of type: {} was throw while sending the system end reservation notification e-mail message, due to the exception: {} being thrown. Reason: {}",
                     exception.getClass().getSimpleName(), exception.getCause().getClass().getSimpleName(), exception.getMessage());
         }
     }

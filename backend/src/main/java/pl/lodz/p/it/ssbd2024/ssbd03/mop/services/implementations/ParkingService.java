@@ -45,6 +45,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccup
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.LeastOccupiedWeighted;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.MostOccupied;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.SectorStrategy;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -69,6 +70,7 @@ public class ParkingService implements ParkingServiceInterface {
     private final AccountMOPFacade accountFacade;
     private final UserLevelMOPFacade userLevelMOPFacade;
     private final ParkingHistoryDataFacade parkingHistoryDataFacade;
+    private final MailProvider mailProvider;
 
     @Value("${reservation.max_hours}")
     private Integer reservationMaxHours;
@@ -87,12 +89,14 @@ public class ParkingService implements ParkingServiceInterface {
                           ReservationFacade reservationFacade,
                           AccountMOPFacade accountFacade,
                           UserLevelMOPFacade userLevelMOPFacade,
-                          ParkingHistoryDataFacade parkingHistoryDataFacade) {
+                          ParkingHistoryDataFacade parkingHistoryDataFacade,
+                          MailProvider mailProvider) {
         this.parkingFacade = parkingFacade;
         this.reservationFacade = reservationFacade;
         this.accountFacade = accountFacade;
         this.userLevelMOPFacade = userLevelMOPFacade;
         this.parkingHistoryDataFacade = parkingHistoryDataFacade;
+        this.mailProvider = mailProvider;
     }
 
     // MOP.2 - Add parking
@@ -180,6 +184,15 @@ public class ParkingService implements ParkingServiceInterface {
         for (Reservation reservation : reservations) {
             reservation.setStatus(Reservation.ReservationStatus.CANCELLED);
             this.reservationFacade.edit(reservation);
+
+            // Send a notification email
+            mailProvider.sendAdministrativelyCancelledReservationInfoEmail(
+                    reservation.getClient().getAccount().getName(),
+                    reservation.getClient().getAccount().getLastname(),
+                    reservation.getClient().getAccount().getEmail(),
+                    reservation.getClient().getAccount().getAccountLanguage(),
+                    reservation.getId().toString()
+            );
         }
 
         sector.deactivateSector(deactivationTime);

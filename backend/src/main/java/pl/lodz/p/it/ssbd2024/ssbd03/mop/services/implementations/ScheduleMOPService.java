@@ -28,6 +28,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ScheduleMOPServiceInterface;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -63,14 +64,17 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
     private final ReservationFacade reservationFacade;
     private final UserLevelMOPFacade userLevelFacade;
     private final ParkingFacade parkingFacade;
+    private final MailProvider mailProvider;
 
     @Autowired
     public ScheduleMOPService(ReservationFacade reservationFacade,
                               UserLevelMOPFacade userLevelFacade,
-                              ParkingFacade parkingFacade) {
+                              ParkingFacade parkingFacade,
+                              MailProvider mailProvider) {
         this.reservationFacade = reservationFacade;
         this.userLevelFacade = userLevelFacade;
         this.parkingFacade = parkingFacade;
+        this.mailProvider = mailProvider;
     }
 
     @RunAsSystem
@@ -116,6 +120,15 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                     Sector sector = reservation.getSector();
                     sector.setOccupiedPlaces(sanitizeInteger(sector.getOccupiedPlaces() - 1));
                     parkingFacade.editSector(sector);
+
+                    // Send mail notification
+                    mailProvider.sendSystemEndReservationInfoEmail(
+                            reservation.getClient().getAccount().getName(),
+                            reservation.getClient().getAccount().getLastname(),
+                            reservation.getClient().getAccount().getEmail(),
+                            reservation.getClient().getAccount().getAccountLanguage(),
+                            reservation.getId().toString()
+                    );
                 }
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while terminating reservation with id: {}. Cause: {}.",
