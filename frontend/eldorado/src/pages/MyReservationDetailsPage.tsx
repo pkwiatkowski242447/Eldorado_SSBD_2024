@@ -202,8 +202,8 @@ function MyReservationDetailsPage() {
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("enter.parking.without.reservation.page.yes")}</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleCancelReservation}>{t("enter.parking.without.reservation.page.no")}</AlertDialogAction>
+                            <AlertDialogAction onClick={handleCancelReservation}>{t("enter.parking.without.reservation.page.yes")}</AlertDialogAction>
+                            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>{t("enter.parking.without.reservation.page.no")}</AlertDialogCancel>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

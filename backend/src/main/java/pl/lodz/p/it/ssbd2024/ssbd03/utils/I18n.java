@@ -199,6 +199,18 @@ public class I18n {
     public static final String PASSWORD_RESET_ACTION_DESCRIPTION = "mail.reset.password.action_description";
     public static final String PASSWORD_RESET_NOTE_TITLE = "mail.reset.password.note_title";
 
+    public static final String MADE_RESERVATION_GREETING_MESSAGE = "mail.made.reservation.greeting.message";
+    public static final String MADE_RESERVATION_MESSAGE_SUBJECT = "mail.made.reservation.message.subject";
+    public static final String MADE_RESERVATION_RESULT_MESSAGE = "mail.made.reservation.result_message";
+    public static final String MADE_RESERVATION_ACTION_DESCRIPTION = "mail.made.reservation.action_description";
+    public static final String MADE_RESERVATION_NOTE_TITLE = "mail.made.reservation.note_title";
+
+    public static final String CANCELLED_RESERVATION_GREETING_MESSAGE = "mail.cancelled.reservation.greeting.message";
+    public static final String CANCELLED_RESERVATION_MESSAGE_SUBJECT = "mail.cancelled.reservation.message.subject";
+    public static final String CANCELLED_RESERVATION_RESULT_MESSAGE = "mail.cancelled.reservation.result_message";
+    public static final String CANCELLED_RESERVATION_ACTION_DESCRIPTION = "mail.cancelled.reservation.action_description";
+    public static final String CANCELLED_RESERVATION_NOTE_TITLE = "mail.cancelled.reservation.note_title";
+
     public static final String AUTO_GENERATED_MESSAGE_NOTE = "mail.auto.generate.message.note";
 
     public static final String CLIENT_USER_LEVEL = "user.level.client";
