@@ -4,6 +4,7 @@ import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,6 +16,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.config.dbconfig.DatabaseConfigConstants;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 
 import java.util.List;
@@ -66,7 +68,12 @@ public class AccountHistoryDataAuthFacade extends AbstractFacade<AccountHistoryD
     @Override
     @RolesAllowed({Authorities.LOGIN})
     public void create(AccountHistoryData account) throws ApplicationBaseException {
-        super.create(account);
+        TypedQuery<Integer> findParkingByIdQuery = entityManager.createNamedQuery("AccountHistoryData.checkIfEntityExists", Integer.class);
+        findParkingByIdQuery.setParameter("id", account.getId());
+        findParkingByIdQuery.setParameter("version", account.getVersion());
+        boolean exists = !findParkingByIdQuery.getResultList().isEmpty();
+
+        if (!exists) super.create(account);
     }
 
     // R - read methods

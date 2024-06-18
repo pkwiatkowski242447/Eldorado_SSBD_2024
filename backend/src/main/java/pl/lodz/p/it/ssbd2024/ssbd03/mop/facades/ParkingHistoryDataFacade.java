@@ -63,7 +63,7 @@ public class ParkingHistoryDataFacade extends AbstractFacade<ParkingHistoryData>
     @Override
     @RolesAllowed(Authorities.EDIT_PARKING)
     public void create(ParkingHistoryData parkingHistoryData) throws ApplicationBaseException {
-        TypedQuery<ParkingHistoryData> findParkingByIdQuery = entityManager.createNamedQuery("ParkingHistoryData.checkIfEntityExists", ParkingHistoryData.class);
+        TypedQuery<Integer> findParkingByIdQuery = entityManager.createNamedQuery("ParkingHistoryData.checkIfEntityExists", Integer.class);
         findParkingByIdQuery.setParameter("id", parkingHistoryData.getId());
         findParkingByIdQuery.setParameter("version", parkingHistoryData.getVersion());
         boolean exists = !findParkingByIdQuery.getResultList().isEmpty();

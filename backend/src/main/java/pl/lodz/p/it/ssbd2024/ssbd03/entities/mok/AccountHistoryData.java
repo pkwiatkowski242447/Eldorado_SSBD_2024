@@ -43,6 +43,13 @@ import java.util.UUID;
                         SELECT a FROM AccountHistoryData a
                         ORDER BY a.login
                         """
+        ),
+        @NamedQuery(
+                name = "AccountHistoryData.checkIfEntityExists",
+                query = """
+                        SELECT 1 FROM AccountHistoryData a
+                        WHERE a.id = :id AND a.version = :version
+                        """
         )
 })
 public class AccountHistoryData {
