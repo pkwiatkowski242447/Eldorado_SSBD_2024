@@ -2,7 +2,9 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
+import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.ParkingHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Reservation;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -89,6 +91,18 @@ public interface ParkingServiceInterface {
      * @throws ParkingNotFoundException Thrown when parking with given id cannot be found in the database.
      */
     Parking getParkingById(UUID id) throws ApplicationBaseException;
+
+    /**
+     * Retrieve historic data of a given parking.
+     *
+     * @param id         ID of the parking which history data is requested.
+     * @param pageNumber The page number of the results to return.
+     * @param pageSize   The number of results to return per page.
+     * @return A list history data entries, ordered by modification time from newest, with pagination applied.
+     * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
+     */
+    List<ParkingHistoryData> getHistoryDataByParkingId(UUID id, int pageNumber, int pageSize)
+            throws ApplicationBaseException;
 
     /**
      * Activates sector with given id, by setting active field to true.
