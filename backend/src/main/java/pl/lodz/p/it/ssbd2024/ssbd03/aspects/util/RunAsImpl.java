@@ -59,15 +59,17 @@ public class RunAsImpl {
      */
     @Around(value = "runAsSystemPointcut()")
     private Object runAsSystemAdvice(ProceedingJoinPoint point) throws Throwable {
-        Object result = null;
+        Object result;
         try {
+            Authentication authenticationBefore = SecurityContextHolder.getContext().getAuthentication();
+
             List<SimpleGrantedAuthority> listOfRoles = rolesMapper.getAuthorities(Roles.SYSTEM);
             Authentication authentication = new AnonymousAuthenticationToken(UUID.randomUUID().toString(), "SYSTEM", listOfRoles);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             result = point.proceed();
 
-            SecurityContextHolder.getContext().setAuthentication(null);
+            SecurityContextHolder.getContext().setAuthentication(authenticationBefore);
         } catch (Throwable throwable) {
             log.error("Exception: {} was thrown during aspect method execution. Message: {}. Cause: ",
                     throwable.getClass().getSimpleName(), throwable.getMessage(), throwable.getCause());
