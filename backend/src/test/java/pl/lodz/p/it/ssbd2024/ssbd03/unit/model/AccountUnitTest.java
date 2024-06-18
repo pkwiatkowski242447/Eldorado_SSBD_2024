@@ -37,7 +37,14 @@ public class AccountUnitTest {
 
     private static Account exampleAccount;
     private static Account testAccount;
-    private static Set<UserLevel> userLevels = new HashSet<>();
+    private static Account otherAccount;
+
+    private static final String LOGIN_NO2 = "OtherLogin";
+    private static final String PASSWORD_NO2 = "OtherPassword";
+    private static final String FIRST_NAME_NO2 = "OtherFirstname";
+    private static final String LAST_NAME_NO2 = "OtherLastname";
+    private static final String EMAIL_NO2 = "otherEmail@sb.pl";
+    private static final String PHONE_NUMBER_NO2 = "321654987";
 
     @BeforeAll
     public static void setUp() throws Exception {
@@ -56,14 +63,16 @@ public class AccountUnitTest {
         pastPasswords.add("ExamplePasswordNo2");
         pastPasswords.add("ExamplePasswordNo3");
 
+        Field previousPasswords = Account.class.getDeclaredField("previousPasswords");
+        previousPasswords.setAccessible(true);
+        previousPasswords.set(exampleAccount, pastPasswords);
+        previousPasswords.setAccessible(false);
+
         UserLevel client = new Client();
         client.setAccount(exampleAccount);
 
         UserLevel admin = new Admin();
         admin.setAccount(exampleAccount);
-
-        userLevels.add(client);
-        userLevels.add(admin);
 
         exampleAccount.addUserLevel(client);
         exampleAccount.addUserLevel(admin);
@@ -93,9 +102,6 @@ public class AccountUnitTest {
         admin = new Admin();
         admin.setAccount(testAccount);
 
-        userLevels.add(client);
-        userLevels.add(admin);
-
         testAccount.addUserLevel(client);
         testAccount.addUserLevel(admin);
 
@@ -107,6 +113,18 @@ public class AccountUnitTest {
         activityLog.setLastUnsuccessfulLoginIp(LAST_UNSUCCESSFUL_LOGIN_IP);
 
         testAccount.setActivityLog(activityLog);
+
+        previousPasswords = Account.class.getDeclaredField("previousPasswords");
+        previousPasswords.setAccessible(true);
+        previousPasswords.set(testAccount, pastPasswords);
+        previousPasswords.setAccessible(false);
+
+        otherAccount = new Account(LOGIN_NO2,
+                PASSWORD_NO2,
+                FIRST_NAME_NO2,
+                LAST_NAME_NO2,
+                EMAIL_NO2,
+                PHONE_NUMBER_NO1);
     }
 
     //ACTIVITY LOG DATA
@@ -211,6 +229,12 @@ public class AccountUnitTest {
         assertEquals(exampleAccount.getLastname(), LAST_NAME_NO1);
         assertEquals(exampleAccount.getPhoneNumber(), PHONE_NUMBER_NO1);
         assertEquals(exampleAccount.getAccountLanguage(), ACCOUNT_LANGUAGE_NO1);
+
+        assertFalse(exampleAccount.getPreviousPasswords().isEmpty());
+        assertEquals(3, exampleAccount.getPreviousPasswords().size());
+        assertTrue(exampleAccount.getPreviousPasswords().contains("ExamplePasswordNo1"));
+        assertTrue(exampleAccount.getPreviousPasswords().contains("ExamplePasswordNo2"));
+        assertTrue(exampleAccount.getPreviousPasswords().contains("ExamplePasswordNo3"));
 
         assertFalse(exampleAccount.getSuspended());
         assertFalse(exampleAccount.getActive());
@@ -397,5 +421,130 @@ public class AccountUnitTest {
         assertNotEquals(phoneNumberBefore, newPhoneNumber);
         assertNotEquals(phoneNumberBefore, phoneNumberAfter);
         assertEquals(newPhoneNumber, phoneNumberAfter);
+    }
+
+    @Test
+    public void accountSetActivationTimeTestPositive() throws Exception {
+        Field activationTime = Account.class.getDeclaredField("activationTime");
+        activationTime.setAccessible(true);
+        activationTime.set(testAccount, LocalDateTime.now().minusHours(72));
+        activationTime.setAccessible(false);
+
+        LocalDateTime activationTimeBefore = testAccount.getActivationTime();
+        LocalDateTime newActivationTime = LocalDateTime.now();
+
+        assertNotNull(activationTimeBefore);
+        assertNotNull(newActivationTime);
+
+        activationTime = Account.class.getDeclaredField("activationTime");
+        activationTime.setAccessible(true);
+        activationTime.set(testAccount, newActivationTime);
+        activationTime.setAccessible(false);
+
+        LocalDateTime activationTimeAfter = testAccount.getActivationTime();
+
+        assertNotEquals(activationTimeBefore, newActivationTime);
+        assertNotEquals(activationTimeBefore, activationTimeAfter);
+        assertEquals(activationTimeAfter, newActivationTime);
+    }
+
+    @Test
+    public void accountSetCreationTimeTestPositive() throws Exception {
+        Field creationTime = Account.class.getDeclaredField("creationTime");
+        creationTime.setAccessible(true);
+        creationTime.set(testAccount, LocalDateTime.now().minusHours(168));
+        creationTime.setAccessible(false);
+
+        LocalDateTime creationTimeBefore = testAccount.getCreationTime();
+        LocalDateTime newCreationTime = LocalDateTime.now();
+
+        assertNotNull(creationTimeBefore);
+        assertNotNull(newCreationTime);
+
+        creationTime = Account.class.getDeclaredField("creationTime");
+        creationTime.setAccessible(true);
+        creationTime.set(testAccount, newCreationTime);
+        creationTime.setAccessible(false);
+
+        LocalDateTime creationTimeAfter = testAccount.getCreationTime();
+
+        assertNotEquals(creationTimeBefore, newCreationTime);
+        assertNotEquals(creationTimeBefore, creationTimeAfter);
+        assertEquals(creationTimeAfter, newCreationTime);
+    }
+
+    @Test
+    public void accountSetUpdateTimeTestPositive() throws Exception {
+        Field updateTime = Account.class.getDeclaredField("updateTime");
+        updateTime.setAccessible(true);
+        updateTime.set(testAccount, LocalDateTime.now().minusHours(144));
+        updateTime.setAccessible(false);
+
+        LocalDateTime updateTimeBefore = testAccount.getUpdateTime();
+        LocalDateTime newUpdateTime = LocalDateTime.now();
+
+        assertNotNull(updateTimeBefore);
+        assertNotNull(newUpdateTime);
+
+        updateTime = Account.class.getDeclaredField("updateTime");
+        updateTime.setAccessible(true);
+        updateTime.set(testAccount, newUpdateTime);
+        updateTime.setAccessible(false);
+
+        LocalDateTime updateTimeAfter = testAccount.getUpdateTime();
+
+        assertNotEquals(updateTimeBefore, newUpdateTime);
+        assertNotEquals(updateTimeBefore, updateTimeAfter);
+        assertEquals(updateTimeAfter, newUpdateTime);
+    }
+
+    @Test
+    public void accountSetCreatedByTestPositive() throws Exception {
+        Field createdBy = Account.class.getDeclaredField("createdBy");
+        createdBy.setAccessible(true);
+        createdBy.set(testAccount, otherAccount.getLogin());
+        createdBy.setAccessible(false);
+
+        String createdByBefore = testAccount.getCreatedBy();
+        String newCreatedBy = testAccount.getLogin();
+
+        assertNotNull(createdByBefore);
+        assertNotNull(newCreatedBy);
+
+        createdBy = Account.class.getDeclaredField("createdBy");
+        createdBy.setAccessible(true);
+        createdBy.set(testAccount, newCreatedBy);
+        createdBy.setAccessible(false);
+
+        String createdByAfter = testAccount.getCreatedBy();
+
+        assertNotEquals(createdByBefore, newCreatedBy);
+        assertNotEquals(createdByBefore, createdByAfter);
+        assertEquals(createdByAfter, newCreatedBy);
+    }
+
+    @Test
+    public void accountSetUpdatedByTestPositive() throws Exception {
+        Field updatedBy = Account.class.getDeclaredField("updatedBy");
+        updatedBy.setAccessible(true);
+        updatedBy.set(testAccount, otherAccount.getLogin());
+        updatedBy.setAccessible(false);
+
+        String updatedByBefore = testAccount.getUpdatedBy();
+        String newUpdatedBy = testAccount.getLogin();
+
+        assertNotNull(updatedByBefore);
+        assertNotNull(newUpdatedBy);
+
+        updatedBy = Account.class.getDeclaredField("updatedBy");
+        updatedBy.setAccessible(true);
+        updatedBy.set(testAccount, newUpdatedBy);
+        updatedBy.setAccessible(false);
+
+        String updatedByAfter = testAccount.getUpdatedBy();
+
+        assertNotEquals(updatedByBefore, newUpdatedBy);
+        assertNotEquals(updatedByBefore, updatedByAfter);
+        assertEquals(updatedByAfter, newUpdatedBy);
     }
 }

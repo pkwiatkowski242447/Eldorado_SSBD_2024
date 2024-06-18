@@ -137,7 +137,7 @@ public class AccountHistoryData {
     @PreUpdate
     @PreRemove
     private void setModificationTime() {
-        modificationTime = LocalDateTime.now();
+        this.modificationTime = LocalDateTime.now();
     }
 
     public AccountHistoryData(Account account, OperationType operationType, Account modifiedBy) {
