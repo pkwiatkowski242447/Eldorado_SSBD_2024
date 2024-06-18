@@ -127,7 +127,7 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
 
         long clientTotalReservationHours = reservation.getClient().getTotalReservationHours();
         // Check if client type can be upgraded
-        if (clientTotalReservationHours >= premiumThreshold) {
+        if (clientTotalReservationHours >= premiumThreshold && reservation.getClient().getType() != Client.ClientType.PREMIUM) {
             reservation.getClient().setType(Client.ClientType.PREMIUM);
 
             // Send Mail notification
@@ -139,7 +139,8 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
                     Client.ClientType.PREMIUM.name()
             );
 
-        } else if (clientTotalReservationHours >= standardThreshold) {
+        } else if (clientTotalReservationHours < premiumThreshold && clientTotalReservationHours >= standardThreshold &&
+                reservation.getClient().getType() != Client.ClientType.STANDARD) {
             reservation.getClient().setType(Client.ClientType.STANDARD);
 
             // Send Mail notification
