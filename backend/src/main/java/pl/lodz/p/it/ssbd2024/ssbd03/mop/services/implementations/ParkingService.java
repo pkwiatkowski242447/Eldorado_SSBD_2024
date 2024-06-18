@@ -102,7 +102,18 @@ public class ParkingService implements ParkingServiceInterface {
     public Parking createParking(String city, String zipCode, String street, Parking.SectorDeterminationStrategy strategy) throws ApplicationBaseException {
         Address address = new Address(city, zipCode, street);
         Parking parking = new Parking(address, strategy);
-        this.parkingFacade.create(parking);
+
+        parkingFacade.create(parking);
+        parkingHistoryDataFacade.create(new ParkingHistoryData(
+                        parking,
+                        accountFacade.findByLogin(SecurityContextHolder
+                                        .getContext()
+                                        .getAuthentication()
+                                        .getName())
+                                .orElse(null)
+                )
+        );
+
         return parking;
     }
 
@@ -252,7 +263,7 @@ public class ParkingService implements ParkingServiceInterface {
     // MOP.4 - Edit parking
 
     @Override
-    @RolesAllowed({Authorities.EDIT_PARKING})
+    @RolesAllowed(Authorities.EDIT_PARKING)
     public Parking editParking(Parking modifiedParking, UUID parkingId) throws ApplicationBaseException {
         Parking foundParking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
 
