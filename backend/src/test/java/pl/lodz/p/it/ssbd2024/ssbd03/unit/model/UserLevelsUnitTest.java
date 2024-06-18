@@ -1,11 +1,12 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.unit.model;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +41,11 @@ public class UserLevelsUnitTest {
     private static Account exampleAccount;
     private static Account testAccount;
     private static UserLevel exampleUserLevel;
+    private static UserLevel testUserLevel;
+
+    private static Client clientUserLevel;
+    private static Staff staffUserLevel;
+    private static Admin adminUserLevel;
 
     @BeforeAll
     public static void setUp() throws Exception {
@@ -110,7 +116,16 @@ public class UserLevelsUnitTest {
         exampleUserLevel = new Client();
         exampleUserLevel.setAccount(testAccount);
         testAccount.addUserLevel(exampleUserLevel);
-        exampleUserLevel.setUpdateTime(UPDATE_TIME_NO1);
+        exampleUserLevel.setUpdateTime(LocalDateTime.now().minusHours(48));
+
+        testUserLevel = new Admin();
+        testUserLevel.setAccount(testAccount);
+        testAccount.addUserLevel(testUserLevel);
+        exampleUserLevel.setUpdateTime(LocalDateTime.now().minusHours(96));
+
+        clientUserLevel = new Client();
+        staffUserLevel = new Staff();
+        adminUserLevel = new Admin();
     }
 
     @Test
@@ -217,6 +232,109 @@ public class UserLevelsUnitTest {
         assertNotEquals(updateTimeBefore, updateTimeAfter);
         assertNotEquals(updateTimeBefore, newUpdateTime);
         assertEquals(updateTimeAfter, newUpdateTime);
+    }
+
+    @WithMockUser(username = "ExampleUser", roles = {"ADMIN"})
+    @Test
+    public void userLevelBeforePersistingToTheDatabaseTest() throws Exception {
+        String userName = "ExampleUser";
+
+        Field creationTimeField = UserLevel.class.getDeclaredField("creationTime");
+        creationTimeField.setAccessible(true);
+        creationTimeField.set(testUserLevel, LocalDateTime.now().minusHours(36));
+        creationTimeField.setAccessible(false);
+
+        Field createdByField = UserLevel.class.getDeclaredField("createdBy");
+        createdByField.setAccessible(true);
+        createdByField.set(testUserLevel, exampleAccount.getLogin());
+        createdByField.setAccessible(false);
+
+        LocalDateTime creationTimeBefore = testUserLevel.getCreationTime();
+        assertNotNull(creationTimeBefore);
+        String createdByBefore = testUserLevel.getCreatedBy();
+        assertNotNull(createdByBefore);
+
+        Method beforePersistingToTheDatabase = UserLevel.class.getDeclaredMethod("beforePersistingToTheDatabase");
+        beforePersistingToTheDatabase.setAccessible(true);
+        beforePersistingToTheDatabase.invoke(testUserLevel);
+        beforePersistingToTheDatabase.setAccessible(false);
+
+        LocalDateTime creationTimeAfter = testUserLevel.getCreationTime();
+        assertNotNull(creationTimeAfter);
+        String createdByAfter = testUserLevel.getCreatedBy();
+        assertNotNull(createdByAfter);
+
+        assertNotEquals(creationTimeBefore, creationTimeAfter);
+        assertTrue(creationTimeAfter.isAfter(creationTimeBefore));
+
+        assertNotEquals(createdByBefore, userName);
+    }
+
+    @Test
+    public void userLevelBeforeUpdatingInTheDatabase() throws Exception {
+        LocalDateTime updateTimeBefore = exampleUserLevel.getUpdateTime();
+        assertNotNull(updateTimeBefore);
+
+        Method beforeUpdatingInTheDatabase = UserLevel.class.getDeclaredMethod("beforeUpdatingInTheDatabase");
+        beforeUpdatingInTheDatabase.setAccessible(true);
+        beforeUpdatingInTheDatabase.invoke(exampleUserLevel);
+        beforeUpdatingInTheDatabase.setAccessible(false);
+
+        LocalDateTime updateTimeAfter = exampleUserLevel.getUpdateTime();
+        assertNotNull(updateTimeAfter);
+
+        assertNotEquals(updateTimeBefore, updateTimeAfter);
+    }
+
+    @Test
+    public void clientToStringTestPositive() {
+        assertNotNull(clientUserLevel);
+        String result = clientUserLevel.toString();
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        assertTrue(result.contains("Client"));
+    }
+
+    @Test
+    public void clientConstructorWithVersionTestPositive() {
+        Long version = 21L;
+        Client testClient = new Client(version);
+        assertNotNull(testClient);
+        assertEquals(testClient.getVersion(), version);
+    }
+
+    @Test
+    public void staffToStringTestPositive() {
+        assertNotNull(staffUserLevel);
+        String result = staffUserLevel.toString();
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        assertTrue(result.contains("Staff"));
+    }
+
+    @Test
+    public void staffConstructorWithVersionTestPositive() {
+        Long version = 22L;
+        Staff testStaff = new Staff(version);
+        assertNotNull(testStaff);
+        assertEquals(testStaff.getVersion(), version);
+    }
+
+    @Test
+    public void adminToStringTestPositive() {
+        assertNotNull(adminUserLevel);
+        String result = adminUserLevel.toString();
+        assertFalse(result.isEmpty());
+        assertFalse(result.isBlank());
+        assertTrue(result.contains("Admin"));
+    }
+
+    @Test
+    public void adminConstructorWithVersionTestPositive() {
+        Long version = 23L;
+        Admin testAdmin = new Admin(version);
+        assertNotNull(testAdmin);
+        assertEquals(testAdmin.getVersion(), version);
     }
 
     @Test
