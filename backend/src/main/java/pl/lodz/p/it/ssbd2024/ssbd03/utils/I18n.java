@@ -223,6 +223,12 @@ public class I18n {
     public static final String SYSTEM_END_RESERVATION_ACTION_DESCRIPTION = "mail.system.end.reservation.action_description";
     public static final String SYSTEM_END_RESERVATION_NOTE_TITLE = "mail.system.end.reservation.note_title";
 
+    public static final String CHANGED_CLIENT_TYPE_GREETING_MESSAGE = "mail.changed.client.type.greeting.message";
+    public static final String CHANGED_CLIENT_TYPE_MESSAGE_SUBJECT = "mail.changed.client.type.message.subject";
+    public static final String CHANGED_CLIENT_TYPE_RESULT_MESSAGE = "mail.changed.client.type.result_message";
+    public static final String CHANGED_CLIENT_TYPE_ACTION_DESCRIPTION = "mail.changed.client.type.action_description";
+    public static final String CHANGED_CLIENT_TYPE_NOTE_TITLE = "mail.changed.client.type.note_title";
+
     public static final String AUTO_GENERATED_MESSAGE_NOTE = "mail.auto.generate.message.note";
 
     public static final String CLIENT_USER_LEVEL = "user.level.client";

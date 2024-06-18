@@ -88,7 +88,7 @@ INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('9428
 -- Third Client
 INSERT INTO public.account (id, creation_timestamp, login, password, suspended, active, two_factor_auth, language, phone_number, version, blocked) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', current_timestamp, 'piotrnowak', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', false, true, false, 'PL', '000000003', 0, false);
 INSERT INTO public.past_password(account_id, past_password) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa');
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'Piotr', 'Nowak', 'wetoxah453@elahan.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 'Piotr', 'Nowak', 'piotrnowak1@adresik.net');
 
 INSERT INTO public.user_level (id, creation_timestamp, level, account_id, version) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', current_timestamp, 'CLIENT', '02b0d9d7-a472-48d0-95e0-13a3e6a11d00', 0);
 INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('cbf34cb0-c96b-4037-80d4-1eef34890e85', 'BASIC', 0);
@@ -276,7 +276,7 @@ INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, 
 INSERT INTO public.parking (id, creation_timestamp, sector_strategy, zip_code, city, street, version) VALUES ('c94a751b-77e3-4a4d-bb64-74bfbe9c8857', current_timestamp, 'MOST_OCCUPIED', '21-037', 'Check', 'Strategies', 0);
 
 INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('6113f6d0-f74b-48ff-ac8c-99c2827b72b0', current_timestamp, 3, 10, 3, 'CR-01', 'c94a751b-77e3-4a4d-bb64-74bfbe9c8857', 'UNCOVERED', 0);
-INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('2dda962e-0fbe-4c9c-9dd5-59b945b7764f', current_timestamp, 2, 10, 99, 'CR-02', 'c94a751b-77e3-4a4d-bb64-74bfbe9c8857', 'UNCOVERED', 0);
+INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('2dda962e-0fbe-4c9c-9dd5-59b945b7764f', current_timestamp, 1, 10, 99, 'CR-02', 'c94a751b-77e3-4a4d-bb64-74bfbe9c8857', 'UNCOVERED', 0);
 INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, weight, name, parking_id, type, version) VALUES ('74151bef-7b38-4915-85ce-b8691f5fa4a1', current_timestamp, 0, 10, 3, 'CR-03', 'c94a751b-77e3-4a4d-bb64-74bfbe9c8857', 'UNCOVERED', 0);
 
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('17fc3479-43c7-49ad-96f4-5299304e8015', current_timestamp, TIMESTAMP '2024-06-14 10:00:00', TIMESTAMP '2024-06-14 20:00:00', '900cbc37-2a95-4bd6-96f2-897c12155f85', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
@@ -284,7 +284,3 @@ INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, cl
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('62f21719-9470-4c75-8980-87eb835968dc', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '6113f6d0-f74b-48ff-ac8c-99c2827b72b0', 0, 'IN_PROGRESS');
 
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('fbec4998-23fa-4e11-9d18-cd8c066a4530', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', '900cbc37-2a95-4bd6-96f2-897c12155f85', '2dda962e-0fbe-4c9c-9dd5-59b945b7764f', 0, 'IN_PROGRESS');
-
-
-INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('fbec4998-23fa-4e11-9d18-cd8c066a4531', current_timestamp, TIMESTAMP '2024-06-14 10:30:00', TIMESTAMP '2024-06-14 21:00:00', 'cbf34cb0-c96b-4037-80d4-1eef34890e85', '2dda962e-0fbe-4c9c-9dd5-59b945b7764f', 0, 'IN_PROGRESS');
-INSERT INTO public.parking_event (id, reservation_id, date, type, version) VALUES ('94d17bd1-da2e-4047-822b-942526dfbd7f', 'fbec4998-23fa-4e11-9d18-cd8c066a4531', TIMESTAMP '2024-03-01 16:00:00', 'ENTRY', 0);

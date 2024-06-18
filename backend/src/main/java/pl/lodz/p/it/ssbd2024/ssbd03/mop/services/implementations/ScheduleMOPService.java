@@ -179,8 +179,27 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                 // Check if client type can be upgraded
                 if (clientTotalReservationHours >= premiumThreshold) {
                     client.setType(Client.ClientType.PREMIUM);
+
+                    // Send Mail notification
+                    mailProvider.sendChangedClientTypeInfoEmail(
+                            reservation.getClient().getAccount().getName(),
+                            reservation.getClient().getAccount().getLastname(),
+                            reservation.getClient().getAccount().getEmail(),
+                            reservation.getClient().getAccount().getAccountLanguage(),
+                            Client.ClientType.PREMIUM.name()
+                    );
+
                 } else if (clientTotalReservationHours >= standardThreshold) {
                     client.setType(Client.ClientType.STANDARD);
+
+                    // Send Mail notification
+                    mailProvider.sendChangedClientTypeInfoEmail(
+                            reservation.getClient().getAccount().getName(),
+                            reservation.getClient().getAccount().getLastname(),
+                            reservation.getClient().getAccount().getEmail(),
+                            reservation.getClient().getAccount().getAccountLanguage(),
+                            Client.ClientType.STANDARD.name()
+                    );
                 }
 
                 userLevelFacade.edit(client);
