@@ -12,7 +12,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Account;
-import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.AccountHistoryData;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.Client;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
@@ -48,7 +47,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.MostOccupi
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.SectorDeterminationStrategy.SectorStrategy;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -78,12 +76,6 @@ public class ParkingService implements ParkingServiceInterface {
 
     @Value("${reservation.client_limit}")
     private Integer clientLimit;
-
-    @Value("${client_type.standard.threshold}")
-    private Integer standardThreshold;
-
-    @Value("${client_type.premium.threshold}")
-    private Integer premiumThreshold;
 
     @Autowired
     public ParkingService(ParkingFacade parkingFacade,
@@ -437,37 +429,7 @@ public class ParkingService implements ParkingServiceInterface {
             if (reservation.getEndTime() == null) {
                 reservation.setEndTime(LocalDateTime.now());
             } else if (reservation.getClient() != null) {
-                reservation.getClient().setTotalReservationHours(reservation.getClient().getTotalReservationHours() +
-                        Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toHours()
-                );
-
-                long clientTotalReservationHours = reservation.getClient().getTotalReservationHours();
-                // Check if client type can be upgraded
-                if (clientTotalReservationHours >= premiumThreshold) {
-                    reservation.getClient().setType(Client.ClientType.PREMIUM);
-
-                    // Send Mail notification
-                    mailProvider.sendChangedClientTypeInfoEmail(
-                            reservation.getClient().getAccount().getName(),
-                            reservation.getClient().getAccount().getLastname(),
-                            reservation.getClient().getAccount().getEmail(),
-                            reservation.getClient().getAccount().getAccountLanguage(),
-                            Client.ClientType.PREMIUM.name()
-                    );
-
-                } else if (clientTotalReservationHours >= standardThreshold) {
-                    reservation.getClient().setType(Client.ClientType.STANDARD);
-
-                    // Send Mail notification
-                    mailProvider.sendChangedClientTypeInfoEmail(
-                            reservation.getClient().getAccount().getName(),
-                            reservation.getClient().getAccount().getLastname(),
-                            reservation.getClient().getAccount().getEmail(),
-                            reservation.getClient().getAccount().getAccountLanguage(),
-                            Client.ClientType.STANDARD.name()
-                    );
-
-                }
+                userLevelMOPFacade.clientTypeChangeCheck(reservation);
             }
             reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
             reservation.setStatus(Reservation.ReservationStatus.COMPLETED_MANUALLY);

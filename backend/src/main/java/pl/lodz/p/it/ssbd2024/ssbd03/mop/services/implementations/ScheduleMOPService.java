@@ -23,14 +23,12 @@ import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Sector;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationDatabaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationOptimisticLockException;
-import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingEventFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ParkingFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.ReservationFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.facades.UserLevelMOPFacade;
 import pl.lodz.p.it.ssbd2024.ssbd03.mop.services.interfaces.ScheduleMOPServiceInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.providers.MailProvider;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +52,6 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
      */
     @Value("${scheduler.maximum_reservation_time}")
     private String endTime;
-
-    @Value("${client_type.standard.threshold}")
-    private Integer standardThreshold;
-
-    @Value("${client_type.premium.threshold}")
-    private Integer premiumThreshold;
 
     private final ReservationFacade reservationFacade;
     private final UserLevelMOPFacade userLevelFacade;
@@ -171,39 +163,8 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
 
                 Client client = reservation.getClient();
 
-                client.setTotalReservationHours(client.getTotalReservationHours() +
-                        Duration.between(reservation.getBeginTime(), reservation.getEndTime()).toHours()
-                );
-
-                long clientTotalReservationHours = client.getTotalReservationHours();
-                // Check if client type can be upgraded
-                if (clientTotalReservationHours >= premiumThreshold) {
-                    client.setType(Client.ClientType.PREMIUM);
-
-                    // Send Mail notification
-                    mailProvider.sendChangedClientTypeInfoEmail(
-                            reservation.getClient().getAccount().getName(),
-                            reservation.getClient().getAccount().getLastname(),
-                            reservation.getClient().getAccount().getEmail(),
-                            reservation.getClient().getAccount().getAccountLanguage(),
-                            Client.ClientType.PREMIUM.name()
-                    );
-
-                } else if (clientTotalReservationHours >= standardThreshold) {
-                    client.setType(Client.ClientType.STANDARD);
-
-                    // Send Mail notification
-                    mailProvider.sendChangedClientTypeInfoEmail(
-                            reservation.getClient().getAccount().getName(),
-                            reservation.getClient().getAccount().getLastname(),
-                            reservation.getClient().getAccount().getEmail(),
-                            reservation.getClient().getAccount().getAccountLanguage(),
-                            Client.ClientType.STANDARD.name()
-                    );
-                }
-
+                userLevelFacade.clientTypeChangeCheck(reservation);
                 userLevelFacade.edit(client);
-
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while canceling reservation with id: {}. Cause: {}.",
                         exception.getClass().getSimpleName(), reservation.getId(), exception.getMessage());
@@ -213,5 +174,5 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
 
     private static int sanitizeInteger(int value) {
         return Math.max(value, 0);
-    };
+    }
 }
