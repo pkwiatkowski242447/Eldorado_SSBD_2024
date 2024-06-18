@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mok.*;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,10 +36,11 @@ public class AccountUnitTest {
     private static final String ACCOUNT_LANGUAGE_NO1 = "PL";
 
     private static Account exampleAccount;
+    private static Account testAccount;
     private static Set<UserLevel> userLevels = new HashSet<>();
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws Exception {
         exampleAccount = new Account(LOGIN_NO1,
                 PASSWORD_NO1,
                 FIRST_NAME_NO1,
@@ -48,6 +50,11 @@ public class AccountUnitTest {
 
         exampleAccount.blockAccount(false);
         exampleAccount.setAccountLanguage(ACCOUNT_LANGUAGE_NO1);
+
+        Set<String> pastPasswords = new HashSet<>();
+        pastPasswords.add("ExamplePasswordNo1");
+        pastPasswords.add("ExamplePasswordNo2");
+        pastPasswords.add("ExamplePasswordNo3");
 
         UserLevel client = new Client();
         client.setAccount(exampleAccount);
@@ -69,6 +76,37 @@ public class AccountUnitTest {
         activityLog.setLastUnsuccessfulLoginIp(LAST_UNSUCCESSFUL_LOGIN_IP);
 
         exampleAccount.setActivityLog(activityLog);
+
+        testAccount = new Account(LOGIN_NO1,
+                PASSWORD_NO1,
+                FIRST_NAME_NO1,
+                LAST_NAME_NO1,
+                EMAIL_NO1,
+                PHONE_NUMBER_NO1);
+
+        testAccount.blockAccount(false);
+        testAccount.setAccountLanguage(ACCOUNT_LANGUAGE_NO1);
+
+        client = new Client();
+        client.setAccount(testAccount);
+
+        admin = new Admin();
+        admin.setAccount(testAccount);
+
+        userLevels.add(client);
+        userLevels.add(admin);
+
+        testAccount.addUserLevel(client);
+        testAccount.addUserLevel(admin);
+
+        activityLog = new ActivityLog();
+        activityLog.setUnsuccessfulLoginCounter(UNSUCCESSFUL_LOGIN_COUNTER);
+        activityLog.setLastSuccessfulLoginTime(LAST_SUCCESSFUL_LOGIN_TIME);
+        activityLog.setLastSuccessfulLoginIp(LAST_SUCCESSFUL_LOGIN_IP);
+        activityLog.setLastUnsuccessfulLoginTime(LAST_UNSUCCESSFUL_LOGIN_TIME);
+        activityLog.setLastUnsuccessfulLoginIp(LAST_UNSUCCESSFUL_LOGIN_IP);
+
+        testAccount.setActivityLog(activityLog);
     }
 
     //ACTIVITY LOG DATA
@@ -191,5 +229,173 @@ public class AccountUnitTest {
         assertEquals(exampleAccount.getActivityLog().getLastSuccessfulLoginIp(), LAST_SUCCESSFUL_LOGIN_IP);
         assertEquals(exampleAccount.getActivityLog().getLastUnsuccessfulLoginTime(), LAST_UNSUCCESSFUL_LOGIN_TIME);
         assertEquals(exampleAccount.getActivityLog().getLastUnsuccessfulLoginIp(), LAST_UNSUCCESSFUL_LOGIN_IP);
+    }
+
+    @Test
+    public void accountSetPasswordTestPositive() {
+        String passwordBefore = testAccount.getPassword();
+        String newPassword = "P@ssw0rd!123!";
+
+        assertNotNull(passwordBefore);
+        assertNotNull(newPassword);
+
+        testAccount.setPassword(newPassword);
+
+        String passwordAfter = testAccount.getPassword();
+
+        assertNotEquals(passwordBefore, newPassword);
+        assertNotEquals(passwordBefore, passwordAfter);
+        assertEquals(newPassword, passwordAfter);
+    }
+
+    @Test
+    public void accountSetSuspendedTestPositive() {
+        boolean suspendedBefore = testAccount.getSuspended();
+        boolean newSuspended = !suspendedBefore;
+
+        testAccount.setSuspended(newSuspended);
+
+        boolean suspendedAfter = testAccount.getSuspended();
+
+        assertNotEquals(suspendedBefore, newSuspended);
+        assertNotEquals(suspendedBefore, suspendedAfter);
+        assertEquals(newSuspended, suspendedAfter);
+    }
+
+    @Test
+    public void accountSetActiveTestPositive() {
+        boolean activeBefore = testAccount.getActive();
+        boolean newActive = !activeBefore;
+
+        testAccount.setActive(newActive);
+
+        boolean activeAfter = testAccount.getActive();
+
+        assertNotEquals(activeBefore, newActive);
+        assertNotEquals(activeBefore, activeAfter);
+        assertEquals(newActive, activeAfter);
+    }
+
+    @Test
+    public void accountSetBlockedTestPositive() {
+        boolean blockedBefore = testAccount.getBlocked();
+        boolean newBlocked = !blockedBefore;
+
+        testAccount.setBlocked(newBlocked);
+
+        boolean blockedAfter = testAccount.getBlocked();
+
+        assertNotEquals(blockedBefore, newBlocked);
+        assertNotEquals(blockedBefore, blockedAfter);
+        assertEquals(newBlocked, blockedAfter);
+    }
+
+    @Test
+    public void accountSetTwoFactorAuthTestPositive() {
+        boolean twoFactorAuthBefore = testAccount.getTwoFactorAuth();
+        boolean newTwoFactorAuth = !twoFactorAuthBefore;
+
+        testAccount.setTwoFactorAuth(newTwoFactorAuth);
+
+        boolean twoFactorAuthAfter = testAccount.getTwoFactorAuth();
+
+        assertNotEquals(twoFactorAuthBefore, newTwoFactorAuth);
+        assertNotEquals(twoFactorAuthBefore, twoFactorAuthAfter);
+        assertEquals(newTwoFactorAuth, twoFactorAuthAfter);
+    }
+
+    @Test
+    public void accountSetFirstNameTestPositive() {
+        String nameBefore = testAccount.getName();
+        String newName = "NewFirstName";
+
+        assertNotNull(nameBefore);
+        assertNotNull(newName);
+
+        testAccount.setName(newName);
+
+        String nameAfter = testAccount.getName();
+
+        assertNotNull(nameAfter);
+
+        assertNotEquals(nameBefore, newName);
+        assertNotEquals(nameBefore, nameAfter);
+        assertEquals(newName, nameAfter);
+    }
+
+    @Test
+    public void accountSetLastNameTestPositive() {
+        String lastNameBefore = testAccount.getLastname();
+        String newLastName = "NewLastName";
+
+        assertNotNull(lastNameBefore);
+        assertNotNull(newLastName);
+
+        testAccount.setLastname(newLastName);
+
+        String lastNameAfter = testAccount.getLastname();
+
+        assertNotNull(lastNameAfter);
+
+        assertNotEquals(lastNameBefore, newLastName);
+        assertNotEquals(lastNameBefore, lastNameAfter);
+        assertEquals(newLastName, lastNameAfter);
+    }
+
+    @Test
+    public void accountSetEmailTestPositive() {
+        String emailBefore = testAccount.getEmail();
+        String newEmail = "NewEmail";
+
+        assertNotNull(emailBefore);
+        assertNotNull(newEmail);
+
+        testAccount.setEmail(newEmail);
+
+        String lastNameAfter = testAccount.getEmail();
+
+        assertNotNull(lastNameAfter);
+
+        assertNotEquals(emailBefore, newEmail);
+        assertNotEquals(emailBefore, lastNameAfter);
+        assertEquals(newEmail, lastNameAfter);
+    }
+
+    @Test
+    public void accountSetAccountLanguageTestPositive() {
+        String accountLanguageBefore = testAccount.getAccountLanguage();
+        String newAccountLanguage = "NewAccountLanguage";
+
+        assertNotNull(accountLanguageBefore);
+        assertNotNull(newAccountLanguage);
+
+        testAccount.setAccountLanguage(newAccountLanguage);
+
+        String accountLanguageAfter = testAccount.getAccountLanguage();
+
+        assertNotNull(accountLanguageAfter);
+
+        assertNotEquals(accountLanguageBefore, newAccountLanguage);
+        assertNotEquals(accountLanguageBefore, accountLanguageAfter);
+        assertEquals(newAccountLanguage, accountLanguageAfter);
+    }
+
+    @Test
+    public void accountSetPhoneNumberTestPositive() {
+        String phoneNumberBefore = testAccount.getPhoneNumber();
+        String newPhoneNumber = "987654321";
+
+        assertNotNull(phoneNumberBefore);
+        assertNotNull(newPhoneNumber);
+
+        testAccount.setPhoneNumber(newPhoneNumber);
+
+        String phoneNumberAfter = testAccount.getPhoneNumber();
+
+        assertNotNull(phoneNumberAfter);
+
+        assertNotEquals(phoneNumberBefore, newPhoneNumber);
+        assertNotEquals(phoneNumberBefore, phoneNumberAfter);
+        assertEquals(newPhoneNumber, phoneNumberAfter);
     }
 }
