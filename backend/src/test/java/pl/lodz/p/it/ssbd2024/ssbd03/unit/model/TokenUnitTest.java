@@ -16,6 +16,7 @@ public class TokenUnitTest {
         token = new Token();
 
     }
+
     @Test
     public void testToString() {
         String result = token.toString();
