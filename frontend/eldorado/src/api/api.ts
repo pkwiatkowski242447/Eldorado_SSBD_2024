@@ -372,5 +372,9 @@ export const api = {
 
     getRandomImage: () => {
         return apiWithConfig.get('/auth/random-image')
+    },
+
+    getParkingHistory: (id: string, details: string) => {
+        return apiWithConfig.get(`/parking/${id}/history-data` + details)
     }
 }

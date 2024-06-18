@@ -27,6 +27,7 @@ export const Pathnames = {
         reservationDetails: '/all-reservations/:id',
         parkingManagement: '/manage-parking',
         parkingManagementInfo: '/manage-parking/:id',
+        parkingManagementHistory: '/manage-parking/:id/history',
         exitParking: '/exit-parking',
     },
     client: {

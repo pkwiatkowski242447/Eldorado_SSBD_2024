@@ -31,7 +31,7 @@ function LoginPage() {
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
                 transition: 'opacity 1s ease-in-out',
-                opacity: imageLoaded ? 0.10 : 0,
+                opacity: imageLoaded ? 0.15 : 0,
             }}/>
             <div style={{position: 'relative'}}>
                 <a href="/home" className="flex items-center">

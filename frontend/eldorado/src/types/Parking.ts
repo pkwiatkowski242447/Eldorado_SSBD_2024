@@ -11,6 +11,7 @@ export enum sectorStrategy {
     MOST_OCCUPIED = "MOST_OCCUPIED",
     LEAST_OCCUPIED_WEIGHTED = "LEAST_OCCUPIED_WEIGHTED"
 }
+
 export interface ParkingListType {
     id: string;
     city: string;
@@ -30,6 +31,17 @@ export interface ParkingType {
     signature: string;
 }
 
+export interface HistoryParkingType {
+    id: string;
+    version: number,
+    city: string;
+    street: string;
+    zipCode: string;
+    strategy: sectorStrategy;
+    modificationTime: string;
+    modifiedBy: string;
+}
+
 export interface CreateParkingType {
     city: string;
     zipCode: string;
@@ -39,7 +51,7 @@ export interface CreateParkingType {
 
 export interface SectorListType {
     id: string;
-    name:string;
+    name: string;
     type: sectorType;
     maxPlaces: number;
     occupiedPlaces: number;    //todo change to occupiedSpaces
@@ -48,7 +60,7 @@ export interface SectorListType {
 }
 
 export interface CreateSectorType {
-    name:string;
+    name: string;
     type: sectorType;
     maxPlaces: number;
     weight: number;
@@ -66,7 +78,7 @@ export interface SectorType {
 export interface SectorType {
     id: string;
     parkingId: string;
-    name:string;
+    name: string;
     type: sectorType;
     maxPlaces: number;
     weight: number;
@@ -79,7 +91,7 @@ export interface SectorType {
 export interface EditSectorType {
     id: string;
     parkingId: string;
-    name:string;
+    name: string;
     type: sectorType;
     maxPlaces: number;
     weight: number;
@@ -116,7 +128,7 @@ export function dtoTimeToString(arr: number[]): string {
     return format(date, "dd.MM.yyyy HH:mm");
 }
 
-export function sectorDTOtoSectorListType(object:any):SectorListType {
+export function sectorDTOtoSectorListType(object: any): SectorListType {
     const time = object.deactivationTime !== null ? dtoTimeToString(object.deactivationTime) : "";
     return {
         id: object.id,

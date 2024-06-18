@@ -28,6 +28,7 @@ import CreateReservationInSectorPage from "@/pages/CreateReservationInSectorPage
 import {ExitParkingPage} from "@/pages/ExitParkingPage.tsx";
 import EnterParkingWithoutReservationPage from "@/pages/EnterParkingWithoutReservationPage.tsx";
 import EnterParkingWithReservationPage from "@/pages/EnterParkingWithReservationPage.tsx";
+import ParkingManagementHistoryPage from "@/pages/ParkingManagementHistoryPage.tsx";
 
 export const PublicRoutes: RouteType[] = [
     {
@@ -155,6 +156,10 @@ export const StaffRoutes: RouteType[] = [
     {
         path: Pathnames.staff.reservationDetails,
         Component: ReservationDetailsPage
+    },
+    {
+        path: Pathnames.staff.parkingManagementHistory,
+        Component: ParkingManagementHistoryPage
     }
 ]
 
