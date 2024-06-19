@@ -94,16 +94,14 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
 
         for (Reservation reservation : reservationsToBeFinished) {
             try {
-                int numberOfEntries = 0;
-                int numberOfExits = 0;
-                for (ParkingEvent parkingEvent : reservation.getParkingEvents()) {
-                    if (parkingEvent.getType() == ParkingEvent.EventType.ENTRY) {
-                        numberOfEntries += 1;
-                    }
-                    else {
-                        numberOfExits += 1;
-                    }
-                }
+                long numberOfEntries = reservation.getParkingEvents().stream()
+                        .filter(event -> event.getType() == ParkingEvent.EventType.ENTRY)
+                        .count();
+
+                long numberOfExits = reservation.getParkingEvents().stream()
+                        .filter(event -> event.getType() == ParkingEvent.EventType.EXIT)
+                        .count();
+
                 if (numberOfExits != numberOfEntries) {
                     ParkingEvent exitEvent = new ParkingEvent(LocalDateTime.now(), ParkingEvent.EventType.EXIT);
                     reservation.addParkingEvent(exitEvent);
@@ -113,14 +111,16 @@ public class ScheduleMOPService implements ScheduleMOPServiceInterface {
                     sector.setOccupiedPlaces(sanitizeInteger(sector.getOccupiedPlaces() - 1));
                     parkingFacade.editSector(sector);
 
-                    // Send mail notification
-                    mailProvider.sendSystemEndReservationInfoEmail(
-                            reservation.getClient().getAccount().getName(),
-                            reservation.getClient().getAccount().getLastname(),
-                            reservation.getClient().getAccount().getEmail(),
-                            reservation.getClient().getAccount().getAccountLanguage(),
-                            reservation.getId().toString()
-                    );
+                    if (reservation.getClient() != null) {
+                        // Send mail notification
+                        mailProvider.sendSystemEndReservationInfoEmail(
+                                reservation.getClient().getAccount().getName(),
+                                reservation.getClient().getAccount().getLastname(),
+                                reservation.getClient().getAccount().getEmail(),
+                                reservation.getClient().getAccount().getAccountLanguage(),
+                                reservation.getId().toString()
+                        );
+                    }
                 }
             } catch (Exception exception) {
                 log.error("Exception: {} occurred while terminating reservation with id: {}. Cause: {}.",

@@ -43,7 +43,11 @@ public class UserLevelsUnitTest {
     private static UserLevel exampleUserLevel;
     private static UserLevel testUserLevel;
 
+    private static final Client.ClientType CLIENT_TYPE = Client.ClientType.STANDARD;
+    private static final Long TOTAL_RESERVATION_HOURS = 100L;
+
     private static Client clientUserLevel;
+    private static Client testClientUserLevel;
     private static Staff staffUserLevel;
     private static Admin adminUserLevel;
 
@@ -124,8 +128,21 @@ public class UserLevelsUnitTest {
         exampleUserLevel.setUpdateTime(LocalDateTime.now().minusHours(96));
 
         clientUserLevel = new Client();
+        testClientUserLevel = new Client();
         staffUserLevel = new Staff();
         adminUserLevel = new Admin();
+
+        Field clientTypeField = Client.class.getDeclaredField("type");
+        clientTypeField.setAccessible(true);
+        clientTypeField.set(clientUserLevel, CLIENT_TYPE);
+        clientTypeField.set(testClientUserLevel, CLIENT_TYPE);
+        clientTypeField.setAccessible(false);
+
+        Field totalReservationHoursField = Client.class.getDeclaredField("totalReservationHours");
+        totalReservationHoursField.setAccessible(true);
+        totalReservationHoursField.set(clientUserLevel, TOTAL_RESERVATION_HOURS);
+        totalReservationHoursField.set(testClientUserLevel, TOTAL_RESERVATION_HOURS);
+        totalReservationHoursField.setAccessible(false);
     }
 
     @Test
@@ -301,6 +318,49 @@ public class UserLevelsUnitTest {
         Client testClient = new Client(version);
         assertNotNull(testClient);
         assertEquals(testClient.getVersion(), version);
+    }
+
+    @Test
+    public void clientAllArgsConstructorAndGettersTestPositive() {
+        assertNotNull(clientUserLevel);
+        assertEquals(clientUserLevel.getType(), CLIENT_TYPE);
+        assertEquals(clientUserLevel.getTotalReservationHours(), TOTAL_RESERVATION_HOURS);
+    }
+
+    @Test
+    public void clientSetClientTypeTestPositive() {
+        Client.ClientType clientTypeBefore = testClientUserLevel.getType();
+        Client.ClientType newClientType = Client.ClientType.PREMIUM;
+        assertNotNull(clientTypeBefore);
+        assertNotNull(newClientType);
+
+        testClientUserLevel.setType(newClientType);
+
+        Client.ClientType clientTypeAfter = testClientUserLevel.getType();
+        assertNotNull(clientTypeAfter);
+
+        assertNotEquals(clientTypeBefore, newClientType);
+        assertNotEquals(clientTypeBefore, clientTypeAfter);
+        assertEquals(clientTypeAfter, newClientType);
+    }
+
+    @Test
+    public void clientSetTotalReservationHoursTestPositive() {
+        Long totalReservationHoursBefore = testClientUserLevel.getTotalReservationHours();
+        Long newTotalReservationHours = 150L;
+
+        assertNotNull(totalReservationHoursBefore);
+        assertNotNull(newTotalReservationHours);
+
+        testClientUserLevel.setTotalReservationHours(newTotalReservationHours);
+
+        Long totalReservationHoursAfter = testClientUserLevel.getTotalReservationHours();
+
+        assertNotNull(totalReservationHoursAfter);
+
+        assertNotEquals(totalReservationHoursBefore, newTotalReservationHours);
+        assertNotEquals(totalReservationHoursBefore, totalReservationHoursAfter);
+        assertEquals(totalReservationHoursAfter, newTotalReservationHours);
     }
 
     @Test

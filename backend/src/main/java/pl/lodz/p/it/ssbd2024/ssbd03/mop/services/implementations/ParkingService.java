@@ -428,7 +428,8 @@ public class ParkingService implements ParkingServiceInterface {
             // Case for anonymous user - end time is being set
             if (reservation.getEndTime() == null) {
                 reservation.setEndTime(LocalDateTime.now());
-            } else if (reservation.getClient() != null) {
+            }
+            if (reservation.getClient() != null) {
                 userLevelMOPFacade.clientTypeChangeCheck(reservation);
             }
             reservation.getSector().setOccupiedPlaces(reservation.getSector().getOccupiedPlaces() - 1);
