@@ -509,7 +509,7 @@
   "active.parking.info.page.strategy": "Strategia",
   "active.parking.info.page.sectors": "Sektory",
   "active.parking.info.page.total.parking.spaces": "Łączna liczba miejsc parkingowych",
-  "active.parking.info.page.free.parking.spaces": "Wolne miejsca parkingowe",
+  "active.parking.info.page.occupied.parking.spaces": "Liczba zajętych miejsc parkingowych",
   "active.parking.page.view.info": "Zobacz informacje",
   "active.parking.page.city": "Miasto",
   "active.parking.page.street": "Ulica",

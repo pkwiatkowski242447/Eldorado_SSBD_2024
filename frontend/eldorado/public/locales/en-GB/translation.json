@@ -519,7 +519,7 @@
   "active.parking.info.page.strategy": "Strategy",
   "active.parking.info.page.sectors": "Sectors",
   "active.parking.info.page.total.parking.spaces": "Total parking spaces",
-  "active.parking.info.page.free.parking.spaces": "Free parking spaces",
+  "active.parking.info.page.occupied.parking.spaces": "Occupied parking spaces",
 
   "active.parking.page.view.info": "View Info",
   "active.parking.page.city": "City",
