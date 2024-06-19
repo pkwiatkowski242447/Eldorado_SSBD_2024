@@ -509,7 +509,7 @@
   "active.parking.info.page.strategy": "Strategia",
   "active.parking.info.page.sectors": "Sektory",
   "active.parking.info.page.total.parking.spaces": "Łączna liczba miejsc parkingowych",
-  "active.parking.info.page.free.parking.spaces": "Wolne miejsca parkingowe",
+  "active.parking.info.page.occupied.parking.spaces": "Liczba zajętych miejsc parkingowych",
   "active.parking.page.view.info": "Zobacz informacje",
   "active.parking.page.city": "Miasto",
   "active.parking.page.street": "Ulica",
@@ -796,6 +796,18 @@
   "exit.parking.form.exitParking": "Zakończ rezerwację",
   "createReservationPage.name": "Nazwa sektora",
   "createReservationPage.maxPlaces": "Maksymalna liczba miejsc",
-  "createReservationPage.type": "Typ"
+  "createReservationPage.type": "Typ",
+
+  "parking.management.page.view.history": "Zobacz historię",
+  "breadcrumb.parking.history": "Historia parkowania",
+  "parking.management.history.page.title": "Historia parkowania",
+  "parking.management.history.page.id": "ID",
+  "parking.management.history.page.version": "Wersja",
+  "parking.management.history.page.city": "Miasto",
+  "parking.management.history.page.street": "Ulica",
+  "parking.management.history.page.zip.code": "Kod pocztowy",
+  "parking.management.history.page.strategy": "Strategia",
+  "parking.management.history.page.modification.time": "Czas modyfikacji",
+  "parking.management.history.page.modified.by": "Zmodyfikowane przez"
 
 }

@@ -204,6 +204,9 @@ function ParkingManagementPage() {
                                             >
                                                 {t("parking.management.page.delete.parking")}
                                             </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={()=> navigate(`/manage-parking/${parking.id}/history`)}>
+                                                {t("parking.management.page.view.history")}
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>

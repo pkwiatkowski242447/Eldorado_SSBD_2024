@@ -369,4 +369,12 @@ export const api = {
         }
         return apiAnonymous.post(`/parking/reservations/${id}/exit?end=${endReservation}`)
     },
+
+    getRandomImage: () => {
+        return apiWithConfig.get('/auth/random-image')
+    },
+
+    getParkingHistory: (id: string, details: string) => {
+        return apiWithConfig.get(`/parking/${id}/history-data` + details)
+    }
 }
