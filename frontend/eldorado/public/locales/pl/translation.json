@@ -98,7 +98,7 @@
   "loginPage.submit": "Zaloguj się",
   "loginPage.noAccount": "Nie masz konta? ",
   "loginPage.signUp": "Zarejestruj się",
-  "loginPage.loginTooShort": "Login musi mieć co najmniej 3 znaki",
+  "loginPage.loginTooShort": "Login musi mieć co najmniej 4 znaki",
   "loginPage.loginTooLong": "Login może mieć maksymalnie 32 znaki",
   "loginPage.passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
   "loginPage.passwordTooLong": "Hasło może mieć maksymalnie 60 znaków",
@@ -447,7 +447,7 @@
 
   "bean.validation.account.login.blank": "Login nie może być pusty",
   "bean.validation.account.login.regex.not.met": "Format loginu nie jest prawidłowy",
-  "bean.validation.account.login.too.short": "Login musi mieć co najmniej 3 znaki",
+  "bean.validation.account.login.too.short": "Login musi mieć co najmniej 4 znaki",
   "bean.validation.account.login.too.long": "Login może mieć maksymalnie 50 znaków",
   "bean.validation.account.password.blank": "Hasło nie może być puste",
   "bean.validation.account.password.invalid.length": "Hasło musi mieć od 8 do 60 znaków",

@@ -3,12 +3,13 @@ import {useNavigate} from "react-router-dom";
 import {api} from "../api/api";
 import {Pathnames} from "../router/pathnames";
 import {usersApi} from "@/api/userApi.ts";
-import {useEffect} from "react";
+import {useContext, useEffect} from "react";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {RolesEnum} from "@/types/TokenPayload.ts";
 import handleApiError from "@/components/HandleApiError.ts";
 import {localDateTimeToDate, UserType} from "@/types/Users.ts";
 import {useTranslation} from "react-i18next";
+import {SessionContext} from "@/context/SessionContext.tsx";
 
 export const useAccount = () => {
 
@@ -17,6 +18,8 @@ export const useAccount = () => {
     const {t} = useTranslation();
     const navigate = useNavigate()
     const {toast} = useToast()
+    const { resetTimer } = useContext(SessionContext);
+
 
     useEffect(() => {
         const storedAccount = localStorage.getItem('account');
@@ -44,6 +47,7 @@ export const useAccount = () => {
             localStorage.removeItem('etag')
             setAccount(null)
             navigateToMainPage()
+            resetTimer();
         }
     }
 

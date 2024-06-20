@@ -448,7 +448,7 @@
 
   "bean.validation.account.login.blank" : "Login cannot be blank",
   "bean.validation.account.login.regex.not.met" : "Login does not meet format requirements",
-  "bean.validation.account.login.too.short" : "Login must be at least 3 characters long",
+  "bean.validation.account.login.too.short" : "Login must be at least 4 characters long",
   "bean.validation.account.login.too.long" : "Login can be at most 50 characters long",
 
   "bean.validation.account.password.blank" : "Password cannot be blank",
