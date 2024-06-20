@@ -32,6 +32,21 @@ describe("MOK.18 Show user's account info", () => {
 
         cy.xpath("/html/body/div[1]/div/div[1]/div/main/div[2]/div/div/div/h3")
             .should("contain", "Informacje o koncie");
+
+        cy.xpath("/html/body/div[1]/div/div[1]/div/main/div[2]/div/div/div/div/p[1]")
+            .should("contain", "Imię");
+
+        cy.xpath("/html/body/div[1]/div/div[1]/div/main/div[2]/div/div/div/div/p[2]")
+            .should("contain", "E-mail");
+
+        cy.xpath("/html/body/div[1]/div/div[1]/div/main/div[2]/div/div/div/div/p[3]")
+            .should("contain", "Login");
+
+        cy.xpath("/html/body/div[1]/div/div[1]/div/main/div[2]/div/div/div/div/p[4]")
+            .should("contain", "Telefon");
+
+        cy.xpath("/html/body/div[1]/div/div[1]/div/main/div[2]/div/div/div/div/p[5]")
+            .should("contain", "Język konta");
     });
 
 });
