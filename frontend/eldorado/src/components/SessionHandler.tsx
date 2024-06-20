@@ -44,7 +44,9 @@ const SessionHandler = () => {
                 if (currentTime > expiryTime) {
                     setExpiredDialogOpen(true);
                 } else {
-                    const timeoutDuration = (expiryTime - currentTime - 120) * 1000; // 2 minutes before expiration
+                    console.log('Token will expire in:', expiryTime - currentTime, 'seconds')
+                    console.log('Renewal will appear in:', (expiryTime - currentTime - 180), 'seconds')
+                    const timeoutDuration = (expiryTime - currentTime - 240) * 1000; // 3 minutes before expiration
                     const id = setTimeout(() => {
                         setRefreshDialogOpen(true);
                     }, timeoutDuration);
@@ -55,24 +57,25 @@ const SessionHandler = () => {
         }
     }, [isAuthenticated]);
 
-    const handleRefreshSession = () => {
+    const handleRefreshSession = async () => {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-            api.refreshSession(refreshToken)
-                .then(response => {
-                    localStorage.setItem('token', response.data.accessToken);
-                    localStorage.setItem('refreshToken', response.data.refreshToken);
-                    toast({
-                        title: t("general.refreshSession.popUp1"),
-                        description: t("general.refreshSession.popUp2")
-                    });
-                    setRefreshDialogOpen(false);
-                    resetTimer();
-                }).catch((error) => {
+            try {
+                const response = await api.refreshSession(refreshToken);
+                await localStorage.setItem('token', response.data.accessToken);
+                await localStorage.setItem('refreshToken', response.data.refreshToken);
+                toast({
+                    title: t("general.refreshSession.popUp1"),
+                    description: t("general.refreshSession.popUp2")
+                });
+                setRefreshDialogOpen(false);
+                checkTokenExpiration();
+                resetTimer();
+            } catch (error) {
                 setRefreshDialogOpen(false);
                 console.error(error);
                 setExpiredDialogOpen(true);
-            });
+            }
         }
     };
 
