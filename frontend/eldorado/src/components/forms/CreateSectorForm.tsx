@@ -33,7 +33,7 @@ function CreateSectorForm({setDialogOpen, refresh, parkingId}:createParkingFormP
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [newSector, setNewSector] = useState<CreateSectorType>({name:"", type:sectorType.UNCOVERED, maxPlaces:0, weight:1 })
     const formSchema = z.object({
-        name: z.string().min(5, {message:t("create.sector.form.sector.name.too.short")})
+        name: z.string({message: t("general.field.required")}).min(5, {message:t("create.sector.form.sector.name.too.short")})
             .max(5, {message: t("create.sector.form.sector.name.too.long")}).regex(RegExp("^[A-Z]{2}-[0-9]{2}$"), {message: t("create.sector.form.sector.name.regex.not.met")}),
         maxPlaces: z.coerce.number({message: t("create.sector.form.sector.max.places.has.to.be.number")}).int({message: t("create.sector.form.sector.max.places.has.to.be.integer")}).min(0, {message: t("create.sector.form.sector.max.places.at.least.zero")}).max(1000,{message: t("create.sector.form.sector.max.places.at.most.thousand")}),
         type: z.enum(["UNCOVERED", "COVERED", "UNDERGROUND"]),

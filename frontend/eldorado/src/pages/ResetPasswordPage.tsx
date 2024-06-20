@@ -34,15 +34,22 @@ function ResetPasswordPage() {
     const [formValues, setFormValues] = useState(null);
 
     const formSchema = z.object({
-        password: z.string().min(8, {message: t("resetPasswordPage.passwordTooShort")})
+        password: z.string({message: t("general.field.required")}).min(8, {message: t("resetPasswordPage.passwordTooShort")})
             .max(60, {message: t("resetPasswordPage.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+        repeatPassword: z.string({message: t("general.field.required")}).min(8, {message: t("resetPasswordPage.passwordTooShort")})
+            .max(60, {message: t("resetPasswordPage.passwordTooLong")})
+            .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
+    }).refine(values => values.password === values.repeatPassword, {
+        message: t("accountSettings.passwordsMustMatch"),
+        path: ["repeatPassword"],
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             password: "",
+            repeatPassword: "",
         },
     })
 
@@ -105,9 +112,25 @@ function ResetPasswordPage() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel
-                                                    className="text-black">{t("resetPasswordPage.password")}</FormLabel>
+                                                    className="text-black">{t("resetPasswordPage.password")} *</FormLabel>
                                                 <FormControl>
                                                     <Input type="password" {...field}/>
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div>
+                                    <FormField
+                                        control={form.control}
+                                        name="repeatPassword"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel
+                                                    className="text-black">{t("accountSettings.authentication.newPasswordRepeat")} *</FormLabel>
+                                                <FormControl>
+                                                    <Input type="password" {...field} />
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>

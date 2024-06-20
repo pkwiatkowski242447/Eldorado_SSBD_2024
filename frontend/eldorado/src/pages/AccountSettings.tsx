@@ -42,7 +42,7 @@ function AccountSettings() {
     const navigate = useNavigate();
 
     const emailSchema = z.object({
-        email: z.string().email({message: t("accountSettings.wrongEmail")}),
+        email: z.string({message: t("general.field.required")}).email({message: t("accountSettings.wrongEmail")}),
     });
 
     const userDataSchema = z.object({
@@ -61,13 +61,13 @@ function AccountSettings() {
     });
 
     const passwordSchema = z.object({
-        oldPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+        oldPassword: z.string({message: t("general.field.required")}).min(8, {message: t("accountSettings.passwordTooShort")})
             .max(60, {message: t("accountSettings.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
-        newPassword: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+        newPassword: z.string({message: t("general.field.required")}).min(8, {message: t("accountSettings.passwordTooShort")})
             .max(60, {message: t("accountSettings.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
-        newPasswordRepeat: z.string().min(8, {message: t("accountSettings.passwordTooShort")})
+        newPasswordRepeat: z.string({message: t("general.field.required")}).min(8, {message: t("accountSettings.passwordTooShort")})
             .max(60, {message: t("accountSettings.passwordTooLong")})
             .regex(/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,32}$/, {message: t("registerPage.passwordInvalid")}),
     }).refine(values => values.newPassword === values.newPasswordRepeat, {

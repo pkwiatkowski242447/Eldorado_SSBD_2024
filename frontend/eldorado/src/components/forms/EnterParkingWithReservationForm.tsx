@@ -26,7 +26,7 @@ function EnterParkingWithReservationForm() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
     const formSchema = z.object({
-        id: z.string()
+        id: z.string({message: t("general.field.required")})
             .min(36, {message: t("enter.parking.with.reservation.form.id.too.short")})
             .max(36, {message: t("enter.parking.with.reservation.form.id.too.long")})
             .regex(RegExp("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"), {message: t("enter.parking.with.reservation.form.id.regex.not.met")}),

@@ -13,7 +13,7 @@ public class AccountHistoryDataMessages {
     public static final String PASSWORD_BLANK = "bean.validation.account.history.password.blank";
     public static final String PASSWORD_INVALID_LENGTH = "bean.validation.account.history.password.invalid.length";
 
-    public static final String VERIFIED_NULL = "bean.validation.account.history.verified.flag.null";
+    public static final String SUSPENDED_NULL = "bean.validation.account.history.suspended.flag.null";
     public static final String ACTIVE_NULL = "bean.validation.account.history.active.flag.null";
     public static final String BLOCKED_NULL = "bean.validation.account.history.blocked.flag.null";
     public static final String TWO_FACTOR_AUTH_NULL = "bean.validation.account.history.two.factor.auth.flag.null";

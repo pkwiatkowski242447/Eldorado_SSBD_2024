@@ -34,11 +34,11 @@ function EditParkingForm({setDialogOpen, refresh, parkingId}:editParkingFormProp
     const [editedParking, setEditedParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""})
     const [parking, setParking] = useState<ParkingType>({parkingId:"", version:"", city:"", street:"", zipCode:"", strategy:sectorStrategy.LEAST_OCCUPIED, signature:""});
     const formSchema = z.object({
-        city: z.string().min(2, {message: t("edit.parking.form.city.too.short")})
-            .max(50, {message: t("edit.parking.form.city.too.long")}).regex(RegExp("^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$"), {message: t("edit.parking.form.city.regex.not.met")}),
-        street: z.string().min(2, {message: t("edit.parking.form.street.too.short")})
-            .max(60, {message: t("edit.parking.form.street.too.long")}).regex(RegExp("^[A-Za-z0-9.-]{5,50}$"), {message: t("edit.parking.form.street.regex.not.met")}),
-        zipCode: z.string().min(6, {message: t("edit.parking.form.zip.code.too.short")})
+        city: z.string({message: t("general.field.required")}).min(2, {message: t("edit.parking.form.city.too.short")})
+            .max(50, {message: t("edit.parking.form.city.too.long")}).regex(RegExp("^([a-zA-Z\\u0080-\\u024FąĄćĆęĘłŁńŃóÓśŚźŹżŻ]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024FąĄćĆęĘłŁńŃóÓśŚźŹżŻ]*$"), {message: t("edit.parking.form.city.regex.not.met")}),
+        street: z.string({message: t("general.field.required")}).min(2, {message: t("edit.parking.form.street.too.short")})
+            .max(60, {message: t("edit.parking.form.street.too.long")}).regex(RegExp("^[A-Za-ząĄćĆęĘłŁńŃóÓśŚźŹżŻ0-9.-]{5,50}$"), {message: t("edit.parking.form.street.regex.not.met")}),
+        zipCode: z.string({message: t("general.field.required")}).min(6, {message: t("edit.parking.form.zip.code.too.short")})
             .max(6, {message: t("edit.parking.form.zip.code.too.long")}).regex(RegExp("^\\d{2}-\\d{3}$"), {message: t("edit.parking.form.zip.code.regex.not.met")}),
         strategy: z.enum(["LEAST_OCCUPIED", "MOST_OCCUPIED", "LEAST_OCCUPIED_WEIGHTED"])
     })
