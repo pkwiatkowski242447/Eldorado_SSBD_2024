@@ -1,10 +1,13 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.entities.mok;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.DatabaseConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.consts.mok.AccountHistoryDataConsts;
+import pl.lodz.p.it.ssbd2024.ssbd03.utils.messages.mok.AccountHistoryDataMessages;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -55,28 +58,41 @@ import java.util.UUID;
 public class AccountHistoryData {
 
     @Id
+    @NotNull(message = AccountHistoryDataMessages.ID_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_ID_COLUMN, columnDefinition = "UUID", nullable = false, updatable = false)
     private UUID id;
 
     @Id
+    @NotNull(message = AccountHistoryDataMessages.VERSION_NULL)
+    @PositiveOrZero(message = AccountHistoryDataMessages.VERSION_LESS_THAN_ZERO)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_VERSION_COLUMN, nullable = false, updatable = false)
     private Long version;
 
+    @NotBlank(message = AccountHistoryDataMessages.LOGIN_BLANK)
+    @Pattern(regexp = AccountHistoryDataConsts.LOGIN_REGEX, message = AccountHistoryDataMessages.LOGIN_REGEX_NOT_MET)
+    @Size(min = AccountHistoryDataConsts.LOGIN_MIN_LENGTH, message = AccountHistoryDataMessages.LOGIN_TOO_SHORT)
+    @Size(max = AccountHistoryDataConsts.LOGIN_MAX_LENGTH, message = AccountHistoryDataMessages.LOGIN_TOO_LONG)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_LOGIN_COLUMN, nullable = false, updatable = false, length = 32)
     private String login;
 
+    @NotBlank(message = AccountHistoryDataMessages.PASSWORD_BLANK)
+    @Size(min = AccountHistoryDataConsts.PASSWORD_LENGTH, max = AccountHistoryDataConsts.PASSWORD_LENGTH, message = AccountHistoryDataMessages.PASSWORD_INVALID_LENGTH)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_PASSWORD_COLUMN, nullable = false, updatable = false, length = 60)
     private String password;
 
+    @NotNull(message = AccountHistoryDataMessages.SUSPENDED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_SUSPENDED_COLUMN, nullable = false, updatable = false)
     private Boolean suspended;
 
+    @NotNull(message = AccountHistoryDataMessages.ACTIVE_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_ACTIVE_COLUMN, nullable = false, updatable = false)
     private Boolean active;
 
+    @NotNull(message = AccountHistoryDataMessages.BLOCKED_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_BLOCKED_COLUMN, nullable = false, updatable = false)
     private Boolean blocked;
 
+    @NotNull(message = AccountHistoryDataMessages.TWO_FACTOR_AUTH_NULL)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_TWO_FACTOR_AUTH_COLUMN, nullable = false, updatable = false)
     private Boolean twoFactorAuth;
 
@@ -84,15 +100,28 @@ public class AccountHistoryData {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime blockedTime;
 
+    @NotBlank(message = AccountHistoryDataMessages.NAME_BLANK)
+    @Pattern(regexp = AccountHistoryDataConsts.NAME_REGEX, message = AccountHistoryDataMessages.NAME_REGEX_NOT_MET)
+    @Size(min = AccountHistoryDataConsts.NAME_MIN_LENGTH, message = AccountHistoryDataMessages.NAME_TOO_SHORT)
+    @Size(max = AccountHistoryDataConsts.NAME_MAX_LENGTH, message = AccountHistoryDataMessages.NAME_TOO_LONG)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_FIRST_NAME_COLUMN, nullable = false, length = 64, updatable = false)
     private String name;
 
+    @NotBlank(message = AccountHistoryDataMessages.LASTNAME_BLANK)
+    @Pattern(regexp = AccountHistoryDataConsts.LASTNAME_REGEX, message = AccountHistoryDataMessages.LASTNAME_REGEX_NOT_MET)
+    @Size(min = AccountHistoryDataConsts.LASTNAME_MIN_LENGTH, message = AccountHistoryDataMessages.LASTNAME_TOO_SHORT)
+    @Size(max = AccountHistoryDataConsts.LASTNAME_MAX_LENGTH, message = AccountHistoryDataMessages.LASTNAME_TOO_LONG)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_LAST_NAME_COLUMN, nullable = false, length = 64, updatable = false)
     private String lastname;
 
+    @Email(message = AccountHistoryDataMessages.EMAIL_CONSTRAINT_NOT_MET)
+    @Size(min = AccountHistoryDataConsts.EMAIL_MIN_LENGTH, message = AccountHistoryDataMessages.EMAIL_TOO_SHORT)
+    @Size(max = AccountHistoryDataConsts.EMAIL_MAX_LENGTH, message = AccountHistoryDataMessages.EMAIL_TOO_LONG)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_EMAIL_COLUMN, nullable = false, length = 64, updatable = false)
     private String email;
 
+    @NotBlank(message = AccountHistoryDataMessages.PHONE_NUMBER_BLANK)
+    @Pattern(regexp = AccountHistoryDataConsts.PHONE_NUMBER_REGEX, message = AccountHistoryDataMessages.PHONE_NUMBER_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_PHONE_NUMBER_COLUMN, nullable = false, length = 16, updatable = false)
     private String phoneNumber;
 
@@ -113,6 +142,8 @@ public class AccountHistoryData {
     @Column(name = DatabaseConsts.ACCOUNT_HIST_UNSUCCESSFUL_LOGIN_COUNTER_COLUMN, nullable = false)
     private Integer unsuccessfulLoginCounter;
 
+    @NotBlank(message = AccountHistoryDataMessages.LANGUAGE_BLANK)
+    @Pattern(regexp = AccountHistoryDataConsts.LANGUAGE_REGEX, message = AccountHistoryDataMessages.LANGUAGE_REGEX_NOT_MET)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_LANGUAGE_COLUMN, nullable = false, length = 2, updatable = false)
     private String language;
 
@@ -120,6 +151,8 @@ public class AccountHistoryData {
     @Enumerated(EnumType.STRING)
     private OperationType operationType;
 
+    @NotNull(message = AccountHistoryDataMessages.MODIFICATION_TIME_NULL)
+    @PastOrPresent(message = AccountHistoryDataMessages.MODIFICATION_TIME_FUTURE)
     @Column(name = DatabaseConsts.ACCOUNT_HIST_MODIFICATION_TIME_COLUMN, nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime modificationTime;

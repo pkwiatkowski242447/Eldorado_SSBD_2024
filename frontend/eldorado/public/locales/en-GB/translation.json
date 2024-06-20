@@ -30,6 +30,7 @@
   "general.success": "Success",
   "general.yes": "Yes",
   "general.no": "No",
+  "general.field.required": "Field required",
 
   "loginPage.accountSuspended": "Account suspended? ",
   "loginPage.accountSuspended.text": "Go here",

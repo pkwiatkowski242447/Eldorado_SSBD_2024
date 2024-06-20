@@ -90,7 +90,8 @@ const CountrySelect = ({
                     type="button"
                     variant={"outline"}
                     className={cn("flex gap-1 rounded-e-none rounded-s-lg px-3")}
-                    disabled={disabled}
+                    // disabled={disabled}
+                    disabled={true}
                 >
                     <FlagComponent country={value} countryName={value}/>
                     <ChevronsUpDown

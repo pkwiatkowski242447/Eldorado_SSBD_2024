@@ -29,6 +29,7 @@
   "general.success": "Sukces",
   "general.yes": "Tak",
   "general.no": "Nie",
+  "general.field.required": "Pole wymagane",
 
   "loginPage.accountSuspended": "Konto zawieszone? ",
   "loginPage.accountSuspended.text": " Przejdź tutaj",
