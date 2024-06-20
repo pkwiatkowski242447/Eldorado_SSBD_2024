@@ -22,8 +22,8 @@ export function CreateReservationForm({onSubmit}: DateTimePickerFormProps) {
     const locale = window.navigator.language == "pl" ? pl : enUS;
 
     const formSchema = z.object({
-        startDateTime: z.date().min(new Date(), {message: "You can't create a reservation which starts in the past"}),
-        endDateTime: z.date().min(new Date(), {message: "You can't create a reservation which ends right now"}),
+        startDateTime: z.date({message: t("general.field.required")}).min(new Date(), {message: "You can't create a reservation which starts in the past"}),
+        endDateTime: z.date({message: t("general.field.required")}).min(new Date(), {message: "You can't create a reservation which ends right now"}),
     }).refine((obj) => obj.endDateTime > obj.startDateTime, {
             message:t("createReservationForm.formSchema.endDateTime.smaller.than.startDateTime"),
             path:["endDateTime"]

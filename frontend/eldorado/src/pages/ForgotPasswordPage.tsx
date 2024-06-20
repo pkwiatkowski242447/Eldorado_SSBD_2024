@@ -19,7 +19,7 @@ function ForgotPasswordPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     const formSchema = z.object({
-        email: z.string().min(1, {message: t("forgotPasswordPage.emptyEmail")})
+        email: z.string({message: t("general.field.required")}).min(1, {message: t("forgotPasswordPage.emptyEmail")})
             .email(t("forgotPasswordPage.wrongEmail")),
     })
 

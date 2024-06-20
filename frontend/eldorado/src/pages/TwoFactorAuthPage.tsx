@@ -17,7 +17,7 @@ function TwoFactorAuthPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     const FormSchema = z.object({
-        pin: z.string().min(8, {
+        pin: z.string({message: t("general.field.required")}).min(8, {
             message: t("twoFactorAuthPage.wrongCode"),
         }),
     });
