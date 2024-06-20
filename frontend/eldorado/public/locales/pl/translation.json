@@ -808,6 +808,11 @@
   "parking.management.history.page.zip.code": "Kod pocztowy",
   "parking.management.history.page.strategy": "Strategia",
   "parking.management.history.page.modification.time": "Czas modyfikacji",
-  "parking.management.history.page.modified.by": "Zmodyfikowane przez"
+  "parking.management.history.page.modified.by": "Zmodyfikowane przez",
+
+  "STAFF" : "Pracownik",
+  "CLIENT" : "Klient",
+  "ADMIN" : "Administrator"
+
 
 }

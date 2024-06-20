@@ -259,7 +259,7 @@ function UserAccountSettings() {
             api.modifyAccountUser(managedUser.login, managedUser.version, managedUser.userLevelsDto,
                 name, lastName, phoneNumber, twoFactorAuth, etag)
                 .then(() => {
-                    getCurrentAccount();
+                    // getCurrentAccount();
                     toast({
                         title: t("accountSettings.popUp.changeUserDataOK.title"),
                         description: t("accountSettings.popUp.changeOtherUserDataOK.text"),
