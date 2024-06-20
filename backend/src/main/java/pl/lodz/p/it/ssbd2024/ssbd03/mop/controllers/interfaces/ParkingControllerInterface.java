@@ -245,6 +245,11 @@ public interface ParkingControllerInterface {
      *                                  exception handling aspects from facade and service layers below.
      */
     @PostMapping(value = "/{id}/enter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New reservation"),
+            @ApiResponse(responseCode = "400", description = "Entry was not possible due to reservation not being created."),
+            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
+    })
     ResponseEntity<?> enterParkingWithoutReservation(@PathVariable("id") String parkingId) throws ApplicationBaseException;
 
     /**

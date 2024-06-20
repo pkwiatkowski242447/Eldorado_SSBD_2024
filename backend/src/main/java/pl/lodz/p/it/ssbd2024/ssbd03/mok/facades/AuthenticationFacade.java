@@ -88,7 +88,7 @@ public class AuthenticationFacade extends AbstractFacade<Account> {
      * @return If there is user account with given username in the system, this method returns their account in a form of Optional.
      * Otherwise, empty optional is returned.
      */
-    @RolesAllowed({Authorities.LOGIN, Authorities.REFRESH_SESSION})
+    @RolesAllowed({Authorities.LOGIN, Authorities.REFRESH_SESSION, Authorities.SWITCH_USER_LEVEL})
     @Transactional(propagation = Propagation.REQUIRED)
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {

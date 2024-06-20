@@ -227,4 +227,12 @@ public class AuthenticationController implements AuthenticationControllerInterfa
             return request.getRemoteAddr();
         }
     }
+
+    @Override
+    @RolesAllowed(Authorities.SWITCH_USER_LEVEL)
+    public ResponseEntity<?> changeUserLevel(String level) throws ApplicationBaseException {
+        authenticationService.changeUserLevel(level);
+
+        return ResponseEntity.noContent().build();
+    }
 }

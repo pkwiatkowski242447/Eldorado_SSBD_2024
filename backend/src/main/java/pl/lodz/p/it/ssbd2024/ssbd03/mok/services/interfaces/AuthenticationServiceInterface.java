@@ -94,4 +94,10 @@ public interface AuthenticationServiceInterface {
      *                                  on facade components.
      */
     Optional<Account> findByLogin(String login) throws ApplicationBaseException;
+
+    /**
+     * Handles action to change user level.
+     * @param userLevel The name of the desired user level.
+     */
+    void changeUserLevel(String userLevel) throws ApplicationBaseException;
 }
