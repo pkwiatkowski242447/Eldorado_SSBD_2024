@@ -3,7 +3,13 @@
 
 describe("MOK.2 Authenticate", () => {
     beforeEach(() => {
-        cy.visit("http://localhost:3000/login");
+        cy.visit("http://localhost:3000/login", {
+            onBeforeLoad(win: Cypress.AUTWindow) {
+                Object.defineProperty(win.navigator, 'languages', {
+                    value: ['pl'],
+                });
+            }
+        })
     });
 
     it("Correct authentication", () => {
