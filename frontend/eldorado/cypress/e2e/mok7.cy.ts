@@ -48,7 +48,7 @@ describe("MOK.7 Remove user level from account", () => {
         cy.wait(2000);
 
         // Open jerzybem menu
-        cy.xpath("/html/body/div/div/div[1]/div/div[3]/div[1]/table/tbody/tr[1]/td[8]/button")
+        cy.xpath("/html/body/div/div/div[1]/div/div[3]/div[1]/table/tbody/tr[2]/td[8]/button")
             .click();
 
         // Choose settings option

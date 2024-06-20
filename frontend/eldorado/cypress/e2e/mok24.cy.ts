@@ -37,9 +37,13 @@ describe("MOK.24 Resend e-mail confirmation e-mail", () => {
         cy.xpath("/html/body/div[2]/div/div[3]")
             .click();
 
+        cy.wait(2000);
+
         // Open e-mail screen
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/nav/button[3]")
             .click();
+
+        cy.wait(2000);
 
         // Enter new e-mail
         cy.xpath("//*[@id=\":rg:-form-item\"]")
