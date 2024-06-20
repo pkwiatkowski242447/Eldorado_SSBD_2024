@@ -199,7 +199,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
 
     @Test
     public void loginUsingCredentialsEndpointTestNegativeWhenUserAccountIsNotActive() throws Exception {
-        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jchrystus", "P@ssw0rd!", "pl");
+        AuthenticationLoginDTO accountLoginDTO = new AuthenticationLoginDTO("jchrzan", "P@ssw0rd!", "pl");
         RequestSpecification request = RestAssured.given();
 
         request
@@ -343,7 +343,7 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
         assertEquals(list2.get(0), "aandrus");
         assertEquals(list2.get(1), "adamn");
         assertEquals(list2.get(2), "jakubkoza");
-        assertEquals(list2.get(3), "jchrystus");
+        assertEquals(list2.get(3), "jchrzan");
         assertEquals(list2.get(4), "jerzybem");
         assertEquals(list2.get(5), "juleswinnfield");
         assertEquals(list2.get(6), "kamilslimak");
