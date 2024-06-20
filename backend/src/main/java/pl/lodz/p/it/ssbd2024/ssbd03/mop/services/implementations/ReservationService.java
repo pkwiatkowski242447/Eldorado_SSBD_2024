@@ -88,7 +88,7 @@ public class ReservationService implements ReservationServiceInterface {
     // MOP.15 - Get all active reservation
 
     @Override
-    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
+    @RolesAllowed({Authorities.GET_ACTIVE_RESERVATIONS})
     public List<Reservation> getAllActiveReservationsByUserLoginWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         return reservationFacade.findAllActiveUserReservationByLoginWithPagination(login, pageNumber, pageSize);
     }
@@ -96,7 +96,7 @@ public class ReservationService implements ReservationServiceInterface {
     // MOP.16 - Get all historical reservation
 
     @Override
-    @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
+    @RolesAllowed({Authorities.GET_HISTORICAL_RESERVATIONS})
     public List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         return reservationFacade.findAllHistoricalUserReservationByLoginWithPagination(login, pageNumber, pageSize);
     }
@@ -104,7 +104,7 @@ public class ReservationService implements ReservationServiceInterface {
     // MOP.14 - Reserve a parking place
 
     @Override
-    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE})
     public Reservation makeReservation(String clientLogin, UUID sectorId, LocalDateTime beginTime, LocalDateTime endTime) throws ApplicationBaseException {
         // Check begin time
         if (beginTime.isBefore(LocalDateTime.now()) || endTime.isBefore(beginTime) || endTime.isEqual(beginTime)
@@ -184,7 +184,7 @@ public class ReservationService implements ReservationServiceInterface {
     // MOP.17 - Cancel an active reservation
 
     @Override
-    @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    @RolesAllowed({Authorities.CANCEL_RESERVATION})
     public void cancelReservation(UUID reservationId) throws ApplicationBaseException {
         Reservation reservation = reservationFacade.findClientReservation(
                 reservationId,

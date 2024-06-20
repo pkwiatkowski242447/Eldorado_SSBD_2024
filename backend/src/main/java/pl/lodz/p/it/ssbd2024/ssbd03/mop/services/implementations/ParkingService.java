@@ -152,7 +152,7 @@ public class ParkingService implements ParkingServiceInterface {
     // MOP.9 - Activate sector
 
     @Override
-    @RolesAllowed(Authorities.ACTIVATE_SECTOR)
+    @RolesAllowed({Authorities.ACTIVATE_SECTOR})
     public void activateSector(UUID id) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
         if (sector.getActive(this.reservationMaxHours)) throw new SectorAlreadyActiveException();
@@ -163,7 +163,7 @@ public class ParkingService implements ParkingServiceInterface {
     // MOP.10 - Deactivate sector
 
     @Override
-    @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
+    @RolesAllowed({Authorities.DEACTIVATE_SECTOR})
     public void deactivateSector(UUID id, LocalDateTime deactivationTime) throws ApplicationBaseException {
         Sector sector = parkingFacade.findAndRefreshSectorById(id).orElseThrow(SectorNotFoundException::new);
 
@@ -269,7 +269,7 @@ public class ParkingService implements ParkingServiceInterface {
     // MOP.4 - Edit parking
 
     @Override
-    @RolesAllowed(Authorities.EDIT_PARKING)
+    @RolesAllowed({Authorities.EDIT_PARKING})
     public Parking editParking(Parking modifiedParking, UUID parkingId) throws ApplicationBaseException {
         Parking foundParking = parkingFacade.findAndRefresh(parkingId).orElseThrow(ParkingNotFoundException::new);
 
@@ -352,7 +352,7 @@ public class ParkingService implements ParkingServiceInterface {
     // MOP.18 - Enter parking with reservation
 
     @Override
-    @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
+    @RolesAllowed({Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public Reservation enterParkingWithoutReservation(UUID parkingId, String login, boolean isAnonymous) throws ApplicationBaseException {
         Client client = null;
         Client.ClientType clientType = Client.ClientType.BASIC;
@@ -396,7 +396,7 @@ public class ParkingService implements ParkingServiceInterface {
     // MOP.19 Exit the parking
 
     @Override
-    @RolesAllowed(Authorities.EXIT_PARKING)
+    @RolesAllowed({Authorities.EXIT_PARKING})
     public void exitParking(UUID reservationId, String userLogin, boolean endReservation) throws ApplicationBaseException {
         Reservation reservation = this.reservationFacade.findAndRefresh(reservationId).orElseThrow(ReservationNotFoundException::new);
 

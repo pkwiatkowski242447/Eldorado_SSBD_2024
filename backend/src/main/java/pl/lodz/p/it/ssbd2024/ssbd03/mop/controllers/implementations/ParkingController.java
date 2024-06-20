@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -17,10 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.LoggerInterceptor;
 import pl.lodz.p.it.ssbd2024.ssbd03.aspects.logging.TxTracked;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountOutputDTO.AccountHistoryDataOutputDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.parkingDTO.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mop.sectorDTO.*;
-import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mok.AccountHistoryDataMapper;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.mappers.mop.*;
 import pl.lodz.p.it.ssbd2024.ssbd03.config.security.consts.Authorities;
 import pl.lodz.p.it.ssbd2024.ssbd03.entities.mop.Parking;
@@ -80,7 +80,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_PARKING})
-    public ResponseEntity<?> createParking(@Valid ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> createParking(ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException {
         Parking parking = parkingService.createParking(parkingCreateDTO.getCity(), parkingCreateDTO.getZipCode(),
                 parkingCreateDTO.getStreet(), Parking.SectorDeterminationStrategy.valueOf(parkingCreateDTO.getStrategy()));
         return ResponseEntity.created(URI.create(this.createdParkingResourceURL + parking.getId())).build();
@@ -90,7 +90,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.ADD_SECTOR})
-    public ResponseEntity<?> createSector(String parkingId, @Valid SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> createSector(String parkingId, SectorCreateDTO sectorCreateDTO) throws ApplicationBaseException {
         Sector sector;
         try {
             sector = parkingService.createSector(UUID.fromString(parkingId),
@@ -120,7 +120,7 @@ public class ParkingController implements ParkingControllerInterface {
     // MOP.13 - Get sector
 
     @Override
-    @RolesAllowed(Authorities.GET_SECTOR)
+    @RolesAllowed({Authorities.GET_SECTOR})
     public ResponseEntity<?> getSectorById(String id) throws ApplicationBaseException {
         try {
             Sector sector = parkingService.getSectorById(UUID.fromString(id));
@@ -131,7 +131,9 @@ public class ParkingController implements ParkingControllerInterface {
 
             return ResponseEntity.ok().headers(headers).body(sectorOutputDTO);
         } catch (SectorNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(e.getMessage());
         } catch (IllegalArgumentException iae) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
@@ -151,7 +153,9 @@ public class ParkingController implements ParkingControllerInterface {
 
             return ResponseEntity.ok().headers(headers).body(parkingOutputDTO);
         } catch (ParkingNotFoundException exception) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(exception.getMessage());
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
@@ -171,7 +175,9 @@ public class ParkingController implements ParkingControllerInterface {
             }
             return ResponseEntity.ok(sectors);
         } catch (ParkingNotFoundException exception) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(exception.getMessage());
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new InvalidDataFormatException(I18n.BAD_UUID_INVALID_FORMAT_EXCEPTION);
         }
@@ -234,7 +240,7 @@ public class ParkingController implements ParkingControllerInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
+    @RolesAllowed({Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> enterParkingWithoutReservation(String parkingId) throws ApplicationBaseException {
@@ -250,7 +256,7 @@ public class ParkingController implements ParkingControllerInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.ENTER_PARKING_WITH_RESERVATION)
+    @RolesAllowed({Authorities.ENTER_PARKING_WITH_RESERVATION})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class,
                     ReservationNotStartedException.class, ReservationNoAvailablePlaceException.class})
@@ -268,7 +274,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.EDIT_PARKING})
-    public ResponseEntity<?> editParking(String ifMatch, @Valid ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> editParking(String ifMatch, ParkingModifyDTO parkingModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
         }
@@ -288,7 +294,7 @@ public class ParkingController implements ParkingControllerInterface {
 
     @Override
     @RolesAllowed({Authorities.EDIT_SECTOR})
-    public ResponseEntity<?> editSector(String ifMatch, @Valid SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> editSector(String ifMatch, SectorModifyDTO sectorModifyDTO) throws ApplicationBaseException {
         if (ifMatch == null || ifMatch.isBlank()) {
             throw new InvalidRequestHeaderIfMatchException();
         }
@@ -338,7 +344,7 @@ public class ParkingController implements ParkingControllerInterface {
 
 
     @Override
-    @RolesAllowed(Authorities.EXIT_PARKING)
+    @RolesAllowed({Authorities.EXIT_PARKING})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
     public ResponseEntity<?> exitParking(String reservationId, boolean endReservation) throws ApplicationBaseException {

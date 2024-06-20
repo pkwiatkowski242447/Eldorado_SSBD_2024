@@ -69,7 +69,8 @@ public class AccountHistoryDataFacade extends AbstractFacade<AccountHistoryData>
             Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.CHANGE_USER_PASSWORD,
             Authorities.CHANGE_OWN_PASSWORD, Authorities.BLOCK_ACCOUNT, Authorities.UNBLOCK_ACCOUNT,
             Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT, Authorities.CONFIRM_ACCOUNT_CREATION,
-            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.RESET_PASSWORD
+            Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.RESET_PASSWORD,
+            Authorities.CHANGE_OWN_PASSWORD_AFTER_ADMINISTRATIVE_CHANGE
     })
     public void create(AccountHistoryData account) throws ApplicationBaseException {
         TypedQuery<Integer> findParkingByIdQuery = entityManager.createNamedQuery("AccountHistoryData.checkIfEntityExists", Integer.class);

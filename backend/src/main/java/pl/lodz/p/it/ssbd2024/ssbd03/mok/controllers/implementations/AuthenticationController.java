@@ -6,14 +6,9 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.RollbackException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.eclipse.angus.mail.iap.ByteArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -44,11 +39,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountSuspend
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces.AuthenticationControllerInterface;
 import pl.lodz.p.it.ssbd2024.ssbd03.mok.services.interfaces.AuthenticationServiceInterface;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
@@ -101,8 +91,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> loginUsingCredentials(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                   @Valid @RequestBody AuthenticationLoginDTO accountLoginDTO,
+    public ResponseEntity<?> loginUsingCredentials(String proxyChain, AuthenticationLoginDTO accountLoginDTO,
                                                    HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
@@ -157,8 +146,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     })
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> loginUsingAuthenticationCode(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                          @Valid @RequestBody AuthenticationCodeDTO authenticationCodeDTO,
+    public ResponseEntity<?> loginUsingAuthenticationCode(String proxyChain, AuthenticationCodeDTO authenticationCodeDTO,
                                                           HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         try {
@@ -182,8 +170,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     @RolesAllowed({Authorities.REFRESH_SESSION})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class, ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> refreshUserSession(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                                @Valid @RequestBody RefreshTokenDTO refreshTokenDTO, HttpServletRequest request) throws ApplicationBaseException {
+    public ResponseEntity<?> refreshUserSession(String proxyChain, RefreshTokenDTO refreshTokenDTO,
+                                                HttpServletRequest request) throws ApplicationBaseException {
         String sourceAddress = getSourceAddress(proxyChain, request);
         String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
         AccessAndRefreshTokensDTO accessAndRefreshTokensDTO = this.authenticationService.refreshUserSession(refreshTokenDTO.getRefreshToken(), userLogin);
@@ -195,9 +183,8 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     // Logout method
 
     @Override
-    @RolesAllowed(Authorities.LOGOUT)
-    public ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
-                                    HttpServletRequest request, HttpServletResponse response) {
+    @RolesAllowed({Authorities.LOGOUT})
+    public ResponseEntity<?> logout(String proxyChain, HttpServletRequest request, HttpServletResponse response) {
         String sourceAddress = getSourceAddress(proxyChain, request);
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();

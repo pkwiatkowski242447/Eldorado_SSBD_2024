@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2024.ssbd03.mok.controllers.interfaces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.accountInputDTO.AccountRegisterDTO;
@@ -36,7 +37,7 @@ public interface RegistrationControllerInterface {
             @ApiResponse(responseCode = "409", description = "User account with given login or password already exists."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> registerClient(@RequestBody AccountRegisterDTO accountRegisterDTO)
+    ResponseEntity<?> registerClient(@Valid @RequestBody AccountRegisterDTO accountRegisterDTO)
             throws ApplicationBaseException;
 
     /**
@@ -58,7 +59,7 @@ public interface RegistrationControllerInterface {
             @ApiResponse(responseCode = "409", description = "User account with given login or password already exists."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> registerStaff(@RequestBody AccountRegisterDTO accountRegisterDTO)
+    ResponseEntity<?> registerStaff(@Valid @RequestBody AccountRegisterDTO accountRegisterDTO)
             throws ApplicationBaseException;
 
     /**
@@ -80,6 +81,6 @@ public interface RegistrationControllerInterface {
             @ApiResponse(responseCode = "409", description = "User account with given login or password already exists."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> registerAdmin(@RequestBody AccountRegisterDTO accountRegisterDTO)
+    ResponseEntity<?> registerAdmin(@Valid @RequestBody AccountRegisterDTO accountRegisterDTO)
             throws ApplicationBaseException;
 }

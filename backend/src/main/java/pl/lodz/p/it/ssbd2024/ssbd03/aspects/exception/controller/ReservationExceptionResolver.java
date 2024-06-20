@@ -11,7 +11,6 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClient
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientLimitException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationClientUserLevelNotFound;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationInsufficientClientType;
-import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.time.ReservationExceedingMaximumTime;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationNoAvailablePlaceException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.ReservationSectorNonActiveException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mop.reservation.read.ReservationNotFoundException;

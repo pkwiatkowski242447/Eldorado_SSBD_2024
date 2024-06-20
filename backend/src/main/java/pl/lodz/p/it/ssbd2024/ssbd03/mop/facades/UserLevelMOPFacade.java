@@ -93,7 +93,10 @@ public class UserLevelMOPFacade extends AbstractFacade<UserLevel> {
      * @throws ApplicationBaseException General superclass of all the exceptions thrown by the
      *                                  facade exception handling aspect.
      */
-    @RolesAllowed({Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING, Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
+    @RolesAllowed({
+            Authorities.RESERVE_PARKING_PLACE, Authorities.DELETE_PARKING,
+            Authorities.ENTER_PARKING_WITHOUT_RESERVATION
+    })
     public Optional<Client> findGivenUserLevelForGivenAccount(String login) throws ApplicationBaseException {
         Client userLevel = null;
 

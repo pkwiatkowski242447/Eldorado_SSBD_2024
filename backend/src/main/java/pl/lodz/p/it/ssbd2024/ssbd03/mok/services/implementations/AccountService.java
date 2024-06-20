@@ -286,7 +286,7 @@ public class AccountService implements AccountServiceInterface {
     }
 
     @Override
-    @RolesAllowed({Authorities.RESET_PASSWORD})
+    @RolesAllowed({Authorities.RESET_PASSWORD, Authorities.CHANGE_OWN_PASSWORD_AFTER_ADMINISTRATIVE_CHANGE})
     public void changeAccountPassword(String token, String newPassword) throws ApplicationBaseException {
         String decodedTokenValue = new String(Base64.getUrlDecoder().decode(token.getBytes()));
         Token tokenObject = this.tokenFacade.findByTokenValue(decodedTokenValue).orElseThrow(TokenNotFoundException::new);
@@ -587,7 +587,6 @@ public class AccountService implements AccountServiceInterface {
     @Override
     @RolesAllowed({Authorities.ADD_USER_LEVEL})
     public void addClientUserLevel(String id) throws ApplicationBaseException {
-
         Account account = accountFacade.find(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(I18n.ACCOUNT_NOT_FOUND_EXCEPTION));
 
         if (account.getUserLevels().stream().anyMatch(userLevel -> userLevel instanceof Client)) {

@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.utils.providers;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -71,6 +72,7 @@ public class MailProvider {
 //    @RolesAllowed({
 //            Authorities.REGISTER_CLIENT, Authorities.REGISTER_USER, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL
 //    })
+    @PermitAll
     public void sendRegistrationConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -103,7 +105,8 @@ public class MailProvider {
      * @param language        Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
+    // @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
+    @PermitAll
     public void sendAccountAccessRestoreEmailMessage(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -135,7 +138,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
+    // @RolesAllowed({Authorities.RESTORE_ACCOUNT_ACCESS})
+    @PermitAll
     public void sendAccountAccessRestoreInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -165,7 +169,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.BLOCK_ACCOUNT, Authorities.LOGIN})
+    // @RolesAllowed({Authorities.BLOCK_ACCOUNT, Authorities.LOGIN})
+    @PermitAll
     public void sendBlockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language, boolean adminLock) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -197,7 +202,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
+    // @RolesAllowed({Authorities.UNBLOCK_ACCOUNT})
+    @PermitAll
     public void sendUnblockAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
@@ -227,7 +233,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.REMOVE_ACCOUNT})
+    // @RolesAllowed({Authorities.REMOVE_ACCOUNT})
+    @PermitAll
     public void sendRemoveAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
@@ -257,7 +264,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.BLOCK_ACCOUNT})
+    // @RolesAllowed({Authorities.BLOCK_ACCOUNT})
+    @PermitAll
     public void sendSuspendAccountInfoEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException("Given image could not be found!"));
@@ -288,7 +296,8 @@ public class MailProvider {
      * @param language        Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.CHANGE_USER_MAIL, Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
+    // @RolesAllowed({Authorities.CHANGE_USER_MAIL, Authorities.CHANGE_OWN_MAIL, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL})
+    @PermitAll
     public void sendEmailConfirmEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -321,7 +330,8 @@ public class MailProvider {
      * @param language        Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.RESET_PASSWORD, Authorities.CHANGE_USER_PASSWORD})
+    // @RolesAllowed({Authorities.RESET_PASSWORD, Authorities.CHANGE_USER_PASSWORD})
+    @PermitAll
     public void sendPasswordResetEmail(String firstName, String lastName, String emailReceiver, String confirmationURL, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -354,7 +364,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.LOGIN})
+    // @RolesAllowed({Authorities.LOGIN})
+    @PermitAll
     public void sendTwoFactorAuthCode(String firstName, String lastName, String authCode, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -385,7 +396,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION})
+    // @RolesAllowed({Authorities.CONFIRM_ACCOUNT_CREATION})
+    @PermitAll
     public void sendActivationConfirmationEmail(String firstName, String lastName, String emailReceiver, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -416,7 +428,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.ADD_USER_LEVEL})
+    // @RolesAllowed({Authorities.ADD_USER_LEVEL})
+    @PermitAll
     public void sendEmailNotificationAboutGrantedUserLevel(String firstName, String lastName, String emailReceiver, String userLevel, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -448,7 +461,8 @@ public class MailProvider {
      * @param language      Language of the message.
      */
     @Async
-//    @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
+    // @RolesAllowed({Authorities.REMOVE_USER_LEVEL})
+    @PermitAll
     public void sendEmailNotificationAboutRevokedUserLevel(String firstName, String lastName, String emailReceiver, String userLevel, String language) {
         try {
             String logo = this.loadImage("eldorado.png").orElseThrow(() -> new ImageNotFoundException(MailProviderMessages.IMAGE_NOT_FOUND_EXCEPTION));
@@ -482,7 +496,8 @@ public class MailProvider {
      * @param timeframe     Reservation timeframe.
      */
     @Async
-//    @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    // @RolesAllowed(Authorities.RESERVE_PARKING_PLACE)
+    @PermitAll
     public void sendMadeReservationInfoEmail(String firstName, String lastName, String emailReceiver,
                                              String language, String address, String sector, String timeframe) {
         try {
@@ -520,7 +535,8 @@ public class MailProvider {
      * @param reservationId Identifier of the reservation.
      */
     @Async
-//    @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    // @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    @PermitAll
     public void sendCancelledReservationInfoEmail(String firstName, String lastName, String emailReceiver,
                                                   String language, String reservationId) {
         try {
@@ -556,7 +572,8 @@ public class MailProvider {
      * @param reservationId Identifier of the reservation.
      */
     @Async
-//    @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
+    // @RolesAllowed(Authorities.DEACTIVATE_SECTOR)
+    @PermitAll
     public void sendAdministrativelyCancelledReservationInfoEmail(String firstName, String lastName, String emailReceiver,
                                                   String language, String reservationId) {
         try {
@@ -592,7 +609,8 @@ public class MailProvider {
      * @param reservationId Identifier of the reservation.
      */
     @Async
-//    @RolesAllowed(Authorities.END_RESERVATION)
+    // @RolesAllowed(Authorities.END_RESERVATION)
+    @PermitAll
     public void sendSystemEndReservationInfoEmail(String firstName, String lastName, String emailReceiver,
                                                                   String language, String reservationId) {
         try {
@@ -628,7 +646,8 @@ public class MailProvider {
      * @param newClientTypeName Name of the granted client type.
      */
     @Async
-//    @RolesAllowed({Authorities.EXIT_PARKING, Authorities.END_RESERVATION})
+    // @RolesAllowed({Authorities.EXIT_PARKING, Authorities.END_RESERVATION})
+    @PermitAll
     public void sendChangedClientTypeInfoEmail(String firstName, String lastName, String emailReceiver,
                                                   String language, String newClientTypeName) {
         try {
@@ -672,6 +691,7 @@ public class MailProvider {
 //            Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.ADD_USER_LEVEL,
 //            Authorities.REMOVE_USER_LEVEL
 //    })
+    @PermitAll
     private void sendEmail(String emailContent, String emailReceiver, String senderEmail, String emailSubject) throws MessagingException {
         if (!Arrays.asList(env.getActiveProfiles()).contains("test")) {
             MimeMessage mimeMessage = mailSender.createMimeMessage();

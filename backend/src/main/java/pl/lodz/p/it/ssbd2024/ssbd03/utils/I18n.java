@@ -18,6 +18,7 @@ public class I18n {
     public static final String ACCOUNT_AUTHENTICATION_EXCEPTION = "account.authentication.exception";
     public static final String ACCOUNT_RESTORE_ACCESS_EXCEPTION = "account.restore.access.exception";
     public static final String ACCOUNT_USER_LEVELS_CONFLICT = "account.user_levels.conflict.exception";
+    public static final String ACCOUNT_ACTIVATION_TIMED_OUT_EXCEPTION = "account.activation.operation.timed.out.exception";
 
     // Account reset own password exceptions
     public static final String SET_NEW_PASSWORD_IS_THE_SAME_AS_CURRENT_ONE = "account.reset.password.same.passwords.exception";
