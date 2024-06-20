@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.exception.ExceptionDTO;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.TokenDataExtractionException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.read.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.token.TokenNotValidException;
 
@@ -46,5 +47,20 @@ public class TokenExceptionResolver {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ExceptionDTO(exception));
+    }
+
+    /**
+     * This method will translate any TokenDataExtractionException and its subclasses into HTTP Response status
+     * 400 BAD REQUEST and place message extracted from the exception in the response body.
+     *
+     * @param exception Instance of TokenDataExtractionException or any of its subclasses, that is being caught, in order
+     *                  to be transformed into HTTP Response.
+     * @return 400 BAD REQUEST is thrown when this exception is caught when propagating from controller.
+     */
+    @ExceptionHandler(value = { TokenDataExtractionException.class })
+    public ResponseEntity<?> handleTokenDataExtractionException(TokenDataExtractionException exception) {
+        return ResponseEntity.badRequest()
+               .contentType(MediaType.APPLICATION_JSON)
+               .body(new ExceptionDTO(exception));
     }
 }

@@ -74,7 +74,7 @@ public class GenericExceptionResolver {
 
     /**
      * This method is used to transform any MapperBaseException or exception that extend it, which could be thrown when
-     * trying to map not handled / invalid data. After such exception is propagated from controller
+     * trying to map not handled / invalid. After such exception is propagated from controller
      * it will be caught and transformed into HTTP Response.
      *
      * @param mapperBaseException MapperBaseException that was caught in order to be transformed to HTTP Response.

@@ -93,7 +93,7 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "400", description = "The account is blocked or not activated or account with given e-mail has not been found."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> forgetAccountPassword(@RequestBody AccountEmailDTO accountEmailDTO)
+    ResponseEntity<?> forgetAccountPassword(@Valid @RequestBody AccountEmailDTO accountEmailDTO)
             throws ApplicationBaseException;
 
     /**
@@ -137,7 +137,7 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
     ResponseEntity<?> changeAccountPassword(@PathVariable("token") String token,
-                                            @RequestBody AccountPasswordDTO accountPasswordDTO)
+                                            @Valid @RequestBody AccountPasswordDTO accountPasswordDTO)
             throws ApplicationBaseException;
 
     /**
@@ -579,7 +579,7 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "400", description = "The account is blocked, is activated or the account with given e-mail has not been found."),
             @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
     })
-    ResponseEntity<?> sendAccountRestorationEmailMessage(@RequestBody AccountEmailDTO accountEmailDTO)
+    ResponseEntity<?> sendAccountRestorationEmailMessage(@Valid @RequestBody AccountEmailDTO accountEmailDTO)
             throws ApplicationBaseException;
 
     /**

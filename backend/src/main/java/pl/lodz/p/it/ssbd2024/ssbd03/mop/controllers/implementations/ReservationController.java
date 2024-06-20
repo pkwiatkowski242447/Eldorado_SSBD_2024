@@ -62,7 +62,7 @@ public class ReservationController implements ReservationControllerInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_ACTIVE_RESERVATIONS)
+    @RolesAllowed({Authorities.GET_ACTIVE_RESERVATIONS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllActiveReservationSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
@@ -77,7 +77,7 @@ public class ReservationController implements ReservationControllerInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.GET_HISTORICAL_RESERVATIONS)
+    @RolesAllowed({Authorities.GET_HISTORICAL_RESERVATIONS})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> getAllHistoricalReservationSelf(int pageNumber, int pageSize) throws ApplicationBaseException {
@@ -97,7 +97,7 @@ public class ReservationController implements ReservationControllerInterface {
             retryFor = {ApplicationDatabaseException.class, RollbackException.class,
                     ReservationNoAvailablePlaceException.class, ReservationClientLimitException.class,
                     ApplicationOptimisticLockException.class})
-    public ResponseEntity<?> makeReservation(@Valid MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
+    public ResponseEntity<?> makeReservation(MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
         //TODO future test Retryable OptimisticLock?
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -117,7 +117,7 @@ public class ReservationController implements ReservationControllerInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.CANCEL_RESERVATION)
+    @RolesAllowed({Authorities.CANCEL_RESERVATION})
     @Retryable(maxAttemptsExpression = "${retry.max.attempts}", backoff = @Backoff(delayExpression = "${retry.max.delay}"),
             retryFor = {ApplicationDatabaseException.class, RollbackException.class})
     public ResponseEntity<?> cancelReservation(String id) throws ApplicationBaseException {

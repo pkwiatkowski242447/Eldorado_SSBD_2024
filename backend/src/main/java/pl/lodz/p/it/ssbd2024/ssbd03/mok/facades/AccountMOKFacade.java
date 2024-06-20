@@ -101,7 +101,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
     @RolesAllowed({
             Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT, Authorities.UNBLOCK_ACCOUNT,
             Authorities.GET_USER_ACCOUNT, Authorities.CHANGE_USER_PASSWORD, Authorities.BLOCK_ACCOUNT,
-            Authorities.RESET_PASSWORD
+            Authorities.RESET_PASSWORD, Authorities.CHANGE_OWN_PASSWORD_AFTER_ADMINISTRATIVE_CHANGE
     })
     public Optional<Account> findAndRefresh(UUID id) throws ApplicationBaseException {
         return super.findAndRefresh(id);
@@ -144,7 +144,8 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT, Authorities.CONFIRM_ACCOUNT_CREATION,
             Authorities.CONFIRM_EMAIL_CHANGE, Authorities.RESEND_EMAIL_CONFIRMATION_MAIL, Authorities.GET_OWN_HISTORICAL_DATA,
             Authorities.GET_OWN_ACCOUNT, Authorities.CHANGE_OWN_MAIL, Authorities.REMOVE_USER_LEVEL,
-            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.GET_ADMIN_PASSWORD_RESET_STATUS, Authorities.RESET_PASSWORD
+            Authorities.RESTORE_ACCOUNT_ACCESS, Authorities.GET_ADMIN_PASSWORD_RESET_STATUS, Authorities.RESET_PASSWORD,
+            Authorities.CHANGE_OWN_PASSWORD_AFTER_ADMINISTRATIVE_CHANGE
     })
     public Optional<Account> findByLogin(String login) throws ApplicationBaseException {
         try {
@@ -306,7 +307,7 @@ public class AccountMOKFacade extends AbstractFacade<Account> {
             Authorities.UNBLOCK_ACCOUNT, Authorities.MODIFY_OWN_ACCOUNT, Authorities.MODIFY_USER_ACCOUNT,
             Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_ACCOUNT_CREATION, Authorities.CONFIRM_EMAIL_CHANGE,
             Authorities.ADD_USER_LEVEL, Authorities.REMOVE_USER_LEVEL, Authorities.RESTORE_ACCOUNT_ACCESS,
-            Authorities.RESET_PASSWORD
+            Authorities.RESET_PASSWORD, Authorities.CHANGE_OWN_PASSWORD_AFTER_ADMINISTRATIVE_CHANGE
     })
     public void edit(Account account) throws ApplicationBaseException {
         super.edit(account);

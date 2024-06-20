@@ -97,7 +97,8 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      *                                  facade exception handling aspect.
      */
     @Override
-    @RolesAllowed({Authorities.GET_PARKING, Authorities.DELETE_PARKING, Authorities.EDIT_PARKING, Authorities.ADD_SECTOR,
+    @RolesAllowed({
+            Authorities.GET_PARKING, Authorities.DELETE_PARKING, Authorities.EDIT_PARKING, Authorities.ADD_SECTOR,
             Authorities.DELETE_SECTOR, Authorities.EDIT_SECTOR, Authorities.RESERVE_PARKING_PLACE,
             Authorities.CANCEL_RESERVATION, Authorities.ENTER_PARKING_WITHOUT_RESERVATION,
             Authorities.ENTER_PARKING_WITH_RESERVATION, Authorities.EXIT_PARKING
@@ -423,7 +424,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
      * @return List of sector available for entry.
      * @throws ApplicationBaseException when other problem occurred.
      */
-    @RolesAllowed(Authorities.ENTER_PARKING_WITHOUT_RESERVATION)
+    @RolesAllowed({Authorities.ENTER_PARKING_WITHOUT_RESERVATION})
     public List<Sector> getAvailableSectorsNow(Client.ClientType clientType, UUID parkingId, LocalDateTime now, int maxReservationHours) throws ApplicationBaseException {
         TypedQuery<Sector> query = entityManager.createNamedQuery("Reservation.getAvailableBasicSectorsNow", Sector.class)
                 .setParameter("deactivationMinimum", LocalDateTime.now().plusHours(this.reservationMaxLength));
