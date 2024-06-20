@@ -39,7 +39,7 @@ public interface ParkingControllerInterface {
             @ApiResponse(responseCode = "409", description = "Parking with specified address already exist."),
             @ApiResponse(responseCode = "500", description = "Unexpected exception occurred.")
     })
-    ResponseEntity<?> createParking(@RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException;
+    ResponseEntity<?> createParking(@Valid @RequestBody ParkingCreateDTO parkingCreateDTO) throws ApplicationBaseException;
 
     /**
      * This method is used to create new sector.
