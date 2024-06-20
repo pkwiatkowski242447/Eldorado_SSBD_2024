@@ -145,7 +145,7 @@ export function DeactivateSectorForm({setDialogOpen, refresh, sectorId}:deactiva
                 <AlertDialogContent>
                     <AlertDialogTitle>{t("general.confirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {t("deactivate.sector.form.are.you.sure.you.want.to.edit.this.sector")}
+                        {t("deactivate.sector.form.are.you.sure.you.want.to.deactivate.this.sector")}
                     </AlertDialogDescription>
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t("general.cancel")}</AlertDialogCancel>
