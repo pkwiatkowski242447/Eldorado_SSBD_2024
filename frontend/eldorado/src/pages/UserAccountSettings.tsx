@@ -57,12 +57,12 @@ function UserAccountSettings() {
         name: z.string()
             .min(2, {message: t("accountSettings.firstNameTooShort")})
             .max(32, {message: t("accountSettings.firstNameTooLong")})
-            .regex(/^[A-Za-z]+$/, {message: t("general.nameInvalid")})
+            .regex(/^[A-Za-ząĄćĆęĘłŁńŃóÓśŚźŹżŻ]+$/, {message: t("general.nameInvalid")})
             .optional(),
         lastName: z.string()
             .min(2, {message: t("accountSettings.lastNameTooShort")})
             .max(32, {message: t("accountSettings.lastNameTooLong")})
-            .regex(/^[A-Za-z]+$/, {message: t("general.lastNameInvalid")})
+            .regex(/^[A-Za-ząĄćĆęĘłŁńŃóÓśŚźŹżŻ]+$/, {message: t("general.lastNameInvalid")})
             .optional(),
         phoneNumber: z.string().refine(isValidPhoneNumber, {message: t("accountSettings.phoneNumberInvalid")}).optional(),
         twoFactorAuth: z.boolean().optional().default(managedUser?.twoFactorAuth || false),

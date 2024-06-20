@@ -3,7 +3,14 @@
 
 describe("MOK.1 Register", () => {
     beforeEach(() => {
-        cy.visit("http://localhost:3000/register");
+
+        cy.visit("http://localhost:3000/register", {
+            onBeforeLoad(win: Cypress.AUTWindow) {
+                Object.defineProperty(win.navigator, 'languages', {
+                    value: ['pl'],
+                });
+            }
+        })
     });
 
     it("Correct regisration", () => {

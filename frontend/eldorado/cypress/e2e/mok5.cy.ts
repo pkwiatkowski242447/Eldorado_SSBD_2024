@@ -3,7 +3,13 @@
 
 describe("MOK.5 Unblock user account", () => {
     beforeEach(() => {
-        cy.visit("http://localhost:3000/login");
+        cy.visit("http://localhost:3000/login", {
+            onBeforeLoad(win: Cypress.AUTWindow) {
+                Object.defineProperty(win.navigator, 'languages', {
+                    value: ['pl'],
+                });
+            }
+        })
 
         // Enter login
         cy.xpath("/html/body/div/div/div[1]/div/div/div[2]/form/div[1]/div/input")

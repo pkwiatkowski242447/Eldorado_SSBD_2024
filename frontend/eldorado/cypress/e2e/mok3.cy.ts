@@ -3,7 +3,13 @@
 
 describe("MOK.3 Reset password", () => {
     beforeEach(() => {
-        cy.visit("http://localhost:3000/forgot-password");
+        cy.visit("http://localhost:3000/forgot-password", {
+            onBeforeLoad(win: Cypress.AUTWindow) {
+                Object.defineProperty(win.navigator, 'languages', {
+                    value: ['pl'],
+                });
+            }
+        })
     });
 
     it("Successful password reset", () => {
