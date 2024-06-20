@@ -15,6 +15,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {useAccount} from "@/hooks/useAccount.ts";
 import {useTranslation} from "react-i18next";
 import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
 
 const SiteHeader = () => {
     const {account} = useAccountState();
@@ -270,6 +271,9 @@ const SiteHeader = () => {
                     <>
                         <small
                             className="text-sm font-medium leading-none">{t("siteHeader.hello")}{account?.login}</small>
+                        {//@ts-expect-error 😴😴😴😴😴😴
+                            <Badge variant={"default"}>{t(account?.activeUserLevel?.roleName)}</Badge>
+                        }
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="secondary" size="icon" className="rounded-full">

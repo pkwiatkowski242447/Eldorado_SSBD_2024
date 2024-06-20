@@ -820,6 +820,10 @@
   "parking.management.history.page.zip.code": "Zip code",
   "parking.management.history.page.strategy": "Strategy",
   "parking.management.history.page.modification.time": "Modification time",
-  "parking.management.history.page.modified.by": "Modified by"
+  "parking.management.history.page.modified.by": "Modified by",
+
+  "STAFF" : "Staff",
+  "CLIENT" : "Client",
+  "ADMIN" : "Admin"
 
 }

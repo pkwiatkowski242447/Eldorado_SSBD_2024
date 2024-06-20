@@ -192,7 +192,7 @@ function AccountSettings() {
             api.modifyAccountSelf(account.login, account.version, account.userLevelsDto,
                 name, lastName, phoneNumber, twoFactorAuth, etag)
                 .then(() => {
-                    getCurrentAccount();
+                    // getCurrentAccount();
                     toast({
                         title: t("accountSettings.popUp.changeUserDataOK.title"),
                         description: t("accountSettings.popUp.changeUserDataOK.text"),
