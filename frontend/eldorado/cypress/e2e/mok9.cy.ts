@@ -34,7 +34,7 @@ describe("MOK.9 Change other user password", () => {
             .click();
     });
 
-    it("Successful password change", () => {
+    it("Successful other user password change", () => {
         // Choose user list view
         cy.xpath("/html/body/div/div/header/nav/a[2]")
             .click();

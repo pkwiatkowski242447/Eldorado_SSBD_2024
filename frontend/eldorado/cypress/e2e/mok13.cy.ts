@@ -34,7 +34,7 @@ describe("MOK.13 Modify other user account", () => {
             .click();
     });
 
-    it("Successful password change", () => {
+    it("Successful other user personal data modified", () => {
         // Choose user list view
         cy.xpath("/html/body/div/div/header/nav/a[2]")
             .click();
@@ -50,6 +50,8 @@ describe("MOK.13 Modify other user account", () => {
         // Choose personal data change
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/nav/button[3]")
             .click();
+
+        cy.wait(2000);
 
         // Input username
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/div/div/div/div/form/div/div[1]/div/input")
@@ -79,6 +81,10 @@ describe("MOK.13 Modify other user account", () => {
             .should("contain", "Dane użytkownika zostały pomyślnie zmienione.");
 
         // Check new user data in account details
+        // Refresh data
+        cy.xpath("/html/body/div/div/div[1]/div/div[1]/button")
+            .click();
+
         // Choose personal data change
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/nav/button[1]")
             .click();

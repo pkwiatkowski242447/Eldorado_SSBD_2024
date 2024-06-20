@@ -18,7 +18,7 @@ describe("MOK.12 Modify own account", () => {
             .click();
     });
 
-    it("Successful password change", () => {
+    it("Successful own personal data modified", () => {
         // Click account menu
         cy.xpath("/html/body/div/div/header/div/button")
             .click();
@@ -30,6 +30,8 @@ describe("MOK.12 Modify own account", () => {
         // Choose personal data change
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/nav/button[2]")
             .click();
+
+        cy.wait(2000);
 
         // Input username
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/div/div/div/div/form/div/div[1]/div/input")
@@ -59,6 +61,10 @@ describe("MOK.12 Modify own account", () => {
             .should("contain", "Twoje dane osobowe zostały pomyślnie zmienione.");
 
         // Check new user data in account details
+        // Refresh data
+        cy.xpath("/html/body/div/div/div[1]/div/div[1]/button")
+            .click();
+
         // Choose personal data change
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/nav/button[1]")
             .click();

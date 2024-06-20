@@ -31,6 +31,8 @@ describe("MOK.8 Change own password", () => {
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/nav/button[4]")
             .click();
 
+        cy.wait(2000);
+
         // Input current password
         cy.xpath("/html/body/div/div/div[1]/div/main/div[2]/div/div/div/div/form/div/div[1]/div/input")
             .type("P@ssw0rd!");
