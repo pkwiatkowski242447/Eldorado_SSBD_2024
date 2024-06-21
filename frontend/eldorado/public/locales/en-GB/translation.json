@@ -826,6 +826,9 @@
 
   "STAFF" : "Staff",
   "CLIENT" : "Client",
-  "ADMIN" : "Admin"
+  "ADMIN" : "Admin",
 
+  "Staff" : "Staff",
+  "Client" : "Client",
+  "Admin" : "Admin"
 }

@@ -814,7 +814,11 @@
 
   "STAFF" : "Pracownik",
   "CLIENT" : "Klient",
-  "ADMIN" : "Administrator"
+  "ADMIN" : "Administrator",
+
+  "Staff" : "Pracownik",
+  "Client" : "Klient",
+  "Admin" : "Administrator"
 
 
 }

@@ -26,7 +26,7 @@ function UserLevelsForm({managedUser, handleRemoveClick, handleAddClick, isAlert
                     <div className="flex flex-row justify-around">
                         {allUserLevels.map((level: AccountTypeEnum) => (
                             <div key={level} className="flex flex-col items-center m-5 ">
-                                <Badge variant="secondary">{level}</Badge>
+                                <Badge variant="secondary">{t(level)}</Badge>
                                 <div className={"pt-2"}>
                                     {managedUser?.userLevelsDto.some((userLevel: {
                                         roleName: string;
