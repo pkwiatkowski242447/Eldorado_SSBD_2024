@@ -28,7 +28,6 @@ public class AbstractEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    //TODO validation?
     /**
      * The version of the entity used for optimistic locking.
      */
