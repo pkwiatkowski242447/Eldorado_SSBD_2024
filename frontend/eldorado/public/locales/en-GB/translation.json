@@ -31,6 +31,7 @@
   "general.yes": "Yes",
   "general.no": "No",
   "general.field.required": "Field required",
+  "general.unknown.error": "An unexpected error occurred. Please try again later.",
 
   "loginPage.accountSuspended": "Account suspended? ",
   "loginPage.accountSuspended.text": "Go here",
