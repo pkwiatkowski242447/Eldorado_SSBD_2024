@@ -62,7 +62,6 @@ function ChangeUserLevelPage() {
                     account.activeUserLevel = newActiveUserLevel;
                     localStorage.setItem('account', JSON.stringify(account));
                     localStorage.setItem('chosenUserLevel', newActiveUserLevel.roleName);
-                    console.log(newActiveUserLevel.roleName);
                     api.backendChangeUserLevel(newActiveUserLevel?.roleName).catch(error => {
                         handleApiError(error);
                     });
@@ -120,7 +119,7 @@ function ChangeUserLevelPage() {
                                                             </FormControl>
                                                             <FormLabel>
                                                                 <Badge
-                                                                    variant={"secondary"}>{roleNames[userLevel.roleName]}</Badge>
+                                                                    variant={"secondary"}>{t(roleNames[userLevel.roleName])}</Badge>
                                                             </FormLabel>
                                                         </FormItem>
                                                     ))}

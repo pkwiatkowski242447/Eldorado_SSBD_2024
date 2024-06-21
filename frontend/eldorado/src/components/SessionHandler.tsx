@@ -44,9 +44,7 @@ const SessionHandler = () => {
                 if (currentTime > expiryTime) {
                     setExpiredDialogOpen(true);
                 } else {
-                    console.log('Token will expire in:', expiryTime - currentTime, 'seconds')
-                    console.log('Renewal will appear in:', (expiryTime - currentTime - 180), 'seconds')
-                    const timeoutDuration = (expiryTime - currentTime - 240) * 1000; // 3 minutes before expiration
+                    const timeoutDuration = (expiryTime - currentTime - 180) * 1000; // 3 minutes before expiration
                     const id = setTimeout(() => {
                         setRefreshDialogOpen(true);
                     }, timeoutDuration);
