@@ -379,7 +379,7 @@ function UserAccountSettings() {
                         <Button variant={`${activeForm === 'History' ? 'outline' : 'ghost'}`}
                                 onClick={() => setActiveForm('History')}
                                 className={`text-muted-foreground transition-colors hover:text-foreground`}>
-                            History
+                            {t("accountSettings.history")}
                         </Button>
                     </nav>
                     <div className="grid gap-6">
