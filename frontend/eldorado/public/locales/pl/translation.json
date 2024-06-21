@@ -818,7 +818,9 @@
 
   "Staff" : "Pracownik",
   "Client" : "Klient",
-  "Admin" : "Administrator"
+  "Admin" : "Administrator",
 
+  "account.activation.operation.timed.out.exception": "Operacja aktywacji wygasła",
+  "application.invalid.argument.exception": "Podano nieprawidłowy argument"
 
 }

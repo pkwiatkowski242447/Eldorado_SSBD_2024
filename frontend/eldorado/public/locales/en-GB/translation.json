@@ -1,14 +1,13 @@
 {
-  "general:hours": "Hours",
-  "general:minutes": "Minutes",
-  "general:pickDate": "Pick date",
+  "general.hours": "Hours",
+  "general.minutes": "Minutes",
+  "general.pickDate": "Pick date",
   "general.ok": "OK",
   "general.cancel": "Cancel",
   "general.confirm": "Confirm",
   "general.english": "English",
   "general.polish": "Polish",
   "general.refresh": "Refresh data",
-  "general.pickDate": "Pick date",
   "general.sessionAboutToExpire": "Your session is about to expire",
   "general.sessionAboutToExpire.text": "Your session is about to expire. Press the button below to extend it.",
   "general.refreshSession": "Extend session",
@@ -830,5 +829,9 @@
 
   "Staff" : "Staff",
   "Client" : "Client",
-  "Admin" : "Admin"
+  "Admin" : "Admin",
+
+  "account.activation.operation.timed.out.exception": "Activation operation timed out",
+  "application.invalid.argument.exception": "Invalid argument"
+
 }
