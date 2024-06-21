@@ -97,8 +97,6 @@ public class ReservationController implements ReservationControllerInterface {
                     ReservationNoAvailablePlaceException.class, ReservationClientLimitException.class,
                     ApplicationOptimisticLockException.class})
     public ResponseEntity<?> makeReservation(MakeReservationDTO makeReservationDTO) throws ApplicationBaseException {
-        //TODO future test Retryable OptimisticLock?
-
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
         try {

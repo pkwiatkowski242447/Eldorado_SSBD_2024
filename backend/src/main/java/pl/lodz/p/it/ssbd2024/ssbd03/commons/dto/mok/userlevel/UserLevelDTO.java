@@ -27,13 +27,14 @@ import java.util.UUID;
 @Getter @Setter
 @LoggerInterceptor
 public abstract class UserLevelDTO {
-    //TODO validation, certainly...
     @Schema(description = "UUID identifier linked with user level", example = "73538016-095a-4564-965c-9a17c9ded334", requiredMode = Schema.RequiredMode.REQUIRED)
     private UUID id;
+
     @NotNull(message = UserLevelMessages.VERSION_NULL)
     @Min(value = 0, message = UserLevelMessages.VERSION_LESS_THAN_ZERO)
     @Schema(description = "Number of object version", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long version;
+
     @NotBlank(message = UserLevelMessages.ROLE_NAME_BLANK)
     @Schema(description = "Name of user level representing by this object", requiredMode = Schema.RequiredMode.REQUIRED)
     private String roleName;

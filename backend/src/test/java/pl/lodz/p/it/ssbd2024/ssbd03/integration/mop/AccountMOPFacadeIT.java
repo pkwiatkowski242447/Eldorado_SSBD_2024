@@ -86,8 +86,6 @@ public class AccountMOPFacadeIT extends TestcontainersConfig {
         assertEquals("nazwisko", account.getLastname());
     }
 
-// TODO: Resolve issue when updating user level (specifically - Client) by MOP in client_data (user_level ?)
-
 //    @Test
 //    @Transactional(propagation = Propagation.REQUIRED)
 //    public void accountMOPFacadeEditAccountTest() {
