@@ -229,7 +229,7 @@ public class AuthenticationController implements AuthenticationControllerInterfa
     }
 
     @Override
-    @RolesAllowed(Authorities.SWITCH_USER_LEVEL)
+    @RolesAllowed({Authorities.SWITCH_USER_LEVEL})
     public ResponseEntity<?> changeUserLevel(String level) throws ApplicationBaseException {
         authenticationService.changeUserLevel(level);
 
