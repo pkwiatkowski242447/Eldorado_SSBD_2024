@@ -40,17 +40,16 @@ type deactivateSectorFormProps = {
     sectorId: string
 }
 
-const formSchema = z.object({
-    dateTime: z.date().min(new Date(),{message:"You can't disable parking in the past"}),
-});
-
-type FormSchemaType = z.infer<typeof formSchema>;
-
 export function DeactivateSectorForm({setDialogOpen, refresh, sectorId}:deactivateSectorFormProps) {
+    const {t} = useTranslation();
+    const formSchema = z.object({
+        dateTime: z.date().min(new Date(),{message: t("deactivate.sector.form.dateTime.min")}),
+    });
+    type FormSchemaType = z.infer<typeof formSchema>;
     const [isLoading, setIsLoading] = useState(false);
     const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
     const [date, setDate] = useState<Date>(new Date());
-    const {t} = useTranslation();
+
     const locale = window.navigator.language == "pl" ? pl : enUS;
     const form = useForm<FormSchemaType>({
         resolver: zodResolver(formSchema),

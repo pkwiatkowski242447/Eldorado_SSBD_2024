@@ -418,10 +418,10 @@
   "account.service.email_from_token_null.exception" : "Adres e-mail z tokenu jest pusty",
   "token.not.found.exception" : "Operacja nie może być wykonana bo nie została wcześniej zainicjalizowana.",
 
-  "account.controller.token.invalid.or.expired" : "Token jest nieprawidłowy lub wygasł",
-  "account.controller.uuid.invalid" : "Nieprawidłowy UUID",
-  "account.controller.uuid.invalid.format.exception" : "Format UUID jest nieprawidłowy",
-  "account.controller.missing.header.if_match.exception" : "Brak nagłówka If-Match",
+  "controller.token.invalid.or.expired" : "Token jest nieprawidłowy lub wygasł",
+  "controller.uuid.invalid" : "Nieprawidłowy UUID",
+  "controller.uuid.invalid.format.exception" : "Format UUID jest nieprawidłowy",
+  "controller.missing.header.if_match.exception" : "Brak nagłówka If-Match",
 
   "controller.data.integrity.compromised.exception" : "Naruszenie integralności danych",
 
@@ -821,6 +821,13 @@
   "Admin" : "Administrator",
 
   "account.activation.operation.timed.out.exception": "Operacja aktywacji wygasła",
-  "application.invalid.argument.exception": "Podano nieprawidłowy argument"
+  "application.invalid.argument.exception": "Podano nieprawidłowy argument",
 
+  "createReservationForm.formSchema.startDateTime.min": "Nie można stworzyc rezerwacji, która zaczyna się w przeszłości",
+  "createReservationForm.formSchema.endDateTime.min": "Nie można stworzyc rezerwacji, która kończy się w tym momencie",
+
+  "reservation.created.title": "Utworzono rezerwację",
+  "reservation.created.message": "Rezerwacja została utworzona pomyślnie. Miłego pobytu!",
+
+  "deactivate.sector.form.dateTime.min": "Nie można dezaktywować sektora w przeszłości"
 }

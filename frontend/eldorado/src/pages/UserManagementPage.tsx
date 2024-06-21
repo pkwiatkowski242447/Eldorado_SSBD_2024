@@ -153,7 +153,8 @@ function UserManagementPage() {
                 <Breadcrumb className={"pl-2"}>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink className="cursor-pointer" onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
+                            <BreadcrumbLink className="cursor-pointer"
+                                            onClick={() => navigate(Pathnames.public.home)}>{t("breadcrumb.home")}</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator>
                             <Slash/>
@@ -236,14 +237,20 @@ function UserManagementPage() {
                                 <TableCell>{user.login}</TableCell>
                                 <TableCell>{user.name}</TableCell>
                                 <TableCell>{user.lastName}</TableCell>
-                                <TableCell className="flex-col justify-center">
-                                    {user.active ? <FiCheck color="green"/> : <FiX color="red"/>}
+                                <TableCell className="flex-col">
+                                    <div className="flex justify-center items-center">
+                                        {user.active ? <FiCheck color="green"/> : <FiX color="red"/>}
+                                    </div>
                                 </TableCell>
-                                <TableCell className="flex-col justify-center">
-                                    {user.blocked ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                <TableCell className="flex-col">
+                                    <div className="flex justify-center items-center">
+                                        {user.blocked ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                    </div>
                                 </TableCell>
-                                <TableCell className="flex-auto">
-                                    {user.suspended ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                <TableCell className="flex-col">
+                                    <div className="flex justify-center items-center">
+                                        {user.suspended ? <FiCheck color="red"/> : <FiX color="green"/>}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
                                     {user.userLevels.map(level => {
