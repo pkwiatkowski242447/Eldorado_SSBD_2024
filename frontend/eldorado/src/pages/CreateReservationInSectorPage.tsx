@@ -29,8 +29,8 @@ function CreateReservationInSectorPage() {
         if (id) {
             await api.createReservation(id, beginTime.toISOString(), endTime.toISOString()).then(() => {
                 toast({
-                    title: "Reservation created successfully!",
-                    description: "To see the reservation details, go to the My Reservations page.",
+                    title: t("reservation.created.title"),
+                    description: t("reservation.created.message"),
                 });
             }).catch((error) => {
                 handleApiError(error);

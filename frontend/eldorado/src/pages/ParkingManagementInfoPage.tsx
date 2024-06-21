@@ -281,7 +281,7 @@ export function ParkingManagementInfoPage() {
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleDeleteParkingClick(sector.id)}>
-                                                {t("parking.management.info.page.delete.parking")}
+                                                {t("parking.management.info.page.delete.sector")}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>

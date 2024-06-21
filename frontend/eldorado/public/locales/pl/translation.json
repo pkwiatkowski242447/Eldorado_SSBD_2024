@@ -395,7 +395,7 @@
   "reservation.already.ended.exception" : "Rezerwacja już się zakończyła",
 
   "application.optimistic.lock.exception" : "Wyjątek blokady optymistycznej",
-  "application.internal.server.error.exception" : "Błąd wewnętrzny serwera",
+  "application.internal.server.error.exception" : "W trakcie przetwarzania żądania wystąpił nieznany błąd. Spróbuj ponownie później.",
   "application.unauthorized.exception": "Operacja niedozwolona ze względu na brak autoryzacji. Odśwież stronę / zaloguj się ponownie.",
   "application.access.denied.exception" : "Dostęp zabroniony",
   "application.database.server.exception" : "Nieoczekiwany błąd bazy danych",

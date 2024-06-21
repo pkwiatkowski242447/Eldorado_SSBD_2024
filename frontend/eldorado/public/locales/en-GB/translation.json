@@ -397,7 +397,7 @@
   "reservation.already.ended.exception" : "Reservation has already ended",
 
   "application.optimistic.lock.exception" : "Optimistic lock exception",
-  "application.internal.server.error.exception" : "Internal server error",
+  "application.internal.server.error.exception" : "An unexpected error occurred while processing the request. Please try again later.",
   "application.unauthorized.exception": "Operation not allowed due to insufficient permissions. Please refresh the page / log in again.",
   "application.access.denied.exception" : "Access denied",
   "application.database.server.exception" : "Unexpected database exception",
