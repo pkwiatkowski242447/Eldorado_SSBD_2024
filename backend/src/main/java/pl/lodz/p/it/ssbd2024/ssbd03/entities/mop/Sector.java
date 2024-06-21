@@ -155,6 +155,7 @@ public class Sector extends AbstractEntity implements Serializable {
 
     // @FutureOrPresent(message = SectorMessages.DEACTIVATION_TIME_PAST)
     @Column(name = DatabaseConsts.SECTOR_DEACTIVATION_TIME_COLUMN)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deactivationTime;
 
     // Other fields - used for access control, and storing historical data

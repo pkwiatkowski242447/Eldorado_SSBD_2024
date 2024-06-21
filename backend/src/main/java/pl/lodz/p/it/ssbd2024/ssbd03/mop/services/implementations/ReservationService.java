@@ -155,7 +155,6 @@ public class ReservationService implements ReservationServiceInterface {
         Reservation newReservation = new Reservation(client, sector, beginTime);
         newReservation.setEndTime(endTime);
 
-        //TODO future check
         parkingFacade.forceVersionUpdate(sector);
 
         reservationFacade.create(newReservation);

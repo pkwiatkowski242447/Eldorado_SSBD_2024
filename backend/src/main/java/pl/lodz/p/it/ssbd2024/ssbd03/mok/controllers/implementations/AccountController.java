@@ -327,7 +327,6 @@ public class AccountController implements AccountControllerInterface {
             throw new AccountDataIntegrityCompromisedException();
         }
 
-        //TODO maybe handle null (other methods same)??
         String currentUserLogin = SecurityContextHolder.getContext().getAuthentication().getName();
 
         AccountOutputDTO accountOutputDTO = AccountMapper.toAccountOutputDto(
