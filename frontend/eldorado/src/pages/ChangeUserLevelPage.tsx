@@ -20,6 +20,8 @@ import {
 import {Slash} from "lucide-react";
 import {Pathnames} from "@/router/pathnames.ts";
 import {Badge} from "@/components/ui/badge.tsx";
+import {api} from "@/api/api.ts";
+import handleApiError from "@/components/HandleApiError.ts";
 
 const FormSchema = z.object({
     type: z.any()
@@ -60,11 +62,15 @@ function ChangeUserLevelPage() {
                     account.activeUserLevel = newActiveUserLevel;
                     localStorage.setItem('account', JSON.stringify(account));
                     localStorage.setItem('chosenUserLevel', newActiveUserLevel.roleName);
+                    console.log(newActiveUserLevel.roleName);
+                    api.backendChangeUserLevel(newActiveUserLevel?.roleName).catch(error => {
+                        handleApiError(error);
+                    });
                 }
             }
             navigate(Pathnames.loggedIn.home);
         } catch (e) {
-            console.log(e);
+            console.log(e)
         }
     }
 

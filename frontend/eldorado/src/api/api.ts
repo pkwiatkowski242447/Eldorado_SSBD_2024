@@ -376,5 +376,9 @@ export const api = {
 
     getParkingHistory: (id: string, details: string) => {
         return apiWithConfig.get(`/parking/${id}/history-data` + details)
+    },
+
+    backendChangeUserLevel: (level: string) => {
+        return apiWithConfig.post(`/auth/change-user-level?level=${level}`)
     }
 }

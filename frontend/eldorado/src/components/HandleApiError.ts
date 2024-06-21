@@ -25,7 +25,8 @@ function handleApiError(error: ApiError): void {
     } else {
         toast({
             variant: "destructive",
-            description: "Error",
+            title: ":(",
+            description: t("general.unknown.error"),
         });
     }
 }

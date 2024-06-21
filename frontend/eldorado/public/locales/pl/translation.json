@@ -30,6 +30,7 @@
   "general.yes": "Tak",
   "general.no": "Nie",
   "general.field.required": "Pole wymagane",
+  "general.unknown.error": "Wystąpił nieznany błąd. Proszę spróbować ponownie później.",
 
   "loginPage.accountSuspended": "Konto zawieszone? ",
   "loginPage.accountSuspended.text": " Przejdź tutaj",
