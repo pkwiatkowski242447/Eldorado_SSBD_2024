@@ -314,7 +314,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     }
 
     @Override
-    @RolesAllowed(Authorities.SWITCH_USER_LEVEL)
+    @RolesAllowed({Authorities.SWITCH_USER_LEVEL})
     public void changeUserLevel(String userLevel) throws ApplicationBaseException {
         Account account = authenticationFacade.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(AccountNotFoundException::new);

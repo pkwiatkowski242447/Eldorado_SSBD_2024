@@ -92,9 +92,9 @@ public class I18n {
     public static final String TOKEN_NOT_FOUND_EXCEPTION = "token.not.found.exception";
 
     // Account controller
-    public static final String TOKEN_INVALID_OR_EXPIRED = "account.controller.token.invalid.or.expired";
-    public static final String UUID_INVALID = "account.controller.uuid.invalid";
-    public static final String MISSING_HEADER_IF_MATCH = "account.controller.missing.header.if_match.exception";
+    public static final String TOKEN_INVALID_OR_EXPIRED = "controller.token.invalid.or.expired";
+    public static final String UUID_INVALID = "controller.uuid.invalid";
+    public static final String MISSING_HEADER_IF_MATCH = "controller.missing.header.if_match.exception";
 
     // General exception messages
     public static final String OPTIMISTIC_LOCK_EXCEPTION = "application.optimistic.lock.exception";

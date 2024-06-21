@@ -418,10 +418,10 @@
   "account.service.email_from_token_null.exception" : "Email from token is null",
   "token.not.found.exception" : "Operation can't be performed due to having not been initialized.",
 
-  "account.controller.token.invalid.or.expired" : "Token is invalid or expired",
-  "account.controller.uuid.invalid" : "Invalid UUID",
+  "controller.token.invalid.or.expired" : "Token is invalid or expired",
+  "controller.uuid.invalid" : "Invalid UUID",
   "account.controller.uuid.invalid.format.exception" : "UUID format is invalid",
-  "account.controller.missing.header.if_match.exception" : "Missing If-Match header",
+  "controller.missing.header.if_match.exception" : "Missing If-Match header",
 
   "controller.data.integrity.compromised.exception" : "Data integrity compromised",
 
