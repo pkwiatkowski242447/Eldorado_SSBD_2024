@@ -20,6 +20,7 @@ import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationBaseException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.ApplicationInternalServerErrorException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.AccountAuthenticationException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.InvalidLoginAttemptException;
+import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.integrity.UserLevelMissingException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.read.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountBlockedByAdminException;
 import pl.lodz.p.it.ssbd2024.ssbd03.exceptions.mok.account.status.AccountBlockedByFailedLoginAttemptsException;
@@ -310,5 +311,19 @@ public class AuthenticationService implements AuthenticationServiceInterface {
                 account.getAccountLanguage());
 
         this.tokenFacade.create(multiFactorAuthToken);
+    }
+
+    @Override
+    @RolesAllowed(Authorities.SWITCH_USER_LEVEL)
+    public void changeUserLevel(String userLevel) throws ApplicationBaseException {
+        Account account = authenticationFacade.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(AccountNotFoundException::new);
+
+        UserLevel newUserLevel = account.getUserLevels().stream()
+                .filter(level -> level.getClass().getSimpleName().equalsIgnoreCase(userLevel))
+                .findFirst()
+                .orElseThrow(UserLevelMissingException::new);
+
+        log.info("Changing user level to {}", newUserLevel);
     }
 }

@@ -33,7 +33,7 @@ public interface ReservationServiceInterface {
      * @throws ApplicationBaseException General superclass for all exceptions thrown in this method or handled by
      * exception handling aspects from facade and service layers below.
      */
-    List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException;
+    List<Reservation> getAllHistoricalReservationsByUserLoginWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException;
 
     /**
      * Create new reservation linking client and sector.

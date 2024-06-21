@@ -97,7 +97,7 @@ public class ReservationService implements ReservationServiceInterface {
 
     @Override
     @RolesAllowed({Authorities.GET_HISTORICAL_RESERVATIONS})
-    public List<Reservation> getAllHistoricalReservationsByUserIdWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
+    public List<Reservation> getAllHistoricalReservationsByUserLoginWthPagination(String login, int pageNumber, int pageSize) throws ApplicationBaseException {
         return reservationFacade.findAllHistoricalUserReservationByLoginWithPagination(login, pageNumber, pageSize);
     }
 

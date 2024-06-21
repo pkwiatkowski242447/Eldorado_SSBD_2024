@@ -187,11 +187,6 @@ public interface ParkingServiceInterface {
      * information about the assigned sector.
      * @throws ApplicationBaseException General superclass for all exceptions thrown by aspects intercepting this method.
      */
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "New reservation"),
-            @ApiResponse(responseCode = "400", description = "Entry was not possible due to reservation not being created."),
-            @ApiResponse(responseCode = "500", description = "Unknown error occurred while the request was being processed.")
-    })
     Reservation enterParkingWithoutReservation(UUID parkingId, String login, boolean isAnonymous) throws ApplicationBaseException;
 
     /**

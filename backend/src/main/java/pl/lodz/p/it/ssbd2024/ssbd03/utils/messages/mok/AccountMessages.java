@@ -6,9 +6,11 @@ public class AccountMessages {
     public static final String LOGIN_REGEX_NOT_MET = "bean.validation.account.login.regex.not.met";
     public static final String LOGIN_TOO_SHORT = "bean.validation.account.login.too.short";
     public static final String LOGIN_TOO_LONG = "bean.validation.account.login.too.long";
+    public static final String LOGIN_INVALID = "bean.validation.account.login.invalid";
 
     public static final String PASSWORD_BLANK = "bean.validation.account.password.blank";
     public static final String PASSWORD_INVALID_LENGTH = "bean.validation.account.password.invalid.length";
+    public static final String PASSWORD_INVALID = "bean.validation.account.password.invalid";
 
     public static final String SUSPENDED_NULL = "bean.validation.account.suspended.flag.null";
     public static final String ACTIVE_NULL = "bean.validation.account.active.flag.null";

@@ -1,51 +1,4 @@
 \c ssbd03 ssbd03admin
--- -- GRAND PRIVILEGES
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.account                TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.past_password          TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.personal_data          TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.user_level             TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.client_data            TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.staff_data             TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.admin_data             TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.token                  TO ssbd03mok;
-GRANT SELECT, INSERT                 ON TABLE public.account_history        TO ssbd03mok;
-
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.account_attributes     TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.attribute_association  TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.attribute_name         TO ssbd03mok;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.attribute_value        TO ssbd03mok;
-
-GRANT SELECT                         ON TABLE public.account_attributes     TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.attribute_association  TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.attribute_name         TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.attribute_value        TO ssbd03auth;
-
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.reservation            TO ssbd03mop;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.parking                TO ssbd03mop;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.sector                 TO ssbd03mop;
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE public.parking_event          TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.account                TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.personal_data          TO ssbd03mop;
-GRANT SELECT                , UPDATE ON TABLE public.user_level             TO ssbd03mop;
-GRANT SELECT                , UPDATE ON TABLE public.client_data            TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.admin_data             TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.staff_data             TO ssbd03mop;
-GRANT SELECT, INSERT                 ON TABLE public.parking_history        TO ssbd03mop;
-
-GRANT SELECT                         ON TABLE public.account_attributes     TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.attribute_association  TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.attribute_name         TO ssbd03mop;
-GRANT SELECT                         ON TABLE public.attribute_value        TO ssbd03mop;
-
-
-GRANT SELECT, UPDATE                 ON TABLE public.account                TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.personal_data          TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.user_level             TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.client_data            TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.staff_data             TO ssbd03auth;
-GRANT SELECT                         ON TABLE public.admin_data             TO ssbd03auth;
-GRANT SELECT, INSERT, DELETE         ON TABLE public.token                  TO ssbd03auth;
-GRANT SELECT, INSERT                 ON TABLE public.account_history        TO ssbd03auth;
 
 -- INSERT VALUE
 -- Admin
@@ -219,9 +172,9 @@ INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('bad2
 -------------------------------------
 
 -- Activated User 1 - Client
-INSERT INTO public.account (id, creation_timestamp, login, password, suspended, active, two_factor_auth, language, phone_number, version, blocked) VALUES ('c276cb93-5cfe-4bf5-9998-ecdeee8ba06b', current_timestamp, 'jchrystus', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', false, false, false, 'PL', '100000000', 0, false);
+INSERT INTO public.account (id, creation_timestamp, login, password, suspended, active, two_factor_auth, language, phone_number, version, blocked) VALUES ('c276cb93-5cfe-4bf5-9998-ecdeee8ba06b', current_timestamp, 'jchrzan', '$2a$12$A1wGVanmSuv.GRqlKI4OuuvtV.AgP8pfb3I3fOyNuvgOHpuCiGzHa', false, false, false, 'PL', '100000000', 0, false);
 
-INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('c276cb93-5cfe-4bf5-9998-ecdeee8ba06b', 'Jezus', 'Chrystus', 'jchrystus@example.com');
+INSERT INTO public.personal_data (id, name, lastname, email) VALUES ('c276cb93-5cfe-4bf5-9998-ecdeee8ba06b', 'Jan', 'Chrzan', 'jchrzan@example.com');
 
 INSERT INTO public.user_level (id, creation_timestamp, level, account_id, version) VALUES ('900cbc37-2a95-4bd6-96f2-897c12155f85', current_timestamp, 'CLIENT', 'c276cb93-5cfe-4bf5-9998-ecdeee8ba06b', 0);
 INSERT INTO public.client_data (id, type, total_reservation_hours) VALUES ('900cbc37-2a95-4bd6-96f2-897c12155f85', 'BASIC', 0);

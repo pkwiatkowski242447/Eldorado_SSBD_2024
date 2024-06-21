@@ -97,6 +97,6 @@ public class TestcontainersConfigFull {
 
     protected void resetDatabase() throws IOException, InterruptedException {
         postgres.execInContainer("psql -U ssbd03admin -d ssbd03 -a -f scripts/reset_db.sql".split(" "));
-        postgres.execInContainer("psql -U ssbd03admin -d ssbd03 -a -f scripts/init_users.sql".split(" "));
+        postgres.execInContainer("psql -U ssbd03admin -d ssbd03 -a -f scripts/init_data.sql".split(" "));
     }
 }

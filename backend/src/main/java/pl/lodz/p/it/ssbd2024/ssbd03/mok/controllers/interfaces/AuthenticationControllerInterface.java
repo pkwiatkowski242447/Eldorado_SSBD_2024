@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationCodeDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.authentication.AuthenticationLoginDTO;
 import pl.lodz.p.it.ssbd2024.ssbd03.commons.dto.mok.token.RefreshTokenDTO;
@@ -128,14 +129,30 @@ public interface AuthenticationControllerInterface {
      *
      * @param request  HttpRequest object, associated with the current request.
      * @param response HttpResponse object, .
-     * @return 204 OK is returned when user is logged out successfully.
+     * @return 204 NO CONTENT is returned when user is logged out successfully.
      */
     @PostMapping(value = "/logout")
     @Operation(summary = "Log out", description = "This endpoint is used to log out a user from the application.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Logging out previously authenticated user was successful."),
+            @ApiResponse(responseCode = "204", description = "Logging out previously authenticated user was successful.")
     })
     ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
                              HttpServletRequest request,
                              HttpServletResponse response);
+
+    // Change user level
+
+    /**
+     * This method is used to handle action to change user level.
+     *
+     * @param level The name of the desired user level.
+     * @return 204 NO CONTENT is returned when change user level is handled properly.
+     */
+    @PostMapping(value = "/change-user-level")
+    @Operation(summary = "Change user level", description = "This endpoint is used to changing user level.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Changing user level was successful."),
+            @ApiResponse(responseCode = "400", description = "There was a problem with changing the user level.")
+    })
+    ResponseEntity<?> changeUserLevel(@RequestParam("level") String level) throws ApplicationBaseException;
 }
