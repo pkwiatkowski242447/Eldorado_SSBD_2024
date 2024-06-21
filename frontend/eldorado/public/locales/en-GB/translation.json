@@ -596,7 +596,7 @@
   "parking.management.info.page.activate.sector": "Activate sector",
   "parking.management.info.page.deactivate.sector": "Deactivate sector",
   "parking.management.info.page.edit.sector": "Edit sector",
-  "parking.management.info.page.delete.parking": "Delete parking",
+  "parking.management.info.page.delete.sector": "Delete sector",
   "parking.management.info.page.deactivate.parking": "Deactivate Parking",
   "parking.management.info.page.edit.parking": "Edit Parking",
   "parking.management.info.page.are.you.sure.you.want.to.delete.this.sector": "Are you sure you want to delete this sector?",
@@ -727,7 +727,7 @@
 
   "date.time.picker.form.submit": "Submit",
 
-  "deactivate.sector.form.are.you.sure.you.want.to.edit.this.sector": "Are you sure you want edit this sector?",
+  "deactivate.sector.form.are.you.sure.you.want.to.deactivate.this.sector": "Are you sure you want deactivate this sector?",
   "deactivate.sector.form.deactivate": "Deactivate",
 
   "edit.parking.form.city": "City",

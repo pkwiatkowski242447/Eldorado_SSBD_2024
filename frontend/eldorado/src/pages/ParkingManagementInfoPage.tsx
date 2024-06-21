@@ -300,7 +300,7 @@ export function ParkingManagementInfoPage() {
                     <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>{t("parking.management.info.page.edit.parking")}</DialogTitle>
+                                <DialogTitle>{t("parking.management.info.page.edit.sector")}</DialogTitle>
                             </DialogHeader>
                             <EditSectorForm setDialogOpen={setEditDialogOpen} refresh={refresh} sectorId={sectorId} sectorDeactivate={sectorDeactivate}/>
                         </DialogContent>

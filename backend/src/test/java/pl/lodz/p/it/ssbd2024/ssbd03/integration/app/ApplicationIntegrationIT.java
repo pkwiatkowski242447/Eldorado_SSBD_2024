@@ -3295,7 +3295,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                //todo I18n.PARKING_CONSTRAINT_VIOLATION
                 .body("message", Matchers.equalTo(I18n.INVALID_ARGUMENT_EXCEPTION))
                 .body("violations[0]", Matchers.equalTo(AddressMessages.CITY_NAME_TOO_SHORT))
                 .body("violations[1]", Matchers.equalTo(AddressMessages.CITY_BLANK));
@@ -3373,7 +3372,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
-                //todo I18n.PARKING_CONSTRAINT_VIOLATION
                 .body("message", Matchers.equalTo(I18n.PARKING_ADDRESS_DUPLICATE_EXCEPTION));
     }
 
@@ -3797,7 +3795,6 @@ public class ApplicationIntegrationIT extends TestcontainersConfigFull {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.CONFLICT.value())
-                //todo I18n.PARKING_CONSTRAINT_VIOLATION
                 .body("message", Matchers.equalTo(I18n.PARKING_ADDRESS_DUPLICATE_EXCEPTION));
 
     }
