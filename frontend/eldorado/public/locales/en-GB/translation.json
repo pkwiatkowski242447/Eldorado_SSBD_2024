@@ -771,8 +771,8 @@
   "exit.parking.form.exit": "Exit",
   "exit.parking.form.are.you.sure.you.want.to.edit.this.parking": "Are you sure you want to exit the parking?",
 
-  "exit.parking.form.tooShort": "Reservation ID has to be 36 character long",
-  "exit.parking.form.tooLong": "Reservation ID has to be 36 character long",
+  "exit.parking.form.id.too.short": "Reservation ID has to be 36 characters long",
+  "exit.parking.form.id.too.long": "Reservation ID has to be 36 characters long",
   "exit.parking.form.regex.not.met": "Reservation ID does not meet format requirements",
   "exit.parking.success.message": "You have successfully exited the parking. See you soon!",
 
