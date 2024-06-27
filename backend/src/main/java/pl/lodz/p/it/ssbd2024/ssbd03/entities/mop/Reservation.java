@@ -112,7 +112,7 @@ import java.util.List;
                 query = """
                         SELECT DISTINCT p FROM ParkingEvent p
                         WHERE p.reservation.id = :reservationId
-                        ORDER BY p.createdBy DESC
+                        ORDER BY p.date ASC
                         """
         ),
         // Deactivating sector
