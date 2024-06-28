@@ -232,7 +232,7 @@ public class ParkingFacade extends AbstractFacade<Parking> {
         var list = getEntityManager().createNamedQuery("Sector.findAllInParking", Sector.class)
                 .setParameter("parkingId", parkingId)
                 .setParameter("showOnlyActive", active)
-                .setParameter("deactivationMinimum", LocalDateTime.now().plusDays(this.reservationMaxLength))
+                .setParameter("deactivationMinimum", LocalDateTime.now().plusHours(this.reservationMaxLength))
                 .setFirstResult(pageNumber * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
