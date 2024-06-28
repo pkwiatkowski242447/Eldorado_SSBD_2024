@@ -96,6 +96,12 @@ INSERT INTO public.sector (id, creation_timestamp, occupied_places, max_places, 
 -- First Reservation (for michalkowal)
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('90a0035d-6265-4b53-a547-901b3bbabd1d', current_timestamp, TIMESTAMP '2024-04-10 07:00:00', TIMESTAMP '2024-04-10 09:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'COMPLETED_MANUALLY');
 
+-- Second Reservation (for michalkowal)
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('9666e04e-636e-44de-b16e-d4698530318d', TIMESTAMP '2024-05-01', TIMESTAMP '2024-05-08 10:00:00', TIMESTAMP '2024-05-08 18:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'TERMINATED');
+
+-- Third Reservation (for michalkowal)
+INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('2fb9509f-7aea-431d-bc8f-4a997b404946', TIMESTAMP '2024-05-12', TIMESTAMP '2024-05-14 08:00:00', TIMESTAMP '2024-05-14 16:00:00', '69507c7f-4c03-4087-85e6-3ae3b6fc2201', '3e6a85db-d751-4549-bbb7-9705f0b2fa6b', 0, 'CANCELLED');
+
 -- Reservation for jakubkoza - expired
 INSERT INTO public.reservation (id, creation_timestamp, begin_time, end_time, client_id, sector_id, version, status) VALUES ('1ec7d685-71ac-4418-834a-ed7b6fc68fc8', current_timestamp, TIMESTAMP '2024-04-15 12:00:00', TIMESTAMP '2024-04-15 13:00:00', '9428fadf-191c-4dd7-8626-01c3e0ff603c', '4ce920a0-6f4d-4e95-ba24-99ba32b66491', 0, 'COMPLETED_AUTOMATICALLY');
 
