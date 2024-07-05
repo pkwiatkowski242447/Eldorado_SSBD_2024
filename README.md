@@ -1,4 +1,4 @@
-# Eldorado _2024
+# Eldorado_2024
 
 <p id="description">This procject was developed for Network Database Systems course on Technical University on Lodz during VI semester.</p>
 
