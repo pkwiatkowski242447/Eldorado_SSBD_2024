@@ -57,7 +57,7 @@ public class ParkingHistoryData {
 
     @NotNull(message = ParkingHistoryDataMessages.ID_NULL)
     @Id
-    @Column(name = DatabaseConsts.PARKING_HIST_ID_COLUMN, columnDefinition = "UUID", updatable = false, nullable = false)
+    @Column(name = DatabaseConsts.PARKING_HIST_ID_COLUMN, columnDefinition = "BINARY(16)", updatable = false, nullable = false)
     private UUID id;
 
     @NotNull(message = ParkingHistoryDataMessages.VERSION_NULL)

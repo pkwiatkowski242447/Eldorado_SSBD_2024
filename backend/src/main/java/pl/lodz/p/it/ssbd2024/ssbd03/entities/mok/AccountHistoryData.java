@@ -59,7 +59,7 @@ public class AccountHistoryData {
 
     @Id
     @NotNull(message = AccountHistoryDataMessages.ID_NULL)
-    @Column(name = DatabaseConsts.ACCOUNT_HIST_ID_COLUMN, columnDefinition = "UUID", nullable = false, updatable = false)
+    @Column(name = DatabaseConsts.ACCOUNT_HIST_ID_COLUMN, columnDefinition = "BINARY(16)", nullable = false, updatable = false)
     private UUID id;
 
     @Id

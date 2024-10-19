@@ -24,7 +24,7 @@ public class AbstractEntity {
      * The unique identifier (ID) of the entity.
      */
     @Id
-    @Column(name = DatabaseConsts.PK_COLUMN, columnDefinition = "UUID", unique = true, nullable = false, updatable = false)
+    @Column(name = DatabaseConsts.PK_COLUMN, columnDefinition = "BINARY(16)", unique = true, nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
