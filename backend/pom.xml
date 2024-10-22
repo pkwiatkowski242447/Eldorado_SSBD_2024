@@ -34,6 +34,8 @@
         <!--Hibernate-->
         <hibernate.version>6.4.4.Final</hibernate.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <!-- PostgreSQL -->
+        <postgresql.version>42.7.4</postgresql.version>
         <!-- MySQL -->
         <mysql.version>9.0.0</mysql.version>
         <!--Test-->
@@ -252,6 +254,13 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
+        </dependency>
+
+        <!-- PostgreSQL -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
         </dependency>
 
         <!-- MySQL -->
