@@ -25,7 +25,7 @@ WORKDIR /usr/local/tomcat/webapps
 #ENV TZ=Europe/Warsaw
 
 COPY backend/target/rest_application.war ./ROOT.war
-#
+
 HEALTHCHECK --interval=20s --timeout=20s --retries=15 --start-period=2m \
 CMD curl -s --head localhost:8080/eldorado/ | head -1 | grep 200  || exit 1
 
@@ -36,7 +36,7 @@ EXPOSE 80 443
 
 WORKDIR /etc/nginx
 
-COPY nginx/conf/* ./conf.d
-COPY nginx/ssl/* ./ssl
+COPY nginx/* ./conf.d
+COPY nginx/* ./ssl
 
 RUN chmod -R 666 ./conf.d && chmod -R 666 ./ssl
