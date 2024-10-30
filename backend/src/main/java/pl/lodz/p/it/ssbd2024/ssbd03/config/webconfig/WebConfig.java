@@ -25,11 +25,11 @@ import java.util.List;
 @ComponentScan({"pl.lodz.p.it.ssbd2024.ssbd03", "org.springdoc"})
 @PropertySource(value = {
         "classpath:application.properties",
-        "classpath:properties/mail.properties",
+        "file:/usr/local/tomcat/config/mail.properties",
         "classpath:properties/urls.properties",
         "classpath:properties/consts.properties",
         "classpath:properties/retry.properties",
-        "classpath:properties/key.properties"
+        "file:/usr/local/tomcat/config/key.properties"
 })
 @EnableAsync
 @EnableRetry
