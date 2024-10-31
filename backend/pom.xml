@@ -450,7 +450,7 @@
     </dependencies>
 
     <build>
-        <finalName>rest_application</finalName>
+        <finalName>ROOT</finalName>
         <plugins>
             <!--Compiler + Packaging-->
             <plugin>

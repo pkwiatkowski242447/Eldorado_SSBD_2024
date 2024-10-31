@@ -59,6 +59,11 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         put("^/api/v1/parking/%s/enter$".formatted(UUID_REGEX), HttpMethod.POST.name());
         put("^/api/v1/parking/get/%s$".formatted(UUID_REGEX), HttpMethod.GET.name());
         put("^/api/v1/parking/client/sectors/%s$".formatted(UUID_REGEX), HttpMethod.GET.name());
+
+        put("^/api/v1/health/liveness", HttpMethod.GET.name());
+        put("^/api/v1/health/readiness", HttpMethod.GET.name());
+
+        put("^/api/v1/dead/liveness", HttpMethod.GET.name());
     }};
 
     @Override

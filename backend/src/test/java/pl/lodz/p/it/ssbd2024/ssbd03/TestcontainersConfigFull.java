@@ -65,7 +65,7 @@ public class TestcontainersConfigFull {
                 .withNetwork(network)
                 .withNetworkAliases(tomcatHost)
                 .withCopyFileToContainer(
-                        MountableFile.forHostPath(Path.of("target/rest_application.war")),
+                        MountableFile.forHostPath(Path.of("target/ROOT.war")),
                         "/usr/local/tomcat/webapps/ROOT.war")
                 .withCreateContainerCmdModifier(cmd -> {
                             cmd.getHostConfig().withPortBindings(

@@ -24,7 +24,7 @@ WORKDIR /usr/local/tomcat/webapps
 #RUN apt-get update && apt-get install -y tzdata
 #ENV TZ=Europe/Warsaw
 
-COPY backend/target/rest_application.war ./ROOT.war
+COPY backend/target/ROOT.war ./ROOT.war
 
 HEALTHCHECK --interval=20s --timeout=20s --retries=15 --start-period=2m \
 CMD curl -s --head localhost:8080/eldorado/ | head -1 | grep 200  || exit 1
