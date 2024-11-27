@@ -1,6 +1,15 @@
 package pl.lodz.p.it.ssbd2024.ssbd03.config.webconfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.aop.CountedAspect;
+import io.micrometer.core.aop.TimedAspect;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -22,14 +31,21 @@ import java.util.List;
 
 @EnableWebMvc
 @Configuration
+//@EnableAutoConfiguration(exclude = {
+//        DataSourceAutoConfiguration.class,
+//        DataSourceTransactionManagerAutoConfiguration.class,
+//        HibernateJpaAutoConfiguration.class
+//})
 @ComponentScan({"pl.lodz.p.it.ssbd2024.ssbd03", "org.springdoc"})
 @PropertySource(value = {
         "classpath:application.properties",
-        "file:/usr/local/tomcat/config/mail.properties",
+        //"file:/usr/local/tomcat/config/mail.properties",
+        "classpath:properties/mail.properties",
         "classpath:properties/urls.properties",
         "classpath:properties/consts.properties",
         "classpath:properties/retry.properties",
-        "file:/usr/local/tomcat/config/key.properties"
+        // "file:/usr/local/tomcat/config/key.properties"\
+        "classpath:properties/key.properties"
 })
 @EnableAsync
 @EnableRetry
@@ -53,5 +69,20 @@ public class WebConfig implements WebMvcConfigurer {
         taskExecutor.setThreadNamePrefix("Async-");
         taskExecutor.initialize();
         return new DelegatingSecurityContextAsyncTaskExecutor(taskExecutor);
+    }
+
+    @Bean
+    public PrometheusMeterRegistry meterRegistry() {
+        return new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    }
+
+    @Bean
+    public CountedAspect countedAspect(MeterRegistry registry) {
+        return new CountedAspect(registry);
+    }
+
+    @Bean
+    public TimedAspect timedAspect(MeterRegistry registry) {
+        return new TimedAspect();
     }
 }

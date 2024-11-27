@@ -64,6 +64,8 @@ public class JWTRequiredFilter extends OncePerRequestFilter {
         put("^/api/v1/health/readiness", HttpMethod.GET.name());
 
         put("^/api/v1/dead/liveness", HttpMethod.GET.name());
+        put("^/api/v1/metrics.*", null);
+        put("^/api/v1/load-generation.*", null);
     }};
 
     @Override

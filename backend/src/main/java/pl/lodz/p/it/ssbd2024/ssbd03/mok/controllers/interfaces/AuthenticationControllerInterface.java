@@ -138,7 +138,7 @@ public interface AuthenticationControllerInterface {
     })
     ResponseEntity<?> logout(@RequestHeader(value = "X-Forwarded-For", required = false) String proxyChain,
                              HttpServletRequest request,
-                             HttpServletResponse response);
+                             HttpServletResponse response) throws ApplicationBaseException;
 
     // Change user level
 

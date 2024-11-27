@@ -25,7 +25,7 @@ public class TestcontainersConfigFull {
 
     @BeforeAll
     static void beforeAll() throws IOException {
-        ResourcePropertySource props = new ResourcePropertySource("classpath:testcontainers-config.properties");
+        ResourcePropertySource props = new ResourcePropertySource("classpath:testcontainers-env.conf");
         String postgresVersion  = (String) Objects.requireNonNullElse(props.getProperty("postgres.version"), "latest");
         String postgresUser     = (String) Objects.requireNonNullElse(props.getProperty("postgres.user"), "postgres");
         String postgresPass     = (String) Objects.requireNonNullElse(props.getProperty("postgres.pass"), "postgres");
