@@ -32,16 +32,19 @@ import java.util.List;
 @EnableWebMvc
 @Configuration
 @ComponentScan({"pl.lodz.p.it.ssbd2024.ssbd03", "org.springdoc"})
-@PropertySource(value = {
-        "classpath:application.properties",
-        "file:/usr/local/tomcat/config/mail.properties",
-        // "classpath:properties/mail.properties",
-        "classpath:properties/urls.properties",
-        "classpath:properties/consts.properties",
-        "classpath:properties/retry.properties",
-        "file:/usr/local/tomcat/config/key.properties"
-        // "classpath:properties/key.properties"
-})
+@PropertySource(
+        value = {
+                "classpath:application.properties",
+                "file:/usr/local/tomcat/config/mail.properties",
+                "classpath:properties/mail.properties",
+                "classpath:properties/urls.properties",
+                "classpath:properties/consts.properties",
+                "classpath:properties/retry.properties",
+                "file:/usr/local/tomcat/config/key.properties",
+                "classpath:properties/key.properties"
+        },
+        ignoreResourceNotFound = true
+)
 @EnableAsync
 @EnableRetry
 @EnableAspectJAutoProxy(proxyTargetClass = true)

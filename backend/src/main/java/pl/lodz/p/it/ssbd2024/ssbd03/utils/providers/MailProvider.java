@@ -698,11 +698,10 @@ public class MailProvider {
             mimeMessage.setHeader("Content-Type", "text/plain; charset=\"utf-8\"");
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
+            messageHelper.setFrom(senderEmail);
             messageHelper.setTo(emailReceiver);
-
             messageHelper.setSubject(emailSubject);
             messageHelper.setText(emailContent, true);
-            messageHelper.setFrom(senderEmail);
             this.mailSender.send(mimeMessage);
         }
     }

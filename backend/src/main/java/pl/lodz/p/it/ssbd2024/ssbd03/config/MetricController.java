@@ -8,6 +8,7 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +33,7 @@ public class MetricController {
     }
 
     @GetMapping
-    ResponseEntity<?> getMetrics() {
-        return ResponseEntity.ok(registry.scrape());
+    ResponseEntity<String> getMetrics() {
+        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(registry.scrape());
     }
 }
